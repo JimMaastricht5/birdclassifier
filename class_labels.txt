@@ -1,0 +1,11 @@
+017.Cardinal
+029.American_Crow
+047.American_Goldfinch
+049.Boat_tailed_Grackle
+073.Blue_Jay
+076.Dark_eyed_Junco
+094.White_breasted_Nuthatch
+118.House_Sparrow
+129.Song_Sparrow
+191.Red_headed_Woodpecker
+192.Downy_Woodpecker
