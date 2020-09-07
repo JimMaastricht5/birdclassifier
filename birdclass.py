@@ -12,6 +12,8 @@ import cv2
 import PanTilt9685
 import imutils  # CV helper functions
 import argparse  # arguement parser
+import tflite_runtime.interpreter as tflite
+import numpy as np
 
 # parse arguements
 # construct the argument parser and parse the arguments
@@ -22,16 +24,25 @@ args = vars(ap.parse_args())
 
 # setup pan tilt and initialize variables
 currpan, currtilt, pwm = PanTilt9685.init_pantilt()
-SCR_W = 640
-SCR_H = 480
+SCR_W = 224
+SCR_H = 224
 
 cap = cv2.VideoCapture(0)  # capture
 cap.set(3, SCR_W)  # set Width
 cap.set(4, SCR_H)  # set Height
 first_img = None  # init first img
 
-faceCascade = cv2.CascadeClassifier('/home/pi/opencv/data/haarcascades_cuda/haarcascade_frontalface_default.xml')
-# birdCascade = cv2.CascadeClassifier('/home/pi/opencv/data/haarcascades_birs/birds/xml')
+# set up interpreters
+# faceCascade = cv2.CascadeClassifier('/home/pi/opencv/data/haarcascades_cuda/haarcascade_frontalface_default.xml')
+birdCascade = cv2.CascadeClassifier('/home/pi/opencv/data/haarcascades_birs/birds/xml')
+
+# tensor flow lite setup
+interpreter = tflite.interpreter(model_path='/home/pi/birdclass/lite-model_aiy_vision_classifier_birds_V1_3.tflite')
+interpreter.allocate_tensors()
+
+# Get input and output tensors
+input_details = interpreter.get_input_details()
+output_details = interpreter.get_output_details()
 
 print('press esc to quit')
 
@@ -66,8 +77,8 @@ while True:  # while escape key is not pressed
         cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
         # look for a face or other object if motion is detected
-        faces = faceCascade.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=5, minSize=(20, 20))
-  #      birds = birdCascade.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=5, minSize=(20, 20))
+        # faces = faceCascade.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=5, minSize=(20, 20))
+        birds = birdCascade.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=5, minSize=(20, 20))
 
         # control pan title mechanism
         # currpan, currtilt = PanTilt9685.trackobject(pwm, cv2, currpan, currtilt, img, gray, faces, SCR_H, SCR_W)
@@ -83,3 +94,19 @@ while True:  # while escape key is not pressed
 
 cap.release()
 cv2.destroyAllWindows()
+
+
+
+#Load input image
+input_image = cv2.imread("/path/")
+input_shape = input_details[0]['shape']
+#Reshape input_image
+np.reshape((input_image,input_shape)
+
+#Set the value of Input tensor
+interpreter.set_tensor(input_details[0]['index'], input_image)
+interpreter.invoke()
+
+#prediction for input data
+output_data = interpreter.get_tensor(output_details[0]['index'])
+fire_probability = output_data[0][0] * 100 #prediction probability
