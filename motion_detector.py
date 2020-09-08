@@ -19,7 +19,8 @@ def init(cv2, cap):
 # once first image is captured call motion detector in a loop to find each subsequent image
 # compare image to first img; if different than motion
 # return image, gray scale, gray blur, threshold image, and contours
-def detect(cv2, cap, first_img):
+def detect(cv2, cap, first_img, min_area):
+    motionb = Fasle
     ret, img = cap.read()  # capture an image from the camera
     img = cv2.flip(img, -1)  # mirror image; comment out if not needed for your camera
     grayimg = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)  # convert image to gray scale BGR for OpenCv recognition
@@ -35,6 +36,10 @@ def detect(cv2, cap, first_img):
     threshimg = cv2.dilate(threshimg, None, iterations=2)
     cnts = cv2.findContours(threshimg.copy(), cv2.RETR_EXTERNAL,
                         cv2.CHAIN_APPROX_SIMPLE)
-    cnts = imutils.grab_contours(cnts)
+    
+    cnts = imutils.grab_contours(cnts)  # set of contours showing motion
+    for c in cnts:  #loop over countours if too small ignore it
+        if cv2.contourArea(c) >= min_area:
+           motionb = True 
 
-    return img, grayimg, grayblur, threshimg, cnts
+    return motionb, img, grayimg, grayblur, threshimg
