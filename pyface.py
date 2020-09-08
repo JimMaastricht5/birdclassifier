@@ -38,22 +38,11 @@ def face_detector(args):
 
     print('press esc to quit')
     while True:  # while escape key is not pressed
-        ret, img, gray, graymotion, thresh, first_img, cnts = motion_detector.detect(cv2, cap, first_img)
-
-        cnts = imutils.grab_contours(cnts)  # set of contours showing motion
-        # loop over the contours
-        for c in cnts:
-            # if the contour is too small, ignore it
-            if cv2.contourArea(c) < args["min_area"]:
-                continue
-
-            # motion detected
-            # compute the bounding box for the contour, draw motion on frame
-            # (x, y, w, h) = cv2.boundingRect(c)
-            # cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
-
+        motionb, ret, img, gray, graymotion, thresh, first_img = motion_detector.detect(cv2, cap, first_img, args["min_area"])
+        
+        if motionb:  # motion detected boolean = True
             # look for a face or other object if motion is detected
-            faces = faceCascade.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=5, minSize=(20, 20))
+            faces = faceCascade.detectMultiScale(gray, scaleFactor=1.0485258, minNeighbors=5)  #higher scale is faster, higher min n more accurate but more false neg
             for (x, y, w, h) in faces:
                 rect = (x, y, (x + w), (y + h))
                 # cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
