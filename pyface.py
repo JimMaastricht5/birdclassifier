@@ -2,25 +2,24 @@
 #    Based on tutorial by pythonprogramming.net
 #    Visit original post: https://pythonprogramming.net/haar-cascade-face-eye-detection-python-opencv-tutorial/
 # Adapted by Marcelo Rovai - MJRoBot.org @ 7Feb2018
-# Adpted by Jim Maastricht to incorporate pantilt functionality
+# Adpted by Jim Maastricht to incorporate pantilt functionality and motion detection
 # cascades at: https://github.com/Itseez/opencv/tree/master/data/haarcascades
-# Q: What do I do when I encounter an "undefined symbol: __atomic_fetch_add8" error related to libatomic.so?
-# A: The pip install has been giving readers troubles since OpenCV 4.1.1
+# encounter an "undefined symbol: __atomic_fetch_add8" error related to libatomic.so on OpenCv version w/Raspberry Pi
 # (around the November 2019 timeframe). Be sure to install version 4.1.0.25 :
-# packages: PCA9685-Driver, opencv-python=4.1.0.25
+# packages: PCA9685-Driver
 import cv2  # opencv2
 import PanTilt9685  # pan tilt control code
 import motion_detector  # motion detector helper functions
 import tweeter  # twitter helper functions
 import imutils  # CV helper functions
 import argparse  # arguement parser
-# from twython import Twython; needed?
 from auth import (
     api_key,
     api_secret_key,
     access_token,
     access_token_secret
-)
+)  # import twitter keys
+
 
 def face_detector(args):
     # setup pan tilt and initialize variables
