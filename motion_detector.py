@@ -3,6 +3,7 @@
 # first_img should be without motion.
 # compare gray scale image to first image.  If different than motion
 # return image captured, gray scale, guassian blured version, thresholds, first_img, and countours
+# code by JimMaastricht5@gmail.com based on https://www.pyimagesearch.com/category/object-tracking/
 import cv2
 import imutils
 
