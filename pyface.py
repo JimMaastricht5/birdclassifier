@@ -45,9 +45,11 @@ def face_detector(args):
                 rect = (x, y, (x + w), (y + h))
                 cv2.rectangle(img, rect, (0, 255, 0), 2)
                 face_img = img[int(x):int(y), int(x + w):int(y + h)]
+                # roi_gray = gray[y:y + h, x:x + w]
+                # roi_color = img[y:y + h, x:x + w]
                 twitter.post_image("found face", face_img)
 
-            currpan, currtilt = PanTilt9685.trackobject(pwm, cv2, currpan, currtilt, img, gray, faces,
+            currpan, currtilt = PanTilt9685.trackobject(pwm, cv2, currpan, currtilt, img, faces,
                                                         args["screen-width"], args["screen-height"])
 
         cv2.imshow('video', img)
