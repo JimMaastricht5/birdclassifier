@@ -1,5 +1,6 @@
 # module to tweet picture
 # auth.py must be located in project; protect this file as it contains keys
+# code by JimMaastricht5@gmail.com
 from twython import Twython
 from auth import (
     api_key,
@@ -8,9 +9,11 @@ from auth import (
     access_token_secret
 )
 
+
 # initialize twitter connection and login
 def init(api_key, api_secret_key, access_token, access_token_secret):
     return Twython(api_key, api_secret_key, access_token, access_token_secret)
+
 
 # set status message
 def post_status(twitter, message):
@@ -25,20 +28,19 @@ def post_image(twitter, message, image):
 
 # test code
 def main_test():
-    twitter = init_tweeter_connection(api_key, api_secret_key, access_token, access_token_secret)
+    twitter = init(api_key, api_secret_key, access_token, access_token_secret)
 
     # test code to tweet a message
     message = 'Python status'
-    post_status(message)
+    post_status(twitter, message)
     print('tweeted: %s' % message)
 
     # test code to tweet a picture
     message = 'Python image test'
-    image = open('cardinal.jpg', 'rb')
-    post_image(message, image)
+    twtimage = open('cardinal.jpg', 'rb')
+    post_image(twitter, message, twtimage)
     print('tweeted: %s' % message)
 
 
 if __name__ == "__main__":
     main_test()
-
