@@ -33,18 +33,22 @@ def load_labels(filename):
 
 def main(args):
     img = Image.open(args.image)
-    possible_labels = load_labels(args.label_file)
-    result, label = set_label(img, possible_labels, args.model_file, args.num_threads, args.input_mean, args.input_std)
+    interpreter, possible_labels = init_tf2(args.model_file, args.num_threads, args.label_file)
+    result, label = set_label(img, possible_labels, interpreter, args.input_mean, args.input_std)
     print('result', result)
     print('label', label)
 
 
-# input image and return best result and label
-def set_label(img, labels, model_path, num_threads, input_mean, input_std):
-
-    interpreter = tf.lite.Interpreter(model_path, num_threads)
+# initialize tensor flow model
+def init_tf2(model_file, num_threads, label_file):
+    possible_labels = load_labels(label_file)
+    interpreter = tf.lite.Interpreter(model_file, num_threads)
     interpreter.allocate_tensors()
+    return interpreter, possible_labels
 
+
+# input image and return best result and label
+def set_label(img, labels, interpreter, input_mean, input_std):
     input_details = interpreter.get_input_details()
     output_details = interpreter.get_output_details()
 
@@ -54,7 +58,7 @@ def set_label(img, labels, model_path, num_threads, input_mean, input_std):
     # NxHxWxC, H:1, W:2
     height = input_details[0]['shape'][1]
     width = input_details[0]['shape'][2]
-    img.resize(width, height)
+    img = img.resize((width, height))
 
     # add N dim
     input_data = np.expand_dims(img, axis=0)
@@ -79,7 +83,7 @@ def set_label(img, labels, model_path, num_threads, input_mean, input_std):
             print('{:08.6f}: {}'.format(float(results[i] / 255.0), labels[i]))
 
     print('time: {:.3f}ms'.format((stop_time - start_time) * 1000))
-    return results[0], labels[0]
+    return results[0], labels[0]  # confidence and best label
 
 
 # test function
