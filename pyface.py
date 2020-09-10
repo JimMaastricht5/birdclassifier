@@ -44,9 +44,8 @@ def face_detector(args):
             for (x, y, w, h) in faces:
                 rect = (x, y, (x + w), (y + h))
                 cv2.rectangle(img, rect, (0, 255, 0), 2)
-                face_img = img[int(x):int(y), int(x + w):int(y + h)]
-                # roi_gray = gray[y:y + h, x:x + w]
-                # roi_color = img[y:y + h, x:x + w]
+                # face_img = img[x):(y), (x + w):(y + h)]  # old
+                face_img = img[y:y + h, x:x + w]  # try this?
                 twitter.post_image("found face", face_img)
 
             currpan, currtilt = PanTilt9685.trackobject(pwm, cv2, currpan, currtilt, img, faces,
@@ -70,8 +69,8 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("-v", "--video", help="path to the video file")
     ap.add_argument("-a", "--min-area", type=int, default=500, help="minimum area size")
-    ap.add_argument("-sw", "--screen-width", type=int, default=640, help="max screen width")
-    ap.add_argument("-sh", "--screen-height", type=int, default=380, help="max screen height")
+    ap.add_argument("-sw", "--screen-width", type=int, default=300, help="max screen width")
+    ap.add_argument("-sh", "--screen-height", type=int, default=300, help="max screen height")
     arguments = vars(ap.parse_args())
 
     face_detector(arguments)
