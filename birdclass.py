@@ -20,10 +20,8 @@
 # install OpenCv version 4.1.0.25 to resolve the issue on the pi
 # packages: pan tilt uses PCA9685-Driver
 import cv2  # opencv2
-import time
-import numpy as np
 from PIL import Image
-import tensorflow as tf  # TF2
+import label_image  # code to init tensor flow model and classify bird type
 import PanTilt9685  # pan tilt control code
 import motion_detector  # motion detector helper functions
 import tweeter  # twitter helper functions
@@ -49,12 +47,7 @@ def bird_detector(args):
     first_img = motion_detector.init(cv2, cap)
 
     # tensor flow lite setup
-    interpreter = tflite.interpreter(model_path='/home/pi/birdclass/lite-model_aiy_vision_classifier_birds_V1_3.tflite')
-    interpreter.allocate_tensors()
-
-    # Get input and output tensors
-    input_details = interpreter.get_input_details()
-    output_details = interpreter.get_output_details()
+    interpreter, possible_labels = label_image.init_tf2(args["model_file"], args["num_threads"], args["label_file"])
 
     print('press esc to quit')
     while True:  # while escape key is not pressed
@@ -64,16 +57,22 @@ def bird_detector(args):
         if motionb:  # motion detected boolean = True
             # look for object if motion is detected
             # higher scale is faster, higher min n more accurate but more false neg 3-5 reasonable range
-            birds = birdCascade.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=5, minSize=(20, 20))
+            birds = birdCascade.detectMultiScale(gray, scaleFactor=1.0485258, minNeighbors=5)
             for (x, y, w, h) in birds:
                 rect = (x, y, (x + w), (y + h))
                 cv2.rectangle(img, rect, (0, 255, 0), 2)
                 # bird_img = img[x):(y), (x + w):(y + h)]  # old
                 bird_img = img[y:y + h, x:x + w] # try this?
-                twitter.post_image("found bird", bird_img)
 
-            currpan, currtilt = PanTilt9685.trackobject(pwm, cv2, currpan, currtilt, img, birds,
-                                                        args["screen-width"], args["screen-height"])
+                # run tensor flow lite model to id bird type
+                confidence, label = label_image.set_label(bird_img, possible_labels, interpreter,
+                                                      args["input_mean"], args["input_std"])
+                print (confidence, label)
+                twitter.post_image(confidence + " " + label, bird_img)
+
+
+            # currpan, currtilt = PanTilt9685.trackobject(pwm, cv2, currpan, currtilt, img, birds,
+            #       args["screen-width"], args["screen-height"])
 
         cv2.imshow('video', img)
         cv2.imshow('gray', graymotion)
@@ -92,9 +91,18 @@ if __name__ == "__main__":
     # construct the argument parser and parse the arguments
     ap = argparse.ArgumentParser()
     ap.add_argument("-v", "--video", help="path to the video file")
-    ap.add_argument("-a", "--min-area", type=int, default=500, help="minimum area size")
-    ap.add_argument("-sw", "--screen-width", type=int, default=300, help="max screen width")
-    ap.add_argument("-sh", "--screen-height", type=int, default=300, help="max screen height")
+    ap.add_argument("-a", "--min-area", type=int, default=20, help="minimum area size")
+    ap.add_argument("-sw", "--screen-width", type=int, default=224, help="max screen width")
+    ap.add_argument("-sh", "--screen-height", type=int, default=224, help="max screen height")
+    ap.add_argument(  '-i', '--image', default='c:/users/maastricht/cub2011/models/cardinal.jpg',
+        help='image to be classified')
+    ap.add_argument('-m', '--model_file', default='c:/users/maastricht/cub2011/models/mobilenet_tweeters.tflite',
+        help='.tflite model to be executed')
+    ap.add_argument('-l', '--label_file', default='c:/users/maastricht/cub2011/models/class_labels.txt',
+        help='name of file containing labels')
+    ap.add_argument('--input_mean', default=127.5, type=float, help='Tensor input_mean')
+    ap.add_argument('--input_std', default=127.5, type=float, help='Tensor input standard deviation')
+    ap.add_argument('--num_threads', default=None, type=int, help='Tensor number of threads')
     arguments = vars(ap.parse_args())
 
     bird_detector(arguments)
