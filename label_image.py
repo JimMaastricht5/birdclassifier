@@ -92,17 +92,17 @@ if __name__ == '__main__':
     parser.add_argument(
         '-i',
         '--image',
-        default='c:/users/maastricht/cub2011/models/cardinal.jpg',
+        default='/home/pi/birdclass/cardinal.jpg',
         help='image to be classified')
     parser.add_argument(
         '-m',
         '--model_file',
-        default='c:/users/maastricht/cub2011/models/mobilenet_tweeters.tflite',
+        default='/home/pi/birdclass/mobilenet_tweeters.tflite',
         help='.tflite model to be executed')
     parser.add_argument(
         '-l',
         '--label_file',
-        default='c:/users/maastricht/cub2011/models/class_labels.txt',
+        default='/home/pi/birdclass/class_labels.txt',
         help='name of file containing labels')
     parser.add_argument(
         '--input_mean',
