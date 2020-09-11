@@ -37,7 +37,7 @@ def bird_detector(args):
     # setup pan tilt and initialize variables
     currpan, currtilt, pwm = PanTilt9685.init_pantilt()
 
-    bird_cascade = cv2.CascadeClassifier('/home/pi/opencv/data/haarcascades_birds/birds/xml')
+    bird_cascade = cv2.CascadeClassifier('/home/pi/opencv/data/haarcascades_birds/birds1.xml')
     cap = cv2.VideoCapture(0)  # capture video image
     cap.set(3, args["screenwidth"])  # set screen width
     cap.set(4, args["screenheight"])  # set screen height
@@ -60,9 +60,11 @@ def bird_detector(args):
             for (x, y, w, h) in birds:
                 cv2.rectangle(img, (x, y), ((x + w), (y + h)), (0, 255, 0), 2)
                 bird_img = img[y:y + h, x:x + w]  # extract image of bird
+                cv2.imshow('video', img)
+                cv2.imshow('bird', bird_img)
 
                 # run tensor flow lite model to id bird type
-                confidence, label = label_image.set_label(bird_img, possible_labels, interpreter,
+                confidence, label = label_image.set_label(img, possible_labels, interpreter,
                                                           args["inputmean"], args["inputstd"])
                 print(confidence, label)
                 # twitter.post_image(confidence + " " + label, bird_img)
@@ -91,8 +93,8 @@ if __name__ == "__main__":
     ap.add_argument("-sw", "--screenwidth", type=int, default=640, help="max screen width")
     ap.add_argument("-sh", "--screenheight", type=int, default=480, help="max screen height")
     # ap.add_argument('-i', '--image', default='c:/users/maastricht/cub2011/models/cardinal.jpg',
-    ap.add_argument('-i', '--image', default='/home/pi/birdclass/cardinal.jpg',
-                                    help='image to be classified')
+    # ap.add_argument('-i', '--image', default='/home/pi/birdclass/cardinal.jpg',
+    #                                help='image to be classified')
     # ap.add_argument('-m', '--modelfile', default='c:/users/maastricht/cub2011/models/mobilenet_tweeters.tflite',
     ap.add_argument('-m', '--modelfile', default='/home/pi/birdclass/mobilenet_tweeters.tflite',
                     help='.tflite model to be executed')

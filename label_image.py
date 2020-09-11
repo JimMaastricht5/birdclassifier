@@ -58,7 +58,7 @@ def set_label(img, labels, interpreter, input_mean, input_std):
     # NxHxWxC, H:1, W:2
     height = input_details[0]['shape'][1]
     width = input_details[0]['shape'][2]
-    img = img.resize((width, height))
+    img = img.resize((width, height)) # refcheck=False?
 
     # add N dim
     input_data = np.expand_dims(img, axis=0)
