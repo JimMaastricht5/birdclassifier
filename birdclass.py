@@ -20,7 +20,6 @@
 # install OpenCv version 4.1.0.25 to resolve the issue on the pi
 # packages: pan tilt uses PCA9685-Driver
 import cv2  # opencv2
-from PIL import Image
 import label_image  # code to init tensor flow model and classify bird type
 import PanTilt9685  # pan tilt control code
 import motion_detector  # motion detector helper functions
@@ -38,7 +37,7 @@ def bird_detector(args):
     # setup pan tilt and initialize variables
     currpan, currtilt, pwm = PanTilt9685.init_pantilt()
 
-    birdCascade = cv2.CascadeClassifier('/home/pi/opencv/data/haarcascades_birs/birds/xml')
+    bird_cascade = cv2.CascadeClassifier('/home/pi/opencv/data/haarcascades_birds/birds/xml')
     cap = cv2.VideoCapture(0)  # capture video image
     cap.set(3, args["screen-width"])  # set screen width
     cap.set(4, args["screen-height"])  # set screen height
@@ -57,22 +56,21 @@ def bird_detector(args):
         if motionb:  # motion detected boolean = True
             # look for object if motion is detected
             # higher scale is faster, higher min n more accurate but more false neg 3-5 reasonable range
-            birds = birdCascade.detectMultiScale(gray, scaleFactor=1.0485258, minNeighbors=5)
+            birds = bird_cascade.detectMultiScale(gray, scaleFactor=1.0485258, minNeighbors=5)
             for (x, y, w, h) in birds:
                 rect = (x, y, (x + w), (y + h))
                 cv2.rectangle(img, rect, (0, 255, 0), 2)
                 # bird_img = img[x):(y), (x + w):(y + h)]  # old
-                bird_img = img[y:y + h, x:x + w] # try this?
+                bird_img = img[y:y + h, x:x + w]  # try this?
 
                 # run tensor flow lite model to id bird type
                 confidence, label = label_image.set_label(bird_img, possible_labels, interpreter,
-                                                      args["input_mean"], args["input_std"])
-                print (confidence, label)
+                                                          args["input_mean"], args["input_std"])
+                print(confidence, label)
                 twitter.post_image(confidence + " " + label, bird_img)
 
-
-            # currpan, currtilt = PanTilt9685.trackobject(pwm, cv2, currpan, currtilt, img, birds,
-            #       args["screen-width"], args["screen-height"])
+            currpan, currtilt = PanTilt9685.trackobject(pwm, cv2, currpan, currtilt, img, birds,
+                                                        args["screen-width"], args["screen-height"])
 
         cv2.imshow('video', img)
         cv2.imshow('gray', graymotion)
@@ -94,12 +92,12 @@ if __name__ == "__main__":
     ap.add_argument("-a", "--min-area", type=int, default=20, help="minimum area size")
     ap.add_argument("-sw", "--screen-width", type=int, default=224, help="max screen width")
     ap.add_argument("-sh", "--screen-height", type=int, default=224, help="max screen height")
-    ap.add_argument(  '-i', '--image', default='c:/users/maastricht/cub2011/models/cardinal.jpg',
-        help='image to be classified')
+    ap.add_argument('-i', '--image', default='c:/users/maastricht/cub2011/models/cardinal.jpg',
+                    help='image to be classified')
     ap.add_argument('-m', '--model_file', default='c:/users/maastricht/cub2011/models/mobilenet_tweeters.tflite',
-        help='.tflite model to be executed')
+                    help='.tflite model to be executed')
     ap.add_argument('-l', '--label_file', default='c:/users/maastricht/cub2011/models/class_labels.txt',
-        help='name of file containing labels')
+                    help='name of file containing labels')
     ap.add_argument('--input_mean', default=127.5, type=float, help='Tensor input_mean')
     ap.add_argument('--input_std', default=127.5, type=float, help='Tensor input standard deviation')
     ap.add_argument('--num_threads', default=None, type=int, help='Tensor number of threads')
