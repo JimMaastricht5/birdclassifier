@@ -55,8 +55,8 @@ def bird_detector(args):
 
         if motionb:  # motion detected boolean = True
             # look for object if motion is detected
-            # higher scale is faster, higher min n more accurate but more false neg 3-5 reasonable range
-            birds = bird_cascade.detectMultiScale(gray, scaleFactor=1.0485258, minNeighbors=5)
+            # higher scale is faster, higher min n more accurate but more false neg 3-6 reasonable range
+            birds = bird_cascade.detectMultiScale(gray, scaleFactor=1.0485258, minNeighbors=6)
             for (x, y, w, h) in birds:
                 rect = (x, y, (x + w), (y + h))
                 cv2.rectangle(img, rect, (0, 255, 0), 2)

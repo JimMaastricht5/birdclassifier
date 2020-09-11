@@ -13,13 +13,13 @@ def trackobject(pwm, cv, currpan, currtilt, img, objsdetected, screen_height, sc
         xfacecenter = x + w / 2
         yfacecenter = y + h / 2
 
-        if abs(screen_width / 2 - xfacecenter) > 20:
+        if abs(screen_width / 2 - xfacecenter) > 50:
             if xfacecenter > screen_width / 2:
                 panto = currpan - 1
             else:
                 panto = currpan + 1
 
-        if abs(screen_height / 2 - yfacecenter) > 20:
+        if abs(screen_height / 2 - yfacecenter) > 50:
             if yfacecenter > screen_height / 2:
                 tiltto = currtilt + 2
             else:

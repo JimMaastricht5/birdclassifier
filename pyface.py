@@ -26,32 +26,32 @@ def face_detector(args):
 
     facecascade = cv2.CascadeClassifier('/home/pi/opencv/data/haarcascades_cuda/haarcascade_frontalface_default.xml')
     cap = cv2.VideoCapture(0)  # capture video image
-    cap.set(3, args["screen-width"])  # set screen width
-    cap.set(4, args["screen-height"])  # set screen height
+    cap.set(3, args["screenwidth"])  # set screen width
+    cap.set(4, args["screenheight"])  # set screen height
 
     twitter = tweeter.init(api_key, api_secret_key, access_token, access_token_secret)
     first_img = motion_detector.init(cv2, cap)
 
     print('press esc to quit')
     while True:  # while escape key is not pressed
-        motionb, ret, img, gray, graymotion, thresh, first_img = \
-            motion_detector.detect(cv2, cap, first_img, args["min-area"])
+        motionb, img, gray, graymotion, thresh = \
+            motion_detector.detect(cv2, cap, first_img, args["minarea"])
         
         if motionb:  # motion detected boolean = True
             # look for a face or other object if motion is detected
             # higher scale is faster, higher min n more accurate but more false neg
-            faces = facecascade.detectMultiScale(gray, scaleFactor=1.0485258, minNeighbors=5)
+            faces = facecascade.detectMultiScale(gray, scaleFactor=1.0485258, minNeighbors=6)
             for (x, y, w, h) in faces:
-                rect = (x, y, (x + w), (y + h))
-                cv2.rectangle(img, rect, (0, 255, 0), 2)
-                # face_img = img[x):(y), (x + w):(y + h)]  # old
-                face_img = img[y:y + h, x:x + w]  # try this?
-                twitter.post_image("found face", face_img)
+                cv2.rectangle(img, (x, y), ((x + w), (y + h)), (0, 255, 0), 2)
+                face_img = img[y:y + h, x:x + w]  # extract face
+                cv2.imshow('face', face_img)
+                cv2.imshow('video', img)
+                # twitter.post_image("found face", face_img)
 
             currpan, currtilt = PanTilt9685.trackobject(pwm, cv2, currpan, currtilt, img, faces,
-                                                        args["screen-width"], args["screen-height"])
+                                                       args["screenwidth"], args["screenheight"])
 
-        cv2.imshow('video', img)
+
         cv2.imshow('gray', graymotion)
         cv2.imshow('threshold', thresh)
 
@@ -68,9 +68,9 @@ if __name__ == "__main__":
     # construct the argument parser and parse the arguments
     ap = argparse.ArgumentParser()
     ap.add_argument("-v", "--video", help="path to the video file")
-    ap.add_argument("-a", "--min-area", type=int, default=500, help="minimum area size")
-    ap.add_argument("-sw", "--screen-width", type=int, default=300, help="max screen width")
-    ap.add_argument("-sh", "--screen-height", type=int, default=300, help="max screen height")
+    ap.add_argument("-a", "--minarea", type=int, default=500, help="minimum area size")
+    ap.add_argument("-w", "--screenwidth", type=int, default=640, help="max screen width")
+    ap.add_argument("-g", "--screenheight", type=int, default=480, help="max screen height")
     arguments = vars(ap.parse_args())
 
     face_detector(arguments)
