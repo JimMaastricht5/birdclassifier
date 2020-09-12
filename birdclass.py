@@ -60,11 +60,10 @@ def bird_detector(args):
             for (x, y, w, h) in birds:
                 cv2.rectangle(img, (x, y), ((x + w), (y + h)), (0, 255, 0), 2)
                 bird_img = img[y:y + h, x:x + w]  # extract image of bird
-                cv2.imshow('video', img)
-                cv2.imshow('bird', bird_img)
-
+                cv2.imwrite("temp.jpg", bird_img) # write out file to disk for debugging and tensor feed
                 # run tensor flow lite model to id bird type
-                confidence, label = label_image.set_label(img, possible_labels, interpreter,
+                ts_img = Image.open("temp.jpg") # reload from image; ensures matching disk to tensor
+                confidence, label = label_image.set_label(ts_img, possible_labels, interpreter,
                                                           args["inputmean"], args["inputstd"])
                 print(confidence, label)
                 # twitter.post_image(confidence + " " + label, bird_img)
@@ -75,6 +74,7 @@ def bird_detector(args):
         cv2.imshow('video', img)
         # cv2.imshow('gray', graymotion)
         # cv2.imshow('threshold', thresh)
+        # cv2.imshow('bird', bird_img)
 
         # check for esc key and quit if pressed
         k = cv2.waitKey(30) & 0xff
@@ -92,18 +92,16 @@ if __name__ == "__main__":
     ap.add_argument("-a", "--minarea", type=int, default=20, help="minimum area size")
     ap.add_argument("-sw", "--screenwidth", type=int, default=640, help="max screen width")
     ap.add_argument("-sh", "--screenheight", type=int, default=480, help="max screen height")
-    # ap.add_argument('-i', '--image', default='c:/users/maastricht/cub2011/models/cardinal.jpg',
-    # ap.add_argument('-i', '--image', default='/home/pi/birdclass/cardinal.jpg',
-    #                                help='image to be classified')
-    # ap.add_argument('-m', '--modelfile', default='c:/users/maastricht/cub2011/models/mobilenet_tweeters.tflite',
     ap.add_argument('-m', '--modelfile', default='/home/pi/birdclass/mobilenet_tweeters.tflite',
                     help='.tflite model to be executed')
-    # ap.add_argument('-l', '--labelfile', default='c:/users/maastricht/cub2011/models/class_labels.txt',
     ap.add_argument('-l', '--labelfile', default='/home/pi/birdclass/class_labels.txt',
                     help='name of file containing labels')
     ap.add_argument('--inputmean', default=127.5, type=float, help='Tensor input_mean')
     ap.add_argument('--inputstd', default=127.5, type=float, help='Tensor input standard deviation')
     ap.add_argument('--numthreads', default=None, type=int, help='Tensor number of threads')
+    # ap.add_argument('-i', '--image', default='/home/pi/birdclass/cardinal.jpg',
+    #                                help='image to be classified')
+
     arguments = vars(ap.parse_args())
 
     bird_detector(arguments)
