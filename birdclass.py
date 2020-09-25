@@ -19,12 +19,13 @@
 # encountered an "undefined symbol: __atomic_fetch_add8" error related to libatomic.so on OpenCv version w/Raspberry Pi
 # install OpenCv version 4.1.0.25 to resolve the issue on the pi
 # packages: pan tilt uses PCA9685-Driver
-import cv2  # opencv2
+import cv2  # open cv 2
 import label_image  # code to init tensor flow model and classify bird type
 import PanTilt9685  # pan tilt control code
 import motion_detector  # motion detector helper functions
 import tweeter  # twitter helper functions
 import argparse  # argument parser
+import numpy as np
 from auth import (
     api_key,
     api_secret_key,
@@ -34,18 +35,31 @@ from auth import (
 
 
 def bird_detector(args):
-    # setup pan tilt and initialize variables
-    currpan, currtilt, pwm = PanTilt9685.init_pantilt()
+    # initialize the list of class labels MobileNet SSD was trained to
+    # detect, then generate a set of bounding box colors for each class
+    # classes = ["background", "aeroplane", "bicycle", "bird", "boat",
+    #            "bottle", "bus", "car", "cat", "chair", "cow", "diningtable",
+    #            "dog", "horse", "motorbike", "person", "pottedplant", "sheep",
+    #            "sofa", "train", "tvmonitor"]
+    classes = ["bird"]  # classes to detect
+    colors = np.random.uniform(0, 255, size=(len(classes), 3))  # random colors for bounding boxes
 
-    bird_cascade = cv2.CascadeClassifier('/home/pi/opencv/data/haarcascades_birds/birds1.xml')
+    # load serialized model for object detection
+    net = cv2.dnn.readNetFromCaffe(args["prototxt"], args["objmodel"])
+
+    # setup pan tilt and initialize variables
+    if args["panb"]:
+        currpan, currtilt, pwm = PanTilt9685.init_pantilt()
+
+    # initial video capture, screen size, and grab first image (no motion)
     cap = cv2.VideoCapture(0)  # capture video image
     cap.set(3, args["screenwidth"])  # set screen width
     cap.set(4, args["screenheight"])  # set screen height
-
-    twitter = tweeter.init(api_key, api_secret_key, access_token, access_token_secret)
     first_img = motion_detector.init(cv2, cap)
 
-    # tensor flow lite setup
+    twitter = tweeter.init(api_key, api_secret_key, access_token, access_token_secret)  # init twitter api
+
+    # tensor flow lite setup; TF used to classify detected birds
     interpreter, possible_labels = label_image.init_tf2(args["modelfile"], args["numthreads"], args["labelfile"])
 
     print('press esc to quit')
@@ -53,22 +67,54 @@ def bird_detector(args):
         motionb, img, gray, graymotion, thresh = \
             motion_detector.detect(cv2, cap, first_img, args["minarea"])
 
-        if motionb:  # motion detected boolean = True
+        if motionb:
             # look for object if motion is detected
-            # higher scale is faster, higher min n more accurate but more false neg 3-6 reasonable range
-            birds = bird_cascade.detectMultiScale(gray, scaleFactor=1.0485258, minNeighbors=6)
-            for (x, y, w, h) in birds:
-                cv2.rectangle(img, (x, y), ((x + w), (y + h)), (0, 255, 0), 2)
-                bird_img = img[y:y + h, x:x + w]  # extract image of bird
-                cv2.imwrite("temp.jpg", bird_img) # write out file to disk for debugging and tensor feed
-                # run tensor flow lite model to id bird type
-                ts_img = Image.open("temp.jpg") # reload from image; ensures matching disk to tensor
-                confidence, label = label_image.set_label(ts_img, possible_labels, interpreter,
-                                                          args["inputmean"], args["inputstd"])
-                print(confidence, label)
-                # twitter.post_image(confidence + " " + label, bird_img)
+            # load the input image and construct an input blob for the image
+            #  resizing to a fixed 300x300 pixels and then normalizing it via MobileNet SSD
+            (h, w) = img.shape[:2]
+            blob = cv2.dnn.blobFromImage(cv2.resize(img, (300, 300)), 0.007843,
+                                         (300, 300), 127.5)
 
-            currpan, currtilt = PanTilt9685.trackobject(pwm, cv2, currpan, currtilt, img, birds,
+            # pass the blob through the network and obtain the detections and predictions
+            net.setInput(blob)
+            birds = net.forward()
+            birddetected = False
+
+            # loop over the detections; only class detected per input is birds
+            for i in np.arange(0, birds.shape[2]):
+                confidence = birds[0, 0, i, 2]  # extract the confidence associated with the prediction
+                if confidence > args["confidence"]:  # filter out weak detections, default 0.2
+                    # extract the index of the class label from the `detections`,
+                    # then compute the (x, y)-coordinates of the bounding box
+                    birddetected = True
+                    idx = int(detections[0, 0, i, 1])
+                    box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
+                    (startX, startY, endX, endY) = box.astype("int")
+
+                    #     cv2.rectangle(img, (x, y), ((x + w), (y + h)), (0, 255, 0), 2)
+                    #         bird_img = img[y:y + h, x:x + w]  # extract image of bird
+                    bird_img = img[startY:endY, startX:endX]  # extract image of bird
+                    cv2.imwrite("temp.jpg", bird_img) # write out file to disk for debugging and tensor feed
+                    # run tensor flow lite model to id bird type
+                    ts_img = bird_img.open("temp.jpg") # reload from image; ensures matching disk to tensor
+                    tfconfidence, birdclass = label_image.set_label(ts_img, possible_labels, interpreter,
+                                                          args["inputmean"], args["inputstd"])
+
+                    # draw bounding boxes and display label
+                    label = "{}: {:.2f} {:.2f}% ".format(CLASSES[idx] + ' ' + birdclass, confidence * 100,
+                                                         tfconfidence * 100)
+                    # print("[INFO] {}".format(label))
+                    cv2.rectangle(img, (startX, startY), (endX, endY), COLORS[idx], 2)
+                    y = startY - 15 if startY - 15 > 15 else startY + 15  # adjust label loc if too low
+                    cv2.putText(img, label, (startX, y),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.5, COLORS[idx], 2)
+
+                    if birddetected:
+                        print("[INFO] {}".format(label))
+                        # twitter.post_image(confidence + " " + label, img)
+
+            if args["panb"]:
+                currpan, currtilt = PanTilt9685.trackobject(pwm, cv2, currpan, currtilt, img, birds,
                                                         args["screenwidth"], args["screenheight"])
 
         cv2.imshow('video', img)
@@ -92,6 +138,9 @@ if __name__ == "__main__":
     ap.add_argument("-a", "--minarea", type=int, default=20, help="minimum area size")
     ap.add_argument("-sw", "--screenwidth", type=int, default=640, help="max screen width")
     ap.add_argument("-sh", "--screenheight", type=int, default=480, help="max screen height")
+    ap.add_argument('-om', "--objmodel", default='/home/pi/birdclass/MobileNetSSD_deploy.caffemodel')
+    ap.add_argument('-p', '--prototxt', default='/home/pi/birdclass/deploy.prototxt.txt')
+    ap.add_argument('-c', '--confidence', type=float, default=0.2)
     ap.add_argument('-m', '--modelfile', default='/home/pi/birdclass/mobilenet_tweeters.tflite',
                     help='.tflite model to be executed')
     ap.add_argument('-l', '--labelfile', default='/home/pi/birdclass/class_labels.txt',
@@ -99,6 +148,7 @@ if __name__ == "__main__":
     ap.add_argument('--inputmean', default=127.5, type=float, help='Tensor input_mean')
     ap.add_argument('--inputstd', default=127.5, type=float, help='Tensor input standard deviation')
     ap.add_argument('--numthreads', default=None, type=int, help='Tensor number of threads')
+    ap.add_argument('--panb', default=False, type=bool, help='activate pan tilt mechanism')
     # ap.add_argument('-i', '--image', default='/home/pi/birdclass/cardinal.jpg',
     #                                help='image to be classified')
 
