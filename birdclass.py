@@ -87,27 +87,27 @@ def bird_detector(args):
                     # extract the index of the class label from the `detections`,
                     # then compute the (x, y)-coordinates of the bounding box
                     birddetected = True
-                    idx = int(detections[0, 0, i, 1])
-                    box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
+                    idx = int(birds[0, 0, i, 1])
+                    box = birds[0, 0, i, 3:7] * np.array([w, h, w, h])
                     (startX, startY, endX, endY) = box.astype("int")
 
                     #     cv2.rectangle(img, (x, y), ((x + w), (y + h)), (0, 255, 0), 2)
                     #         bird_img = img[y:y + h, x:x + w]  # extract image of bird
                     bird_img = img[startY:endY, startX:endX]  # extract image of bird
-                    cv2.imwrite("temp.jpg", bird_img) # write out file to disk for debugging and tensor feed
+                    cv2.imwrite("temp.jpg", bird_img)  # write out file to disk for debugging and tensor feed
                     # run tensor flow lite model to id bird type
-                    ts_img = bird_img.open("temp.jpg") # reload from image; ensures matching disk to tensor
+                    ts_img = bird_img.open("temp.jpg")  # reload from image; ensures matching disk to tensor
                     tfconfidence, birdclass = label_image.set_label(ts_img, possible_labels, interpreter,
-                                                          args["inputmean"], args["inputstd"])
+                                                            args["inputmean"], args["inputstd"])
 
                     # draw bounding boxes and display label
-                    label = "{}: {:.2f} {:.2f}% ".format(CLASSES[idx] + ' ' + birdclass, confidence * 100,
+                    label = "{}: {:.2f} {:.2f}% ".format(classes[idx] + ' ' + birdclass, confidence * 100,
                                                          tfconfidence * 100)
                     # print("[INFO] {}".format(label))
-                    cv2.rectangle(img, (startX, startY), (endX, endY), COLORS[idx], 2)
+                    cv2.rectangle(img, (startX, startY), (endX, endY), colors[idx], 2)
                     y = startY - 15 if startY - 15 > 15 else startY + 15  # adjust label loc if too low
                     cv2.putText(img, label, (startX, y),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.5, COLORS[idx], 2)
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors[idx], 2)
 
                     if birddetected:
                         print("[INFO] {}".format(label))
@@ -115,7 +115,7 @@ def bird_detector(args):
 
             if args["panb"]:
                 currpan, currtilt = PanTilt9685.trackobject(pwm, cv2, currpan, currtilt, img, birds,
-                                                        args["screenwidth"], args["screenheight"])
+                                                            args["screenwidth"], args["screenheight"])
 
         cv2.imshow('video', img)
         # cv2.imshow('gray', graymotion)
