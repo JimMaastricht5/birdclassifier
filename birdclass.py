@@ -21,7 +21,7 @@
 # packages: pan tilt uses PCA9685-Driver
 import cv2  # open cv 2
 import label_image  # code to init tensor flow model and classify bird type
-import PanTilt9685  # pan tilt control code
+# import PanTilt9685  # pan tilt control code
 import motion_detector  # motion detector helper functions
 import tweeter  # twitter helper functions
 import argparse  # argument parser
@@ -52,10 +52,13 @@ def bird_detector(args):
         currpan, currtilt, pwm = PanTilt9685.init_pantilt()
 
     # initial video capture, screen size, and grab first image (no motion)
-    cap = cv2.VideoCapture(0)  # capture video image
-    cap.set(3, args["screenwidth"])  # set screen width
-    cap.set(4, args["screenheight"])  # set screen height
-    first_img = motion_detector.init(cv2, cap)
+    if args["image"] == "":
+        cap = cv2.VideoCapture(0)  # capture video image
+        cap.set(3, args["screenwidth"])  # set screen width
+        cap.set(4, args["screenheight"])  # set screen height
+        first_img = motion_detector.init(cv2, cap)
+    else:
+        first_img = cv2.imread(args["image"])
 
     twitter = tweeter.init(api_key, api_secret_key, access_token, access_token_secret)  # init twitter api
 
@@ -64,24 +67,29 @@ def bird_detector(args):
 
     print('press esc to quit')
     while True:  # while escape key is not pressed
-        motionb, img, gray, graymotion, thresh = \
-            motion_detector.detect(cv2, cap, first_img, args["minarea"])
+        if args["image"] == "":
+            motionb, img, gray, graymotion, thresh = motion_detector.detect(cv2, cap, first_img, args["minarea"])
+        else:
+            motionb = True
+            img = first_img
 
         if motionb:
             # look for object if motion is detected
             # load the input image and construct an input blob for the image
-            #  resizing to a fixed 300x300 pixels and then normalizing it via MobileNet SSD
+            # resizing to fixed pixels check prototxt file for corect size 224, 224
             (h, w) = img.shape[:2]
-            blob = cv2.dnn.blobFromImage(cv2.resize(img, (300, 300)), 0.007843,
-                                         (300, 300), 127.5)
+            blob = cv2.dnn.blobFromImage(img, 0.007843, (224, 224), (127.5, 127.5, 127.5))
 
             # pass the blob through the network and obtain the detections and predictions
+            print(blob.shape)
             net.setInput(blob)
             birds = net.forward()
             birddetected = False
 
+            print(birds.shape)
+            print(birds)
             # loop over the detections; only class detected per input is birds
-            for i in np.arange(0, birds.shape[2]):
+            for i in np.arange(0, birds.shape[0]):
                 confidence = birds[0, 0, i, 2]  # extract the confidence associated with the prediction
                 if confidence > args["confidence"]:  # filter out weak detections, default 0.2
                     # extract the index of the class label from the `detections`,
@@ -138,7 +146,7 @@ if __name__ == "__main__":
     ap.add_argument("-a", "--minarea", type=int, default=20, help="minimum area size")
     ap.add_argument("-sw", "--screenwidth", type=int, default=640, help="max screen width")
     ap.add_argument("-sh", "--screenheight", type=int, default=480, help="max screen height")
-    ap.add_argument('-om', "--objmodel", default='/home/pi/birdclass/MobileNetSSD_deploy.caffemodel')
+    ap.add_argument('-om', "--objmodel", default='/home/pi/birdclass/bvlc_googlenet.caffemodel')
     ap.add_argument('-p', '--prototxt', default='/home/pi/birdclass/deploy.prototxt.txt')
     ap.add_argument('-c', '--confidence', type=float, default=0.2)
     ap.add_argument('-m', '--modelfile', default='/home/pi/birdclass/mobilenet_tweeters.tflite',
@@ -149,8 +157,8 @@ if __name__ == "__main__":
     ap.add_argument('--inputstd', default=127.5, type=float, help='Tensor input standard deviation')
     ap.add_argument('--numthreads', default=None, type=int, help='Tensor number of threads')
     ap.add_argument('--panb', default=False, type=bool, help='activate pan tilt mechanism')
-    # ap.add_argument('-i', '--image', default='/home/pi/birdclass/cardinal.jpg',
-    #                                help='image to be classified')
+    ap.add_argument('-i', '--image', default='/home/pi/birdclass/cardinal.jpg',
+                                   help='image to be classified')
 
     arguments = vars(ap.parse_args())
 
