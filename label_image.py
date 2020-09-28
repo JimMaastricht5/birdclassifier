@@ -39,7 +39,7 @@ def load_json_labels(filename):
 
 
 def main(args):
-    img = Image.open(args.image)
+    img = cv2.imread(args.image)
     interpreter, possible_labels = init_tf2(args.model_file, args.num_threads, args.label_file)
     result, label = set_label(img, possible_labels, interpreter, args.input_mean, args.input_std)
     print('result', result)
@@ -47,9 +47,9 @@ def main(args):
 
 
 # initialize tensor flow model
-def init_tf2(model_file, num_threads, label_file, type="TXT"):
+def init_tf2(model_file, num_threads, label_file, filetype="TXT"):
     possible_labels = np.asarray(load_labels(label_file))  # load label file and convert to list
-    if type="JSON":
+    if filetype == "JSON":
         possible_labels = load_json_labels(label_file)
     else:
         possible_labels = load_labels(label_file)  # load label file
@@ -73,13 +73,15 @@ def set_label(img, labels, interpreter, input_mean, input_std):
     # *****
     inp_img = cv2.resize(img, (width, height))  # resize to respect input shape and tensor model
     rgb = cv2.cvtColor(inp_img, cv2.COLOR_BGR2RGB)  # convert img to RGB
-    # rgb_tensor = tf.convert_to_tensor(rgb, dtype=tf.float32)  # TF full tensor
-    rgb_tensor = tf.convert_to_tensor(rgb, dtype=tf.uint8)  # TF Lite
+    if floating_model:
+        rgb_tensor = tf.convert_to_tensor(rgb, dtype=tf.float32)  # TF full tensor
+    else:
+        rgb_tensor = tf.convert_to_tensor(rgb, dtype=tf.uint8)  # TF Lite
+
     input_data = tf.expand_dims(rgb_tensor, 0)  # add dims to RGB tensor
     # *****
-
-    # if floating_model:
-    #    input_data = (np.float32(input_data) - input_mean) / input_std
+    if floating_model:
+       input_data = (np.float32(input_data) - input_mean) / input_std
 
     interpreter.set_tensor(input_details[0]['index'], input_data)
 
