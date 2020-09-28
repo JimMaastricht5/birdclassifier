@@ -68,23 +68,21 @@ def bird_detector(args):
     interpreter, possible_labels = label_image.init_tf2(args["modelfile"], args["numthreads"], args["labelfile"])
     tfobjdet, objdet_possible_labels = label_image.init_tf2("/home/pi/birdclass/ssd_mobilenet_v1_1_metadata_1.tflite",
                                                             args["numthreads"],
-                                                             "/home/pi/birdclass/cocolabels.txt")
+                                                             "/home/pi/birdclass/mscoco_label_map.pbtxt", type="JSON")
 
 
     print('press esc to quit')
     while True:  # while escape key is not pressed
         if args["image"] == "":
             motionb, img, gray, graymotion, thresh = motion_detector.detect(cv2, cap, first_img, args["minarea"])
-            # convert opencv img frame to tensor input structure
-            ts_img = label_image.convert_cvframe_to_ts(opencv2=cv2, frame=img)
         else:  # testing code
             motionb = True
-            img = first_img
-            ts_img = first_img
+            first_img = cv2.imread(args["image"])
+            img = cv2.imread(args["image"])
 
         if motionb:
             # look for objects if motion is detected
-            objdet_tfconfidence, birds = label_image.set_label(ts_img, objdet_possible_labels, tfobjdet,
+            objdet_tfconfidence, birds = label_image.set_label(img, objdet_possible_labels, tfobjdet,
                                                             args["inputmean"], args["inputstd"])
             birddetected = False
 

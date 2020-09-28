@@ -24,11 +24,18 @@ import cv2
 import numpy as np
 from PIL import Image
 import tensorflow as tf  # TF2
+import json
 
 
 def load_labels(filename):
     with open(filename, 'r') as f:
         return [line.strip() for line in f.readlines()]
+
+
+def load_json_labels(filename):
+    with open(filename) as f:
+        labels = json.load(f)
+    return labels
 
 
 def main(args):
@@ -40,8 +47,12 @@ def main(args):
 
 
 # initialize tensor flow model
-def init_tf2(model_file, num_threads, label_file):
-    possible_labels = load_labels(label_file)
+def init_tf2(model_file, num_threads, label_file, type="TXT"):
+    possible_labels = np.asarray(load_labels(label_file))  # load label file and convert to list
+    if type="JSON":
+        possible_labels = load_json_labels(label_file)
+    else:
+        possible_labels = load_labels(label_file)  # load label file
     interpreter = tf.lite.Interpreter(model_file, num_threads)
     interpreter.allocate_tensors()
     return interpreter, possible_labels
@@ -58,13 +69,17 @@ def set_label(img, labels, interpreter, input_mean, input_std):
     # NxHxWxC, H:1, W:2
     height = input_details[0]['shape'][1]
     width = input_details[0]['shape'][2]
-    img = img.resize((width, height))
 
-    # add N dim
-    input_data = np.expand_dims(img, axis=0)
+    # *****
+    inp_img = cv2.resize(img, (width, height))  # resize to respect input shape and tensor model
+    rgb = cv2.cvtColor(inp_img, cv2.COLOR_BGR2RGB)  # convert img to RGB
+    # rgb_tensor = tf.convert_to_tensor(rgb, dtype=tf.float32)  # TF full tensor
+    rgb_tensor = tf.convert_to_tensor(rgb, dtype=tf.uint8)  # TF Lite
+    input_data = tf.expand_dims(rgb_tensor, 0)  # add dims to RGB tensor
+    # *****
 
-    if floating_model:
-        input_data = (np.float32(input_data) - input_mean) / input_std
+    # if floating_model:
+    #    input_data = (np.float32(input_data) - input_mean) / input_std
 
     interpreter.set_tensor(input_details[0]['index'], input_data)
 
@@ -77,16 +92,16 @@ def set_label(img, labels, interpreter, input_mean, input_std):
 
     top_k = results.argsort()[-5:][::-1]
     for i in top_k:
-        if floating_model:
+        if floating_model:  # full tensor
             print('{:08.6f}: {}'.format(float(results[i]), labels[i]))
-        else:
-            print('{:08.6f}: {}'.format(float(results[i] / 255.0), labels[i]))
+        else:  # tensor lite
+            print('{:08.6f}: {}'.format((float(results[i]) / 255), labels[i]))
 
     print('time: {:.3f}ms'.format((stop_time - start_time) * 1000))
     return results[0], labels[0]  # confidence and best label
 
 
-def convert_cvframe_to_ts(opencv2, frame)
+def convert_cvframe_to_ts(opencv2, frame):
     numpy_frame = np.asarray(frame)
     numpy_frame = opencv2.normalize(numpy_frame.astype('float'), None, -0.5, .5, cv2.NORM_MINMAX)
     numpy_final = np.expand_dims(numpy_frame, axis=0)
