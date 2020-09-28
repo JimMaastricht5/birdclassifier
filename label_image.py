@@ -20,7 +20,7 @@ from __future__ import print_function
 
 import argparse
 import time
-
+import cv2
 import numpy as np
 from PIL import Image
 import tensorflow as tf  # TF2
@@ -84,6 +84,13 @@ def set_label(img, labels, interpreter, input_mean, input_std):
 
     print('time: {:.3f}ms'.format((stop_time - start_time) * 1000))
     return results[0], labels[0]  # confidence and best label
+
+
+def convert_cvframe_to_ts(opencv2, frame)
+    numpy_frame = np.asarray(frame)
+    numpy_frame = opencv2.normalize(numpy_frame.astype('float'), None, -0.5, .5, cv2.NORM_MINMAX)
+    numpy_final = np.expand_dims(numpy_frame, axis=0)
+    return numpy_final
 
 
 # test function

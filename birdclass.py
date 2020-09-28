@@ -75,13 +75,15 @@ def bird_detector(args):
     while True:  # while escape key is not pressed
         if args["image"] == "":
             motionb, img, gray, graymotion, thresh = motion_detector.detect(cv2, cap, first_img, args["minarea"])
-        else:
+            # convert opencv img frame to tensor input structure
+            ts_img = label_image.convert_cvframe_to_ts(opencv2=cv2, frame=img)
+        else:  # testing code
             motionb = True
             img = first_img
+            ts_img = first_img
 
         if motionb:
-            # look for object if motion is detected
-                        
+            # look for objects if motion is detected
             objdet_tfconfidence, birds = label_image.set_label(ts_img, objdet_possible_labels, tfobjdet,
                                                             args["inputmean"], args["inputstd"])
             birddetected = False
