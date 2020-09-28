@@ -32,6 +32,8 @@ from auth import (
     access_token,
     access_token_secret
 )  # import twitter keys
+import tensorflow as tf
+
 
 
 def bird_detector(args):
@@ -45,7 +47,7 @@ def bird_detector(args):
     colors = np.random.uniform(0, 255, size=(len(classes), 3))  # random colors for bounding boxes
 
     # load serialized model for object detection
-    net = cv2.dnn.readNetFromCaffe(args["prototxt"], args["objmodel"])
+    # net = cv2.dnn.readNetFromCaffe(args["prototxt"], args["objmodel"])
 
     # setup pan tilt and initialize variables
     if args["panb"]:
@@ -64,6 +66,10 @@ def bird_detector(args):
 
     # tensor flow lite setup; TF used to classify detected birds
     interpreter, possible_labels = label_image.init_tf2(args["modelfile"], args["numthreads"], args["labelfile"])
+    tfobjdet, objdet_possible_labels = label_image.init_tf2("/home/pi/birdclass/ssd_mobilenet_v1_1_metadata_1.tflite",
+                                                            args["numthreads"],
+                                                             "/home/pi/birdclass/cocolabels.txt")
+
 
     print('press esc to quit')
     while True:  # while escape key is not pressed
@@ -75,15 +81,9 @@ def bird_detector(args):
 
         if motionb:
             # look for object if motion is detected
-            # load the input image and construct an input blob for the image
-            # resizing to fixed pixels check prototxt file for corect size 224, 224
-            (h, w) = img.shape[:2]
-            blob = cv2.dnn.blobFromImage(img, 0.007843, (224, 224), (127.5, 127.5, 127.5))
-
-            # pass the blob through the network and obtain the detections and predictions
-            print(blob.shape)
-            net.setInput(blob)
-            birds = net.forward()
+                        
+            objdet_tfconfidence, birds = label_image.set_label(ts_img, objdet_possible_labels, tfobjdet,
+                                                            args["inputmean"], args["inputstd"])
             birddetected = False
 
             print(birds.shape)
@@ -99,8 +99,6 @@ def bird_detector(args):
                     box = birds[0, 0, i, 3:7] * np.array([w, h, w, h])
                     (startX, startY, endX, endY) = box.astype("int")
 
-                    #     cv2.rectangle(img, (x, y), ((x + w), (y + h)), (0, 255, 0), 2)
-                    #         bird_img = img[y:y + h, x:x + w]  # extract image of bird
                     bird_img = img[startY:endY, startX:endX]  # extract image of bird
                     cv2.imwrite("temp.jpg", bird_img)  # write out file to disk for debugging and tensor feed
                     # run tensor flow lite model to id bird type
