@@ -62,27 +62,7 @@ def init_tf2(model_file, num_threads, label_file, filetype="TXT"):
 def set_label(img, labels, interpreter, input_mean, input_std):
     input_details = interpreter.get_input_details()
     output_details = interpreter.get_output_details()
-
-    # check the type of the input tensor
-    floating_model = input_details[0]['dtype'] == np.float32
-
-    # NxHxWxC, H:1, W:2
-    height = input_details[0]['shape'][1]
-    width = input_details[0]['shape'][2]
-
-    # *****
-    inp_img = cv2.resize(img, (width, height))  # resize to respect input shape and tensor model
-    rgb = cv2.cvtColor(inp_img, cv2.COLOR_BGR2RGB)  # convert img to RGB
-    if floating_model:
-        rgb_tensor = tf.convert_to_tensor(rgb, dtype=tf.float32)  # TF full tensor
-    else:
-        rgb_tensor = tf.convert_to_tensor(rgb, dtype=tf.uint8)  # TF Lite
-
-    input_data = tf.expand_dims(rgb_tensor, 0)  # add dims to RGB tensor
-    # *****
-    if floating_model:
-       input_data = (np.float32(input_data) - input_mean) / input_std
-
+    floating_model, input_data = convert_cvframe_to_ts(img, input_details, input_mean, input_std)
     interpreter.set_tensor(input_details[0]['index'], input_data)
 
     start_time = time.time()
@@ -103,11 +83,27 @@ def set_label(img, labels, interpreter, input_mean, input_std):
     return results[0], labels[0]  # confidence and best label
 
 
-def convert_cvframe_to_ts(opencv2, frame):
-    numpy_frame = np.asarray(frame)
-    numpy_frame = opencv2.normalize(numpy_frame.astype('float'), None, -0.5, .5, cv2.NORM_MINMAX)
-    numpy_final = np.expand_dims(numpy_frame, axis=0)
-    return numpy_final
+def convert_cvframe_to_ts(frame, input_details, input_mean, input_std):
+    # check the type of the input tensor
+    floating_model = input_details[0]['dtype'] == np.float32
+
+    # NxHxWxC, H:1, W:2
+    height = input_details[0]['shape'][1]
+    width = input_details[0]['shape'][2]
+
+    inp_img = cv2.resize(frame, (width, height))  # resize to respect input shape and tensor model
+    rgb = cv2.cvtColor(inp_img, cv2.COLOR_BGR2RGB)  # convert img to RGB
+    if floating_model:
+        rgb_tensor = tf.convert_to_tensor(rgb, dtype=tf.float32)  # TF full tensor
+    else:
+        rgb_tensor = tf.convert_to_tensor(rgb, dtype=tf.uint8)  # TF Lite
+
+    input_data = tf.expand_dims(rgb_tensor, 0)  # add dims to RGB tensor
+
+    if floating_model:
+        input_data = (np.float32(input_data) - input_mean) / input_std
+
+    return floating_model, input_data
 
 
 # test function
