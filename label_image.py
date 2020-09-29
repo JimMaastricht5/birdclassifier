@@ -34,7 +34,8 @@ def load_labels(filename):
 def main(args):
     img = cv2.imread(args.image)
     obj_interpreter, obj_labels = init_tf2(args.obj_det_file, args.num_threads, args.obj_det_label_file)
-    results, labels, rects = object_detection(img, obj_labels, obj_interpreter, args.input_mean, args.input_std)
+    results, labels, rects = object_detection(args.confidence, img, obj_labels,
+                                              obj_interpreter, args.input_mean, args.input_std)
 
     print('objects detected', results)
     print('labels detected', labels)
@@ -54,11 +55,11 @@ def init_tf2(model_file, num_threads, label_file):
 
 
 # input image and return best result and label
-def object_detection(img, labels, interpreter, input_mean, input_std):
+def object_detection(min_confidence, img, labels, interpreter, input_mean, input_std):
     confidences = []
     confidence_labels = []
     confidence_rects = []
-    birdb = False
+
     input_details = interpreter.get_input_details()
     output_details = interpreter.get_output_details()
     floating_model, input_data = convert_cvframe_to_ts(img, input_details, input_mean, input_std)
@@ -74,7 +75,7 @@ def object_detection(img, labels, interpreter, input_mean, input_std):
         det_confidences = interpreter.get_tensor(output_details[2]['index'])
 
         for index, det_confidence in enumerate(det_confidences[0]):
-            if det_confidence > 0.5:
+            if det_confidence >= min_confidence:
                 labelidx = int(det_labels_index[index][0] - 1)  # get result label index for labels; offset -1 row 0
                 label = labels[labelidx]  # grab text from possible labels
                 confidences.append(det_confidence)
@@ -171,6 +172,7 @@ if __name__ == '__main__':
         help='input standard deviation')
     parser.add_argument(
         '--num_threads', default=None, type=int, help='number of threads')
+    parser.add_argument('-c', '--confidence', type=float, default=0.5)
     arguments = parser.parse_args()
 
     main(arguments)

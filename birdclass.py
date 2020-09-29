@@ -78,9 +78,8 @@ def bird_detector(args):
             birddetected = False
 
             # loop over the detections; only class detected per input is birds
-            for i in np.arange(0, birds.shape[0]):
-                confidence = birds[0, 0, i, 2]  # extract the confidence associated with the prediction
-                if confidence > args["confidence"]:  # filter out weak detections, default 0.2
+            for i in det_confidence:
+                if det_confidence[i] > args.confidence:
                     # extract the index of the class label from the `detections`,
                     # then compute the (x, y)-coordinates of the bounding box
                     birddetected = True
