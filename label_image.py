@@ -35,10 +35,10 @@ def main(args):
     img = cv2.imread(args.image)
     obj_interpreter, obj_labels = init_tf2(args.obj_det_file, args.num_threads, args.obj_det_label_file)
     results, labels, rects = object_detection(img, obj_labels, obj_interpreter, args.input_mean, args.input_std)
+
     print('objects detected', results)
     print('labels detected', labels)
     print('rectangles', rects)
-
     interpreter, possible_labels = init_tf2(args.model_file, args.num_threads, args.label_file)
     result, label = set_label(img, possible_labels, interpreter, args.input_mean, args.input_std)
     print('final result', result)
@@ -58,7 +58,7 @@ def object_detection(img, labels, interpreter, input_mean, input_std):
     confidences = []
     confidence_labels = []
     confidence_rects = []
-
+    birdb = False
     input_details = interpreter.get_input_details()
     output_details = interpreter.get_output_details()
     floating_model, input_data = convert_cvframe_to_ts(img, input_details, input_mean, input_std)

@@ -73,12 +73,10 @@ def bird_detector(args):
 
         if motionb:
             # look for objects if motion is detected
-            objdet_tfconfidence, birds = label_image.set_label(img, objdet_possible_labels, tfobjdet,
+            det_confidence, det_labels, det_rects = label_image.object_detection(img, objdet_possible_labels, tfobjdet,
                                                             args["inputmean"], args["inputstd"])
             birddetected = False
 
-            print(birds.shape)
-            print(birds)
             # loop over the detections; only class detected per input is birds
             for i in np.arange(0, birds.shape[0]):
                 confidence = birds[0, 0, i, 2]  # extract the confidence associated with the prediction
@@ -126,6 +124,16 @@ def bird_detector(args):
 
     cap.release()
     cv2.destroyAllWindows()
+
+# sample code not called
+def draw_rect(image, box):
+    y_min = int(max(1, (box[0] * image.height)))
+    x_min = int(max(1, (box[1] * image.width)))
+    y_max = int(min(image.height, (box[2] * image.height)))
+    x_max = int(min(image.width, (box[3] * image.width)))
+
+    # draw a rectangle on the image
+    cv2.rectangle(image, (x_min, y_min), (x_max, y_max), (255, 255, 255), 2)
 
 
 if __name__ == "__main__":
