@@ -39,15 +39,7 @@ import tensorflow as tf
 def bird_detector(args):
     # initialize the list of class labels MobileNet SSD was trained to
     # detect, then generate a set of bounding box colors for each class
-    # classes = ["background", "aeroplane", "bicycle", "bird", "boat",
-    #            "bottle", "bus", "car", "cat", "chair", "cow", "diningtable",
-    #            "dog", "horse", "motorbike", "person", "pottedplant", "sheep",
-    #            "sofa", "train", "tvmonitor"]
-    classes = ["bird"]  # classes to detect
     colors = np.random.uniform(0, 255, size=(len(classes), 3))  # random colors for bounding boxes
-
-    # load serialized model for object detection
-    # net = cv2.dnn.readNetFromCaffe(args["prototxt"], args["objmodel"])
 
     # setup pan tilt and initialize variables
     if args["panb"]:
@@ -60,15 +52,14 @@ def bird_detector(args):
         cap.set(4, args["screenheight"])  # set screen height
         first_img = motion_detector.init(cv2, cap)
     else:
-        first_img = cv2.imread(args["image"])
+        first_img = cv2.imread(args["image"]) # testing code
 
     twitter = tweeter.init(api_key, api_secret_key, access_token, access_token_secret)  # init twitter api
 
     # tensor flow lite setup; TF used to classify detected birds
     interpreter, possible_labels = label_image.init_tf2(args["modelfile"], args["numthreads"], args["labelfile"])
-    tfobjdet, objdet_possible_labels = label_image.init_tf2("/home/pi/birdclass/ssd_mobilenet_v1_1_metadata_1.tflite",
-                                                            args["numthreads"],
-                                                             "/home/pi/birdclass/mscoco_label_map.pbtxt", type="JSON")
+    tfobjdet, objdet_possible_labels = label_image.init_tf2(args["objectmodel"], args["numthreads"],
+                                                             args["objectlabels"])
 
 
     print('press esc to quit')
@@ -144,8 +135,8 @@ if __name__ == "__main__":
     ap.add_argument("-a", "--minarea", type=int, default=20, help="minimum area size")
     ap.add_argument("-sw", "--screenwidth", type=int, default=640, help="max screen width")
     ap.add_argument("-sh", "--screenheight", type=int, default=480, help="max screen height")
-    ap.add_argument('-om', "--objmodel", default='/home/pi/birdclass/bvlc_googlenet.caffemodel')
-    ap.add_argument('-p', '--prototxt', default='/home/pi/birdclass/deploy.prototxt.txt')
+    ap.add_argument('-om', "--objmodel", default='/home/pi/birdclass/ssd_mobilenet_v1_1_metadata_1.tflite')
+    ap.add_argument('-p', '--objlabels', default='/home/pi/birdclass/mscoco_label_map.txt')
     ap.add_argument('-c', '--confidence', type=float, default=0.2)
     ap.add_argument('-m', '--modelfile', default='/home/pi/birdclass/mobilenet_tweeters.tflite',
                     help='.tflite model to be executed')
