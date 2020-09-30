@@ -1,6 +1,7 @@
 # module to tweet picture
 # auth.py must be located in project; protect this file as it contains keys
 # code by JimMaastricht5@gmail.com
+from PIL import Image
 from twython import Twython
 from auth import (
     api_key,
@@ -21,8 +22,8 @@ def post_status(twitter, message):
 
 
 # set status and add an image
-def post_image(twitter, message, image):
-    response = twitter.upload_media(media=image)
+def post_image(twitter, message, img):
+    response = twitter.upload_media(media=img)
     twitter.update_status(status=message, media_ids=[response['media_id']])
 
 

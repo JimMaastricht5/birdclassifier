@@ -32,14 +32,12 @@ from auth import (
     access_token,
     access_token_secret
 )  # import twitter keys
-import tensorflow as tf
-
 
 
 def bird_detector(args):
     # initialize the list of class labels MobileNet SSD was trained to
     # detect, then generate a set of bounding box colors for each class
-    colors = np.random.uniform(0, 255, size=(len(classes), 3))  # random colors for bounding boxes
+    colors = np.random.uniform(0, 255, size=(11, 3))  # random colors for bounding boxes
 
     # setup pan tilt and initialize variables
     if args["panb"]:
@@ -52,15 +50,13 @@ def bird_detector(args):
         cap.set(4, args["screenheight"])  # set screen height
         first_img = motion_detector.init(cv2, cap)
     else:
-        first_img = cv2.imread(args["image"]) # testing code
+        first_img = cv2.imread(args["image"])  # testing code
 
     twitter = tweeter.init(api_key, api_secret_key, access_token, access_token_secret)  # init twitter api
 
     # tensor flow lite setup; TF used to classify detected birds
     interpreter, possible_labels = label_image.init_tf2(args["modelfile"], args["numthreads"], args["labelfile"])
-    tfobjdet, objdet_possible_labels = label_image.init_tf2(args["objectmodel"], args["numthreads"],
-                                                             args["objectlabels"])
-
+    tfobjdet, objdet_possible_labels = label_image.init_tf2(args["objmodel"], args["numthreads"], args["objlabels"])
 
     print('press esc to quit')
     while True:  # while escape key is not pressed
@@ -73,39 +69,33 @@ def bird_detector(args):
 
         if motionb:
             # look for objects if motion is detected
-            det_confidence, det_labels, det_rects = label_image.object_detection(img, objdet_possible_labels, tfobjdet,
-                                                            args["inputmean"], args["inputstd"])
-            birddetected = False
-
-            # loop over the detections; only class detected per input is birds
-            for i in det_confidence:
-                if det_confidence[i] > args.confidence:
+            det_confidences, det_labels, det_rects = label_image.object_detection(args["confidence"], img,
+                                                                objdet_possible_labels, tfobjdet,
+                                                                args["inputmean"], args["inputstd"])
+            for i, det_confidence in enumerate(det_confidences):
+                if det_confidence > args["confidence"]:
                     # extract the index of the class label from the `detections`,
                     # then compute the (x, y)-coordinates of the bounding box
-                    birddetected = True
-                    idx = int(birds[0, 0, i, 1])
-                    box = birds[0, 0, i, 3:7] * np.array([w, h, w, h])
-                    (startX, startY, endX, endY) = box.astype("int")
+                    (startX, startY, endX, endY) = label_image.scale_rect(img, det_rects[i])
 
-                    bird_img = img[startY:endY, startX:endX]  # extract image of bird
-                    cv2.imwrite("temp.jpg", bird_img)  # write out file to disk for debugging and tensor feed
-                    # run tensor flow lite model to id bird type
-                    ts_img = bird_img.open("temp.jpg")  # reload from image; ensures matching disk to tensor
-                    tfconfidence, birdclass = label_image.set_label(ts_img, possible_labels, interpreter,
-                                                            args["inputmean"], args["inputstd"])
+                    if det_labels[i] == "16.bird":
+                        ts_img = img[startY:endY, startX:endX]  # extract image of bird
+                        cv2.imwrite("tsimg.jpg", ts_img)  # write out files to disk for debugging and tensor feed
+                        tfconfidence, birdclass = label_image.set_label(ts_img, possible_labels, interpreter,
+                                                                args["inputmean"], args["inputstd"])
+                    else:
+                        tfconfidence = det_confidence[i]
+                        birdclass = det_labels[i]
 
                     # draw bounding boxes and display label
-                    label = "{}: {:.2f} {:.2f}% ".format(classes[idx] + ' ' + birdclass, confidence * 100,
-                                                         tfconfidence * 100)
-                    # print("[INFO] {}".format(label))
-                    cv2.rectangle(img, (startX, startY), (endX, endY), colors[idx], 2)
+                    label = "{}: {:.2f}% ".format(birdclass, tfconfidence * 100)
+                    cv2.rectangle(img, (startX, startY), (endX, endY), colors[i], 2)
                     y = startY - 15 if startY - 15 > 15 else startY + 15  # adjust label loc if too low
-                    cv2.putText(img, label, (startX, y),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors[idx], 2)
-
-                    if birddetected:
-                        print("[INFO] {}".format(label))
-                        # twitter.post_image(confidence + " " + label, img)
+                    cv2.putText(img, label, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors[i], 2)
+                    cv2.imwrite("img.jpg", img)
+                    if det_labels[i] == "16.bird":
+                        tw_img = open('cardinal.jpg', 'rb')
+                        tweeter.post_image(twitter, label, tw_img)
 
             if args["panb"]:
                 currpan, currtilt = PanTilt9685.trackobject(pwm, cv2, currpan, currtilt, img, birds,
@@ -114,25 +104,15 @@ def bird_detector(args):
         cv2.imshow('video', img)
         # cv2.imshow('gray', graymotion)
         # cv2.imshow('threshold', thresh)
-        # cv2.imshow('bird', bird_img)
-
+        break
         # check for esc key and quit if pressed
         k = cv2.waitKey(30) & 0xff
         if k == 27:  # press 'ESC' to quit
             break
 
-    cap.release()
+    if args["image"] == "":  # not testing code
+        cap.release()
     cv2.destroyAllWindows()
-
-# sample code not called
-def draw_rect(image, box):
-    y_min = int(max(1, (box[0] * image.height)))
-    x_min = int(max(1, (box[1] * image.width)))
-    y_max = int(min(image.height, (box[2] * image.height)))
-    x_max = int(min(image.width, (box[3] * image.width)))
-
-    # draw a rectangle on the image
-    cv2.rectangle(image, (x_min, y_min), (x_max, y_max), (255, 255, 255), 2)
 
 
 if __name__ == "__main__":
@@ -144,7 +124,7 @@ if __name__ == "__main__":
     ap.add_argument("-sh", "--screenheight", type=int, default=480, help="max screen height")
     ap.add_argument('-om', "--objmodel", default='/home/pi/birdclass/ssd_mobilenet_v1_1_metadata_1.tflite')
     ap.add_argument('-p', '--objlabels', default='/home/pi/birdclass/mscoco_label_map.txt')
-    ap.add_argument('-c', '--confidence', type=float, default=0.2)
+    ap.add_argument('-c', '--confidence', type=float, default=0.5)
     ap.add_argument('-m', '--modelfile', default='/home/pi/birdclass/mobilenet_tweeters.tflite',
                     help='.tflite model to be executed')
     ap.add_argument('-l', '--labelfile', default='/home/pi/birdclass/class_labels.txt',

@@ -73,9 +73,9 @@ def object_detection(min_confidence, img, labels, interpreter, input_mean, input
         det_rects = interpreter.get_tensor(output_details[0]['index'])
         det_labels_index = interpreter.get_tensor(output_details[1]['index'])  # labels are an array for each result
         det_confidences = interpreter.get_tensor(output_details[2]['index'])
-
         for index, det_confidence in enumerate(det_confidences[0]):
             if det_confidence >= min_confidence:
+                # print(index, det_confidence, min_confidence)
                 labelidx = int(det_labels_index[index][0] - 1)  # get result label index for labels; offset -1 row 0
                 label = labels[labelidx]  # grab text from possible labels
                 confidences.append(det_confidence)
@@ -93,6 +93,8 @@ def set_label(img, labels, interpreter, input_mean, input_std):
     input_details = interpreter.get_input_details()
     output_details = interpreter.get_output_details()
     floating_model, input_data = convert_cvframe_to_ts(img, input_details, input_mean, input_std)
+    # floating_model = False
+    # input_data = img
     interpreter.set_tensor(input_details[0]['index'], input_data)
 
     # start_time = time.time()
@@ -113,11 +115,9 @@ def set_label(img, labels, interpreter, input_mean, input_std):
 def convert_cvframe_to_ts(frame, input_details, input_mean, input_std):
     # check the type of the input tensor
     floating_model = input_details[0]['dtype'] == np.float32
-
     # NxHxWxC, H:1, W:2
     height = input_details[0]['shape'][1]
     width = input_details[0]['shape'][2]
-
     inp_img = cv2.resize(frame, (width, height))  # resize to respect input shape and tensor model
     rgb = cv2.cvtColor(inp_img, cv2.COLOR_BGR2RGB)  # convert img to RGB
     if floating_model:
@@ -131,6 +131,15 @@ def convert_cvframe_to_ts(frame, input_details, input_mean, input_std):
         input_data = (np.float32(input_data) - input_mean) / input_std
 
     return floating_model, input_data
+
+
+def scale_rect(img, box):
+    (img_height, img_width, img_layers) = img.shape
+    y_min = int(max(1, (box[0] * img_height)))
+    x_min = int(max(1, (box[1] * img_width)))
+    y_max = int(min(img_height, (box[2] * img_height)))
+    x_max = int(min(img_width, (box[3] * img_width)))
+    return (x_min, y_min, x_max, y_max)
 
 
 # test function
