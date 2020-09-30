@@ -11,24 +11,24 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
+# Revisions by JimMaastricht5@gmail.com
+# refactored for object detection and object classification
+# blended tensor and tensor flow lite capabilities
+# added conversion of cv2 frame to tensor
+# added scale rect results from obj detection to apply to full image
+# added code for detailed object detection and for general classification
 # ==============================================================================
-"""label_image for tflite."""
 
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
 import argparse
-# import time
 import cv2
 import numpy as np
-# from PIL import Image
 import tensorflow as tf  # TF2
-
-
-def load_labels(filename):
-    with open(filename, 'r') as f:
-        return [line.strip() for line in f.readlines()]
+# import time
 
 
 def main(args):
@@ -44,6 +44,11 @@ def main(args):
     result, label = set_label(img, possible_labels, interpreter, args.input_mean, args.input_std)
     print('final result', result)
     print('final label', label)
+
+
+def load_labels(filename):
+    with open(filename, 'r') as f:
+        return [line.strip() for line in f.readlines()]
 
 
 # initialize tensor flow model
@@ -75,7 +80,6 @@ def object_detection(min_confidence, img, labels, interpreter, input_mean, input
         det_confidences = interpreter.get_tensor(output_details[2]['index'])
         for index, det_confidence in enumerate(det_confidences[0]):
             if det_confidence >= min_confidence:
-                # print(index, det_confidence, min_confidence)
                 labelidx = int(det_labels_index[index][0] - 1)  # get result label index for labels; offset -1 row 0
                 label = labels[labelidx]  # grab text from possible labels
                 confidences.append(det_confidence)
@@ -93,8 +97,6 @@ def set_label(img, labels, interpreter, input_mean, input_std):
     input_details = interpreter.get_input_details()
     output_details = interpreter.get_output_details()
     floating_model, input_data = convert_cvframe_to_ts(img, input_details, input_mean, input_std)
-    # floating_model = False
-    # input_data = img
     interpreter.set_tensor(input_details[0]['index'], input_data)
 
     # start_time = time.time()
@@ -104,12 +106,9 @@ def set_label(img, labels, interpreter, input_mean, input_std):
     if floating_model:  # full tensor bird classification model
         output_data = interpreter.get_tensor(output_details[0]['index'])
         results = np.squeeze(output_data)
-        # top_k = results.argsort()[-5:][::-1]
-        # for i in top_k:
-        #     print('{:08.6f}: {}'.format(float(results[i]), labels[i]))
 
     # print('time: {:.3f}ms'.format((stop_time - start_time) * 1000))
-    return results[0], labels[0]  # confidence and best label
+    return results[0], labels[0]  # highest confidence and best label
 
 
 def convert_cvframe_to_ts(frame, input_details, input_mean, input_std):

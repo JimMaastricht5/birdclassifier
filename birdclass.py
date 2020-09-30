@@ -21,7 +21,7 @@
 # packages: pan tilt uses PCA9685-Driver
 import cv2  # open cv 2
 import label_image  # code to init tensor flow model and classify bird type
-# import PanTilt9685  # pan tilt control code
+import PanTilt9685  # pan tilt control code
 import motion_detector  # motion detector helper functions
 import tweeter  # twitter helper functions
 import argparse  # argument parser
@@ -54,7 +54,7 @@ def bird_detector(args):
 
     twitter = tweeter.init(api_key, api_secret_key, access_token, access_token_secret)  # init twitter api
 
-    # tensor flow lite setup; TF used to classify detected birds
+    # tensor flow lite setup; TF used to classify detected birds; need to convert that to tf lite
     interpreter, possible_labels = label_image.init_tf2(args["modelfile"], args["numthreads"], args["labelfile"])
     tfobjdet, objdet_possible_labels = label_image.init_tf2(args["objmodel"], args["numthreads"], args["objlabels"])
 
@@ -70,11 +70,10 @@ def bird_detector(args):
         if motionb:
             # look for objects if motion is detected
             det_confidences, det_labels, det_rects = label_image.object_detection(args["confidence"], img,
-                                                                objdet_possible_labels, tfobjdet,
-                                                                args["inputmean"], args["inputstd"])
+                                                                                  objdet_possible_labels, tfobjdet,
+                                                                                  args["inputmean"], args["inputstd"])
             for i, det_confidence in enumerate(det_confidences):
                 if det_confidence > args["confidence"]:
-                    # extract the index of the class label from the `detections`,
                     # then compute the (x, y)-coordinates of the bounding box
                     (startX, startY, endX, endY) = label_image.scale_rect(img, det_rects[i])
 
@@ -82,8 +81,8 @@ def bird_detector(args):
                         ts_img = img[startY:endY, startX:endX]  # extract image of bird
                         cv2.imwrite("tsimg.jpg", ts_img)  # write out files to disk for debugging and tensor feed
                         tfconfidence, birdclass = label_image.set_label(ts_img, possible_labels, interpreter,
-                                                                args["inputmean"], args["inputstd"])
-                    else:
+                                                                        args["inputmean"], args["inputstd"])
+                    else:  # not a bird
                         tfconfidence = det_confidence[i]
                         birdclass = det_labels[i]
 
@@ -93,18 +92,20 @@ def bird_detector(args):
                     y = startY - 15 if startY - 15 > 15 else startY + 15  # adjust label loc if too low
                     cv2.putText(img, label, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors[i], 2)
                     cv2.imwrite("img.jpg", img)
-                    if det_labels[i] == "16.bird":
+
+                    if det_labels[i] == "16.bird":  # share what you see
                         tw_img = open('cardinal.jpg', 'rb')
                         tweeter.post_image(twitter, label, tw_img)
 
             if args["panb"]:
-                currpan, currtilt = PanTilt9685.trackobject(pwm, cv2, currpan, currtilt, img, birds,
+                currpan, currtilt = PanTilt9685.trackobject(pwm, cv2, currpan, currtilt, img,
+                                                            (startX, startY, endX, endY),
                                                             args["screenwidth"], args["screenheight"])
 
         cv2.imshow('video', img)
         # cv2.imshow('gray', graymotion)
         # cv2.imshow('threshold', thresh)
-        break
+
         # check for esc key and quit if pressed
         k = cv2.waitKey(30) & 0xff
         if k == 27:  # press 'ESC' to quit
@@ -134,7 +135,7 @@ if __name__ == "__main__":
     ap.add_argument('--numthreads', default=None, type=int, help='Tensor number of threads')
     ap.add_argument('--panb', default=False, type=bool, help='activate pan tilt mechanism')
     ap.add_argument('-i', '--image', default='/home/pi/birdclass/cardinal.jpg',
-                                   help='image to be classified')
+                                            help='image to be classified')
 
     arguments = vars(ap.parse_args())
 

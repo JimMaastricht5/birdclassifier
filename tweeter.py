@@ -1,7 +1,6 @@
 # module to tweet picture
 # auth.py must be located in project; protect this file as it contains keys
 # code by JimMaastricht5@gmail.com
-from PIL import Image
 from twython import Twython
 from auth import (
     api_key,

@@ -8,8 +8,10 @@ from PCA9685 import PCA9685
 def trackobject(pwm, cv, currpan, currtilt, img, objsdetected, screen_height, screen_width):
     panto = currpan
     tiltto = currtilt
-    for (x, y, w, h) in objsdetected:
-        cv.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
+    for (x, y, x2, y2) in objsdetected:
+        # cv.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
+        w = abs(x2 - x)
+        h = abs(y2 - y)
         xfacecenter = x + w / 2
         yfacecenter = y + h / 2
 
