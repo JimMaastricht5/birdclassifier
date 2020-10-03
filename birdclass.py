@@ -26,6 +26,7 @@ import motion_detector  # motion detector helper functions
 import tweeter  # twitter helper functions
 import argparse  # argument parser
 import numpy as np
+import time
 from auth import (
     api_key,
     api_secret_key,
@@ -38,6 +39,8 @@ def bird_detector(args):
     # initialize the list of class labels MobileNet SSD was trained to
     # detect, then generate a set of bounding box colors for each class
     colors = np.random.uniform(0, 255, size=(11, 3))  # random colors for bounding boxes
+    birds_found =[]
+    starttime = time.time()
 
     # setup pan tilt and initialize variables
     if args["panb"]:
@@ -91,11 +94,18 @@ def bird_detector(args):
                     cv2.rectangle(img, (startX, startY), (endX, endY), colors[i], 2)
                     y = startY - 15 if startY - 15 > 15 else startY + 15  # adjust label loc if too low
                     cv2.putText(img, label, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors[i], 2)
-                    cv2.imwrite("img.jpg", img)
+                    cv2.imwrite("img.jpg", img)  # write out image for debugging and testing
 
                     if det_labels[i] == "16.bird":  # share what you see
-                        tw_img = open('cardinal.jpg', 'rb')
-                        tweeter.post_image(twitter, label, tw_img)
+                        if birdclass in birds_found:  # seen it
+                            elapsed_time = time.time()
+                            if elapsed_time - starttime >= 300:  # elapsed time in seconds; give it 5 minutes
+                                starttime = time.time()  # rest timer
+                                birds_found = []  # clear birds found
+                        else:
+                            tw_img = open('img.jpg', 'rb')
+                            tweeter.post_image(twitter, label, tw_img)
+                            birds_found.append(birdclass)
 
             if args["panb"]:
                 currpan, currtilt = PanTilt9685.trackobject(pwm, cv2, currpan, currtilt, img,
