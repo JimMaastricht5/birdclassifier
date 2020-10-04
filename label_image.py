@@ -56,6 +56,8 @@ def init_tf2(model_file, num_threads, label_file):
     possible_labels = np.asarray(load_labels(label_file))  # load label file and convert to list
     interpreter = tf.lite.Interpreter(model_file, num_threads)
     interpreter.allocate_tensors()
+    print(interpreter)
+    print(possible_labels)
     return interpreter, possible_labels
 
 
@@ -68,6 +70,7 @@ def object_detection(min_confidence, img, labels, interpreter, input_mean, input
     input_details = interpreter.get_input_details()
     output_details = interpreter.get_output_details()
     floating_model, input_data = convert_cvframe_to_ts(img, input_details, input_mean, input_std)
+    print(input_details)
     interpreter.set_tensor(input_details[0]['index'], input_data)
 
     # start_time = time.time()
