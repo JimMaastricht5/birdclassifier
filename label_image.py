@@ -19,7 +19,8 @@
 # added scale rect results from obj detection to apply to full image
 # added code for detailed object detection and for general classification
 # ==============================================================================
-
+# PY4: pip3 install https://dl.google.com/coral/python/tflite_runtime-2.1.0.post1-cp37-cp37m-linux_armv7l.whl
+#
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -27,6 +28,7 @@ from __future__ import print_function
 import argparse
 import cv2
 import numpy as np
+# import tflite_runtime.interpreter as tf  # for pi4 with install wheel above
 import tensorflow as tf  # TF2
 # import time
 
