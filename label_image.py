@@ -28,8 +28,8 @@ from __future__ import print_function
 import argparse
 import cv2
 import numpy as np
-# import tflite_runtime.interpreter as tf  # for pi4 with install wheel above
-import tensorflow as tf  # TF2
+import tflite_runtime.interpreter as tflite  # for pi4 with install wheel above
+# import tensorflow as tf  # TF2
 # import time
 
 
@@ -56,7 +56,8 @@ def load_labels(filename):
 # initialize tensor flow model
 def init_tf2(model_file, num_threads, label_file):
     possible_labels = np.asarray(load_labels(label_file))  # load label file and convert to list
-    interpreter = tf.lite.Interpreter(model_file, num_threads)
+    # interpreter = tf.lite.Interpreter(model_file, num_threads)
+    interpreter = tflite.Interpreter(model_file, num_threads)
     interpreter.allocate_tensors()
     print(interpreter)
     print(possible_labels)
@@ -72,7 +73,7 @@ def object_detection(min_confidence, img, labels, interpreter, input_mean, input
     input_details = interpreter.get_input_details()
     output_details = interpreter.get_output_details()
     floating_model, input_data = convert_cvframe_to_ts(img, input_details, input_mean, input_std)
-    print(input_details)
+    # print(input_details)
     interpreter.set_tensor(input_details[0]['index'], input_data)
 
     # start_time = time.time()
@@ -85,11 +86,11 @@ def object_detection(min_confidence, img, labels, interpreter, input_mean, input
         det_confidences = interpreter.get_tensor(output_details[2]['index'])
         for index, det_confidence in enumerate(det_confidences[0]):
             if det_confidence >= min_confidence:
-                labelidx = int(det_labels_index[index][0] - 1)  # get result label index for labels; offset -1 row 0
+                labelidx = int(det_labels_index[0][index] - 1)  # get result label index for labels; offset -1 row 0
                 label = labels[labelidx]  # grab text from possible labels
                 confidences.append(det_confidence)
                 confidence_labels.append(label)
-                confidence_rects.append(det_rects[index][0])
+                confidence_rects.append(det_rects[0][index])
                 # print('confidence and label {:08.6f}: {}'.format(float(det_confidence), label))
                 # print("Rectangles are: {}".format(det_rects[index]))
 
@@ -122,17 +123,24 @@ def convert_cvframe_to_ts(frame, input_details, input_mean, input_std):
     # NxHxWxC, H:1, W:2
     height = input_details[0]['shape'][1]
     width = input_details[0]['shape'][2]
-    inp_img = cv2.resize(frame, (width, height))  # resize to respect input shape and tensor model
-    rgb = cv2.cvtColor(inp_img, cv2.COLOR_BGR2RGB)  # convert img to RGB
-    if floating_model:
-        rgb_tensor = tf.convert_to_tensor(rgb, dtype=tf.float32)  # TF full tensor
-    else:
-        rgb_tensor = tf.convert_to_tensor(rgb, dtype=tf.uint8)  # TF Lite
+    # inp_img = cv2.resize(frame, (width, height))  # resize to respect input shape and tensor model
+    # rgb = cv2.cvtColor(inp_img, cv2.COLOR_BGR2RGB)  # convert img to RGB
 
-    input_data = tf.expand_dims(rgb_tensor, 0)  # add dims to RGB tensor
+    inp_img = cv2.resize(frame, (width, height), interpolation=cv2.INTER_CUBIC)
+    reshape_image = inp_img.reshape(width, height, 3)
+    image_np_expanded = np.expand_dims(reshape_image, axis=0)
+    input_data = image_np_expanded.astype('uint8')  # float32
 
-    if floating_model:
-        input_data = (np.float32(input_data) - input_mean) / input_std
+
+    # if floating_model:
+    #     rgb_tensor = tflite.convert_to_tensor(rgb, dtype=tf.float32)  # TF full tensor
+    # else:
+    #     rgb_tensor = tflite.convert_to_tensor(rgb, dtype=tf.uint8)  # TF Lite
+    #
+    # input_data = tflite.expand_dims(rgb_tensor, 0)  # add dims to RGB tensor
+    #
+    # if floating_model:
+    #     input_data = (np.float32(input_data) - input_mean) / input_std
 
     return floating_model, input_data
 
