@@ -16,9 +16,10 @@
 # 192.Downy_Woodpecker
 
 # special notes when setting up the code on a rasberry pi 4 9/9/20
-# encountered an "undefined symbol: __atomic_fetch_add8" error related to libatomic.so on OpenCv version w/Raspberry Pi
-# install OpenCv version 4.1.0.25 to resolve the issue on the pi
-# packages: pan tilt uses PCA9685-Driver
+# install supporting libraries for directions @: https://qengineering.eu/install-opencv-4.2-on-raspberry-pi-4.html
+# install OpenCv version 4.4+
+# packages: pan tilt uses PCA9685-Driver, twitter use twython package, auth.py must be in project for import auth
+#   oauthlib,
 import cv2  # open cv 2
 import label_image  # code to init tensor flow model and classify bird type
 import PanTilt9685  # pan tilt control code

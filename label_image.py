@@ -103,8 +103,6 @@ def set_label(img, labels, interpreter, input_mean, input_std):
     input_details = interpreter.get_input_details()
     output_details = interpreter.get_output_details()
     floating_model, input_data = convert_cvframe_to_ts(img, input_details, input_mean, input_std)
-    print(img)
-    print(floating_model, input_details)
     interpreter.set_tensor(input_details[0]['index'], input_data)
 
     # start_time = time.time()
