@@ -59,8 +59,8 @@ def init_tf2(model_file, num_threads, label_file):
     # interpreter = tf.lite.Interpreter(model_file, num_threads)
     interpreter = tflite.Interpreter(model_file, num_threads)
     interpreter.allocate_tensors()
-    print(interpreter)
-    print(possible_labels)
+    # print(interpreter)
+    # print(possible_labels)
     return interpreter, possible_labels
 
 
@@ -103,6 +103,8 @@ def set_label(img, labels, interpreter, input_mean, input_std):
     input_details = interpreter.get_input_details()
     output_details = interpreter.get_output_details()
     floating_model, input_data = convert_cvframe_to_ts(img, input_details, input_mean, input_std)
+    print(img)
+    print(floating_model, input_details)
     interpreter.set_tensor(input_details[0]['index'], input_data)
 
     # start_time = time.time()
@@ -129,18 +131,12 @@ def convert_cvframe_to_ts(frame, input_details, input_mean, input_std):
     inp_img = cv2.resize(frame, (width, height), interpolation=cv2.INTER_CUBIC)
     reshape_image = inp_img.reshape(width, height, 3)
     image_np_expanded = np.expand_dims(reshape_image, axis=0)
-    input_data = image_np_expanded.astype('uint8')  # float32
 
-
-    # if floating_model:
-    #     rgb_tensor = tflite.convert_to_tensor(rgb, dtype=tf.float32)  # TF full tensor
-    # else:
-    #     rgb_tensor = tflite.convert_to_tensor(rgb, dtype=tf.uint8)  # TF Lite
-    #
-    # input_data = tflite.expand_dims(rgb_tensor, 0)  # add dims to RGB tensor
-    #
-    # if floating_model:
-    #     input_data = (np.float32(input_data) - input_mean) / input_std
+    if floating_model:
+        input_data = image_np_expanded.astype('float32')
+        input_data = (np.float32(input_data) - input_mean) / input_std
+    else:
+        input_data = image_np_expanded.astype('uint8')
 
     return floating_model, input_data
 
