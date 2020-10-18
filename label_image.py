@@ -59,8 +59,6 @@ def init_tf2(model_file, num_threads, label_file):
     # interpreter = tf.lite.Interpreter(model_file, num_threads)
     interpreter = tflite.Interpreter(model_file, num_threads)
     interpreter.allocate_tensors()
-    # print(interpreter)
-    # print(possible_labels)
     return interpreter, possible_labels
 
 
@@ -73,7 +71,6 @@ def object_detection(min_confidence, img, labels, interpreter, input_mean, input
     input_details = interpreter.get_input_details()
     output_details = interpreter.get_output_details()
     floating_model, input_data = convert_cvframe_to_ts(img, input_details, input_mean, input_std)
-    # print(input_details)
     interpreter.set_tensor(input_details[0]['index'], input_data)
 
     # start_time = time.time()
@@ -88,14 +85,15 @@ def object_detection(min_confidence, img, labels, interpreter, input_mean, input
         det_confidences = interpreter.get_tensor(output_details[2]['index'])
         for index, det_confidence in enumerate(det_confidences[0]):
             if det_confidence >= min_confidence:
-                labelidx = int(det_labels_index[0][index]) - 1  # get result label index for labels;
-                try: label = labels[labelidx]  # grab text from possible labels
-                except: label =""
+                labelidx = int(det_labels_index[0][index])  # get result label index for labels;
+                try:
+                    label = labels[labelidx]  # grab text from possible labels
+                except:
+                    label = ""
+
                 confidences.append(det_confidence)
                 confidence_labels.append(label)
                 confidence_rects.append(det_rects[0][index])
-                # print('confidence and label {:08.6f}: {}'.format(float(det_confidence), label))
-                # print("Rectangles are: {}".format(det_rects[index]))
 
     # print('time: {:.3f}ms'.format((stop_time - start_time) * 1000))
     return confidences, confidence_labels, confidence_rects  # confidence and best label
@@ -112,9 +110,9 @@ def set_label(img, labels, interpreter, input_mean, input_std):
     interpreter.invoke()
     # stop_time = time.time()
 
-    if floating_model:  # full tensor bird classification model
-        output_data = interpreter.get_tensor(output_details[0]['index'])
-        results = np.squeeze(output_data)
+    # if floating_model:  # full tensor bird classification model
+    output_data = interpreter.get_tensor(output_details[0]['index'])
+    results = np.squeeze(output_data)
 
     # print('time: {:.3f}ms'.format((stop_time - start_time) * 1000))
     return results[0], labels[0]  # highest confidence and best label
@@ -126,8 +124,6 @@ def convert_cvframe_to_ts(frame, input_details, input_mean, input_std):
     # NxHxWxC, H:1, W:2
     height = input_details[0]['shape'][1]
     width = input_details[0]['shape'][2]
-    # inp_img = cv2.resize(frame, (width, height))  # resize to respect input shape and tensor model
-    # rgb = cv2.cvtColor(inp_img, cv2.COLOR_BGR2RGB)  # convert img to RGB
 
     inp_img = cv2.resize(frame, (width, height), interpolation=cv2.INTER_CUBIC)
     reshape_image = inp_img.reshape(width, height, 3)
@@ -167,17 +163,17 @@ if __name__ == '__main__':
     parser.add_argument(
         '-om',
         '--obj_det_file',
-        default='/home/pi/birdclass/ssd_mobilenet_v1_1_metadata_2.tflite',
+        default='/home/pi/birdclass/lite-model_ssd_mobilenet_v1_1_metadata_2.tflite',
         help='.tensor model for obj detection')
     parser.add_argument(
         '-l',
         '--label_file',
-        default='/home/pi/birdclass/ssd_mobilenet_v1_1_metadata_2_labelmap.txt',
+        default='/home/pi/birdclass/class_labels.txt',
         help='name of file containing labels for bird classification model')
     parser.add_argument(
         '-ol',
         '--obj_det_label_file',
-        default='/home/pi/birdclass/mscoco_label_map.txt',
+        default='/home/pi/birdclass/lite-model_ssd_mobilenet_v1_1_metadata_2_labelmap.txt',
         help='name of file containing labels')
 
     parser.add_argument(

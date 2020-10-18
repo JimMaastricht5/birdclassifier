@@ -40,7 +40,7 @@ def bird_detector(args):
     # initialize the list of class labels MobileNet SSD was trained to
     # detect, then generate a set of bounding box colors for each class
     colors = np.random.uniform(0, 255, size=(11, 3))  # random colors for bounding boxes
-    birds_found =[]
+    birds_found = []
     starttime = time.time()
 
     # setup pan tilt and initialize variables
@@ -134,8 +134,9 @@ if __name__ == "__main__":
     ap.add_argument("-a", "--minarea", type=int, default=20, help="minimum area size")
     ap.add_argument("-sw", "--screenwidth", type=int, default=640, help="max screen width")
     ap.add_argument("-sh", "--screenheight", type=int, default=480, help="max screen height")
-    ap.add_argument('-om', "--objmodel", default='/home/pi/birdclass/ssd_mobilenet_v1_1_metadata_2.tflite')
-    ap.add_argument('-p', '--objlabels', default='/home/pi/birdclass/ssd_mobilenet_v1_1_metadata_2_labelmap.txt')
+    ap.add_argument('-om', "--objmodel", default='/home/pi/birdclass/lite-model_ssd_mobilenet_v1_1_metadata_2.tflite')
+    ap.add_argument('-p', '--objlabels',
+                    default='/home/pi/birdclass/lite-model_ssd_mobilenet_v1_1_metadata_2_labelmap.txt')
     ap.add_argument('-c', '--confidence', type=float, default=0.5)
     ap.add_argument('-m', '--modelfile', default='/home/pi/birdclass/mobilenet_tweeters.tflite',
                     help='.tflite model to be executed')
@@ -148,7 +149,6 @@ if __name__ == "__main__":
     # ap.add_argument('-i', '--image', default='/home/pi/birdclass/cardinal.jpg',
     #                                         help='image to be classified')
     ap.add_argument('-i', '--image', default='', help='image to be classified')
-
 
     arguments = vars(ap.parse_args())
 
