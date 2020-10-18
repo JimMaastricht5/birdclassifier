@@ -83,11 +83,14 @@ def object_detection(min_confidence, img, labels, interpreter, input_mean, input
     if floating_model is False:  # tensor lite obj det prebuilt model
         det_rects = interpreter.get_tensor(output_details[0]['index'])
         det_labels_index = interpreter.get_tensor(output_details[1]['index'])  # labels are an array for each result
+        print(det_labels_index)
+
         det_confidences = interpreter.get_tensor(output_details[2]['index'])
         for index, det_confidence in enumerate(det_confidences[0]):
             if det_confidence >= min_confidence:
-                labelidx = int(det_labels_index[0][index] - 1)  # get result label index for labels; offset -1 row 0
-                label = labels[labelidx]  # grab text from possible labels
+                labelidx = int(det_labels_index[0][index]) - 1  # get result label index for labels;
+                try: label = labels[labelidx]  # grab text from possible labels
+                except: label =""
                 confidences.append(det_confidence)
                 confidence_labels.append(label)
                 confidence_rects.append(det_rects[0][index])
@@ -164,12 +167,12 @@ if __name__ == '__main__':
     parser.add_argument(
         '-om',
         '--obj_det_file',
-        default='/home/pi/birdclass/ssd_mobilenet_v1_1_metadata_1.tflite',
+        default='/home/pi/birdclass/ssd_mobilenet_v1_1_metadata_2.tflite',
         help='.tensor model for obj detection')
     parser.add_argument(
         '-l',
         '--label_file',
-        default='/home/pi/birdclass/class_labels.txt',
+        default='/home/pi/birdclass/ssd_mobilenet_v1_1_metadata_2_labelmap.txt',
         help='name of file containing labels for bird classification model')
     parser.add_argument(
         '-ol',
