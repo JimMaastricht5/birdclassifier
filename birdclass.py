@@ -42,6 +42,7 @@ def bird_detector(args):
     colors = np.random.uniform(0, 255, size=(11, 3))  # random colors for bounding boxes
     birds_found = []
     starttime = time.time()
+    motioncheck = time.time()
 
     # setup pan tilt and initialize variables
     if args["panb"]:
@@ -71,7 +72,9 @@ def bird_detector(args):
             first_img = cv2.imread(args["image"])
             img = cv2.imread(args["image"])
 
-        if motionb:
+        videoimg = img
+        if motionb and ((time.time() - motioncheck) > 1):
+            motioncheck = time.time()
             # look for objects if motion is detected
             det_confidences, det_labels, det_rects = label_image.object_detection(args["confidence"], img,
                                                                                   objdet_possible_labels, tfobjdet,
@@ -83,7 +86,7 @@ def bird_detector(args):
 
                     if det_labels[i] == "16.bird":
                         ts_img = img[startY:endY, startX:endX]  # extract image of bird
-                        cv2.imwrite("tsimg.jpg", ts_img)  # write out files to disk for debugging and tensor feed
+                        # cv2.imwrite("tsimg.jpg", ts_img)  # write out files to disk for debugging and tensor feed
                         tfconfidence, birdclass = label_image.set_label(ts_img, possible_labels, interpreter,
                                                                         args["inputmean"], args["inputstd"])
                     else:  # not a bird
@@ -95,7 +98,7 @@ def bird_detector(args):
                     cv2.rectangle(img, (startX, startY), (endX, endY), colors[i], 2)
                     y = startY - 15 if startY - 15 > 15 else startY + 15  # adjust label loc if too low
                     cv2.putText(img, label, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors[i], 2)
-                    cv2.imwrite("img.jpg", img)  # write out image for debugging and testing
+                    cv2.imshow('obj detection', img)
 
                     if det_labels[i] == "16.bird":  # share what you see
                         if birdclass in birds_found:  # seen it
@@ -104,6 +107,7 @@ def bird_detector(args):
                                 starttime = time.time()  # rest timer
                                 birds_found = []  # clear birds found
                         else:
+                            cv2.imwrite("img.jpg", img)  # write out image for debugging and testing
                             tw_img = open('img.jpg', 'rb')
                             tweeter.post_image(twitter, label, tw_img)
                             birds_found.append(birdclass)
@@ -113,7 +117,7 @@ def bird_detector(args):
                                                             (startX, startY, endX, endY),
                                                             args["screenwidth"], args["screenheight"])
 
-        cv2.imshow('video', img)
+        cv2.imshow('video', videoimg)
         # cv2.imshow('gray', graymotion)
         # cv2.imshow('threshold', thresh)
 
@@ -132,8 +136,8 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("-v", "--video", help="path to the video file")
     ap.add_argument("-a", "--minarea", type=int, default=20, help="minimum area size")
-    ap.add_argument("-sw", "--screenwidth", type=int, default=640, help="max screen width")
-    ap.add_argument("-sh", "--screenheight", type=int, default=480, help="max screen height")
+    ap.add_argument("-sw", "--screenwidth", type=int, default=320, help="max screen width")
+    ap.add_argument("-sh", "--screenheight", type=int, default=240, help="max screen height")
     ap.add_argument('-om', "--objmodel", default='/home/pi/birdclass/lite-model_ssd_mobilenet_v1_1_metadata_2.tflite')
     ap.add_argument('-p', '--objlabels',
                     default='/home/pi/birdclass/lite-model_ssd_mobilenet_v1_1_metadata_2_labelmap.txt')
