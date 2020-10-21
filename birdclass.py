@@ -72,13 +72,15 @@ def bird_detector(args):
             first_img = cv2.imread(args["image"])
             img = cv2.imread(args["image"])
 
-        if motionb and ((time.time() - motioncheck) > 1):
+        if ((time.time() - motioncheck) > 1):
+        # if motionb:  # and ((time.time() - motioncheck) > 1):
             motioncheck = time.time()
             # look for objects if motion is detected
             det_confidences, det_labels, det_rects = label_image.object_detection(args["confidence"], img,
                                                                                   objdet_possible_labels, tfobjdet,
                                                                                   args["inputmean"], args["inputstd"])
             for i, det_confidence in enumerate(det_confidences):
+                print(det_confidence, det_labels[i])
                 if det_confidence > args["confidence"]:
                     # then compute the (x, y)-coordinates of the bounding box
                     (startX, startY, endX, endY) = label_image.scale_rect(img, det_rects[i])
@@ -118,8 +120,8 @@ def bird_detector(args):
         ret, videoimg = cap.read()
         videoimg = cv2.flip(videoimg, -1)  # mirror image; comment out if not needed for your camera
         cv2.imshow('video', videoimg)
-        # cv2.imshow('gray', graymotion)
-        # cv2.imshow('threshold', thresh)
+        cv2.imshow('gray', graymotion)
+        cv2.imshow('threshold', thresh)
 
         # check for esc key and quit if pressed
         k = cv2.waitKey(30) & 0xff
@@ -135,7 +137,7 @@ if __name__ == "__main__":
     # construct the argument parser and parse the arguments
     ap = argparse.ArgumentParser()
     ap.add_argument("-v", "--video", help="path to the video file")
-    ap.add_argument("-a", "--minarea", type=int, default=20, help="minimum area size")
+    ap.add_argument("-a", "--minarea", type=int, default=5, help="minimum area size")
     ap.add_argument("-sw", "--screenwidth", type=int, default=320, help="max screen width")
     ap.add_argument("-sh", "--screenheight", type=int, default=240, help="max screen height")
     ap.add_argument('-om', "--objmodel", default='/home/pi/birdclass/lite-model_ssd_mobilenet_v1_1_metadata_2.tflite')
