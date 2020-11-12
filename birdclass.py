@@ -72,7 +72,7 @@ def bird_detector(args):
             first_img = cv2.imread(args["image"])
             img = cv2.imread(args["image"])
 
-        if ((time.time() - motioncheck) > 1):
+        if ((time.time() - motioncheck) > 1):  # motion detection not working w/fisheye lens
         # if motionb:  # and ((time.time() - motioncheck) > 1):
             motioncheck = time.time()
             # look for objects if motion is detected
@@ -85,7 +85,7 @@ def bird_detector(args):
                     # then compute the (x, y)-coordinates of the bounding box
                     (startX, startY, endX, endY) = label_image.scale_rect(img, det_rects[i])
 
-                    if det_labels[i] == "16.bird":
+                    if det_labels[i] == "bird":
                         ts_img = img[startY:endY, startX:endX]  # extract image of bird
                         # cv2.imwrite("tsimg.jpg", ts_img)  # write out files to disk for debugging and tensor feed
                         tfconfidence, birdclass = label_image.set_label(ts_img, possible_labels, interpreter,
@@ -95,13 +95,17 @@ def bird_detector(args):
                         birdclass = det_labels[i]
 
                     # draw bounding boxes and display label
-                    label = "{}: {:.2f}% ".format(birdclass, tfconfidence * 100)
+                    if tfconfidence >= args["confidence"]: # high confidence in species
+                        label = "{}: {:2f}% ".format(birdclass, tfconfidence * 100)
+                    else:
+                        label = "{}: {:2f}% ".format("bird", det_confidence * 100)
+
                     cv2.rectangle(img, (startX, startY), (endX, endY), colors[i], 2)
                     y = startY - 15 if startY - 15 > 15 else startY + 15  # adjust label loc if too low
                     cv2.putText(img, label, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors[i], 2)
                     cv2.imshow('obj detection', img)
 
-                    if det_labels[i] == "16.bird":  # share what you see
+                    if det_labels[i] == "bird":  # share what you see
                         if birdclass in birds_found:  # seen it
                             elapsed_time = time.time()
                             if elapsed_time - starttime >= 300:  # elapsed time in seconds; give it 5 minutes
@@ -120,8 +124,8 @@ def bird_detector(args):
         ret, videoimg = cap.read()
         videoimg = cv2.flip(videoimg, -1)  # mirror image; comment out if not needed for your camera
         cv2.imshow('video', videoimg)
-        cv2.imshow('gray', graymotion)
-        cv2.imshow('threshold', thresh)
+        # cv2.imshow('gray', graymotion)
+        # cv2.imshow('threshold', thresh)
 
         # check for esc key and quit if pressed
         k = cv2.waitKey(30) & 0xff
@@ -143,7 +147,7 @@ if __name__ == "__main__":
     ap.add_argument('-om', "--objmodel", default='/home/pi/birdclass/lite-model_ssd_mobilenet_v1_1_metadata_2.tflite')
     ap.add_argument('-p', '--objlabels',
                     default='/home/pi/birdclass/lite-model_ssd_mobilenet_v1_1_metadata_2_labelmap.txt')
-    ap.add_argument('-c', '--confidence', type=float, default=0.65)
+    ap.add_argument('-c', '--confidence', type=float, default=0.50)
     ap.add_argument('-m', '--modelfile', default='/home/pi/birdclass/mobilenet_tweeters.tflite',
                     help='.tflite model to be executed')
     ap.add_argument('-l', '--labelfile', default='/home/pi/birdclass/class_labels.txt',
