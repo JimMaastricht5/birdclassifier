@@ -14,6 +14,25 @@
 # 129.Song_Sparrow
 # 191.Red_headed_Woodpecker
 # 192.Downy_Woodpecker
+(kaggle)
+# 300.American GoldFinch
+# 301.Baltimore Oriole
+# 302.Black Capped Chickadee
+# 303.Brown Thrasher
+# 304.Chipping Sparrow
+# 305.Common Starling
+# 306.Dark Eyed Junko
+# 307.Eastern Bluebird
+# 308.Eastern Meadowlark
+# 309.Eastern Towee
+# 310.Evening Grosbeak
+# 311.Green Jay
+# 312.House Finch
+# 313.Northern Cardinal
+# 314.Purple Finch
+# 315.Robin
+# 316.Tit Mouse
+
 
 # special notes when setting up the code on a rasberry pi 4 9/9/20
 # install supporting libraries for directions @: https://qengineering.eu/install-opencv-4.2-on-raspberry-pi-4.html
