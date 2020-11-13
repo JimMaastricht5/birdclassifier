@@ -1,7 +1,8 @@
 # motion detector with builtin bird detection and bird classification
 # built by JimMaastricht5@gmail.com
 # uses Haar Cascade for bird detection and tensorflow lite model for bird classification
-# tensor flow model built using tools from tensor in colab notebook birdclassifier.ipynb
+# tensor flow model built using tools from tensor in colab notebook
+# https://colab.research.google.com/drive/1taZ9JincTaZuZh_JmBSC4pAbSQavxbq5#scrollTo=D3i_6WSXjUhk
 # model trained to find birds common to feeders in WI using caltech bird dataset 2011
 # 017.Cardinal
 # 029.American_Crow
@@ -14,7 +15,7 @@
 # 129.Song_Sparrow
 # 191.Red_headed_Woodpecker
 # 192.Downy_Woodpecker
-(kaggle)
+# (kaggle)
 # 300.American GoldFinch
 # 301.Baltimore Oriole
 # 302.Black Capped Chickadee
