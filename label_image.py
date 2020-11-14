@@ -116,7 +116,7 @@ def set_label(img, labels, interpreter, input_mean, input_std):
     # print(results)  # see confidence factors for species
     cindex = np.where(results == np.amax(results))
     lindex = cindex[0] + 1  # class labels start in pos 1
-    print (lindex, cindex)
+    # print (lindex, cindex)
     # print('time: {:.3f}ms'.format((stop_time - start_time) * 1000))
     return float(results[cindex]), labels[lindex]  # highest confidence and best label
 
