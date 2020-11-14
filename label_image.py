@@ -113,7 +113,7 @@ def set_label(img, labels, interpreter, input_mean, input_std):
     # if floating_model:  # full tensor bird classification model
     output_data = interpreter.get_tensor(output_details[0]['index'])
     results = np.squeeze(output_data)
-
+    print(results)
     # print('time: {:.3f}ms'.format((stop_time - start_time) * 1000))
     return results[0], labels[0]  # highest confidence and best label
 

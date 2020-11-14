@@ -110,7 +110,7 @@ def bird_detector(args):
                         # cv2.imwrite("tsimg.jpg", ts_img)  # write out files to disk for debugging and tensor feed
                         tfconfidence, birdclass = label_image.set_label(ts_img, possible_labels, interpreter,
                                                                         args["inputmean"], args["inputstd"])
-                        print(birdclass, tconfidence)
+                        print(birdclass, tfconfidence)
                     else:  # not a bird
                         tfconfidence = det_confidence
                         birdclass = det_labels[i]
