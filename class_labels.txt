@@ -1,5 +1,4 @@
 017.Cardinal
-029.American_Crow
 049.Boat_tailed_Grackle
 073.Blue_Jay
 094.White_breasted_Nuthatch
@@ -9,7 +8,6 @@
 301.Baltimore_Oriole
 302.Black-Capped_Chickadee
 303.Brown_Thrasher
-304.Chipping_Sparrow
 305.Common_Starling
 306.Dark_Eyed_Junco
 307.Eastern_Bluebird
@@ -18,9 +16,6 @@
 310.Evening_Grosbeak
 311.Green_Jay
 312.House_Finch
-313.Northern_Cardinal
-314.Northern_Flicker
-315.Northern_Mockingbird
 316.Purple_Finch
 317.Robin
 318.Tit_Mouse
