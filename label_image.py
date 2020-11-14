@@ -28,8 +28,8 @@ from __future__ import print_function
 import argparse
 import cv2
 import numpy as np
-# import tflite_runtime.interpreter as tflite  # for pi4 with install wheel above
-import tensorflow as tf  # TF2
+import tflite_runtime.interpreter as tflite  # for pi4 with install wheel above
+# import tensorflow as tf  # TF2
 # import time
 
 
@@ -56,8 +56,8 @@ def load_labels(filename):
 # initialize tensor flow model
 def init_tf2(model_file, num_threads, label_file):
     possible_labels = np.asarray(load_labels(label_file))  # load label file and convert to list
-    interpreter = tf.lite.Interpreter(model_file, num_threads)
-    # interpreter = tflite.Interpreter(model_file, num_threads)
+    # interpreter = tf.lite.Interpreter(model_file, num_threads)
+    interpreter = tflite.Interpreter(model_file, num_threads)
     interpreter.allocate_tensors()
     return interpreter, possible_labels
 
