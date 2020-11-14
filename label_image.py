@@ -114,7 +114,7 @@ def set_label(img, labels, interpreter, input_mean, input_std):
     output_data = interpreter.get_tensor(output_details[0]['index'])
     results = np.squeeze(output_data)
     print(results)
-    lindex = results.index(max(results))
+    lindex = np.amax(results)
     # print('time: {:.3f}ms'.format((stop_time - start_time) * 1000))
     return results[lindex], labels[lindex]  # highest confidence and best label
 
