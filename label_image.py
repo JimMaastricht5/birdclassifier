@@ -113,7 +113,7 @@ def set_label(img, labels, interpreter, input_mean, input_std):
     # if floating_model:  # full tensor bird classification model
     output_data = interpreter.get_tensor(output_details[0]['index'])
     results = np.squeeze(output_data)
-    print(results)  # see confidence factors for species
+    # print(results)  # see confidence factors for species
     cindex = np.where(results == np.amax(results))
     lindex = cindex[0] + 1  # class labels start in pos 1
     print (lindex, cindex)
