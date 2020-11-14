@@ -5,7 +5,6 @@
 # https://colab.research.google.com/drive/1taZ9JincTaZuZh_JmBSC4pAbSQavxbq5#scrollTo=D3i_6WSXjUhk
 # model trained to find birds common to feeders in WI using caltech bird dataset 2011
 # 017.Cardinal
-# 029.American_Crow
 # 047.American_Goldfinch
 # 049.Boat_tailed_Grackle
 # 073.Blue_Jay
@@ -20,7 +19,6 @@
 # 301.Baltimore Oriole
 # 302.Black Capped Chickadee
 # 303.Brown Thrasher
-# 304.Chipping Sparrow
 # 305.Common Starling
 # 306.Dark Eyed Junko
 # 307.Eastern Bluebird
@@ -29,10 +27,10 @@
 # 310.Evening Grosbeak
 # 311.Green Jay
 # 312.House Finch
-# 313.Northern Cardinal
-# 314.Purple Finch
-# 315.Robin
-# 316.Tit Mouse
+# 313.Northern Cardinal (combined with Cardinal)
+# 316 Purple Finch
+# 317.Robin
+# 318.Tit Mouse
 
 
 # special notes when setting up the code on a rasberry pi 4 9/9/20
