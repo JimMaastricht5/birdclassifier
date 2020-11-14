@@ -168,7 +168,7 @@ if __name__ == "__main__":
     ap.add_argument('-om', "--objmodel", default='/home/pi/birdclass/lite-model_ssd_mobilenet_v1_1_metadata_2.tflite')
     ap.add_argument('-p', '--objlabels',
                     default='/home/pi/birdclass/lite-model_ssd_mobilenet_v1_1_metadata_2_labelmap.txt')
-    ap.add_argument('-c', '--confidence', type=float, default=0.50)
+    ap.add_argument('-c', '--confidence', type=float, default=0.60)
     ap.add_argument('-bc', '--bconfidence', type=float, default=0.30)
     ap.add_argument('-m', '--modelfile', default='/home/pi/birdclass/mobilenet_tweeters.tflite',
                     help='.tflite model to be executed')
