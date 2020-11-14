@@ -100,7 +100,7 @@ def bird_detector(args):
                                                                                   objdet_possible_labels, tfobjdet,
                                                                                   args["inputmean"], args["inputstd"])
             for i, det_confidence in enumerate(det_confidences):
-                print(det_confidence, det_labels[i])
+                # print(det_confidence, det_labels[i])
                 if det_confidence > args["confidence"]:
                     # then compute the (x, y)-coordinates of the bounding box
                     (startX, startY, endX, endY) = label_image.scale_rect(img, det_rects[i])
@@ -110,12 +110,13 @@ def bird_detector(args):
                         # cv2.imwrite("tsimg.jpg", ts_img)  # write out files to disk for debugging and tensor feed
                         tfconfidence, birdclass = label_image.set_label(ts_img, possible_labels, interpreter,
                                                                         args["inputmean"], args["inputstd"])
+                        print(birdclass, tconfidence)
                     else:  # not a bird
                         tfconfidence = det_confidence
                         birdclass = det_labels[i]
 
                     # draw bounding boxes and display label
-                    if tfconfidence >= args["confidence"]: # high confidence in species
+                    if tfconfidence >= args["bconfidence"]: # high confidence in species
                         label = "{}: {:2f}% ".format(birdclass, tfconfidence * 100)
                     else:
                         label = "{}: {:2f}% ".format("bird", det_confidence * 100)
@@ -168,6 +169,7 @@ if __name__ == "__main__":
     ap.add_argument('-p', '--objlabels',
                     default='/home/pi/birdclass/lite-model_ssd_mobilenet_v1_1_metadata_2_labelmap.txt')
     ap.add_argument('-c', '--confidence', type=float, default=0.50)
+    ap.add_argument('-bc', '--bconfidence', type=float, default=0.10)
     ap.add_argument('-m', '--modelfile', default='/home/pi/birdclass/mobilenet_tweeters.tflite',
                     help='.tflite model to be executed')
     ap.add_argument('-l', '--labelfile', default='/home/pi/birdclass/class_labels.txt',
