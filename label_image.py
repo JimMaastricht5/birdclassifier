@@ -118,7 +118,7 @@ def set_label(img, labels, interpreter, input_mean, input_std):
     lindex = cindex[0] + 1  # class labels start in pos 1
     print (lindex, cindex)
     # print('time: {:.3f}ms'.format((stop_time - start_time) * 1000))
-    return results[cindex], labels[lindex]  # highest confidence and best label
+    return float(results[cindex]), labels[lindex]  # highest confidence and best label
 
 
 def convert_cvframe_to_ts(frame, input_details, input_mean, input_std):
