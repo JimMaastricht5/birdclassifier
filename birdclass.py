@@ -108,12 +108,13 @@ def bird_detector(args):
                         # cv2.imwrite("tsimg.jpg", ts_img)  # write out files to disk for debugging and tensor feed
                         tfconfidence, birdclass = label_image.set_label(ts_img, possible_labels, interpreter,
                                                                         args["inputmean"], args["inputstd"])
-                        print(birdclass, tfconfidence)
+                        # print(birdclass, tfconfidence)
                     else:  # not a bird
                         tfconfidence = det_confidence
                         birdclass = det_labels[i]
 
                     # draw bounding boxes and display label
+                    print('bird ', det_confidence, birdclass, tfconfidence)  # tell us what you saw....
                     if tfconfidence >= args["bconfidence"]: # high confidence in species
                         label = "{}: {:2f}% ".format(birdclass, tfconfidence * 100)
                     else:
@@ -130,7 +131,7 @@ def bird_detector(args):
                             if elapsed_time - starttime >= 300:  # elapsed time in seconds; give it 5 minutes
                                 starttime = time.time()  # rest timer
                                 birds_found = []  # clear birds found
-                        else:
+                        else:  # something new is at the feeder
                             cv2.imwrite("img.jpg", img)  # write out image for debugging and testing
                             tw_img = open('img.jpg', 'rb')
                             tweeter.post_image(twitter, label, tw_img)
@@ -166,7 +167,7 @@ if __name__ == "__main__":
     ap.add_argument('-om', "--objmodel", default='/home/pi/birdclass/lite-model_ssd_mobilenet_v1_1_metadata_2.tflite')
     ap.add_argument('-p', '--objlabels',
                     default='/home/pi/birdclass/lite-model_ssd_mobilenet_v1_1_metadata_2_labelmap.txt')
-    ap.add_argument('-c', '--confidence', type=float, default=0.60)
+    ap.add_argument('-c', '--confidence', type=float, default=0.70)
     ap.add_argument('-bc', '--bconfidence', type=float, default=0.30)
     ap.add_argument('-m', '--modelfile', default='/home/pi/birdclass/mobilenet_tweeters.tflite',
                     help='.tflite model to be executed')
