@@ -175,7 +175,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '-om',
         '--obj_det_file',
-        default='/home/pi/PycharmProjects/pyface2/lite-model_ssd_mobilenet_v1_1_metadata_2.tflite',
+        default='/home/pi/PycharmProjects/pyface2/ssd_mobilenet_v1_1_metadata_2.tflite',
         help='.tensor model for obj detection')
     parser.add_argument(
         '-l',
