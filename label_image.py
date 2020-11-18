@@ -118,7 +118,7 @@ def set_label(img, labels, interpreter, input_mean, input_std):
     print(results)  # see confidence factors for species
     try:
         cresult = float(results[cindex])
-        lresult = labesl[lindex]
+        lresult = labels[lindex]
     except:
         print('confidence and label indices', cindex, lindex)
         print('results', results)
