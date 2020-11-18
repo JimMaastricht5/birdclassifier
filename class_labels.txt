@@ -1,6 +1,5 @@
 017.Cardinal
 049.Boat_tailed_Grackle
-073.Blue_Jay
 094.White_breasted_Nuthatch
 118.House_Sparrow
 129.Song_Sparrow
@@ -14,7 +13,6 @@
 308.Eastern_Meadowlark
 309.Eastern_Towee
 310.Evening_Grosbeak
-311.Green_Jay
 312.House_Finch
 316.Purple_Finch
 317.Robin
