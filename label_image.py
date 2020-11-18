@@ -113,18 +113,19 @@ def set_label(img, labels, interpreter, input_mean, input_std):
     # if floating_model:  # full tensor bird classification model
     output_data = interpreter.get_tensor(output_details[0]['index'])
     results = np.squeeze(output_data)
-    # print(results)  # see confidence factors for species
     cindex = np.where(results == np.amax(results))
-    lindex = cindex[0] + 1  # class labels start in pos 1
+    lindex = cindex[0]  # grab best result; np array is in max order descending
+    print(results)  # see confidence factors for species
     try:
         cresult = float(results[cindex])
         lresult = labesl[lindex]
     except:
-        print('confidence and label indexs', cindex, lindex)
+        print('confidence and label indices', cindex, lindex)
         print('results', results)
         cresult = float(0)
         lresult = ''
 
+    print(cresult, lresult)
     # print('time: {:.3f}ms'.format((stop_time - start_time) * 1000))
     return cresult, lresult  # highest confidence and best label
 
