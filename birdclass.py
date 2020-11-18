@@ -5,32 +5,24 @@
 # https://colab.research.google.com/drive/1taZ9JincTaZuZh_JmBSC4pAbSQavxbq5#scrollTo=D3i_6WSXjUhk
 # model trained to find birds common to feeders in WI using caltech bird dataset 2011
 # 017.Cardinal
-# 047.American_Goldfinch
 # 049.Boat_tailed_Grackle
-# 073.Blue_Jay
-# 076.Dark_eyed_Junco
 # 094.White_breasted_Nuthatch
 # 118.House_Sparrow
 # 129.Song_Sparrow
-# 191.Red_headed_Woodpecker
-# 192.Downy_Woodpecker
-# (kaggle)
-# 300.American GoldFinch
-# 301.Baltimore Oriole
-# 302.Black Capped Chickadee
-# 303.Brown Thrasher
-# 305.Common Starling
-# 306.Dark Eyed Junko
-# 307.Eastern Bluebird
-# 308.Eastern Meadowlark
-# 309.Eastern Towee
-# 310.Evening Grosbeak
-# 311.Green Jay
-# 312.House Finch
-# 313.Northern Cardinal (combined with Cardinal)
-# 316 Purple Finch
+# 300.American_Goldfinch
+# 301.Baltimore_Oriole
+# 302.Black-Capped_Chickadee
+# 303.Brown_Thrasher
+# 305.Common_Starling
+# 306.Dark_Eyed_Junco
+# 307.Eastern_Bluebird
+# 308.Eastern_Meadowlark
+# 309.Eastern_Towee
+# 310.Evening_Grosbeak
+# 312.House_Finch
+# 316.Purple_Finch
 # 317.Robin
-# 318.Tit Mouse
+# 318.Tit_Mouse
 
 
 # special notes when setting up the code on a rasberry pi 4 9/9/20
