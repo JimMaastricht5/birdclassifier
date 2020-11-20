@@ -155,12 +155,12 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("-v", "--video", help="path to the video file")
     ap.add_argument("-a", "--minarea", type=int, default=5, help="minimum area size")
-    ap.add_argument("-sw", "--screenwidth", type=int, default=1280, help="max screen width")
-    ap.add_argument("-sh", "--screenheight", type=int, default=1024, help="max screen height")
+    ap.add_argument("-sw", "--screenwidth", type=int, default=224, help="max screen width")
+    ap.add_argument("-sh", "--screenheight", type=int, default=224, help="max screen height")
     ap.add_argument('-om', "--objmodel", default='/home/pi/PycharmProjects/pyface2/ssd_mobilenet_v1_1_metadata_1.tflite')
     ap.add_argument('-p', '--objlabels',
                     default='/home/pi/PycharmProjects/pyface2/lite-model_ssd_mobilenet_v1_1_metadata_2_labelmap.txt')
-    ap.add_argument('-c', '--confidence', type=float, default=0.65)
+    ap.add_argument('-c', '--confidence', type=float, default=0.70)
     ap.add_argument('-bc', '--bconfidence', type=float, default=0.30)
     ap.add_argument('-m', '--modelfile', default='/home/pi/PycharmProjects/pyface2/mobilenet_tweeters.tflite',
                     help='.tflite model to be executed')
