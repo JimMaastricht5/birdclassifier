@@ -1,6 +1,4 @@
 017.Cardinal
-049.Boat_tailed_Grackle
-094.White_breasted_Nuthatch
 118.House_Sparrow
 129.Song_Sparrow
 300.American_Goldfinch
