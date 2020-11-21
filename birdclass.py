@@ -97,28 +97,22 @@ def bird_detector(args):
 
                     if det_labels[i] == "bird":
                         ts_img = img[startY:endY, startX:endX]  # extract image of bird
-                        # cv2.imwrite("tsimg.jpg", ts_img)  # write out files to disk for debugging and tensor feed
+                        cv2.imwrite("tsimg.jpg", ts_img)  # write out files to disk for debugging and tensor feed
                         tfconfidence, birdclass = label_image.set_label(ts_img, possible_labels, interpreter,
                                                                         args["inputmean"], args["inputstd"])
-                        # print(birdclass, tfconfidence)
-                    else:  # not a bird
-                        tfconfidence = det_confidence
-                        birdclass = det_labels[i]
 
-                    # draw bounding boxes and display label
-                    print('bird ', det_confidence, birdclass, tfconfidence)  # tell us what you saw....
-                    if tfconfidence >= args["bconfidence"]: # high confidence in species
-                        label = "{}: {:2f}% ".format(birdclass, tfconfidence * 100)
-                    else:
-                        label = "{}: {:2f}% low confidence on species {}: {:2f}%".format("bird", det_confidence * 100,
+                        print(det_labels[i], det_confidence, birdclass, tfconfidence)  # tell us what you saw....
+                        # draw bounding boxes and display label
+                        if tfconfidence >= args["bconfidence"]: # high confidence in species
+                            label = "{}: {:2f}% ".format(birdclass, tfconfidence * 100)
+                        else:
+                            label = "{}: {:2f}% low confidence on species {}: {:2f}%".format("bird", det_confidence * 100,
                                                                                          birdclass, tfconfidence * 100)
+                        cv2.rectangle(img, (startX, startY), (endX, endY), colors[i], 2)
+                        y = startY - 15 if startY - 15 > 15 else startY + 15  # adjust label loc if too low
+                        cv2.putText(img, label, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors[i], 2)
+                        cv2.imshow('obj detection', img)
 
-                    cv2.rectangle(img, (startX, startY), (endX, endY), colors[i], 2)
-                    y = startY - 15 if startY - 15 > 15 else startY + 15  # adjust label loc if too low
-                    cv2.putText(img, label, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors[i], 2)
-                    cv2.imshow('obj detection', img)
-
-                    if det_labels[i] == "bird":  # share what you see
                         if birdclass in birds_found:  # seen it
                             elapsed_time = time.time()
                             if elapsed_time - starttime >= 300:  # elapsed time in seconds; give it 5 minutes
@@ -130,7 +124,10 @@ def bird_detector(args):
                             tweeter.post_image(twitter, label, tw_img)
                             birds_found.append(birdclass)
 
-            if args["panb"]:
+                    else:  # not a bird
+                        print("I thought I saw a ", det_labels[i], det_confidence)
+
+        if args["panb"]:
                 currpan, currtilt = PanTilt9685.trackobject(pwm, cv2, currpan, currtilt, img,
                                                             (startX, startY, endX, endY),
                                                             args["screenwidth"], args["screenheight"])
