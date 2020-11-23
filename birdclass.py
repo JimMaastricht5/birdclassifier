@@ -82,50 +82,41 @@ def bird_detector(args):
             first_img = cv2.imread(args["image"])
             img = cv2.imread(args["image"])
 
-        if ((time.time() - motioncheck) > 1):  # motion detection not working w/fisheye lens
-        # if motionb:  # and ((time.time() - motioncheck) > 1):
-            motioncheck = time.time()
-            # look for objects if motion is detected
+        if motionb:  # motion detected.
             det_confidences, det_labels, det_rects = label_image.object_detection(args["confidence"], img,
                                                                                   objdet_possible_labels, tfobjdet,
                                                                                   args["inputmean"], args["inputstd"])
             for i, det_confidence in enumerate(det_confidences):
-                # print(det_confidence, det_labels[i])
-                if det_confidence > args["confidence"]:
-                    # then compute the (x, y)-coordinates of the bounding box
-                    (startX, startY, endX, endY) = label_image.scale_rect(img, det_rects[i])
-
-                    if det_labels[i] == "bird":
-                        ts_img = img[startY:endY, startX:endX]  # extract image of bird
-                        cv2.imwrite("tsimg.jpg", ts_img)  # write out files to disk for debugging and tensor feed
-                        tfconfidence, birdclass = label_image.set_label(ts_img, possible_labels, interpreter,
+                print(det_confidence, det_labels[i])
+                if det_confidence >= args["confidence"] and det_labels[i] == "bird":
+                    (startX, startY, endX, endY) = label_image.scale_rect(img, det_rects[i])  # x,y coord bounding box
+                    ts_img = img[startY:endY, startX:endX]  # extract image of bird
+                    # cv2.imwrite("tsimg.jpg", ts_img)  # write out files to disk for debugging and tensor feed
+                    tfconfidence, birdclass = label_image.set_label(ts_img, possible_labels, interpreter,
                                                                         args["inputmean"], args["inputstd"])
 
-                        print(det_labels[i], det_confidence, birdclass, tfconfidence)  # tell us what you saw....
-                        # draw bounding boxes and display label
-                        if tfconfidence >= args["bconfidence"]: # high confidence in species
-                            label = "{}: {:2f}% ".format(birdclass, tfconfidence * 100)
-                        else:
-                            label = "{}: {:2f}% low confidence on species {}: {:2f}%".format("bird", det_confidence * 100,
+                    print(det_labels[i], det_confidence, birdclass, tfconfidence)  # tell us what you saw....
+                    # draw bounding boxes and display label
+                    if tfconfidence >= args["bconfidence"]: # high confidence in species
+                        label = "{}: {:2f}% ".format(birdclass, tfconfidence * 100)
+                    else:
+                        label = "{}: {:2f}% low confidence on species {}: {:2f}%".format("bird", det_confidence * 100,
                                                                                          birdclass, tfconfidence * 100)
-                        cv2.rectangle(img, (startX, startY), (endX, endY), colors[i], 2)
-                        y = startY - 15 if startY - 15 > 15 else startY + 15  # adjust label loc if too low
-                        cv2.putText(img, label, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors[i], 2)
-                        cv2.imshow('obj detection', img)
+                    cv2.rectangle(img, (startX, startY), (endX, endY), colors[i], 2)
+                    y = startY - 15 if startY - 15 > 15 else startY + 15  # adjust label loc if too low
+                    cv2.putText(img, label, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors[i], 2)
+                    cv2.imshow('obj detection', img)
 
-                        if birdclass in birds_found:  # seen it
-                            elapsed_time = time.time()
-                            if elapsed_time - starttime >= 300:  # elapsed time in seconds; give it 5 minutes
-                                starttime = time.time()  # rest timer
-                                birds_found = []  # clear birds found
-                        else:  # something new is at the feeder
-                            cv2.imwrite("img.jpg", img)  # write out image for debugging and testing
-                            tw_img = open('img.jpg', 'rb')
-                            tweeter.post_image(twitter, label, tw_img)
-                            birds_found.append(birdclass)
-
-                    else:  # not a bird
-                        print("I thought I saw a ", det_labels[i], det_confidence)
+                    if birdclass in birds_found:  # seen it
+                        elapsed_time = time.time()
+                        if elapsed_time - starttime >= 300:  # elapsed time in seconds; give it 5 minutes
+                            starttime = time.time()  # rest timer
+                            birds_found = []  # clear birds found
+                    else:  # something new is at the feeder
+                        cv2.imwrite("img.jpg", img)  # write out image for debugging and testing
+                        tw_img = open('img.jpg', 'rb')
+                        tweeter.post_image(twitter, label, tw_img)
+                        birds_found.append(birdclass)
 
         if args["panb"]:
                 currpan, currtilt = PanTilt9685.trackobject(pwm, cv2, currpan, currtilt, img,
@@ -157,7 +148,7 @@ if __name__ == "__main__":
     ap.add_argument('-om', "--objmodel", default='/home/pi/PycharmProjects/pyface2/ssd_mobilenet_v1_1_metadata_1.tflite')
     ap.add_argument('-p', '--objlabels',
                     default='/home/pi/PycharmProjects/pyface2/lite-model_ssd_mobilenet_v1_1_metadata_2_labelmap.txt')
-    ap.add_argument('-c', '--confidence', type=float, default=0.70)
+    ap.add_argument('-c', '--confidence', type=float, default=0.60)
     ap.add_argument('-bc', '--bconfidence', type=float, default=0.30)
     ap.add_argument('-m', '--modelfile', default='/home/pi/PycharmProjects/pyface2/mobilenet_tweeters.tflite',
                     help='.tflite model to be executed')
