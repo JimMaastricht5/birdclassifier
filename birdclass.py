@@ -60,7 +60,12 @@ def bird_detector(args):
 
     # initial video capture, screen size, and grab first image (no motion)
     if args["image"] == "":
-        cap = cv2.VideoCapture(0)  # capture video image
+        try:
+            cap = cv2.VideoCapture(0)  # capture video image
+        except:
+            print('camera failure on intial video capture, ending program')
+            return
+
         cap.set(3, args["screenwidth"])  # set screen width
         cap.set(4, args["screenheight"])  # set screen height
         first_img = motion_detector.init(cv2, cap)
@@ -76,7 +81,12 @@ def bird_detector(args):
     print('press esc to quit')
     while True:  # while escape key is not pressed
         if args["image"] == "":
-            motionb, img, gray, graymotion, thresh = motion_detector.detect(cv2, cap, first_img, args["minarea"])
+            try:
+                motionb, img, gray, graymotion, thresh = motion_detector.detect(cv2, cap, first_img, args["minarea"])
+            except:
+                print('camera failed on motion capture and compare of second image, ending program')
+                return
+
         else:  # testing code
             motionb = True
             first_img = cv2.imread(args["image"])
