@@ -115,7 +115,7 @@ def set_label(img, labels, interpreter, input_mean, input_std):
     results = np.squeeze(output_data)
     cindex = np.where(results == np.amax(results))
     lindex = cindex[0]  # grab best result; np array is in max order descending
-    print(results)  # see confidence factors for species
+    # print(results)  # see confidence factors for species
     try:
         cresult = float(results[cindex])
         lresult = labels[lindex]
@@ -125,7 +125,7 @@ def set_label(img, labels, interpreter, input_mean, input_std):
         cresult = float(0)
         lresult = ''
 
-    print(cresult, lresult)
+    # print(cresult, lresult)
     # print('time: {:.3f}ms'.format((stop_time - start_time) * 1000))
     return cresult, lresult  # highest confidence and best label
 
