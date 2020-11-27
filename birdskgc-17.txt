@@ -1,0 +1,17 @@
+0:017.Cardinal
+1:118.House_Sparrow
+2:129.Song_Sparrow
+3:300.American_Goldfinch
+4:301.Baltimore_Oriole
+5:302.Black_Capped_Chickadee
+6:303.Brown_Thrasher
+7:305.Common_Starling
+8:306.Dark_Eyed_Junco
+9:307.Eastern_Bluebird
+10:308.Eastern_Meadowlark
+11:309.Eastern_Towee
+12:310.Evening_Grosbeak
+13:312.House_Finch
+14:316.Purple_Finch
+15:317.Robin
+16:318.Tit_Mouse
