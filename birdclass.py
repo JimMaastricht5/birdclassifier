@@ -97,7 +97,7 @@ def bird_detector(args):
                                                                                   objdet_possible_labels, tfobjdet,
                                                                                   args["inputmean"], args["inputstd"])
             for i, det_confidence in enumerate(det_confidences):
-                print(det_confidence, det_labels[i])
+                print('object detected', det_confidence, det_labels[i])
                 if det_confidence >= args["confidence"] and det_labels[i] == "bird":
                     (startX, startY, endX, endY) = label_image.scale_rect(img, det_rects[i])  # x,y coord bounding box
                     ts_img = img[startY:endY, startX:endX]  # extract image of bird
@@ -105,7 +105,7 @@ def bird_detector(args):
                     tfconfidence, birdclass = label_image.set_label(ts_img, possible_labels, interpreter,
                                                                         args["inputmean"], args["inputstd"])
 
-                    print(det_labels[i], det_confidence, birdclass, tfconfidence)  # tell us what you saw....
+                    # print(det_labels[i], det_confidence, birdclass, tfconfidence)  # tell us what you saw....
                     # draw bounding boxes and display label
                     if tfconfidence >= args["bconfidence"]: # high confidence in species
                         label = "{}: {:2f}% ".format(birdclass, tfconfidence * 100)
