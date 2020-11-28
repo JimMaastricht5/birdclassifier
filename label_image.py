@@ -171,7 +171,7 @@ if __name__ == '__main__':
         '-m',
         '--model_file',
         # default='/home/pi/PycharmProjects/pyface2/mobilenet_tweeters.tflite',
-        default='/home/pi/PycharmProjects/pyface2/birdskgc-s-224-92.44.h5',
+        default='/home/pi/PycharmProjects/pyface2/birdskgc-s-224-92.44.tflite',
         help='.tensor bird classification model to be executed')
     parser.add_argument(
         '-om',

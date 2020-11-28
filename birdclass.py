@@ -74,9 +74,9 @@ def bird_detector(args):
 
     twitter = tweeter.init(api_key, api_secret_key, access_token, access_token_secret)  # init twitter api
 
-    # tensor flow lite setup; TF used to classify detected birds; need to convert that to tf lite
-    interpreter, possible_labels = label_image.init_tf2(args["modelfile"], args["numthreads"], args["labelfile"])
+    # init tf lite obj detection and species model file
     tfobjdet, objdet_possible_labels = label_image.init_tf2(args["objmodel"], args["numthreads"], args["objlabels"])
+    interpreter, possible_labels = label_image.init_tf2(args["modelfile"], args["numthreads"], args["labelfile"])
 
     print('press esc to quit')
     while True:  # while escape key is not pressed
@@ -165,7 +165,7 @@ if __name__ == "__main__":
     ap.add_argument('-bc', '--bconfidence', type=float, default=0.30)
     ap.add_argument('-m', '--modelfile',
                     # default='/home/pi/PycharmProjects/pyface2/mobilenet_tweeters.tflite',
-                    default='/home/pi/PycharmProjects/pyface2/birdskgc-s-224-92.44.h5',
+                    default='/home/pi/PycharmProjects/pyface2/birdskgc-s-224-92.44.tflite',
                     help='.tflite model to be executed')
     ap.add_argument('-l', '--labelfile',
                     # default='/home/pi/PycharmProjects/pyface2/class_labels.txt',
