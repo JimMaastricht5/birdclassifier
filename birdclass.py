@@ -97,20 +97,18 @@ def bird_detector(args):
                                                                                   objdet_possible_labels, tfobjdet,
                                                                                   args["inputmean"], args["inputstd"])
             for i, det_confidence in enumerate(det_confidences):
-                print('object detected', det_confidence, det_labels[i])
+                print('observation at ', time.localtime(time.time()), det_confidence, det_labels[i])
                 if det_confidence >= args["confidence"] and det_labels[i] == "bird":
                     (startX, startY, endX, endY) = label_image.scale_rect(img, det_rects[i])  # x,y coord bounding box
                     ts_img = img[startY:endY, startX:endX]  # extract image of bird
-                    # cv2.imwrite("tsimg.jpg", ts_img)  # write out files to disk for debugging and tensor feed
                     tfconfidence, birdclass = label_image.set_label(ts_img, possible_labels, interpreter,
                                                                         args["inputmean"], args["inputstd"])
 
-                    # print(det_labels[i], det_confidence, birdclass, tfconfidence)  # tell us what you saw....
-                    # draw bounding boxes and display label
+                    # draw bounding boxes and display label if it is a bird
                     if tfconfidence >= args["bconfidence"]: # high confidence in species
                         label = "{}: {:2f}% ".format(birdclass, tfconfidence * 100)
                     else:
-                        print('{}: {:2f}% low confidence on species {}: {:2f}%'.format("bird", det_confidence * 100,
+                        print('{}: {:2f}% best confidence on species {}: {:2f}%'.format("bird", det_confidence * 100,
                                                                                          birdclass, tfconfidence * 100))
                         label = "{}: {:2f}%".format("bird", det_confidence * 100)
 
@@ -120,9 +118,9 @@ def bird_detector(args):
                     cv2.imshow('obj detection', img)
 
                     if birdclass in birds_found:  # seen it
-                        elapsed_time = time.time()
-                        if elapsed_time - starttime >= 300:  # elapsed time in seconds; give it 5 minutes
-                            starttime = time.time()  # rest timer
+                        print('last seen at:', time.localtime(starttime), label)
+                        if (time.time() - starttime) * 1000 >= 3000:  # elapsed time in seconds;
+                            starttime = time.time()  # reset timer
                             birds_found = []  # clear birds found
                     else:  # something new is at the feeder
                         cv2.imwrite("img.jpg", img)  # write out image for debugging and testing
@@ -162,7 +160,7 @@ if __name__ == "__main__":
     ap.add_argument('-p', '--objlabels',
                     default='/home/pi/PycharmProjects/pyface2/lite-model_ssd_mobilenet_v1_1_metadata_2_labelmap.txt')
     ap.add_argument('-c', '--confidence', type=float, default=0.64)
-    ap.add_argument('-bc', '--bconfidence', type=float, default=0.30)
+    ap.add_argument('-bc', '--bconfidence', type=float, default=0.64)
     ap.add_argument('-m', '--modelfile',
                     # default='/home/pi/PycharmProjects/pyface2/mobilenet_tweeters.tflite',
                     default='/home/pi/PycharmProjects/pyface2/birdskgc-s-224-92.44.tflite',
