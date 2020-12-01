@@ -38,6 +38,7 @@ import tweeter  # twitter helper functions
 import argparse  # argument parser
 import numpy as np
 import time
+from time import strftime
 from auth import (
     api_key,
     api_secret_key,
@@ -106,11 +107,11 @@ def bird_detector(args):
 
                     # draw bounding boxes and display label if it is a bird
                     if tfconfidence >= args["bconfidence"]: # high confidence in species
-                        label = "{}: {:2f}% ".format(birdclass, tfconfidence * 100)
+                        label = "{}: {:.2f}% bird: {:.2f}%".format(birdclass, tfconfidence * 100, det_confidence * 100)
                     else:
-                        print('{}: {:2f}% best confidence on species {}: {:2f}%'.format("bird", det_confidence * 100,
+                        print('{}: {:2f}% best confidence on species {}: {:.2f}%'.format("bird", det_confidence * 100,
                                                                                          birdclass, tfconfidence * 100))
-                        label = "{}: {:2f}%".format("bird", det_confidence * 100)
+                        label = "{}: {:.2f}%".format("bird", det_confidence * 100)
 
                     cv2.rectangle(img, (startX, startY), (endX, endY), colors[i], 2)
                     y = startY - 15 if startY - 15 > 15 else startY + 15  # adjust label loc if too low
@@ -118,8 +119,8 @@ def bird_detector(args):
                     cv2.imshow('obj detection', img)
 
                     if birdclass in birds_found:  # seen it
-                        print('last seen at:', time.localtime(starttime), label)
-                        if (time.time() - starttime) * 1000 >= 3000:  # elapsed time in seconds;
+                        print('last seen at:', strftime('%H:%M:%S', time.localtime(starttime)), label)
+                        if (time.time() - starttime) >= 180:  # 3 min elapsed time in seconds;
                             starttime = time.time()  # reset timer
                             birds_found = []  # clear birds found
                     else:  # something new is at the feeder
@@ -160,7 +161,7 @@ if __name__ == "__main__":
     ap.add_argument('-p', '--objlabels',
                     default='/home/pi/PycharmProjects/pyface2/lite-model_ssd_mobilenet_v1_1_metadata_2_labelmap.txt')
     ap.add_argument('-c', '--confidence', type=float, default=0.64)
-    ap.add_argument('-bc', '--bconfidence', type=float, default=0.64)
+    ap.add_argument('-bc', '--bconfidence', type=float, default=0.73)
     ap.add_argument('-m', '--modelfile',
                     # default='/home/pi/PycharmProjects/pyface2/mobilenet_tweeters.tflite',
                     default='/home/pi/PycharmProjects/pyface2/birdskgc-s-224-92.44.tflite',
