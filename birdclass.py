@@ -114,6 +114,7 @@ def bird_detector(args):
                         print('{}: {:2f}% best confidence on species {}: {:.2f}%'.format("bird", det_confidence * 100,
                                                                                          birdclass, tfconfidence * 100))
                         label = "{}: {:.2f}%".format("bird", det_confidence * 100)
+                        birdclass = 'bird'
 
                     cv2.rectangle(img, (startX, startY), (endX, endY), colors[i], 2)
                     y = startY - 15 if startY - 15 > 15 else startY + 15  # adjust label loc if too low
