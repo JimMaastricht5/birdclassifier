@@ -80,6 +80,8 @@ def bird_detector(args):
     interpreter, possible_labels = label_image.init_tf2(args["modelfile"], args["numthreads"], args["labelfile"])
 
     print('press esc to quit')
+
+    # main loop ******
     while True:  # while escape key is not pressed
         if args["image"] == "":
             try:
@@ -98,7 +100,7 @@ def bird_detector(args):
                                                                                   objdet_possible_labels, tfobjdet,
                                                                                   args["inputmean"], args["inputstd"])
             for i, det_confidence in enumerate(det_confidences):
-                print('observation:', strftime('%H:%M:%S', time.time()), det_confidence, det_labels[i])
+                print('observation:', strftime('%H:%M:%S', time.localtime()), det_confidence, det_labels[i])
                 if det_confidence >= args["confidence"] and det_labels[i] == "bird":
                     (startX, startY, endX, endY) = label_image.scale_rect(img, det_rects[i])  # x,y coord bounding box
                     ts_img = img[startY:endY, startX:endX]  # extract image of bird
