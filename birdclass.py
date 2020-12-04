@@ -123,7 +123,7 @@ def bird_detector(args):
 
                     if birdclass in birds_found:  # seen it
                         print('last seen at:', strftime('%H:%M:%S', time.localtime(starttime)), label)
-                        if (time.time() - starttime) >= 180:  # 3 min elapsed time in seconds;
+                        if (time.time() - starttime) >= 300:  # 5 min elapsed time in seconds;
                             starttime = time.time()  # reset timer
                             birds_found = []  # clear birds found
                     else:  # something new is at the feeder
@@ -163,8 +163,8 @@ if __name__ == "__main__":
                     default='/home/pi/PycharmProjects/pyface2/ssd_mobilenet_v1_1_metadata_1.tflite')
     ap.add_argument('-p', '--objlabels',
                     default='/home/pi/PycharmProjects/pyface2/lite-model_ssd_mobilenet_v1_1_metadata_2_labelmap.txt')
-    ap.add_argument('-c', '--confidence', type=float, default=0.64)
-    ap.add_argument('-bc', '--bconfidence', type=float, default=0.73)
+    ap.add_argument('-c', '--confidence', type=float, default=0.70)
+    ap.add_argument('-bc', '--bconfidence', type=float, default=0.85)
     ap.add_argument('-m', '--modelfile',
                     # default='/home/pi/PycharmProjects/pyface2/mobilenet_tweeters.tflite',
                     default='/home/pi/PycharmProjects/pyface2/birdskgc-s-224-92.44.tflite',
