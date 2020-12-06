@@ -11,7 +11,7 @@ import imutils
 # capture first image and gray scale/blur for baseline motion detection
 def init(cv2, cap):
     ret, img = cap.read()  # capture an image from the camera
-    img = cv2.flip(img, -1)  # mirror image; comment out if not needed for your camera
+    # img = cv2.flip(img, -1)  # mirror image; comment out if not needed for your camera
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)  # convert image to gray scale BGR for OpenCv recognition
     graymotion = cv2.GaussianBlur(gray, (21, 21), 0)  # smooth out image for motion detection
     return graymotion
@@ -23,7 +23,7 @@ def init(cv2, cap):
 def detect(cv2, cap, first_img, min_area):
     motionb = False
     ret, img = cap.read()  # capture an image from the camera
-    img = cv2.flip(img, -1)  # mirror image; comment out if not needed for your camera
+    # img = cv2.flip(img, -1)  # mirror image; comment out if not needed for your camera
     grayimg = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)  # convert image to gray scale BGR for OpenCv recognition
     grayblur = cv2.GaussianBlur(grayimg, (21, 21), 0)  # smooth out image for motion detection
 
