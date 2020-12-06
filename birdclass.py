@@ -137,7 +137,7 @@ def bird_detector(args):
                                                             (startX, startY, endX, endY),
                                                             args["screenwidth"], args["screenheight"])
         ret, videoimg = cap.read()
-        videoimg = cv2.flip(videoimg, -1)  # mirror image; comment out if not needed for your camera
+        # videoimg = cv2.flip(videoimg, -1)  # mirror image; comment out if not needed for your camera
         cv2.imshow('video', videoimg)
         # cv2.imshow('gray', graymotion)
         # cv2.imshow('threshold', thresh)
