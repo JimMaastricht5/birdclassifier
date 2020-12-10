@@ -185,9 +185,9 @@ if __name__ == "__main__":
     ap.add_argument('--inputstd', default=127.5, type=float, help='Tensor input standard deviation')
     ap.add_argument('--numthreads', default=None, type=int, help='Tensor number of threads')
     ap.add_argument('--panb', default=False, type=bool, help='activate pan tilt mechanism')
-    ap.add_argument('-i', '--image', default='/home/pi/birdclass/cardinal.jpg',
-                                            help='image to be classified')
-    # ap.add_argument('-i', '--image', default='', help='image to be classified')
+    # ap.add_argument('-i', '--image', default='/home/pi/birdclass/cardinal.jpg',
+    #                                         help='image to be classified')
+    ap.add_argument('-i', '--image', default='', help='image to be classified')
 
     arguments = vars(ap.parse_args())
 
