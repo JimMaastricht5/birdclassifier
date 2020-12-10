@@ -165,29 +165,29 @@ if __name__ == '__main__':
     parser.add_argument(
         '-i',
         '--image',
-        default='/home/pi/PycharmProjects/pyface2/cardinal.jpg',
+        default='/home/pi/birdclass/test2.jpg',
         help='image to be classified')
     parser.add_argument(
         '-m',
         '--model_file',
         # default='/home/pi/PycharmProjects/pyface2/mobilenet_tweeters.tflite',
-        default='/home/pi/PycharmProjects/pyface2/birdskgc-s-224-92.44.tflite',
+        default='/home/pi/birdclass/birdskgc-s-224-92.44.tflite',
         help='.tensor bird classification model to be executed')
     parser.add_argument(
         '-om',
         '--obj_det_file',
-        default='/home/pi/PycharmProjects/pyface2/ssd_mobilenet_v1_1_metadata_2.tflite',
+        default='/home/pi/birdclass/lite-model_ssd_mobilenet_v1_1_metadata_2.tflite',
         help='.tensor model for obj detection')
     parser.add_argument(
         '-l',
         '--label_file',
         # default='/home/pi/PycharmProjects/pyface2/class_labels.txt',
-        default='/home/pi/PycharmProjects/pyface2/birdskgc-17.txt',
+        default='/home/pi/birdclass/birdskgc-17.txt',
         help='name of file containing labels for bird classification model')
     parser.add_argument(
         '-ol',
         '--obj_det_label_file',
-        default='/home/pi/PycharmProjects/pyface2/lite-model_ssd_mobilenet_v1_1_metadata_2_labelmap.txt',
+        default='/home/pi/birdclass/lite-model_ssd_mobilenet_v1_1_metadata_2_labelmap.txt',
         help='name of file containing labels')
 
     parser.add_argument(

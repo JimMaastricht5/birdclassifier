@@ -99,6 +99,8 @@ def bird_detector(args):
             det_confidences, det_labels, det_rects = label_image.object_detection(args["confidence"], img,
                                                                                   objdet_possible_labels, tfobjdet,
                                                                                   args["inputmean"], args["inputstd"])
+            tweetb = False
+            combined_label = ''
             for i, det_confidence in enumerate(det_confidences):
                 print('observation:', strftime('%H:%M:%S', time.localtime()), det_confidence, det_labels[i])
                 if det_confidence >= args["confidence"] and det_labels[i] == "bird":
@@ -116,21 +118,27 @@ def bird_detector(args):
                         label = "{}: {:.2f}%".format("bird", det_confidence * 100)
                         birdclass = 'bird'
 
+                    combined_label = combined_label + ' ' + label
+                    tweetb = True
+
                     cv2.rectangle(img, (startX, startY), (endX, endY), colors[i], 2)
                     y = startY - 15 if startY - 15 > 15 else startY + 15  # adjust label loc if too low
                     cv2.putText(img, label, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors[i], 2)
-                    cv2.imshow('obj detection', img)
 
                     if birdclass in birds_found:  # seen it
                         print('last seen at:', strftime('%H:%M:%S', time.localtime(starttime)), label)
                         if (time.time() - starttime) >= 300:  # 5 min elapsed time in seconds;
                             starttime = time.time()  # reset timer
                             birds_found = []  # clear birds found
-                    else:  # something new is at the feeder
-                        cv2.imwrite("img.jpg", img)  # write out image for debugging and testing
-                        tw_img = open('img.jpg', 'rb')
-                        tweeter.post_image(twitter, label, tw_img)
-                        birds_found.append(birdclass)
+                        else:  # something new is at the feeder
+                            birds_found.append(birdclass)
+
+            if tweetb:  # image contained a bird
+                cv2.imshow('obj detection', img)  # show all birds in pic with labels
+                cv2.imwrite("img.jpg", img)  # write out image for debugging and testing
+                tw_img = open('img.jpg', 'rb')
+                tweeter.post_image(twitter, combined_label, tw_img)
+                birds_found.append(birdclass)
 
         if args["panb"]:
                 currpan, currtilt = PanTilt9685.trackobject(pwm, cv2, currpan, currtilt, img,
@@ -160,26 +168,26 @@ if __name__ == "__main__":
     ap.add_argument("-sw", "--screenwidth", type=int, default=320, help="max screen width")
     ap.add_argument("-sh", "--screenheight", type=int, default=240, help="max screen height")
     ap.add_argument('-om', "--objmodel",
-                    default='/home/pi/PycharmProjects/pyface2/ssd_mobilenet_v1_1_metadata_1.tflite')
+                    default='/home/pi/birdclass/birdskgc-s-224-92.44.tflite')
     ap.add_argument('-p', '--objlabels',
-                    default='/home/pi/PycharmProjects/pyface2/lite-model_ssd_mobilenet_v1_1_metadata_2_labelmap.txt')
+                    default='/home/pi/birdclass/lite-model_ssd_mobilenet_v1_1_metadata_2_labelmap.txt')
     ap.add_argument('-c', '--confidence', type=float, default=0.80)
     ap.add_argument('-bc', '--bconfidence', type=float, default=0.975)
     ap.add_argument('-m', '--modelfile',
                     # default='/home/pi/PycharmProjects/pyface2/mobilenet_tweeters.tflite',
-                    default='/home/pi/PycharmProjects/pyface2/birdskgc-s-224-92.44.tflite',
+                    default='/home/pi/birdclass/birdskgc-s-224-92.44.tflite',
                     help='.tflite model to be executed')
     ap.add_argument('-l', '--labelfile',
                     # default='/home/pi/PycharmProjects/pyface2/class_labels.txt',
-                    default='/home/pi/PycharmProjects/pyface2/birdskgc-17.txt',
+                    default='/home/pi/birdclass/birdskgc-17.txt',
                     help='name of file containing labels')
     ap.add_argument('--inputmean', default=127.5, type=float, help='Tensor input_mean')
     ap.add_argument('--inputstd', default=127.5, type=float, help='Tensor input standard deviation')
     ap.add_argument('--numthreads', default=None, type=int, help='Tensor number of threads')
     ap.add_argument('--panb', default=False, type=bool, help='activate pan tilt mechanism')
-    # ap.add_argument('-i', '--image', default='/home/pi/birdclass/cardinal.jpg',
-    #                                         help='image to be classified')
-    ap.add_argument('-i', '--image', default='', help='image to be classified')
+    ap.add_argument('-i', '--image', default='/home/pi/birdclass/cardinal.jpg',
+                                            help='image to be classified')
+    # ap.add_argument('-i', '--image', default='', help='image to be classified')
 
     arguments = vars(ap.parse_args())
 
