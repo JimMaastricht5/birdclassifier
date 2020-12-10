@@ -168,18 +168,18 @@ if __name__ == "__main__":
     ap.add_argument("-sw", "--screenwidth", type=int, default=320, help="max screen width")
     ap.add_argument("-sh", "--screenheight", type=int, default=240, help="max screen height")
     ap.add_argument('-om', "--objmodel",
-                    default='/home/pi/birdclass/birdskgc-s-224-92.44.tflite')
+                    default='/home/pi/PycharmProjects/pyface2/birdskgc-s-224-92.44.tflite')
     ap.add_argument('-p', '--objlabels',
-                    default='/home/pi/birdclass/lite-model_ssd_mobilenet_v1_1_metadata_2_labelmap.txt')
+                    default='/home/pi/PycharmProjects/pyface2/lite-model_ssd_mobilenet_v1_1_metadata_2_labelmap.txt')
     ap.add_argument('-c', '--confidence', type=float, default=0.80)
     ap.add_argument('-bc', '--bconfidence', type=float, default=0.975)
     ap.add_argument('-m', '--modelfile',
                     # default='/home/pi/PycharmProjects/pyface2/mobilenet_tweeters.tflite',
-                    default='/home/pi/birdclass/birdskgc-s-224-92.44.tflite',
+                    default='/home/pi/PycharmProjects/pyface2/birdskgc-s-224-92.44.tflite',
                     help='.tflite model to be executed')
     ap.add_argument('-l', '--labelfile',
                     # default='/home/pi/PycharmProjects/pyface2/class_labels.txt',
-                    default='/home/pi/birdclass/birdskgc-17.txt',
+                    default='/home/pi/PycharmProjects/pyface2/birdskgc-17.txt',
                     help='name of file containing labels')
     ap.add_argument('--inputmean', default=127.5, type=float, help='Tensor input_mean')
     ap.add_argument('--inputstd', default=127.5, type=float, help='Tensor input standard deviation')
