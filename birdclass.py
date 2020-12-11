@@ -165,30 +165,43 @@ def bird_detector(args):
 if __name__ == "__main__":
     # construct the argument parser and parse the arguments
     ap = argparse.ArgumentParser()
+    # video setup
     ap.add_argument("-v", "--video", help="path to the video file")
     ap.add_argument("-a", "--minarea", type=int, default=5, help="minimum area size")
     ap.add_argument("-sw", "--screenwidth", type=int, default=320, help="max screen width")
     ap.add_argument("-sh", "--screenheight", type=int, default=240, help="max screen height")
+
+    # object detection model setup
     ap.add_argument('-om', "--obj_det_model",
                     default='/home/pi/birdclass/lite-model_ssd_mobilenet_v1_1_metadata_2.tflite')
     ap.add_argument('-p', '--obj_det_labels',
                     default='/home/pi/PycharmProjects/pyface2/lite-model_ssd_mobilenet_v1_1_metadata_2_labelmap.txt')
-    ap.add_argument('-c', '--confidence', type=float, default=0.80)
-    ap.add_argument('-bc', '--bconfidence', type=float, default=0.975)
+
+    # species model setup
     ap.add_argument('-m', '--species_model',
                     default='/home/pi/PycharmProjects/pyface2/birdskgc-s-224-92.44.tflite',
                     help='.tflite model to be executed')
     ap.add_argument('-l', '--species_labels',
                     default='/home/pi/PycharmProjects/pyface2/birdskgc-17.txt',
                     help='name of file containing labels')
+
+    # tensor flow input arguements
     ap.add_argument('--inputmean', default=127.5, type=float, help='Tensor input_mean')
     ap.add_argument('--inputstd', default=127.5, type=float, help='Tensor input standard deviation')
     ap.add_argument('--numthreads', default=None, type=int, help='Tensor number of threads')
+
+    # confidence settings for object detection and species bconfidence
+    ap.add_argument('-c', '--confidence', type=float, default=0.80)
+    ap.add_argument('-bc', '--bconfidence', type=float, default=0.975)
+
+    # set pan tilt control model
     ap.add_argument('--panb', default=False, type=bool, help='activate pan tilt mechanism')
+
+    # input test image or use video
     # ap.add_argument('-i', '--image', default='/home/pi/birdclass/cardinal.jpg',
     #                                         help='image to be classified')
     ap.add_argument('-i', '--image', default='', help='image to be classified')
 
-    arguments = vars(ap.parse_args())
 
+    arguments = vars(ap.parse_args())
     bird_detector(arguments)
