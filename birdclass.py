@@ -76,8 +76,10 @@ def bird_detector(args):
     twitter = tweeter.init(api_key, api_secret_key, access_token, access_token_secret)  # init twitter api
 
     # init tf lite obj detection and species model file
-    tfobjdet, objdet_possible_labels = label_image.init_tf2(args["objmodel"], args["numthreads"], args["objlabels"])
-    interpreter, possible_labels = label_image.init_tf2(args["modelfile"], args["numthreads"], args["labelfile"])
+    tfobjdet, objdet_possible_labels = label_image.init_tf2(args["obj_det_model"], args["numthreads"],
+                                                            args["obj_det_labels"])
+    interpreter, possible_labels = label_image.init_tf2(args["species_model"], args["numthreads"],
+                                                        args["species_labels"])
 
     print('press esc to quit')
 
@@ -167,18 +169,16 @@ if __name__ == "__main__":
     ap.add_argument("-a", "--minarea", type=int, default=5, help="minimum area size")
     ap.add_argument("-sw", "--screenwidth", type=int, default=320, help="max screen width")
     ap.add_argument("-sh", "--screenheight", type=int, default=240, help="max screen height")
-    ap.add_argument('-om', "--objmodel",
-                    default='/home/pi/PycharmProjects/pyface2/birdskgc-s-224-92.44.tflite')
-    ap.add_argument('-p', '--objlabels',
+    ap.add_argument('-om', "--obj_det_model",
+                    default='/home/pi/birdclass/lite-model_ssd_mobilenet_v1_1_metadata_2.tflite')
+    ap.add_argument('-p', '--obj_det_labels',
                     default='/home/pi/PycharmProjects/pyface2/lite-model_ssd_mobilenet_v1_1_metadata_2_labelmap.txt')
     ap.add_argument('-c', '--confidence', type=float, default=0.80)
     ap.add_argument('-bc', '--bconfidence', type=float, default=0.975)
-    ap.add_argument('-m', '--modelfile',
-                    # default='/home/pi/PycharmProjects/pyface2/mobilenet_tweeters.tflite',
+    ap.add_argument('-m', '--species_model',
                     default='/home/pi/PycharmProjects/pyface2/birdskgc-s-224-92.44.tflite',
                     help='.tflite model to be executed')
-    ap.add_argument('-l', '--labelfile',
-                    # default='/home/pi/PycharmProjects/pyface2/class_labels.txt',
+    ap.add_argument('-l', '--species_labels',
                     default='/home/pi/PycharmProjects/pyface2/birdskgc-17.txt',
                     help='name of file containing labels')
     ap.add_argument('--inputmean', default=127.5, type=float, help='Tensor input_mean')
