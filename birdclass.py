@@ -118,7 +118,7 @@ def bird_detector(args):
                     if tfconfidence >= args["bconfidence"]:  # high confidence in species
                         label = "{}: {:.2f}% bird: {:.2f}%".format(birdclass, tfconfidence * 100, det_confidence * 100)
                     else:
-                        loginfo = label = "bird low confidence species {}: {:.2f}% bird: {:.2f}%".format(birdclass,
+                        loginfo = label = "bird, confidence species {}: {:.2f}% bird: {:.2f}%".format(birdclass,
                                                                             tfconfidence * 100, det_confidence * 100)
                         logging.info(loginfo)
                         print(loginfo)
@@ -135,7 +135,7 @@ def bird_detector(args):
                     if birdclass in birds_found:  # seen it
                         loginfo = label + ' last seen at: ' + str(time.localtime(starttime))
                         logging.info(loginfo)
-                        print(loginfo)
+                        # print(loginfo)
                         if (time.time() - starttime) >= 300:  # 5 min elapsed time in seconds;
                             starttime = time.time()  # reset timer
                             birds_found = []  # clear birds found
