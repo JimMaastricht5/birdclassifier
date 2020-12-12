@@ -99,6 +99,7 @@ def bird_detector(args):
             img = cv2.imread(args["image"])
 
         if motionb:  # motion detected.
+            print('motion')
             det_confidences, det_labels, det_rects = label_image.object_detection(args["confidence"], img,
                                                                                   objdet_possible_labels, tfobjdet,
                                                                                   args["inputmean"], args["inputstd"])
@@ -107,6 +108,7 @@ def bird_detector(args):
             for i, det_confidence in enumerate(det_confidences):
                 loginfo = 'observed ' + str(det_confidence) + ' ' + str(det_labels[i])
                 logging.info(loginfo)
+                print(loginfo)
                 if det_labels[i] == "bird" and (det_confidence >= args["confidence"] or tweetb):
                     (startX, startY, endX, endY) = label_image.scale_rect(img, det_rects[i])  # x,y coord bounding box
                     ts_img = img[startY:endY, startX:endX]  # extract image of bird
@@ -119,6 +121,7 @@ def bird_detector(args):
                     else:
                         loginfo = 'bird: ' + str(det_confidence * 100) + ' ' + birdclass + str(tfconfidence * 100)
                         logging.info(loginfo)
+                        print(loginfo)
                         label = "{}: {:.2f}%".format("bird", det_confidence * 100)
                         birdclass = 'bird'
 
@@ -132,6 +135,7 @@ def bird_detector(args):
                     if birdclass in birds_found:  # seen it
                         loginfo = label + ' last seen at: ' + str(time.localtime(starttime))
                         logging.info(loginfo)
+                        print(loginfo)
                         if (time.time() - starttime) >= 300:  # 5 min elapsed time in seconds;
                             starttime = time.time()  # reset timer
                             birds_found = []  # clear birds found
