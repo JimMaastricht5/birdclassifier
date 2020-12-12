@@ -105,7 +105,7 @@ def bird_detector(args):
             tweetb = False
             combined_label = ''
             for i, det_confidence in enumerate(det_confidences):
-                loginfo = 'observed ' + det_confidence + ' ' + det_labels[i]
+                loginfo = 'observed ' + str(det_confidence) + ' ' + str(det_labels[i])
                 logging.info(loginfo)
                 if det_labels[i] == "bird" and (det_confidence >= args["confidence"] or tweetb):
                     (startX, startY, endX, endY) = label_image.scale_rect(img, det_rects[i])  # x,y coord bounding box
@@ -117,7 +117,8 @@ def bird_detector(args):
                     if tfconfidence >= args["bconfidence"]:  # high confidence in species
                         label = "{}: {:.2f}% bird: {:.2f}%".format(birdclass, tfconfidence * 100, det_confidence * 100)
                     else:
-                        loginfo = 'confidence on bird ' + det_confidence * 100 + ' ' + birdclass + tfconfidence * 100
+                        loginfo = 'confidence on bird ' + str(det_confidence * 100) + ' ' + \
+                                  birdclass + str(tfconfidence * 100)
                         logging.info(loginfo)
                         label = "{}: {:.2f}%".format("bird", det_confidence * 100)
                         birdclass = 'bird'
@@ -130,7 +131,7 @@ def bird_detector(args):
                     cv2.putText(img, label, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors[i], 2)
 
                     if birdclass in birds_found:  # seen it
-                        loginfo = label + ' last seen at: ' + time.localtime(starttime)
+                        loginfo = label + ' last seen at: ' + str(time.localtime(starttime))
                         logging.info(loginfo)
                         if (time.time() - starttime) >= 300:  # 5 min elapsed time in seconds;
                             starttime = time.time()  # reset timer
