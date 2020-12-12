@@ -45,6 +45,7 @@ from auth import (
     access_token,
     access_token_secret
 )  # import twitter keys
+import logging
 
 
 def bird_detector(args):
@@ -53,7 +54,6 @@ def bird_detector(args):
     colors = np.random.uniform(0, 255, size=(11, 3))  # random colors for bounding boxes
     birds_found = []
     starttime = time.time()
-    motioncheck = time.time()
 
     # setup pan tilt and initialize variables
     if args["panb"]:
@@ -64,7 +64,8 @@ def bird_detector(args):
         try:
             cap = cv2.VideoCapture(0)  # capture video image
         except:
-            print('camera failure on intial video capture, ending program')
+            print('camera failure on initial video capture, ending program')
+            logging.critical('camera failure on initial video capture, ending program')
             return
 
         cap.set(3, args["screenwidth"])  # set screen width
@@ -89,7 +90,7 @@ def bird_detector(args):
             try:
                 motionb, img, gray, graymotion, thresh = motion_detector.detect(cv2, cap, first_img, args["minarea"])
             except:
-                print('camera failed on motion capture and compare of second image, ending program')
+                logging.critical('camera failed on motion capture and compare of second image, ending program')
                 return
 
         else:  # testing code
@@ -104,19 +105,21 @@ def bird_detector(args):
             tweetb = False
             combined_label = ''
             for i, det_confidence in enumerate(det_confidences):
-                print('observation:', strftime('%H:%M:%S', time.localtime()), det_confidence, det_labels[i])
-                if det_confidence >= args["confidence"] and det_labels[i] == "bird":
+                loginfo = 'observed ' + det_confidence + ' ' + det_labels[i]
+                logging.info(loginfo)
+                if det_labels[i] == "bird" and (det_confidence >= args["confidence"] or tweetb):
                     (startX, startY, endX, endY) = label_image.scale_rect(img, det_rects[i])  # x,y coord bounding box
                     ts_img = img[startY:endY, startX:endX]  # extract image of bird
                     tfconfidence, birdclass = label_image.set_label(ts_img, possible_labels, interpreter,
-                                                                        args["inputmean"], args["inputstd"])
+                                                        args["inputmean"], args["inputstd"])
 
                     # draw bounding boxes and display label if it is a bird
-                    if tfconfidence >= args["bconfidence"]: # high confidence in species
+                    if tfconfidence >= args["bconfidence"]:  # high confidence in species
                         label = "{}: {:.2f}% bird: {:.2f}%".format(birdclass, tfconfidence * 100, det_confidence * 100)
                     else:
-                        print('{}: {:2f}% best confidence on species {}: {:.2f}%'.format("bird", det_confidence * 100,
-                                                                                         birdclass, tfconfidence * 100))
+                        loginfo = ('confidence on {}: {:.2f}%'.format("bird",
+                                    det_confidence * 100, birdclass, tfconfidence * 100))
+                        logging.info(loginfo)
                         label = "{}: {:.2f}%".format("bird", det_confidence * 100)
                         birdclass = 'bird'
 
@@ -128,7 +131,8 @@ def bird_detector(args):
                     cv2.putText(img, label, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors[i], 2)
 
                     if birdclass in birds_found:  # seen it
-                        print('last seen at:', strftime('%H:%M:%S', time.localtime(starttime)), label)
+                        loginfo = 'last seen at:' + strftime('%H:%M:%S', time.localtime(starttime)) + label
+                        logging.info(loginfo)
                         if (time.time() - starttime) >= 300:  # 5 min elapsed time in seconds;
                             starttime = time.time()  # reset timer
                             birds_found = []  # clear birds found
@@ -144,8 +148,8 @@ def bird_detector(args):
 
         if args["panb"]:
                 currpan, currtilt = PanTilt9685.trackobject(pwm, cv2, currpan, currtilt, img,
-                                                            (startX, startY, endX, endY),
-                                                            args["screenwidth"], args["screenheight"])
+                                            (startX, startY, endX, endY),
+                                            args["screenwidth"], args["screenheight"])
         ret, videoimg = cap.read()
         # videoimg = cv2.flip(videoimg, -1)  # mirror image; comment out if not needed for your camera
         cv2.imshow('video', videoimg)
@@ -202,6 +206,6 @@ if __name__ == "__main__":
     #                                         help='image to be classified')
     ap.add_argument('-i', '--image', default='', help='image to be classified')
 
-
+    logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
     arguments = vars(ap.parse_args())
     bird_detector(arguments)
