@@ -106,7 +106,7 @@ def bird_detector(args):
             tweetb = False
             combined_label = ''
             for i, det_confidence in enumerate(det_confidences):
-                loginfo = 'observed ' + str(det_confidence) + ' ' + str(det_labels[i])
+
                 logging.info(loginfo)
                 print(loginfo)
                 if det_labels[i] == "bird" and (det_confidence >= args["confidence"] or tweetb):
@@ -119,7 +119,8 @@ def bird_detector(args):
                     if tfconfidence >= args["bconfidence"]:  # high confidence in species
                         label = "{}: {:.2f}% bird: {:.2f}%".format(birdclass, tfconfidence * 100, det_confidence * 100)
                     else:
-                        loginfo = 'bird: ' + str(det_confidence * 100) + ' ' + birdclass + str(tfconfidence * 100)
+                        loginfo = label = "bird low confidence species {}: {:.2f}% bird: {:.2f}%".format(birdclass,
+                                                                            tfconfidence * 100, det_confidence * 100)
                         logging.info(loginfo)
                         print(loginfo)
                         label = "{}: {:.2f}%".format("bird", det_confidence * 100)
