@@ -111,14 +111,14 @@ def bird_detector(args):
                     (startX, startY, endX, endY) = label_image.scale_rect(img, det_rects[i])  # x,y coord bounding box
                     ts_img = img[startY:endY, startX:endX]  # extract image of bird
                     tfconfidence, birdclass = label_image.set_label(ts_img, possible_labels, interpreter,
-                                                        args["inputmean"], args["inputstd"])
+                                                                    args["inputmean"], args["inputstd"])
 
                     # draw bounding boxes and display label if it is a bird
                     if tfconfidence >= args["bconfidence"]:  # high confidence in species
                         label = "{}: {:.2f}% bird: {:.2f}%".format(birdclass, tfconfidence * 100, det_confidence * 100)
                     else:
-                        loginfo = ('confidence on {}: {:.2f}%'.format("bird",
-                                    det_confidence * 100, birdclass, tfconfidence * 100))
+                        loginfo = ('confidence on {}: {:.2f}%'.format("bird", det_confidence * 100,
+                                                                      birdclass, tfconfidence * 100))
                         logging.info(loginfo)
                         label = "{}: {:.2f}%".format("bird", det_confidence * 100)
                         birdclass = 'bird'
@@ -147,9 +147,9 @@ def bird_detector(args):
                 birds_found.append(birdclass)
 
         if args["panb"]:
-                currpan, currtilt = PanTilt9685.trackobject(pwm, cv2, currpan, currtilt, img,
-                                            (startX, startY, endX, endY),
-                                            args["screenwidth"], args["screenheight"])
+            currpan, currtilt = PanTilt9685.trackobject(pwm, cv2, currpan, currtilt, img,
+                                                        (startX, startY, endX, endY),
+                                                        args["screenwidth"], args["screenheight"])
         ret, videoimg = cap.read()
         # videoimg = cv2.flip(videoimg, -1)  # mirror image; comment out if not needed for your camera
         cv2.imshow('video', videoimg)
@@ -206,6 +206,6 @@ if __name__ == "__main__":
     #                                         help='image to be classified')
     ap.add_argument('-i', '--image', default='', help='image to be classified')
 
-    logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
+    logging.basicConfig(filename='birdclass.log', format='%(asctime)s - %(message)s', level=logging.INFO)
     arguments = vars(ap.parse_args())
     bird_detector(arguments)
