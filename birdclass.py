@@ -117,8 +117,7 @@ def bird_detector(args):
                     if tfconfidence >= args["bconfidence"]:  # high confidence in species
                         label = "{}: {:.2f}% bird: {:.2f}%".format(birdclass, tfconfidence * 100, det_confidence * 100)
                     else:
-                        loginfo = 'confidence on bird ' + str(det_confidence * 100) + ' ' + \
-                                  birdclass + str(tfconfidence * 100)
+                        loginfo = 'bird: ' + str(det_confidence * 100) + ' ' + birdclass + str(tfconfidence * 100)
                         logging.info(loginfo)
                         label = "{}: {:.2f}%".format("bird", det_confidence * 100)
                         birdclass = 'bird'
