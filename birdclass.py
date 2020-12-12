@@ -117,8 +117,7 @@ def bird_detector(args):
                     if tfconfidence >= args["bconfidence"]:  # high confidence in species
                         label = "{}: {:.2f}% bird: {:.2f}%".format(birdclass, tfconfidence * 100, det_confidence * 100)
                     else:
-                        loginfo = ('confidence on {}: {:.2f}%'.format("bird", det_confidence * 100,
-                                                                      birdclass, tfconfidence * 100))
+                        loginfo = 'confidence on bird ' + det_confidence * 100 + ' ' + birdclass + tfconfidence * 100
                         logging.info(loginfo)
                         label = "{}: {:.2f}%".format("bird", det_confidence * 100)
                         birdclass = 'bird'
@@ -131,7 +130,7 @@ def bird_detector(args):
                     cv2.putText(img, label, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors[i], 2)
 
                     if birdclass in birds_found:  # seen it
-                        loginfo = 'last seen at:' + strftime('%H:%M:%S', time.localtime(starttime)) + label
+                        loginfo = label + ' last seen at: ' + time.localtime(starttime)
                         logging.info(loginfo)
                         if (time.time() - starttime) >= 300:  # 5 min elapsed time in seconds;
                             starttime = time.time()  # reset timer
