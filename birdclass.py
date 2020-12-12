@@ -99,14 +99,13 @@ def bird_detector(args):
             img = cv2.imread(args["image"])
 
         if motionb:  # motion detected.
-            print('motion')
             det_confidences, det_labels, det_rects = label_image.object_detection(args["confidence"], img,
                                                                                   objdet_possible_labels, tfobjdet,
                                                                                   args["inputmean"], args["inputstd"])
             tweetb = False
             combined_label = ''
             for i, det_confidence in enumerate(det_confidences):
-
+                loginfo = "saw a bird calling species model: {:.2f}%".format(det_confidence * 100)
                 logging.info(loginfo)
                 print(loginfo)
                 if det_labels[i] == "bird" and (det_confidence >= args["confidence"] or tweetb):
