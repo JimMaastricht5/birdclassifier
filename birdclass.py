@@ -105,7 +105,7 @@ def bird_detector(args):
             tweetb = False
             combined_label = ''
             for i, det_confidence in enumerate(det_confidences):
-                loginfo = "saw a bird calling species model: {:.2f}%".format(det_confidence * 100)
+                loginfo = "saw  {}: {:.2f}%".format(det_labels[i], det_confidence * 100)
                 logging.info(loginfo)
                 print(loginfo)
                 if det_labels[i] == "bird" and (det_confidence >= args["confidence"] or tweetb):
