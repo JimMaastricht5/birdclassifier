@@ -143,8 +143,9 @@ def bird_detector(args):
                         else:  # something new is at the feeder
                             birds_found.append(birdclass)
 
+            cv2.imshow('obj detection', img)  # show all birds in pic with labels
             if tweetb:  # image contained a bird and species label
-                cv2.imshow('obj detection', img)  # show all birds in pic with labels
+                cv2.imshow('tweeted', img)  # show all birds in pic with labels
                 cv2.imwrite("img.jpg", img)  # write out image for debugging and testing
                 tw_img = open('img.jpg', 'rb')
                 tweeter.post_image(twitter, combined_label, tw_img)
