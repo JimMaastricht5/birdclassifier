@@ -37,9 +37,7 @@ import motion_detector  # motion detector helper functions
 import tweeter  # twitter helper functions
 import argparse  # argument parser
 import numpy as np
-import time
 from datetime import datetime
-from time import strftime
 from auth import (
     api_key,
     api_secret_key,
@@ -103,6 +101,7 @@ def bird_detector(args):
             det_confidences, det_labels, det_rects = label_image.object_detection(args["confidence"], img,
                                                                                   objdet_possible_labels, tfobjdet,
                                                                                   args["inputmean"], args["inputstd"])
+            birdb = False
             tweetb = False
             combined_label = ''
             for i, det_confidence in enumerate(det_confidences):
@@ -111,6 +110,7 @@ def bird_detector(args):
                 logging.info(logtime + loginfo)
                 print(logtime, loginfo)
                 if det_labels[i] == "bird" and (det_confidence >= args["confidence"] or tweetb):
+                    birdb = True
                     (startX, startY, endX, endY) = label_image.scale_rect(img, det_rects[i])  # x,y coord bounding box
                     ts_img = img[startY:endY, startX:endX]  # extract image of bird
                     tfconfidence, birdclass = label_image.set_label(ts_img, possible_labels, interpreter,
@@ -121,8 +121,8 @@ def bird_detector(args):
                         tweetb = True
                         label = "{}: {:.2f}% / {:.2f}%".format(birdclass, tfconfidence * 100, det_confidence * 100)
                     else:
-                        loginfo = label = "species {}: {:.2f}% / {:.2f}%".format(birdclass,
-                                                                            tfconfidence * 100, det_confidence * 100)
+                        loginfo = "species {}: {:.2f}% / {:.2f}%".format(birdclass,
+                                                                        tfconfidence * 100, det_confidence * 100)
                         logging.info(loginfo)
                         print(loginfo)
                         label = "{}: {:.2f}%".format("bird", det_confidence * 100)
@@ -143,9 +143,10 @@ def bird_detector(args):
                     else:  # something new is at the feeder
                         birds_found.append(birdclass)
 
-            cv2.imshow('obj detection', img)  # show all birds in pic with labels
+            if birdb:  # if object detection saw a bird draw the results
+                cv2.imshow('obj detection', img)  # show all birds in pic with labels
 
-            if tweetb:  # image contained a bird and species label
+            if tweetb:  # image contained a bird and species label, tweet it
                 cv2.imshow('tweeted', img)  # show all birds in pic with labels
                 cv2.imwrite("img.jpg", img)  # write out image for debugging and testing
                 tw_img = open('img.jpg', 'rb')
