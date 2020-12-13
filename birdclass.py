@@ -54,7 +54,7 @@ def bird_detector(args):
     # detect, then generate a set of bounding box colors for each class
     colors = np.random.uniform(0, 255, size=(11, 3))  # random colors for bounding boxes
     birds_found = []
-    starttime = time.time()
+    starttime = datetime.now()
 
     # setup pan tilt and initialize variables
     if args["panb"]:
@@ -137,8 +137,8 @@ def bird_detector(args):
                         loginfo = label + ' last seen at: ' + starttime.strftime('%H:%M:%S')
                         logging.info(loginfo)
                         # print(loginfo)
-                        if (time.time() - starttime) >= 300:  # 5 min elapsed time in seconds;
-                            starttime = time.time()  # reset timer
+                        if (datetime.now() - starttime) >= 300:  # 5 min elapsed time in seconds;
+                            starttime = datetime.now()  # reset timer
                             birds_found = []  # clear birds found
                         else:  # something new is at the feeder
                             birds_found.append(birdclass)
@@ -212,5 +212,5 @@ if __name__ == "__main__":
 
     logging.basicConfig(filename='birdclass.log', format='%(asctime)s - %(message)s', level=logging.INFO)
     arguments = vars(ap.parse_args())
-    print(datetime.now().strftime('%H:%M%S'))
+    print(datetime.now().strftime('%H:%M:%S'))
     bird_detector(arguments)
