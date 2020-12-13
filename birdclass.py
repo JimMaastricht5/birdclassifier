@@ -106,7 +106,8 @@ def bird_detector(args):
             tweetb = False
             combined_label = ''
             for i, det_confidence in enumerate(det_confidences):
-                loginfo = datetime.now().strftime('%H:%M) + " saw  {}: {:.2f}%".format(det_labels[i], det_confidence * 100)
+                loginfo = datetime.now().strftime('%H:%M:%S')
+                loginfo = loginfo + " saw  {}: {:.2f}%".format(det_labels[i], det_confidence * 100)
                 logging.info(loginfo)
                 print(loginfo)
                 if det_labels[i] == "bird" and (det_confidence >= args["confidence"] or tweetb):
@@ -117,6 +118,7 @@ def bird_detector(args):
 
                     # draw bounding boxes and display label if it is a bird
                     if tfconfidence >= args["bconfidence"]:  # high confidence in species
+                        tweetb = True
                         label = "{}: {:.2f}% bird: {:.2f}%".format(birdclass, tfconfidence * 100, det_confidence * 100)
                     else:
                         loginfo = label = "bird, confidence species {}: {:.2f}% bird: {:.2f}%".format(birdclass,
@@ -126,9 +128,7 @@ def bird_detector(args):
                         label = "{}: {:.2f}%".format("bird", det_confidence * 100)
                         birdclass = 'bird'
 
-                    combined_label = combined_label + ' ' + label
-                    tweetb = True
-
+                    combined_label = combined_label + ' ' + label  # build label for multi birds in one photo
                     cv2.rectangle(img, (startX, startY), (endX, endY), colors[i], 2)
                     y = startY - 15 if startY - 15 > 15 else startY + 15  # adjust label loc if too low
                     cv2.putText(img, label, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors[i], 2)
@@ -143,7 +143,7 @@ def bird_detector(args):
                         else:  # something new is at the feeder
                             birds_found.append(birdclass)
 
-            if tweetb:  # image contained a bird
+            if tweetb:  # image contained a bird and species label
                 cv2.imshow('obj detection', img)  # show all birds in pic with labels
                 cv2.imwrite("img.jpg", img)  # write out image for debugging and testing
                 tw_img = open('img.jpg', 'rb')
