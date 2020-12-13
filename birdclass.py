@@ -38,7 +38,7 @@ import tweeter  # twitter helper functions
 import argparse  # argument parser
 import numpy as np
 import time
-import datetime
+from datetime import datetime
 from time import strftime
 from auth import (
     api_key,
@@ -212,4 +212,5 @@ if __name__ == "__main__":
 
     logging.basicConfig(filename='birdclass.log', format='%(asctime)s - %(message)s', level=logging.INFO)
     arguments = vars(ap.parse_args())
+    print(datetime.now().strftime('%H:%M%S')
     bird_detector(arguments)
