@@ -121,7 +121,7 @@ def bird_detector(args):
                         tweetb = True
                         label = "{}: {:.2f}% / {:.2f}%".format(birdclass, tfconfidence * 100, det_confidence * 100)
                     else:
-                        loginfo = "species {}: {:.2f}% / {:.2f}%".format(birdclass,
+                        loginfo = "----species {}: {:.2f}% / {:.2f}%".format(birdclass,
                                                                         tfconfidence * 100, det_confidence * 100)
                         logging.info(loginfo)
                         print(loginfo)
@@ -147,6 +147,9 @@ def bird_detector(args):
                 cv2.imshow('obj detection', img)  # show all birds in pic with labels
 
             if tweetb:  # image contained a bird and species label, tweet it
+                logdate = starttime.strftime('%H:%M:%S')
+                logging.info(logdate,'**** tweeted ', label)
+                print(logdate, '**** tweeted', label)
                 cv2.imshow('tweeted', img)  # show all birds in pic with labels
                 cv2.imwrite("img.jpg", img)  # write out image for debugging and testing
                 tw_img = open('img.jpg', 'rb')
