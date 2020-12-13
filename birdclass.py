@@ -38,6 +38,7 @@ import tweeter  # twitter helper functions
 import argparse  # argument parser
 import numpy as np
 import time
+import datetime
 from time import strftime
 from auth import (
     api_key,
@@ -105,7 +106,7 @@ def bird_detector(args):
             tweetb = False
             combined_label = ''
             for i, det_confidence in enumerate(det_confidences):
-                loginfo = "saw  {}: {:.2f}%".format(det_labels[i], det_confidence * 100)
+                loginfo = datetime.now().strftime('%H:%M) + " saw  {}: {:.2f}%".format(det_labels[i], det_confidence * 100)
                 logging.info(loginfo)
                 print(loginfo)
                 if det_labels[i] == "bird" and (det_confidence >= args["confidence"] or tweetb):
@@ -133,7 +134,7 @@ def bird_detector(args):
                     cv2.putText(img, label, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors[i], 2)
 
                     if birdclass in birds_found:  # seen it
-                        loginfo = label + ' last seen at: ' + str(time.localtime(starttime))
+                        loginfo = label + ' last seen at: ' + starttime.strftime('%H:%M:%S')
                         logging.info(loginfo)
                         # print(loginfo)
                         if (time.time() - starttime) >= 300:  # 5 min elapsed time in seconds;
