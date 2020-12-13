@@ -137,7 +137,7 @@ def bird_detector(args):
                         loginfo = label + ' last seen at: ' + starttime.strftime('%H:%M:%S')
                         logging.info(loginfo)
                         # print(loginfo)
-                        if (datetime.now() - starttime) >= 300:  # 5 min elapsed time in seconds;
+                        if (datetime.now().timestamp() - starttime.timestamp()) >= 300:  # 5 min elapsed time in seconds;
                             starttime = datetime.now()  # reset timer
                             birds_found = []  # clear birds found
                         else:  # something new is at the feeder
