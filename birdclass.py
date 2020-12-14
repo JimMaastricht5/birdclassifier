@@ -148,7 +148,7 @@ def bird_detector(args):
 
             if tweetb:  # image contained a bird and species label, tweet it
                 logdate = starttime.strftime('%H:%M:%S')
-                logging.info(logdate,'**** tweeted ', label)
+                logging.info(logdate + '**** tweeted ' + label)
                 print(logdate, '**** tweeted', label)
                 cv2.imshow('tweeted', img)  # show all birds in pic with labels
                 cv2.imwrite("img.jpg", img)  # write out image for debugging and testing
