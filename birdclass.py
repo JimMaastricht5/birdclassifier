@@ -109,7 +109,7 @@ def bird_detector(args):
                 loginfo = " saw  {}: {:.2f}%".format(det_labels[i], det_confidence * 100)
                 logging.info(logtime + loginfo)
                 print(logtime, loginfo)
-                if det_labels[i] == "bird" and (det_confidence >= args["confidence"] or birbb):
+                if det_labels[i] == "bird" and (det_confidence >= args["confidence"] or birdb):
                     birdb = True
                     (startX, startY, endX, endY) = label_image.scale_rect(img, det_rects[i])  # x,y coord bounding box
                     ts_img = img[startY:endY, startX:endX]  # extract image of bird
@@ -148,7 +148,7 @@ def bird_detector(args):
                 cv2.imshow('obj detection', img)  # show all birds in pic with labels
 
             # image contained a bird and species label, tweet it
-            if tweetb and (datetime.now().timestamp() - starttime.timestamp() >= 600)  # wait 10 min in seconds
+            if tweetb and (datetime.now().timestamp() - starttime.timestamp() >= 600):  # wait 10 min in seconds
                 logdate = starttime.strftime('%H:%M:%S')
                 logging.info(logdate + '**** tweeted ' + label)
                 print(logdate, '**** tweeted', label)
