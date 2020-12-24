@@ -195,10 +195,10 @@ if __name__ == "__main__":
 
     # species model setup
     ap.add_argument('-m', '--species_model',
-                    default='/home/pi/PycharmProjects/pyface2/birdskgc-s-224-92.44.tflite',
+                    default='/home/pi/PycharmProjects/pyface2/birdspecies-s-224-93.15.tflite',
                     help='.tflite model to be executed')
     ap.add_argument('-l', '--species_labels',
-                    default='/home/pi/PycharmProjects/pyface2/birdskgc-17.txt',
+                    default='/home/pi/PycharmProjects/pyface2/birdspecies-13.txt',
                     help='name of file containing labels')
 
     # tensor flow input arguements

@@ -171,7 +171,7 @@ if __name__ == '__main__':
         '-m',
         '--model_file',
         # default='/home/pi/PycharmProjects/pyface2/mobilenet_tweeters.tflite',
-        default='/home/pi/birdclass/birdskgc-s-224-92.44.tflite',
+        default='/home/pi/birdclass/birdspecies-s-224-93.15.tflite',
         help='.tensor bird classification model to be executed')
     parser.add_argument(
         '-om',
@@ -182,7 +182,7 @@ if __name__ == '__main__':
         '-l',
         '--label_file',
         # default='/home/pi/PycharmProjects/pyface2/class_labels.txt',
-        default='/home/pi/birdclass/birdskgc-17.txt',
+        default='/home/pi/birdclass/birdspecies-13.txt',
         help='name of file containing labels for bird classification model')
     parser.add_argument(
         '-ol',
