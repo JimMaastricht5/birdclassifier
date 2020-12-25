@@ -208,7 +208,7 @@ if __name__ == "__main__":
 
     # confidence settings for object detection and species bconfidence
     ap.add_argument('-c', '--confidence', type=float, default=0.80)
-    ap.add_argument('-bc', '--bconfidence', type=float, default=0.975)
+    ap.add_argument('-bc', '--bconfidence', type=float, default=0.95)
 
     # set pan tilt control model
     ap.add_argument('--panb', default=False, type=bool, help='activate pan tilt mechanism')
