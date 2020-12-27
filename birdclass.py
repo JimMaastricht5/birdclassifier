@@ -164,7 +164,7 @@ if __name__ == "__main__":
 
     # species model setup
     ap.add_argument('-m', '--species_model',
-                    default='/home/pi/PycharmProjects/pyface2/birdspecies_auto_ml_2020-12-26.tflite',
+                    default='/home/pi/PycharmProjects/pyface2/birdspecies_automl_2020-12-26.tflite',
                     help='.tflite model to be executed')
     ap.add_argument('-l', '--species_labels',
                     default='/home/pi/PycharmProjects/pyface2/birdspecies_automl_2020-12-26.txt',
