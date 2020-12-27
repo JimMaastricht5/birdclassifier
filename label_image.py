@@ -112,6 +112,7 @@ def set_label(img, labels, interpreter, input_mean, input_std):
 
     # if floating_model:  # full tensor bird classification model
     output_data = interpreter.get_tensor(output_details[0]['index'])
+    print(output_data)
     results = np.squeeze(output_data)
     cindex = np.where(results == np.amax(results))
     lindex = cindex[0]  # grab best result; np array is in max order descending
