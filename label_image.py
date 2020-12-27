@@ -128,6 +128,7 @@ def set_label(img, labels, interpreter, input_mean, input_std):
 
     # print(cresult, lresult)
     # print('time: {:.3f}ms'.format((stop_time - start_time) * 1000))
+    cresult = cresult / 100
     return cresult, lresult  # highest confidence and best label
 
 
