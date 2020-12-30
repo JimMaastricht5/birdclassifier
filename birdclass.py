@@ -81,7 +81,9 @@ def bird_detector(args):
                 if det_labels[i] == "bird" and (det_confidence >= args["confidence"] or birdb):
                     birdb = True
                     (startX, startY, endX, endY) = label_image.scale_rect(img, det_rects[i])  # x,y coord bounding box
-                    ts_img = img[startY:endY, startX:endX]  # extract image of bird
+                    logging.info((startX, startY), (endX, endY))  # log rect size, use for bird size
+                    # ts_img = img[startY:endY, startX:endX]  # extract image of bird
+                    ts_img = img  # try maintaining size of org image for better recognition
                     tfconfidence, birdclass = label_image.set_label(ts_img, possible_labels, interpreter,
                                                                     args["inputmean"], args["inputstd"])
 
