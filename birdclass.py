@@ -81,7 +81,8 @@ def bird_detector(args):
                 if det_labels[i] == "bird" and (det_confidence >= args["confidence"] or birdb):
                     birdb = True
                     (startX, startY, endX, endY) = label_image.scale_rect(img, det_rects[i])  # x,y coord bounding box
-                    logging.info(str(startX), str(startY), str(endX), str(endY))  # log rect size, use for bird size
+                    logging.info(str(startX) + ' ' + str(startY) + ' ' +
+                                 str(endX) + ' ' + str(endY))  # log rect size, use for bird size
                     logging.info(str( ((startX-startY) * (endX - endY)) ))
                     size, perarea = birdsize(args, startX, startY, endX, endY)
                     print (size, perarea)
@@ -163,7 +164,7 @@ def birdsize(args, startX, startY, endX, endY):
     else:  # small bird
         size = 'S'
 
-    logging.info(str(birdarea), str(scrarea), str(perarea), size)
+    logging.info(str(birdarea) + ' ' + str(scrarea) + ' ' + str(perarea) + ' ' + size)
     return size, perarea
 
 
