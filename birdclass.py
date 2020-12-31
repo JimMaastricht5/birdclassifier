@@ -158,7 +158,7 @@ def birdsize(args, startX, startY, endX, endY):
     perarea = (birdarea / scrarea) * 100
     if perarea >= 20:  # large bird
         size = 'L'
-    elif perarea >= 15  # medium bird
+    elif perarea >= 15:  # medium bird
         size = 'M'
     else:  # small bird
         size = 'S'
