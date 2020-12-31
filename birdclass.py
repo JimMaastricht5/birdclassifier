@@ -152,7 +152,7 @@ def bird_detector(args):
     cv2.destroyAllWindows()
 
 
-def birdsize(args, startX, startY, endX, endY)
+def birdsize(args, startX, startY, endX, endY):
     birdarea = abs((startX - startY) * (endX - endY))
     scrarea = uint(args['screenheight']) * uint(args['screenwidth'])
     perarea = (birdarea / scrarea) * 100
