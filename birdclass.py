@@ -83,6 +83,8 @@ def bird_detector(args):
                     (startX, startY, endX, endY) = label_image.scale_rect(img, det_rects[i])  # x,y coord bounding box
                     logging.info(str(startX), str(startY), str(endX), str(endY))  # log rect size, use for bird size
                     logging.info(str( ((startX-startY) * (endX - endY)) ))
+                    size, perarea = birdsize(args, startX, startY, endX, endY)
+                    print (size, perarea)
                     # ts_img = img[startY:endY, startX:endX]  # extract image of bird
                     ts_img = img  # try maintaining size of org image for better recognition
                     tfconfidence, birdclass = label_image.set_label(ts_img, possible_labels, interpreter,
@@ -148,6 +150,21 @@ def bird_detector(args):
     if args["image"] == "":  # not testing code
         cap.release()
     cv2.destroyAllWindows()
+
+
+def birdsize(args, startX, startY, endX, endY)
+    birdarea = abs((startX - startY) * (endX - endY))
+    scrarea = uint(args['screenheight']) * uint(args['screenwidth'])
+    perarea = (birdarea / scrarea) * 100
+    if perarea >= 20:  # large bird
+        size = 'L'
+    elif perarea >= 15  # medium bird
+        size = 'M'
+    else:  # small bird
+        size = 'S'
+
+    logging.info(str(birdarea), str(scrarea), str(perarea), size)
+    return size, perarea
 
 
 if __name__ == "__main__":
