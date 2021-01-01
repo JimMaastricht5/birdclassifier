@@ -85,7 +85,9 @@ def bird_detector(args):
                     birdb = True  # set to loop thru img for other birds in pic
                     (startX, startY, endX, endY) = label_image.scale_rect(img, det_rects[i])  # set x,y bounding box
                     bird_size, bird_per_scr_area = birdsize(args, startX, startY, endX, endY)  # determine bird size for refined model
-                    # ts_img = img[startY:endY, startX:endX]  # extract image of bird
+                    birdcrop_img = img[startY:endY, startX:endX]  # extract image of bird
+                    color = label_image.predominant_color(birdcrop_img)
+
                     species_conf, species = label_image.set_label(img, possible_labels, interpreter,
                                                                     args["inputmean"], args["inputstd"])
 
@@ -154,35 +156,6 @@ def birdsize(args, startX, startY, endX, endY):
     logging.info(str(birdarea) + ' ' + str(scrarea) + ' ' + str(perarea) + ' ' + size)
     print(size, perarea)
     return size, perarea
-
-
-def birdcolor(img, startX, startY, endX, endY):
-    # from pyimagesearch.com color detection
-    # define the list of boundaries.  create sets of Green Blue Red GBR defining lower and upper bounds
-    i = 0
-    colorcount = {}
-    colors = ['Red', 'Blue', 'Yellow', 'Gray']
-    boundaries = [
-        ([17, 15, 100], [50, 56, 200]),  # Red
-        ([86, 31, 4], [220, 88, 50]),  # Blue
-        ([25, 146, 190], [62, 174, 250]),  # Yellow
-        ([103, 86, 65], [145, 133, 128])  # Gray
-    ]
-
-    # loop over the boundaries
-    for (lower, upper) in boundaries:
-        lower = np.array(lower, dtype="uint8")  # create NumPy arrays from the boundaries
-        upper = np.array(upper, dtype="uint8")
-        # find the colors within the specified boundaries and apply the mask
-        mask = cv2.inRange(img, lower, upper)
-        maskimg = cv2.bitwise_and(img, img, mask=mask)
-        colorcount[i] = maskimg.any(axis=-1).countnonzero()  # count non-black pixels in image
-        i += 1
-
-    cindex = np.where(colorcount == np.amax(colorcount))  # find color with highest count
-    color = colors[cindex]
-    print(cindex, color)
-    return cindex, color
 
 
 def set_img_label(args, tweetb, bird_conf, species, species_conf, bird_size, bird_per_scr_area, img_label):

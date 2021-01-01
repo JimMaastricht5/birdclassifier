@@ -156,6 +156,35 @@ def scale_rect(img, box):
     return (x_min, y_min, x_max, y_max)
 
 
+def predominant_color(img):
+    # from pyimagesearch.com color detection
+    # define the list of boundaries.  create sets of Green Blue Red GBR defining lower and upper bounds
+    i = 0
+    colorcount = {}
+    colors = ['Red', 'Blue', 'Yellow', 'Gray']
+    boundaries = [
+        ([17, 15, 100], [50, 56, 200]),  # Red
+        ([86, 31, 4], [220, 88, 50]),  # Blue
+        ([25, 146, 190], [62, 174, 250]),  # Yellow
+        ([103, 86, 65], [145, 133, 128])  # Gray
+    ]
+
+    # loop over the boundaries
+    for (lower, upper) in boundaries:
+        lower = np.array(lower, dtype="uint8")  # create NumPy arrays from the boundaries
+        upper = np.array(upper, dtype="uint8")
+        # find the colors within the specified boundaries and apply the mask
+        mask = cv2.inRange(img, lower, upper)
+        maskimg = cv2.bitwise_and(img, img, mask=mask)
+        colorcount[i] = maskimg.any(axis=-1).countnonzero()  # count non-black pixels in image
+        i += 1
+
+    cindex = np.where(colorcount == np.amax(colorcount))  # find color with highest count
+    color = colors[cindex]
+    print(cindex, color)
+    return color
+
+
 # test function
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
