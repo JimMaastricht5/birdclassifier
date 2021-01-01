@@ -60,6 +60,10 @@ def bird_detector(args):
 
     # main loop ******
     while True:  # while escape key is not pressed
+        birdb = False
+        tweetb = False
+        img_label = ''
+
         try:
             motionb, img, gray, graymotion, thresh = motion_detector.detect(cv2, cap, first_img, args["minarea"])
         except:
@@ -70,54 +74,37 @@ def bird_detector(args):
             det_confidences, det_labels, det_rects = label_image.object_detection(args["confidence"], img,
                                                                                   objdet_possible_labels, tfobjdet,
                                                                                   args["inputmean"], args["inputstd"])
-            birdb = False
-            tweetb = False
-            combined_label = ''
+
             for i, det_confidence in enumerate(det_confidences):
                 logtime = datetime.now().strftime('%H:%M:%S')
                 loginfo = " saw  {}: {:.2f}%".format(det_labels[i], det_confidence * 100)
                 logging.info(logtime + loginfo)
                 print(logtime, loginfo)
+
                 if det_labels[i] == "bird" and (det_confidence >= args["confidence"] or birdb):
-                    birdb = True
-                    (startX, startY, endX, endY) = label_image.scale_rect(img, det_rects[i])  # x,y coord bounding box
-                    logging.info(str(startX) + ' ' + str(startY) + ' ' +
-                                 str(endX) + ' ' + str(endY))  # log rect size, use for bird size
-                    logging.info(str( ((startX-startY) * (endX - endY)) ))
-                    size, perarea = birdsize(args, startX, startY, endX, endY)
-                    print (size, perarea)
+                    birdb = True  # set to loop thru img for other birds in pic
+                    (startX, startY, endX, endY) = label_image.scale_rect(img, det_rects[i])  # set x,y bounding box
+                    size, perarea = birdsize(args, startX, startY, endX, endY)  # determine bird size for refined model
                     # ts_img = img[startY:endY, startX:endX]  # extract image of bird
-                    ts_img = img  # try maintaining size of org image for better recognition
-                    tfconfidence, birdclass = label_image.set_label(ts_img, possible_labels, interpreter,
+                    species_conf, species = label_image.set_label(img, possible_labels, interpreter,
                                                                     args["inputmean"], args["inputstd"])
 
                     # draw bounding boxes and display label if it is a bird
-                    if tfconfidence >= args["bconfidence"]:  # high confidence in species
-                        tweetb = True
-                        label = "{}: {:.2f}% / {:.2f}%".format(birdclass, tfconfidence * 100, det_confidence * 100)
-                    else:
-                        loginfo = "----species {}: {:.2f}% / {:.2f}%".format(birdclass,
-                                                                        tfconfidence * 100, det_confidence * 100)
-                        logging.info(loginfo)
-                        print(loginfo)
-                        label = "{}: {:.2f}%".format("bird", det_confidence * 100)
-                        birdclass = 'bird'
-
-                    combined_label = combined_label + ' ' + label  # build label for multi birds in one photo
+                    tweetb, img_label = set_img_label(args, tweetb, det_confidence, species, species_conf, img_label)
                     cv2.rectangle(img, (startX, startY), (endX, endY), colors[i], 2)
                     y = startY - 15 if startY - 15 > 15 else startY + 15  # adjust label loc if too low
-                    cv2.putText(img, label, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors[i], 2)
+                    cv2.putText(img, img_label, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors[i], 2)
 
                     # keep track of what we've seen in the last 10 minutes
-                    if birdclass in birds_found:  # seen it
+                    if species in birds_found:  # seen it
                         logdate = starttime.strftime('%H:%M:%S')
-                        loginfo = label + ' last seen at: '
+                        loginfo = img_label + ' last seen at: '
                         logging.info(loginfo + logdate)
                         if (datetime.now().timestamp() - starttime.timestamp()) >= 600:  # 10 min elapsed in seconds;
                             starttime = datetime.now()  # reset timer
                             birds_found = []  # clear birds found
                     else:  # something new is at the feeder
-                        birds_found.append(birdclass)
+                        birds_found.append(species)
 
             if birdb:  # if object detection saw a bird draw the results
                 cv2.imshow('obj detection', img)  # show all birds in pic with labels
@@ -125,13 +112,12 @@ def bird_detector(args):
             # image contained a bird and species label, tweet it
             if tweetb and (datetime.now().timestamp() - starttime.timestamp() >= 600):  # wait 10 min in seconds
                 logdate = starttime.strftime('%H:%M:%S')
-                logging.info(logdate + '**** tweeted ' + label)
-                print(logdate, '**** tweeted', label)
+                logging.info(logdate + '**** tweeted ' + img_label)
+                print(logdate, '**** tweeted', img_label)
                 cv2.imshow('tweeted', img)  # show all birds in pic with labels
                 cv2.imwrite("img.jpg", img)  # write out image for debugging and testing
                 tw_img = open('img.jpg', 'rb')
-                tweeter.post_image(twitter, combined_label, tw_img)
-                birds_found.append(birdclass)
+                tweeter.post_image(twitter, img_label, tw_img)
 
         if args["panb"]:
             currpan, currtilt = PanTilt9685.trackobject(pwm, cv2, currpan, currtilt, img,
@@ -165,14 +151,16 @@ def birdsize(args, startX, startY, endX, endY):
         size = 'S'
 
     logging.info(str(birdarea) + ' ' + str(scrarea) + ' ' + str(perarea) + ' ' + size)
+    print(size, perarea)
     return size, perarea
 
 
 def birdcolor(img, startX, startY, endX, endY):
     # from pyimagesearch.com color detection
-    # define the list of boundaries.  Set sets of Green Blue Red GBR defining lower and upper bounds
+    # define the list of boundaries.  create sets of Green Blue Red GBR defining lower and upper bounds
     i = 0
     colorcount = {}
+    colors = ['Red', 'Blue', 'Yellow', 'Gray']
     boundaries = [
         ([17, 15, 100], [50, 56, 200]),  # Red
         ([86, 31, 4], [220, 88, 50]),  # Blue
@@ -190,8 +178,24 @@ def birdcolor(img, startX, startY, endX, endY):
         colorcount[i] = maskimg.any(axis=-1).countnonzero()  # count non-black pixels in image
         i += 1
 
-    cindex = np.where(colorcount == np.amax(colorcount))
-    return cindex
+    cindex = np.where(colorcount == np.amax(colorcount))  # find color with highest count
+    color = colors[cindex]
+    print(cindex, color)
+    return cindex, color
+
+
+def set_img_label(args, tweetb, bird_conf, species, species_conf, img_label):
+    if species_conf >= args["bconfidence"]:  # high confidence in species
+        tweetb = True
+        label = "{}: {:.2f}% / {:.2f}%".format(species, species_conf * 100, bird_conf * 100)
+    else:
+        loginfo = "----species {}: {:.2f}% / {:.2f}%".format(species, species_conf * 100, bird_conf * 100)
+        logging.info(loginfo)
+        print(loginfo)
+        label = "{}: {:.2f}%".format("bird", bird_conf * 100)
+        species = 'bird'
+    img_label = img_label + ' ' + label  # build label for multi birds in one photo
+    return tweetb, img_label
 
 
 if __name__ == "__main__":
