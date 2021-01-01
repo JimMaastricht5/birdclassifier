@@ -176,7 +176,7 @@ def predominant_color(img):
         # find the colors within the specified boundaries and apply the mask
         mask = cv2.inRange(img, lower, upper)
         maskimg = cv2.bitwise_and(img, img, mask=mask)
-        colorcount[i] = maskimg.any(axis=-1).countnonzero()  # count non-black pixels in image
+        colorcount[i] = maskimg.any(axis=-1).count_nonzero()  # count non-black pixels in image
         i += 1
 
     cindex = np.where(colorcount == np.amax(colorcount))  # find color with highest count
