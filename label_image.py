@@ -177,7 +177,7 @@ def predominant_color(img):
         mask = cv2.inRange(img, lower, upper)
         maskimg = cv2.bitwise_and(img, img, mask=mask)
         maskimgnp=np.array(maskimg)
-        colorcount[i] = maskimgnp.any(axis=-1).count_nonzero()  # count non-black pixels in image
+        colorcount[i] = np.count_nonzero(maskimgnp.any, axis=None))  # count non-zero values in BGR pixels
         i += 1
 
     cindex = np.where(colorcount == np.amax(colorcount))  # find color with highest count
