@@ -80,7 +80,7 @@ def object_detection(min_confidence, img, labels, interpreter, input_mean, input
     if floating_model is False:  # tensor lite obj det prebuilt model
         det_rects = interpreter.get_tensor(output_details[0]['index'])
         det_labels_index = interpreter.get_tensor(output_details[1]['index'])  # labels are an array for each result
-        # print(det_labels_index)
+        print(det_labels_index)
 
         det_confidences = interpreter.get_tensor(output_details[2]['index'])
         for index, det_confidence in enumerate(det_confidences[0]):
@@ -115,8 +115,6 @@ def set_label(img, labels, interpreter, input_mean, input_std):
     results = np.squeeze(output_data)
     cindex = np.where(results == np.amax(results))
     lindex = cindex[0]  # grab best result; np array is in max order descending
-    print(results)  # see confidence factors for species
-    print('confidence=',cindex, 'label=', lindex)
     try:
         cresult = float(results[cindex])
         lresult = labels[lindex]
@@ -126,10 +124,7 @@ def set_label(img, labels, interpreter, input_mean, input_std):
         cresult = float(0)
         lresult = ''
 
-    # print(cresult, lresult)
-    # print('time: {:.3f}ms'.format((stop_time - start_time) * 1000))
     # cresult = cresult / 100 needed for automl not keras model
-    print(cresult)
     return cresult, lresult  # highest confidence and best label
 
 

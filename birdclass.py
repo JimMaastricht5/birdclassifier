@@ -154,14 +154,14 @@ def bird_detector(args):
 
 
 def birdsize(args, startX, startY, endX, endY):
-    birdarea = abs((startX - startY) * (endX - endY))
+    birdarea = abs((startX - endX) * (startY - endY))
     scrarea = args['screenheight'] * args['screenwidth']
     perarea = (birdarea / scrarea) * 100
-    if perarea >= 20:  # large bird
+    if perarea >= 40:  # large bird
         size = 'L'
-    elif perarea >= 15:  # medium bird
+    elif perarea >= 30:  # medium bird
         size = 'M'
-    else:  # small bird
+    else:  # small bird usually ~ 20%
         size = 'S'
 
     logging.info(str(birdarea) + ' ' + str(scrarea) + ' ' + str(perarea) + ' ' + size)
