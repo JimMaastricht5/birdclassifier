@@ -160,7 +160,7 @@ def predominant_color(img):
     # from pyimagesearch.com color detection
     # define the list of boundaries.  create sets of Green Blue Red GBR defining lower and upper bounds
     i = 0
-    colorcount = {}
+    colorcount = [''] * 4
     colors = ['Red', 'Blue', 'Yellow', 'Gray']
     boundaries = [
         ([17, 15, 100], [50, 56, 200]),  # Red
