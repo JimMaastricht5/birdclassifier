@@ -179,10 +179,8 @@ def predominant_color(img):
         colorcount[i] = np.count_nonzero(maskimg, axis=None)  # count non-zero values in BGR pixels
         i += 1
 
-
     cindex = np.where(colorcount == np.amax(colorcount))  # find color with highest count
-    print(cindex, colorcount)
-    color = colors[cindex]
+    color = colors[cindex[Desktop Entry]
     return color
 
 
