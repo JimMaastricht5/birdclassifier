@@ -161,7 +161,7 @@ def predominant_color(img):
     # define the list of boundaries.  create sets of Green Blue Red GBR defining lower and upper bounds
     i = 0
     colorcount = [''] * 4
-    colors = ['Red', 'Blue', 'Yellow', 'Gray']
+    colors = np.array(['Red', 'Blue', 'Yellow', 'Gray'])
     boundaries = [
         ([17, 15, 100], [50, 56, 200]),  # Red
         ([86, 31, 4], [220, 88, 50]),  # Blue
@@ -176,13 +176,13 @@ def predominant_color(img):
         # find the colors within the specified boundaries and apply the mask
         mask = cv2.inRange(img, lower, upper)
         maskimg = cv2.bitwise_and(img, img, mask=mask)
-        maskimgnp=np.array(maskimg)
-        colorcount[i] = np.count_nonzero(maskimgnp.any, axis=None)  # count non-zero values in BGR pixels
+        colorcount[i] = np.count_nonzero(maskimg, axis=None)  # count non-zero values in BGR pixels
         i += 1
 
+
     cindex = np.where(colorcount == np.amax(colorcount))  # find color with highest count
+    print(cindex, colorcount)
     color = colors[cindex]
-    print(cindex, color)
     return color
 
 
