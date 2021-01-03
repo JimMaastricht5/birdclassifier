@@ -147,7 +147,7 @@ def set_img_label(args, tweetb, bird_conf, species, species_conf, bird_size, bir
     hlabel = "{}: {:.2f}% / {:.2f}%".format(species, species_conf * 100, bird_conf * 100)
     logging.info('--- ' + hlabel + ' ' + bird_size + ' ' + ' ' + color + ' ' + str(bird_per_scr_area))  # log info
     print('--- ' + hlabel + ' ' + bird_size + ' ' + ' ' + color + ' ' + str(bird_per_scr_area))  # log info
-    if species_conf >= args["bconfidence"]:  # high confidence in species
+    if species_conf >= args["sconfidence"]:  # high confidence in species
         tweetret = True
         label = hlabel
     else:
