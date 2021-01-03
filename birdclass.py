@@ -31,7 +31,7 @@ def bird_detector(args):
     # detect, then generate a set of bounding box colors for each class
     colors = np.random.uniform(0, 255, size=(11, 3))  # random colors for bounding boxes
     birds_found = []
-    starttime = datetime.now() - timedelta(minutes=15)  # pauses 10 minutes based on loop below if not adjusted;
+    starttime = datetime(2021, 1, 1, 0, 0, 0, 0)  # init start time for observation delay
 
     # setup pan tilt and initialize variables
     if args["panb"]:
@@ -108,7 +108,7 @@ def bird_detector(args):
                 cv2.imshow('obj detection', img)  # show all birds in pic with labels
 
             # image contained a bird and species label, tweet it
-            if tweetb and (datetime.now() - timedelta(starttime)) > 600:  # wait 10 min in seconds
+            if tweetb and (datetime.now() - starttime).total_seconds() > 600:  # wait 10 min in seconds
                 logdate = starttime.strftime('%H:%M:%S')
                 logging.info(logdate + '*** tweeted ' + img_label)
                 print('*** tweeted', logdate, img_label)
