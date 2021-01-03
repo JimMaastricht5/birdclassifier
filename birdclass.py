@@ -102,8 +102,9 @@ def bird_detector(args):
 
             # image contained a bird and species label, tweet it
             if tweetb and (datetime.now() - starttime).total_seconds() > 600:  # wait 10 min in seconds
+                starttime = datetime.now()
                 logdate = starttime.strftime('%H:%M:%S')
-                logging.info(logdate + '*** tweeted ' + img_label)
+                logging.info('*** tweeted ' + logdate + ' ' + img_label)
                 print('*** tweeted', logdate, img_label)
                 cv2.imshow('tweeted', img)  # show all birds in pic with labels
                 cv2.imwrite("img.jpg", img)  # write out image for debugging and testing
