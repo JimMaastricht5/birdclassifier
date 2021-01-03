@@ -31,7 +31,7 @@ def bird_detector(args):
     # detect, then generate a set of bounding box colors for each class
     colors = np.random.uniform(0, 255, size=(11, 3))  # random colors for bounding boxes
     birds_found = []
-    starttime = datetime.now()
+    starttime = datetime.now()  # will pause 10 minutes based on loop below; needs to be adjusted down
 
     # setup pan tilt and initialize variables
     if args["panb"]:
@@ -77,7 +77,7 @@ def bird_detector(args):
 
             for i, det_confidence in enumerate(det_confidences):
                 logtime = datetime.now().strftime('%H:%M:%S')
-                loginfo = " saw  {}: {:.2f}%".format(det_labels[i], det_confidence * 100)
+                loginfo = "---saw  {}: {:.2f}%".format(det_labels[i], det_confidence * 100)
                 logging.info(logtime + loginfo)
                 print(logtime, loginfo)
 
@@ -100,7 +100,7 @@ def bird_detector(args):
                     # keep track of what we've seen in the last 10 minutes
                     if species in birds_found:  # seen it
                         logdate = starttime.strftime('%H:%M:%S')
-                        loginfo = img_label + ' last seen at: '
+                        loginfo = img_label + '+++ last seen at: '
                         logging.info(loginfo + logdate)
                         if (datetime.now().timestamp() - starttime.timestamp()) >= 600:  # 10 min elapsed in seconds;
                             starttime = datetime.now()  # reset timer
@@ -114,8 +114,8 @@ def bird_detector(args):
             # image contained a bird and species label, tweet it
             if tweetb and (datetime.now().timestamp() - starttime.timestamp() >= 600):  # wait 10 min in seconds
                 logdate = starttime.strftime('%H:%M:%S')
-                logging.info(logdate + '**** tweeted ' + img_label)
-                print(logdate, '**** tweeted', img_label)
+                logging.info(logdate + '*** tweeted ' + img_label)
+                print(logdate, '*** tweeted', img_label)
                 cv2.imshow('tweeted', img)  # show all birds in pic with labels
                 cv2.imwrite("img.jpg", img)  # write out image for debugging and testing
                 tw_img = open('img.jpg', 'rb')
@@ -153,7 +153,7 @@ def birdsize(args, startX, startY, endX, endY):
         size = 'S'
 
     logging.info(str(birdarea) + ' ' + str(scrarea) + ' ' + str(perarea) + ' ' + size)
-    print(size, perarea)
+    # print(size, perarea)
     return size, perarea
 
 
@@ -167,7 +167,7 @@ def set_img_label(args, tweetb, bird_conf, species, species_conf, bird_size, bir
 
     img_label = img_label + ' ' + label + ' ' + bird_size + ' ' + ' ' + color + ' ' + str(bird_per_scr_area)  #label for multi birds in photo
     logging.info(img_label)
-    print(img_label)
+    print('--- ' + img_label)
     return tweetb, img_label
 
 
