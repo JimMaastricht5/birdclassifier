@@ -108,7 +108,6 @@ def bird_detector(args):
                 cv2.imshow('obj detection', img)  # show all birds in pic with labels
 
             # image contained a bird and species label, tweet it
-            print('at tweet section of code')
             if tweetb and (datetime.now().timestamp() - starttime.timestamp() >= 600):  # wait 10 min in seconds
                 logdate = starttime.strftime('%H:%M:%S')
                 logging.info(logdate + '*** tweeted ' + img_label)
@@ -117,7 +116,7 @@ def bird_detector(args):
                 cv2.imwrite("img.jpg", img)  # write out image for debugging and testing
                 tw_img = open('img.jpg', 'rb')
                 tweeter.post_image(twitter, img_label, tw_img)
-            else:
+            elif tweetb:
                 print(tweetb, (datetime.now().timestamp() - starttime.timestamp()))
 
         if args["panb"]:
