@@ -79,7 +79,7 @@ def bird_detector(args):
                 logtime = datetime.now().strftime('%H:%M:%S')
                 loginfo = "---saw  {}: {:.2f}%".format(det_labels[i], det_confidence * 100)
                 logging.info(logtime + loginfo)
-                print(logtime, loginfo)
+                print(loginfo, logtime)
 
                 if det_labels[i] == "bird" and (det_confidence >= args["confidence"] or birdb):
                     birdb = True  # set to loop thru img for other birds in pic
@@ -115,7 +115,7 @@ def bird_detector(args):
             if tweetb and (datetime.now().timestamp() - starttime.timestamp() >= 600):  # wait 10 min in seconds
                 logdate = starttime.strftime('%H:%M:%S')
                 logging.info(logdate + '*** tweeted ' + img_label)
-                print(logdate, '*** tweeted', img_label)
+                print('*** tweeted', logdate, img_label)
                 cv2.imshow('tweeted', img)  # show all birds in pic with labels
                 cv2.imwrite("img.jpg", img)  # write out image for debugging and testing
                 tw_img = open('img.jpg', 'rb')
