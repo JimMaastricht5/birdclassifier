@@ -16,7 +16,7 @@ import motion_detector  # motion detector helper functions
 import tweeter  # twitter helper functions
 import argparse  # argument parser
 import numpy as np
-from datetime import datetime
+from datetime import datetime, timedelta
 from auth import (
     api_key,
     api_secret_key,
