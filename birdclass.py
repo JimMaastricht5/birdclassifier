@@ -30,7 +30,6 @@ def bird_detector(args):
     # initialize the list of class labels MobileNet SSD was trained to
     # detect, then generate a set of bounding box colors for each class
     colors = np.random.uniform(0, 255, size=(11, 3))  # random colors for bounding boxes
-    birds_found = []
     starttime = datetime(2021, 1, 1, 0, 0, 0, 0)  # init start time for observation delay
 
     # setup pan tilt and initialize variables
@@ -47,23 +46,18 @@ def bird_detector(args):
     cap.set(3, args["screenwidth"])  # set screen width
     cap.set(4, args["screenheight"])  # set screen height
     first_img = motion_detector.init(cv2, cap)
-
+    # init twitter and tf lite obj detection and species model file
     twitter = tweeter.init(api_key, api_secret_key, access_token, access_token_secret)  # init twitter api
-
-    # init tf lite obj detection and species model file
     tfobjdet, objdet_possible_labels = label_image.init_tf2(args["obj_det_model"], args["numthreads"],
                                                             args["obj_det_labels"])
     interpreter, possible_labels = label_image.init_tf2(args["species_model"], args["numthreads"],
                                                         args["species_labels"])
-
     print('press esc to quit')
-
     # main loop ******
     while True:  # while escape key is not pressed
         birdb = False
         tweetb = False
         img_label = ''
-
         try:
             motionb, img, gray, graymotion, thresh = motion_detector.detect(cv2, cap, first_img, args["minarea"])
         except:
@@ -97,8 +91,8 @@ def bird_detector(args):
             if birdb:  # if object detection saw a bird draw the results
                 cv2.imshow('obj detection', img)  # show all birds in pic with labels
 
-            if tweetb:
-                cv2.imshow('tweet candidate', img)
+            # if tweetb:
+            #     cv2.imshow('tweet candidate', img)
 
             # image contained a bird and species label, tweet it
             if tweetb and (datetime.now() - starttime).total_seconds() > 600:  # wait 10 min in seconds
@@ -160,7 +154,6 @@ def set_img_label(args, tweetb, bird_conf, species, species_conf, bird_size, bir
     else:
         species = 'bird'  # reset species to bird due to low confidence
         label = "{}: {:.2f}%".format(species, bird_conf * 100)
-
     img_label = img_label + ' ' + label + ' ' + bird_size + ' ' + ' ' + color + ' ' + str(bird_per_scr_area)  #label for multi birds in photo
     return tweetret, img_label
 
