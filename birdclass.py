@@ -80,7 +80,7 @@ def bird_detector(args):
                     birdcrop_img = img[startY:endY, startX:endX]  # extract image of bird
                     color = label_image.predominant_color(birdcrop_img)  # find main color of bird
                     species_conf, species = label_image.set_label(img, possible_labels, interpreter,
-                                                                    args["inputmean"], args["inputstd"])
+                                                                  args["inputmean"], args["inputstd"])
                     # draw bounding boxes and display label if it is a bird
                     tweetb, img_label = set_img_label(args, tweetb, det_confidence, species, species_conf, bird_size,
                                                       bird_per_scr_area, color, img_label)
@@ -127,8 +127,8 @@ def bird_detector(args):
     cv2.destroyAllWindows()
 
 
-def birdsize(args, startX, startY, endX, endY):
-    birdarea = abs((startX - endX) * (startY - endY))
+def birdsize(args, startx, starty, endx, endy):
+    birdarea = abs((startx - endx) * (starty - endy))
     scrarea = args['screenheight'] * args['screenwidth']
     perarea = (birdarea / scrarea) * 100
     if perarea >= 40:  # large bird
@@ -139,14 +139,13 @@ def birdsize(args, startX, startY, endX, endY):
         size = 'S'
 
     logging.info(str(birdarea) + ' ' + str(scrarea) + ' ' + str(perarea) + ' ' + size)
-    # print(size, perarea)
     return size, perarea
 
 
 def set_img_label(args, tweetb, bird_conf, species, species_conf, bird_size, bird_per_scr_area, color, img_label):
     tweetret = tweetb  # store current value if already true
     hlabel = "{}: {:.2f}% / {:.2f}%".format(species, species_conf * 100, bird_conf * 100)
-    logging.info('--- ' + hlabel + ' ' + bird_size + ' ' + ' ' + color + ' ' + str(bird_per_scr_area))  #log info
+    logging.info('--- ' + hlabel + ' ' + bird_size + ' ' + ' ' + color + ' ' + str(bird_per_scr_area))  # log info
     print('--- ' + hlabel + ' ' + bird_size + ' ' + ' ' + color + ' ' + str(bird_per_scr_area))  # log info
     if species_conf >= args["bconfidence"]:  # high confidence in species
         tweetret = True
@@ -154,7 +153,8 @@ def set_img_label(args, tweetb, bird_conf, species, species_conf, bird_size, bir
     else:
         species = 'bird'  # reset species to bird due to low confidence
         label = "{}: {:.2f}%".format(species, bird_conf * 100)
-    img_label = img_label + ' ' + label + ' ' + bird_size + ' ' + ' ' + color + ' ' + str(bird_per_scr_area)  #label for multi birds in photo
+    # label for multi birds in photo
+    img_label = img_label + ' ' + label + ' ' + bird_size + ' ' + ' ' + color + ' ' + str(bird_per_scr_area)
     return tweetret, img_label
 
 
