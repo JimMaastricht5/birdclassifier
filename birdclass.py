@@ -31,7 +31,7 @@ def bird_detector(args):
     # detect, then generate a set of bounding box colors for each class
     colors = np.random.uniform(0, 255, size=(11, 3))  # random colors for bounding boxes
     birds_found = []
-    starttime = datetime.now() - datetime.timedelta(minutes=15)  # pauses 10 minutes based on loop below if not adjusted;
+    starttime = datetime.now() - timedelta(minutes=15)  # pauses 10 minutes based on loop below if not adjusted;
 
     # setup pan tilt and initialize variables
     if args["panb"]:
