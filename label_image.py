@@ -180,7 +180,7 @@ def predominant_color(img):
         i += 1
 
     cindex = np.where(colorcount == np.amax(colorcount))  # find color with highest count
-    color = colors[cindex]
+    color = str(colors[cindex])
     return color
 
 

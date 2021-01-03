@@ -165,8 +165,7 @@ def set_img_label(args, tweetb, bird_conf, species, species_conf, bird_size, bir
         species = 'bird'  # reset species to bird due to low confidence
         label = "{}: {:.2f}%".format(species, bird_conf * 100)
 
-    img_label = img_label + ' ' + label + ' ' + bird_size + ' ' + ' ' + color + ' ' + \
-                str(bird_per_scr_area)  #label for multi birds in photo
+    img_label = img_label + ' ' + label + ' ' + bird_size + ' ' + ' ' + color + ' ' + str(bird_per_scr_area)  #label for multi birds in photo
     logging.info(img_label)
     print(img_label)
     return tweetb, img_label
