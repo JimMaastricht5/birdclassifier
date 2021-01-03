@@ -158,16 +158,18 @@ def birdsize(args, startX, startY, endX, endY):
 
 
 def set_img_label(args, tweetb, bird_conf, species, species_conf, bird_size, bird_per_scr_area, color, img_label):
+
+    hlabel = "{}: {:.2f}% / {:.2f}%".format(species, species_conf * 100, bird_conf * 100)
+    logging.info('--- ' + hlabel + ' ' + bird_size + ' ' + ' ' + color + ' ' + str(bird_per_scr_area))  #log info
+    print('--- ' + hlabel + ' ' + bird_size + ' ' + ' ' + color + ' ' + str(bird_per_scr_area))  # log info
     if species_conf >= args["bconfidence"]:  # high confidence in species
         tweetb = True
-        label = "{}: {:.2f}% / {:.2f}%".format(species, species_conf * 100, bird_conf * 100)
+        label = hlabel
     else:
         species = 'bird'  # reset species to bird due to low confidence
         label = "{}: {:.2f}%".format(species, bird_conf * 100)
 
     img_label = img_label + ' ' + label + ' ' + bird_size + ' ' + ' ' + color + ' ' + str(bird_per_scr_area)  #label for multi birds in photo
-    logging.info(img_label)
-    print('--- ' + img_label)
     return tweetb, img_label
 
 
