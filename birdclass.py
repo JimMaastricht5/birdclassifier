@@ -95,7 +95,7 @@ def bird_detector(args):
             #     cv2.imshow('tweet candidate', img)
 
             # image contained a bird and species label, tweet it
-            if tweetb and (datetime.now() - starttime).total_seconds() > 600:  # wait 10 min in seconds
+            if tweetb and (datetime.now() - starttime).total_seconds() > 1800:  # wait 30 min in seconds
                 starttime = datetime.now()
                 logdate = starttime.strftime('%H:%M:%S')
                 logging.info('*** tweeted ' + logdate + ' ' + img_label)
@@ -154,7 +154,7 @@ def set_img_label(args, tweetb, bird_conf, species, species_conf, bird_size, bir
         species = 'bird'  # reset species to bird due to low confidence
         label = "{}: {:.2f}%".format(species, bird_conf * 100)
     # label for multi birds in photo
-    img_label = img_label + ' ' + label + ' ' + bird_size + ' ' + ' ' + color + ' ' + str(bird_per_scr_area)
+    img_label = "{} {} {} {} {:.2f}%".format(img_label, label, bird_size, color, bird_per_scr_area)
     return tweetret, img_label
 
 
