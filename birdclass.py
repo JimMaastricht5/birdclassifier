@@ -165,8 +165,8 @@ if __name__ == "__main__":
     # construct the argument parser and parse the arguments
     ap = argparse.ArgumentParser()
     # video setup
-    ap.add_argument("-v", "--video", help="path to the video file")
-    ap.add_argument("-a", "--minarea", type=int, default=2, help="motion threshold, lower more")
+    # ap.add_argument("-v", "--video", help="path to the video file")
+    ap.add_argument("-a", "--minarea", type=int, default=2, help="motion threshold, lower triggers more often")
     ap.add_argument("-sw", "--screenwidth", type=int, default=320, help="max screen width")
     ap.add_argument("-sh", "--screenheight", type=int, default=240, help="max screen height")
 
