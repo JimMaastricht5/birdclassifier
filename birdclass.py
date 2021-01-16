@@ -90,9 +90,7 @@ def bird_detector(args):
 
             if birdb:  # if object detection saw a bird draw the results
                 cv2.imshow('obj detection', img)  # show all birds in pic with labels
-
-            # if tweetb:
-            #     cv2.imshow('tweet candidate', img)
+                cv2.imshow('LUV conversion', cv2.cvtColor(img, cv2.COLOR_BGR2LUV))  # test another color space
 
             # image contained a bird and species label, tweet it
             if tweetb and (datetime.now() - starttime).total_seconds() > 1800:  # wait 30 min in seconds
