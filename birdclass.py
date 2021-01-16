@@ -143,6 +143,7 @@ def birdsize(args, startx, starty, endx, endy):
 
 
 def set_img_label(args, tweetb, bird_conf, species, species_conf, bird_size, bird_per_scr_area, color, img_label):
+    # img_label is prior label of first bird if this is the second bird in the picture
     tweetret = tweetb  # store current value if already true
     hlabel = "{}: {:.2f}% / {:.2f}%".format(species, species_conf * 100, bird_conf * 100)
     logging.info('--- ' + hlabel + ' ' + bird_size + ' ' + ' ' + color + ' ' + str(bird_per_scr_area))  # log info
@@ -154,7 +155,9 @@ def set_img_label(args, tweetb, bird_conf, species, species_conf, bird_size, bir
         species = 'bird'  # reset species to bird due to low confidence
         label = "{}: {:.2f}%".format(species, bird_conf * 100)
     # label for multi birds in photo
-    img_label = "{} {} {} {} {:.2f}%".format(img_label, label, bird_size, color, bird_per_scr_area)
+    img_label = "{} {}, {} size, {}, {:.2f}% of img".format(img_label, label, bird_size, color,
+                                                                         bird_per_scr_area)
+
     return tweetret, img_label
 
 
@@ -178,7 +181,7 @@ if __name__ == "__main__":
                     default='/home/pi/PycharmProjects/pyface2/birdspecies-s-224-93.15.tflite',
                     help='.tflite model to be executed')
     ap.add_argument('-l', '--species_labels',
-                    default='/home/pi/PycharmProjects/pyface2/birdspecies-13.txt',
+                    default='/home/pi/PycharmProjects/pyface2/birdspecies-s-224-93.15-13.txt',
                     help='name of file containing labels')
 
     # tensor flow input arguements
