@@ -89,8 +89,11 @@ def bird_detector(args):
                     cv2.putText(img, img_label, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors[i], 2)
 
             if birdb:  # if object detection saw a bird draw the results
-                cv2.imshow('obj detection', img)  # show all birds in pic with labels
-                cv2.imshow('LUV conversion', cv2.cvtColor(img, cv2.COLOR_BGR2LUV))  # test another color space
+                cv2.imshow('org detection', img)  # show all birds in pic with labels
+                imgclr, imgclrbrt, imgclrbrtcon = image_proc.winter(img)  # enhance image for winter
+                cv2.imshow('color enhanced', imgclr)
+                cv2.imshow('color amd brightness enhanced', imgclr)
+                cv2.imshow('color, brightness and contrast enhanced', imgclr)
 
             # image contained a bird and species label, tweet it
             if tweetb and (datetime.now() - starttime).total_seconds() > 1800:  # wait 30 min in seconds
