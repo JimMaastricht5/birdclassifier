@@ -7,7 +7,7 @@ from PIL import ImageEnhance
 # set of enhancements for winter weather in WI
 # enhance color, brightness, and contrast
 # provides all three stages back for viewing
-def winter(img)
+def winter(img):
     img_clr = enhance_color(img, 3)
     img_clr_brt = enhance_brightness(img_clr, 1.2)
     img_clr_brt_con = enhance_contrast(img_clr_brt, 1.5)
