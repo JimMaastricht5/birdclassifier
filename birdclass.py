@@ -14,6 +14,7 @@ import label_image  # code to init tensor flow model and classify bird type
 import PanTilt9685  # pan tilt control code
 import motion_detector  # motion detector helper functions
 import tweeter  # twitter helper functions
+import image_proc  # lib of image enhancement functions
 import argparse  # argument parser
 import numpy as np
 from datetime import datetime, timedelta
