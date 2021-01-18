@@ -9,7 +9,6 @@
 # install OpenCv version 4.4+
 # packages: pan tilt uses PCA9685-Driver, twitter use twython package, auth.py must be in project for import auth
 #   oauthlib,
-import imutils
 import cv2  # open cv 2
 import label_image  # code to init tensor flow model and classify bird type
 import PanTilt9685  # pan tilt control code
