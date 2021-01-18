@@ -12,6 +12,16 @@ def main():
     imgpil = Image.fromarray(cv2.imread('/home/pi/birdclass/test2.jpg'))  # need to pass a PIL Image vs. Numpy array
     img_clr, img_clr_brt, img_clr_brt_con = winter(imgnp)
     img_clr, img_clr_brt, img_clr_brt_con = winter(imgpil)
+    cv2.imshow('org', imgnp)
+    cv2.imshow('color', img_clr)
+    cv2.imshow('color brt', img_clr_brt)
+    cv2.imshow('color brt con', img_clr_brt_con)
+
+    # check for esc key and quit if pressed
+    while True:
+        k = cv2.waitKey(30) & 0xff
+        if k == 27:  # press 'ESC' to quit
+            break
 
 
 # pillow requires a pillow image to work
@@ -31,9 +41,9 @@ def convert(img, convert_to = 'np'):
 # take either a pil image or nparray and returns nparray
 def winter(img):
     img = convert(img, 'PIL')  # converts to PIL format if necessary
-    img_clr = enhance_color(img, 3)
+    img_clr = enhance_color(img, 2)
     img_clr_brt = enhance_brightness(img_clr, 1.2)
-    img_clr_brt_con = enhance_contrast(img_clr_brt, 1.5)
+    img_clr_brt_con = enhance_contrast(img_clr_brt, 1.2)
     return convert(img_clr), convert(img_clr_brt), convert(img_clr_brt_con)  # return numpy arrays
 
 

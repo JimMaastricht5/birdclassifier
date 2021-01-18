@@ -73,7 +73,8 @@ def bird_detector(args):
 
                     # extract image of bird, use crop for better species detection in models
                     # *** need to improve color saturation and brightness for species model
-                    birdcrop_img = img[startY:endY, startX:endX]
+                    imgclr, imgclrbrt, imgclrbrtcon = image_proc.winter(img)  # enhance image for winter
+                    birdcrop_img = imgclrbrtcon[startY:endY, startX:endX]
                     color = label_image.predominant_color(birdcrop_img)  # find main color of bird
                     species_conf, species = label_image.set_label(birdcrop_img, possible_labels, interpreter,
                                                                   args["inputmean"], args["inputstd"])
@@ -87,9 +88,9 @@ def bird_detector(args):
 
             if birdb:  # if object detection saw a bird draw the results
                 cv2.imshow('org detection', img)  # show all birds in pic with labels
-                imgclr, imgclrbrt, imgclrbrtcon = image_proc.winter(img)  # enhance image for winter
-                cv2.imshow('color enhanced', imgclr)
-                cv2.imshow('color amd brightness enhanced', imgclrbrt)
+                # imgclr, imgclrbrt, imgclrbrtcon = image_proc.winter(img)  # enhance image for winter
+                # cv2.imshow('color enhanced', imgclr)
+                # cv2.imshow('color amd brightness enhanced', imgclrbrt)
                 cv2.imshow('color, brightness and contrast enhanced', imgclrbrtcon)
 
             # image contained a bird and species label, tweet it
@@ -98,8 +99,8 @@ def bird_detector(args):
                 logdate = starttime.strftime('%H:%M:%S')
                 logging.info('*** tweeted ' + logdate + ' ' + img_label)
                 print('*** tweeted', logdate, img_label)
-                cv2.imshow('tweeted', img)  # show all birds in pic with labels
-                cv2.imwrite("img.jpg", img)  # write out image for debugging and testing
+                cv2.imshow('tweeted', imgclrbrtcon)  # show all birds in pic with labels
+                cv2.imwrite("img.jpg", imgclrbrtcon)  # write out image for debugging and testing
                 tw_img = open('img.jpg', 'rb')
                 tweeter.post_image(twitter, img_label, tw_img)
             elif tweetb:
