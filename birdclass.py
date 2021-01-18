@@ -38,12 +38,7 @@ def bird_detector(args):
         currpan, currtilt, pwm = PanTilt9685.init_pantilt()
 
     # initial video capture, screen size, and grab first image (no motion)
-    try:
-        cap = cv2.VideoCapture(0)  # capture video image
-    except:
-        print('camera failure on initial video capture, ending program')
-        logging.critical('camera failure on initial video capture, ending program')
-        return
+    cap = cv2.VideoCapture(0)  # capture video image
     cap.set(3, args["screenwidth"])  # set screen width
     cap.set(4, args["screenheight"])  # set screen height
     first_img = motion_detector.init(cv2, cap)
@@ -59,12 +54,7 @@ def bird_detector(args):
         birdb = False
         tweetb = False
         img_label = ''
-        try:
-            motionb, img, gray, graymotion, thresh = motion_detector.detect(cv2, cap, first_img, args["minarea"])
-        except:
-            logging.critical('camera failed on motion capture and compare of second image, ending program')
-            return
-
+        motionb, img, gray, graymotion, thresh = motion_detector.detect(cv2, cap, first_img, args["minarea"])
         if motionb:  # motion detected.
             det_confidences, det_labels, det_rects = label_image.object_detection(args["bconfidence"], img,
                                                                                   objdet_possible_labels, tfobjdet,
