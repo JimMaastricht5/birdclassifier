@@ -67,11 +67,17 @@ def bird_detector(args):
                 if det_labels[i] == "bird" and (det_confidence >= args["bconfidence"] or birdb):
                     birdb = True  # set to loop thru img for other birds in pic
                     (startX, startY, endX, endY) = label_image.scale_rect(img, det_rects[i])  # set x,y bounding box
+
+                    # *** need to improve bird size measurements w/known sized obj in pic, depth is big issue
                     bird_size, bird_per_scr_area = birdsize(args, startX, startY, endX, endY)  # determine bird size
-                    birdcrop_img = img[startY:endY, startX:endX]  # extract image of bird
+
+                    # extract image of bird, use crop for better species detection in models
+                    # *** need to improve color saturation and brightness for species model
+                    birdcrop_img = img[startY:endY, startX:endX]
                     color = label_image.predominant_color(birdcrop_img)  # find main color of bird
-                    species_conf, species = label_image.set_label(img, possible_labels, interpreter,
+                    species_conf, species = label_image.set_label(birdcrop_img, possible_labels, interpreter,
                                                                   args["inputmean"], args["inputstd"])
+
                     # draw bounding boxes and display label if it is a bird
                     tweetb, img_label = set_img_label(args, tweetb, det_confidence, species, species_conf, bird_size,
                                                       bird_per_scr_area, color, img_label)
