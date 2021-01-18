@@ -41,9 +41,9 @@ def convert(img, convert_to = 'np'):
 # take either a pil image or nparray and returns nparray
 def winter(img):
     img = convert(img, 'PIL')  # converts to PIL format if necessary
-    img_clr = enhance_color(img, 2)
-    img_clr_brt = enhance_brightness(img_clr, 1.2)
-    img_clr_brt_con = enhance_contrast(img_clr_brt, 1.2)
+    img_clr = enhance_color(img, 2.5)
+    img_clr_brt = enhance_brightness(img_clr, 1.0)
+    img_clr_brt_con = enhance_contrast(img_clr_brt, 1.0)
     return convert(img_clr), convert(img_clr_brt), convert(img_clr_brt_con)  # return numpy arrays
 
 
