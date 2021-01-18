@@ -12,7 +12,6 @@ def main():
     imgpil = Image.fromarray(cv2.imread('/home/pi/birdclass/test2.jpg'))  # need to pass a PIL Image vs. Numpy array
     img_clr, img_clr_brt, img_clr_brt_con = winter(imgnp)
     img_clr, img_clr_brt, img_clr_brt_con = winter(imgpil)
-    return
 
 
 # pillow requires a pillow image to work
