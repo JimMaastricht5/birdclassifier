@@ -1,17 +1,41 @@
 # lib of image enhancement and processing techniques
 # required Pillow library in project
 
-from PIL import ImageEnhance
+from PIL import ImageEnhance, Image
+import cv2
+import numpy as np
 
+
+# testing code
+def main():
+    imgnp = cv2.imread('/home/pi/birdclass/test2.jpg')
+    imgpil = Image.fromarray(cv2.imread('/home/pi/birdclass/test2.jpg'))  # need to pass a PIL Image vs. Numpy array
+    img_clr, img_clr_brt, img_clr_brt_con = winter(imgnp)
+    img_clr, img_clr_brt, img_clr_brt_con = winter(imgpil)
+    return
+
+
+# pillow requires a pillow image to work
+# func provides both formats for conversion
+# default conversion is to numpy array
+def convert(img, convert_to = 'np'):
+    if isinstance(img,(Image.Image)) and convert_to == 'np':
+        img = np.array(img)
+    elif isinstance(img,(np.ndarray)) and convert_to == 'PIL':
+        img = Image.fromarray(img)
+    # else requires no conversion
+    return img
 
 # set of enhancements for winter weather in WI
 # enhance color, brightness, and contrast
 # provides all three stages back for viewing
+# take either a pil image or nparray and returns nparray
 def winter(img):
+    img = convert(img, 'PIL')  # converts to PIL format if necessary
     img_clr = enhance_color(img, 3)
     img_clr_brt = enhance_brightness(img_clr, 1.2)
     img_clr_brt_con = enhance_contrast(img_clr_brt, 1.5)
-    return img_clr, img_clr_brt, img_clr_brt_con
+    return convert(img_clr), convert(img_clr_brt), convert(img_clr_brt_con)  # return numpy arrays
 
 
 # color enhance image
@@ -45,4 +69,5 @@ def enhance_sharpness(img, factor):
     return ImageEnhance.Sharpness(img).enhance(factor)
 
 
-
+if __name__ == "__main__":
+    main()

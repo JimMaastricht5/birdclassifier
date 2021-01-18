@@ -5,7 +5,7 @@
 # return image captured, gray scale, guassian blured version, thresholds, first_img, and countours
 # code by JimMaastricht5@gmail.com based on https://www.pyimagesearch.com/category/object-tracking/
 # import cv2
-import imutils
+# import imutils
 
 
 # capture first image and gray scale/blur for baseline motion detection
