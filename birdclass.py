@@ -78,7 +78,7 @@ def bird_detector(args):
                     color = label_image.predominant_color(birdcrop_img)  # find main color of bird
                     species_conf, species = label_image.set_label(birdcrop_img, possible_labels, interpreter,
                                                                   args["inputmean"], args["inputstd"])
-                    if color = 'Red':  # temp override for Carindal.  Like to get one right
+                    if color == 'Red':  # temp override for Carindal.  Like to get one right
                         species = 'Cardinal'
                         species_conf = args["sconfidence"]
 
