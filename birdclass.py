@@ -72,12 +72,15 @@ def bird_detector(args):
                     bird_size, bird_per_scr_area = birdsize(args, startX, startY, endX, endY)  # determine bird size
 
                     # extract image of bird, use crop for better species detection in models
-                    # *** need to improve color saturation and brightness for species model
+                    # *** need to color calobrate for species model
                     imgclr, imgclrbrt, imgclrbrtcon = image_proc.winter(img)  # enhance image for winter
                     birdcrop_img = imgclrbrtcon[startY:endY, startX:endX]
                     color = label_image.predominant_color(birdcrop_img)  # find main color of bird
                     species_conf, species = label_image.set_label(birdcrop_img, possible_labels, interpreter,
                                                                   args["inputmean"], args["inputstd"])
+                    if color = 'Red':  # temp override for Carindal.  Like to get one right
+                        species = 'Cardinal'
+                        species_conf = args["sconfidence"]
 
                     # draw bounding boxes and display label if it is a bird
                     tweetb, img_label = set_img_label(args, tweetb, det_confidence, species, species_conf, bird_size,
