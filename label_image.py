@@ -159,7 +159,7 @@ def scale_rect(img, box):
 def predominant_color(img):
     # from pyimagesearch.com color detection
     # define the list of boundaries.  create sets of Green Blue Red GBR defining lower and upper bounds
-    # need to mask off background color???
+
     i = 0
     colorcount = [''] * 4
     colors = np.array(['Red', 'Blue', 'Yellow', 'Gray'])
