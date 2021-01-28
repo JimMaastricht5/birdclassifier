@@ -110,7 +110,8 @@ def bird_detector(args):
                 tw_img = open('img.jpg', 'rb')
                 tweeter.post_image(twitter, img_label, tw_img)
             elif tweetb:
-                print('--- wait to post to twitter has been ', (datetime.now().timestamp() - starttime.timestamp()))
+                print('--- wait 30 min for next tweet:{:.2f}'.format(
+                    (datetime.now().timestamp() - starttime.timestamp()) / 60))
 
         if args["panb"]:
             currpan, currtilt = PanTilt9685.trackobject(pwm, cv2, currpan, currtilt, img,
