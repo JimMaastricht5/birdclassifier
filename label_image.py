@@ -190,10 +190,10 @@ def predominant_color(img):
 
 
 # add bounding box and label to an image
-def add_box_and_label(img, img_label, startX, startY, endX, endY, colors):
-    cv2.rectangle(img, (startX, startY), (endX, endY), colors[i], 2)
+def add_box_and_label(img, img_label, startX, startY, endX, endY, colors, coloroffset):
+    cv2.rectangle(img, (startX, startY), (endX, endY), colors[coloroffset], 2)
     y = startY - 15 if startY - 15 > 15 else startY + 15  # adjust label loc if too low
-    cv2.putText(img, img_label, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors[i], 2)
+    cv2.putText(img, img_label, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors[coloroffset], 2)
     return img
 
 

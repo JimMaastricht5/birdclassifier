@@ -84,9 +84,9 @@ def bird_detector(args):
                                                       bird_per_scr_area, color, img_label)
 
                     # add bounding boxes and labels to images
-                    img = label_image.add_box_and_label(img, img_label, startX, startY, endX, endY, colors)
+                    img = label_image.add_box_and_label(img, img_label, startX, startY, endX, endY, colors, i)
                     imgclrbrtcon = label_image.add_box_and_label(imgclrbrtcon, img_label, startX, startY,
-                                                                 endX, endY, colors)
+                                                                 endX, endY, colors, i)
 
             if birdb:  # if object detection saw a bird draw the results
                 cv2.imshow('org detection', img)  # show all birds in pic with labels
