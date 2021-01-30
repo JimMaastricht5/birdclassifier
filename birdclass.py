@@ -78,23 +78,18 @@ def bird_detector(args):
                     color = label_image.predominant_color(birdcrop_img)  # find main color of bird
                     species_conf, species = label_image.set_label(birdcrop_img, possible_labels, interpreter,
                                                                   args["inputmean"], args["inputstd"])
-                    if color == 'Red':  # temp override for Carindal.  Like to get one right
-                        species = 'Cardinal'
-                        species_conf = 1.0  # 100% confident
 
                     # draw bounding boxes and display label if it is a bird
                     tweetb, img_label = set_img_label(args, tweetb, det_confidence, species, species_conf, bird_size,
                                                       bird_per_scr_area, color, img_label)
-                    cv2.rectangle(img, (startX, startY), (endX, endY), colors[i], 2)
-                    y = startY - 15 if startY - 15 > 15 else startY + 15  # adjust label loc if too low
-                    cv2.putText(img, img_label, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors[i], 2)
 
-                    # repeat for adjusted image for twitter
-                    cv2.putText(imgclrbrtcon, img_label, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors[i], 2)
+                    # add bounding boxes and labels to images
+                    img = label_image.add_box_and_label(img, img_label, startX, startY, endX, endY, colors)
+                    imgclrbrtcon = label_image.add_box_and_label(imgclrbrtcon, img_label, startX, startY,
+                                                                 endX, endY, colors)
 
             if birdb:  # if object detection saw a bird draw the results
                 cv2.imshow('org detection', img)  # show all birds in pic with labels
-                # imgclr, imgclrbrt, imgclrbrtcon = image_proc.winter(img)  # enhance image for winter
                 # cv2.imshow('color enhanced', imgclr)
                 # cv2.imshow('color amd brightness enhanced', imgclrbrt)
                 cv2.imshow('color, brightness and contrast enhanced', imgclrbrtcon)
