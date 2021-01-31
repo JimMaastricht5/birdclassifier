@@ -17,7 +17,7 @@ import tweeter  # twitter helper functions
 import image_proc  # lib of image enhancement functions
 import argparse  # argument parser
 import numpy as np
-from datetime import datetime, timedelta
+from datetime import datetime
 from auth import (
     api_key,
     api_secret_key,
