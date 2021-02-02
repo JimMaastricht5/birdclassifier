@@ -25,8 +25,8 @@ def main():
     cv2.imshow('color histogram equalization', equalizedcolorimg)
     # convert image to pil, test scheme to adjust pil or np images
     # imgpil = Image.fromarray(cv2.imread('/home/pi/birdclass/test2.jpg'))  # need to pass a PIL Image vs. Numpy array
-    # img_clr, img_clr_brt, img_clr_brt_con = winter(imgnp)
-    # img_clr, img_clr_brt, img_clr_brt_con = winter(imgpil)
+    # img_clr, img_clr_brt, img_clr_brt_con = enhancements(imgnp)
+    # img_clr, img_clr_brt, img_clr_brt_con = enhancements(imgpil)
     # cv2.imshow('color', img_clr)
     # cv2.imshow('color brt', img_clr_brt)
     # cv2.imshow('color brt con', img_clr_brt_con)
@@ -49,11 +49,11 @@ def convert(img, convert_to = 'np'):
     # else requires no conversion
     return img
 
-# set of enhancements for winter weather in WI
+
 # enhance color, brightness, and contrast
 # provides all three stages back for viewing
 # take either a pil image or nparray and returns nparray
-def winter(img):
+def enhancements(img):
     img = convert(img, 'PIL')  # converts to PIL format if necessary
     img_clr = enhance_color(img, 2.5)
     img_clr_brt = enhance_brightness(img_clr, 1.0)
