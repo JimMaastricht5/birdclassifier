@@ -3,7 +3,7 @@ from setuptools import setup
 setup(
     name='Bird Class Python App',
     version='1.0',
-    packages=['imutils, numpy, oauthlib, tensorflow, tywthon, Pillow, argparse, datetime, logging, PCA9685'],
+    packages=['imutils, opencv-python, numpy, oauthlib, tensorflow, tywthon, Pillow, argparse, datetime, logging, PIL, scikit-image, PCA9685'],
     url='',
     license='',
     author='maastricht',

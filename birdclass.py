@@ -73,8 +73,9 @@ def bird_detector(args):
 
                     # extract image of bird, use crop for better species detection in models
                     # *** need to color calobrate for species model
-                    imgclr, imgclrbrt, imgclrbrtcon = image_proc.winter(img)  # enhance image for winter
-                    birdcrop_img = imgclrbrtcon[startY:endY, startX:endX]
+                    print(image_proc.is_low_contrast(img))
+                    equalizedimg = image_proc.equalize_color(img)
+                    birdcrop_img = equalizedimg[startY:endY, startX:endX]
                     color = label_image.predominant_color(birdcrop_img)  # find main color of bird
                     species_conf, species = label_image.set_label(birdcrop_img, possible_labels, interpreter,
                                                                   args["inputmean"], args["inputstd"])
@@ -85,14 +86,12 @@ def bird_detector(args):
 
                     # add bounding boxes and labels to images
                     img = label_image.add_box_and_label(img, img_label, startX, startY, endX, endY, colors, i)
-                    imgclrbrtcon = label_image.add_box_and_label(imgclrbrtcon, img_label, startX, startY,
+                    equalizedimg = label_image.add_box_and_label(equalizedimg, img_label, startX, startY,
                                                                  endX, endY, colors, i)
 
             if birdb:  # if object detection saw a bird draw the results
                 cv2.imshow('org detection', img)  # show all birds in pic with labels
-                # cv2.imshow('color enhanced', imgclr)
-                # cv2.imshow('color amd brightness enhanced', imgclrbrt)
-                cv2.imshow('color, brightness and contrast enhanced', imgclrbrtcon)
+                cv2.imshow('color histogram equalized', equalizedimg)
 
             # image contained a bird and species label, tweet it
             if tweetb and (datetime.now() - starttime).total_seconds() > 1800:  # wait 30 min in seconds
@@ -100,8 +99,8 @@ def bird_detector(args):
                 logdate = starttime.strftime('%H:%M:%S')
                 logging.info('*** tweeted ' + logdate + ' ' + img_label)
                 print('*** tweeted', logdate, img_label)
-                cv2.imshow('tweeted', imgclrbrtcon)  # show all birds in pic with labels
-                cv2.imwrite("img.jpg", imgclrbrtcon)  # write out image for debugging and testing
+                cv2.imshow('tweeted', equalizedimg)  # show all birds in pic with labels
+                cv2.imwrite("img.jpg", equalizedimg)  # write out image for debugging and testing
                 tw_img = open('img.jpg', 'rb')
                 tweeter.post_image(twitter, img_label, tw_img)
             elif tweetb:
@@ -115,8 +114,6 @@ def bird_detector(args):
         ret, videoimg = cap.read()
         # videoimg = cv2.flip(videoimg, -1)  # mirror image; comment out if not needed for your camera
         cv2.imshow('video', videoimg)
-        # cv2.imshow('gray', graymotion)
-        # cv2.imshow('threshold', thresh)
 
         # check for esc key and quit if pressed
         k = cv2.waitKey(30) & 0xff
