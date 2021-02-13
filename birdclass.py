@@ -79,8 +79,8 @@ def bird_detector(args):
                                                                   args["inputmean"], args["inputstd"])
 
                     # draw bounding boxes and display label if it is a bird
-                    tweetb, img_label = set_img_label(args, tweetb, det_confidence, species, species_conf, bird_size,
-                                                      bird_per_scr_area, color, img_label)
+                    tweetb, img_label = set_img_label(args, det_confidence, species, species_conf, bird_size,
+                                                      bird_per_scr_area, color)
 
                     # add bounding boxes and labels to images
                     img = label_image.add_box_and_label(img, img_label, startX, startY, endX, endY, colors, i)
@@ -134,22 +134,14 @@ def birdsize(args, startx, starty, endx, endy):
     return size, perarea
 
 
-def set_img_label(args, tweetb, bird_conf, species, species_conf, bird_size, bird_per_scr_area, color, img_label):
-    # img_label is prior label of first bird if this is the second bird in the picture
-    tweetret = tweetb  # store current value if already true
-    hlabel = "{}: {:.2f}% / {:.2f}%".format(species, species_conf * 100, bird_conf * 100)
-    logging.info('--- ' + hlabel + ' ' + bird_size + ' ' + ' ' + color + ' ' + str(bird_per_scr_area))  # log info
-    print('--- ' + hlabel + ' ' + bird_size + ' ' + ' ' + color + ' ' + str(bird_per_scr_area))  # log info
-    if species_conf >= args["sconfidence"]:  # high confidence in species
-        tweetret = True
-        label = hlabel
-    else:
+def set_img_label(args, bird_conf, species, species_conf, bird_size, bird_per_scr_area, color):
+    img_label = "{}: {:.2f}%".format(species, species_conf * 100)
+    logging.info('--- ' + img_label + ' ' + bird_size + ' ' + ' ' + color + ' ' + str(bird_per_scr_area))  # log info
+    print('--- ' + img_label + ' ' + bird_size + ' ' + ' ' + color + ' ' + str(bird_per_scr_area))  # display to term
+    if species_conf < args["sconfidence"]:  # high confidence in species
         species = 'bird'  # reset species to bird due to low confidence
         label = "{}: {:.2f}%".format(species, bird_conf * 100)
-    # label for multi birds in photo
-    img_label = "{} {}".format(img_label, label)
-
-    return tweetret, img_label
+    return (species_conf >= args["sconfidence"]), img_label
 
 
 if __name__ == "__main__":

@@ -123,7 +123,7 @@ def set_label(img, labels, interpreter, input_mean, input_std):
         cresult = float(0)
         lresult = ''
 
-    # cresult = cresult / 100 needed for automl not keras model
+    cresult = cresult / 100 needed for automl or google coral.ai model
     return cresult, lresult  # highest confidence and best label
 
 
