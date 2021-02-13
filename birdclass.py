@@ -135,12 +135,18 @@ def birdsize(args, startx, starty, endx, endy):
 
 
 def set_img_label(args, bird_conf, species, species_conf, bird_size, bird_per_scr_area, color):
-    img_label = "{}: {:.2f}%".format(species, species_conf * 100)
+    start = species.find('(')
+    end = species.find(')')
+    if start >= 0 and end >=0:
+        common_name = species[start:end]
+    else:
+        common_name = species
+    img_label = "{}: {:.2f}".format(common_name, species_conf * 100)
     logging.info('--- ' + img_label + ' ' + bird_size + ' ' + ' ' + color + ' ' + str(bird_per_scr_area))  # log info
     print('--- ' + img_label + ' ' + bird_size + ' ' + ' ' + color + ' ' + str(bird_per_scr_area))  # display to term
-    if species_conf < args["sconfidence"]:  # high confidence in species
+    if species_conf < args["sconfidence"]:  # low confidence in species
         species = 'bird'  # reset species to bird due to low confidence
-        label = "{}: {:.2f}%".format(species, bird_conf * 100)
+        label = "{}: {:.2f}".format(species, bird_conf * 100)
     return (species_conf >= args["sconfidence"]), img_label
 
 
