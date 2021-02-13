@@ -28,22 +28,22 @@ from __future__ import print_function
 import argparse
 import cv2
 import numpy as np
-import tflite_runtime.interpreter as tflite  # for pi4 with install wheel above
-# import tensorflow as tf  # TF2
+# import tflite_runtime.interpreter as tflite  # for pi4 with install wheel above
+import tensorflow as tf  # TF2
 # import time
 
 
 def main(args):
     img = cv2.imread(args.image)
-    obj_interpreter, obj_labels = init_tf2(args.obj_det_file, args.num_threads, args.obj_det_label_file)
-    results, labels, rects = object_detection(args.confidence, img, obj_labels,
-                                              obj_interpreter, args.input_mean, args.input_std)
+    obj_interpreter, obj_labels = init_tf2(args.obj_det_model, args.numthreads, args.obj_det_labels)
+    results, labels, rects = object_detection(args.bconfidence, img, obj_labels,
+                                              obj_interpreter, args.inputmean, args.inputstd)
 
     print('objects detected', results)
     print('labels detected', labels)
     print('rectangles', rects)
-    interpreter, possible_labels = init_tf2(args.model_file, args.num_threads, args.label_file)
-    result, label = set_label(img, possible_labels, interpreter, args.input_mean, args.input_std)
+    interpreter, possible_labels = init_tf2(args.species_model, args.numthreads, args.species_labels)
+    result, label = set_label(img, possible_labels, interpreter, args.inputmean, args.inputstd)
     print('final result', result)
     print('final label', label)
 
@@ -56,8 +56,8 @@ def load_labels(filename):
 # initialize tensor flow model
 def init_tf2(model_file, num_threads, label_file):
     possible_labels = np.asarray(load_labels(label_file))  # load label file and convert to list
-    # interpreter = tf.lite.Interpreter(model_file, num_threads)
-    interpreter = tflite.Interpreter(model_file, num_threads)
+    interpreter = tf.lite.Interpreter(model_file, num_threads)
+    # interpreter = tflite.Interpreter(model_file, num_threads)
     interpreter.allocate_tensors()
     return interpreter, possible_labels
 
@@ -114,6 +114,7 @@ def set_label(img, labels, interpreter, input_mean, input_std):
     results = np.squeeze(output_data)
     cindex = np.where(results == np.amax(results))
     lindex = cindex[0]  # grab best result; np array is in max order descending
+    print(cindex, lindex)
     try:
         cresult = float(results[cindex])
         lresult = labels[lindex]
@@ -199,46 +200,33 @@ def add_box_and_label(img, img_label, startX, startY, endX, endY, colors, coloro
 
 # test function
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        '-i',
-        '--image',
-        default='/home/pi/birdclass/test2.jpg',
-        help='image to be classified')
-    parser.add_argument(
-        '-m',
-        '--model_file',
-        # default='/home/pi/PycharmProjects/pyface2/mobilenet_tweeters.tflite',
-        default='/home/pi/birdclass/birdspecies-s-224-93.15.tflite',
-        help='.tensor bird classification model to be executed')
-    parser.add_argument(
-        '-om',
-        '--obj_det_file',
-        default='/home/pi/birdclass/lite-model_ssd_mobilenet_v1_1_metadata_2.tflite',
-        help='.tensor model for obj detection')
-    parser.add_argument(
-        '-l',
-        '--label_file',
-        # default='/home/pi/PycharmProjects/pyface2/class_labels.txt',
-        default='/home/pi/birdclass/birdspecies-13.txt',
-        help='name of file containing labels for bird classification model')
-    parser.add_argument(
-        '-ol',
-        '--obj_det_label_file',
-        default='/home/pi/birdclass/lite-model_ssd_mobilenet_v1_1_metadata_2_labelmap.txt',
-        help='name of file containing labels')
+    ap = argparse.ArgumentParser()
+    # ap.add_argument('-i', '--image', default='/home/pi/birdclass/test2.jpg',help='image to be classified')
+    ap.add_argument('-i', '--image', default='/home/pi/birdclass/cardinal.jpg', help='image to be classified')
 
-    parser.add_argument(
-        '--input_mean',
-        default=127.5, type=float,
-        help='input_mean')
-    parser.add_argument(
-        '--input_std',
-        default=127.5, type=float,
-        help='input standard deviation')
-    parser.add_argument(
-        '--num_threads', default=None, type=int, help='number of threads')
-    parser.add_argument('-c', '--confidence', type=float, default=0.5)
-    arguments = parser.parse_args()
+    # object detection model setup
+    ap.add_argument('-om', "--obj_det_model",
+                    default='/home/pi/birdclass/lite-model_ssd_mobilenet_v1_1_metadata_2.tflite')
+    ap.add_argument('-p', '--obj_det_labels',
+                    default='/home/pi/birdclass/lite-model_ssd_mobilenet_v1_1_metadata_2_labelmap.txt')
+
+    # species model setup
+    ap.add_argument('-m', '--species_model',
+                    default='/home/pi/birdclass/coral.ai.mobilenet_v2_1.0_224_inat_bird_quant.tflite',
+                    help='.tflite model to be executed')
+    ap.add_argument('-l', '--species_labels',
+                    default='/home/pi/birdclass/coral.ai.inat_bird_labels.txt',
+                    help='name of file containing labels')
+
+    # tensor flow input arguements
+    ap.add_argument('--inputmean', default=127.5, type=float, help='Tensor input_mean')
+    ap.add_argument('--inputstd', default=127.5, type=float, help='Tensor input standard deviation')
+    ap.add_argument('--numthreads', default=None, type=int, help='Tensor number of threads')
+
+    # confidence settings for object detection and species bconfidence
+    ap.add_argument('-bc', '--bconfidence', type=float, default=0.80)
+    ap.add_argument('-sc', '--sconfidence', type=float, default=0.95)
+
+    arguments = ap.parse_args()
 
     main(arguments)
