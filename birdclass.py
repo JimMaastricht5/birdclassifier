@@ -137,6 +137,7 @@ def birdsize(args, startx, starty, endx, endy):
 # set label for image and tweet, use short species name instead of scientific name
 def set_img_label(args, bird_conf, species, species_conf, bird_size, bird_per_scr_area, color):
     if species_conf < args["sconfidence"]:  # low confidence in species
+        print('--- low species confidence {}: {.2f}').format(species, species_conf * 100)
         species = 'bird'  # reset species to bird due to low confidence
     start = species.find('(')
     end = species.find(')')
