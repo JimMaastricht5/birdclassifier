@@ -7,11 +7,10 @@
 # special notes when setting up the code on a rasberry pi 4 9/9/20
 # install supporting libraries for directions @: https://qengineering.eu/install-opencv-4.2-on-raspberry-pi-4.html
 # install OpenCv version 4.4+
-# packages: pan tilt uses PCA9685-Driver, twitter use twython package, auth.py must be in project for import auth
+# packages: twitter use twython package, auth.py must be in project for import auth
 #   oauthlib,
 import cv2  # open cv 2
 import label_image  # code to init tensor flow model and classify bird type
-import PanTilt9685  # pan tilt control code
 import motion_detector  # motion detector helper functions
 import tweeter  # twitter helper functions
 import image_proc  # lib of image enhancement functions
@@ -32,10 +31,6 @@ def bird_detector(args):
     # detect, then generate a set of bounding box colors for each class
     colors = np.random.uniform(0, 255, size=(11, 3))  # random colors for bounding boxes
     starttime = datetime(2021, 1, 1, 0, 0, 0, 0)  # init start time for observation delay
-
-    # setup pan tilt and initialize variables
-    if args["panb"]:
-        currpan, currtilt, pwm = PanTilt9685.init_pantilt()
 
     # initial video capture, screen size, and grab first image (no motion)
     cap = cv2.VideoCapture(0)  # capture video image
@@ -64,7 +59,11 @@ def bird_detector(args):
                 loginfo = "---saw  {}: {:.2f}%".format(det_labels[i], det_confidence * 100)
                 logging.info(logtime + loginfo)
                 print(loginfo, logtime)
-                if det_labels[i] == "bird" and (det_confidence >= args["bconfidence"] or birdb):
+                if image_proc.is_low_contrast(img):
+                    print('low contrast image')
+
+                if det_labels[i] == "bird" and not image_proc.is_low_contrast(img) \
+                        and (det_confidence >= args["bconfidence"] or birdb):
                     birdb = True  # set to loop thru img for other birds in pic
                     (startX, startY, endX, endY) = label_image.scale_rect(img, det_rects[i])  # set x,y bounding box
 
@@ -73,7 +72,6 @@ def bird_detector(args):
 
                     # extract image of bird, use crop for better species detection in models
                     # *** need to color calobrate for species model
-                    print(image_proc.is_low_contrast(img))
                     equalizedimg = image_proc.equalize_color(img)
                     birdcrop_img = equalizedimg[startY:endY, startX:endX]
                     color = label_image.predominant_color(birdcrop_img)  # find main color of bird
@@ -107,10 +105,6 @@ def bird_detector(args):
                 print('--- wait 30 min for next tweet:{:.2f}'.format(
                     (datetime.now().timestamp() - starttime.timestamp()) / 60))
 
-        if args["panb"]:
-            currpan, currtilt = PanTilt9685.trackobject(pwm, cv2, currpan, currtilt, img,
-                                                        (startX, startY, endX, endY),
-                                                        args["screenwidth"], args["screenheight"])
         ret, videoimg = cap.read()
         # videoimg = cv2.flip(videoimg, -1)  # mirror image; comment out if not needed for your camera
         cv2.imshow('video', videoimg)
@@ -175,10 +169,10 @@ if __name__ == "__main__":
 
     # species model setup
     ap.add_argument('-m', '--species_model',
-                    default='/home/pi/PycharmProjects/pyface2/birdspecies-s-224-93.15.tflite',
+                    default='/home/pi/PycharmProjects/pyface2/coral.ai.mobilenet_v2_1.0_224_inat_bird_quant.tflite',
                     help='.tflite model to be executed')
     ap.add_argument('-l', '--species_labels',
-                    default='/home/pi/PycharmProjects/pyface2/birdspecies-s-224-93.15-13.txt',
+                    default='/home/pi/PycharmProjects/pyface2/coral.ai.inat_bird_labels.txt',
                     help='name of file containing labels')
 
     # tensor flow input arguements
@@ -189,9 +183,6 @@ if __name__ == "__main__":
     # confidence settings for object detection and species bconfidence
     ap.add_argument('-bc', '--bconfidence', type=float, default=0.80)
     ap.add_argument('-sc', '--sconfidence', type=float, default=0.95)
-
-    # set pan tilt control model
-    ap.add_argument('--panb', default=False, type=bool, help='activate pan tilt mechanism')
 
     logging.basicConfig(filename='birdclass.log', format='%(asctime)s - %(message)s', level=logging.INFO)
     arguments = vars(ap.parse_args())
