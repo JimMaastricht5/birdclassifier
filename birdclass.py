@@ -119,6 +119,7 @@ def bird_detector(args):
     cv2.destroyAllWindows()
 
 
+# estimate the size of the bird based on the percentage of image area consumed by the bounding box
 def birdsize(args, startx, starty, endx, endy):
     birdarea = abs((startx - endx) * (starty - endy))
     scrarea = args['screenheight'] * args['screenwidth']
@@ -129,24 +130,23 @@ def birdsize(args, startx, starty, endx, endy):
         size = 'M'
     else:  # small bird usually ~ 20%
         size = 'S'
-
     logging.info(str(birdarea) + ' ' + str(scrarea) + ' ' + str(perarea) + ' ' + size)
     return size, perarea
 
 
+# set label for image and tweet, use short species name instead of scientific name
 def set_img_label(args, bird_conf, species, species_conf, bird_size, bird_per_scr_area, color):
+    if species_conf < args["sconfidence"]:  # low confidence in species
+        species = 'bird'  # reset species to bird due to low confidence
     start = species.find('(')
     end = species.find(')')
-    if start >= 0 and end >=0:
+    if start >= 0 and end >= 0:
         common_name = species[start:end]
     else:
         common_name = species
     img_label = "{}: {:.2f}".format(common_name, species_conf * 100)
     logging.info('--- ' + img_label + ' ' + bird_size + ' ' + ' ' + color + ' ' + str(bird_per_scr_area))  # log info
     print('--- ' + img_label + ' ' + bird_size + ' ' + ' ' + color + ' ' + str(bird_per_scr_area))  # display to term
-    if species_conf < args["sconfidence"]:  # low confidence in species
-        species = 'bird'  # reset species to bird due to low confidence
-        label = "{}: {:.2f}".format(species, bird_conf * 100)
     return (species_conf >= args["sconfidence"]), img_label
 
 
