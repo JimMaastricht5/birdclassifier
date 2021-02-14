@@ -113,7 +113,7 @@ def set_label(img, labels, interpreter, input_mean, input_std):
     # start_time = time.time()
     interpreter.invoke()
     # stop_time = time.time()
-    print(output_details)
+    # print(output_details)
     # if floating_model:  # full tensor bird classification model
     # **** need to add code to deal with tf vs. full tensor model; diff in results
     output_data = interpreter.get_tensor(output_details[0]['index'])

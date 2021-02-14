@@ -130,14 +130,14 @@ def birdsize(args, startx, starty, endx, endy):
         size = 'M'
     else:  # small bird usually ~ 20%
         size = 'S'
-    logging.info(str(birdarea) + ' ' + str(scrarea) + ' ' + str(perarea) + ' ' + size)
+    # logging.info(str(birdarea) + ' ' + str(scrarea) + ' ' + str(perarea) + ' ' + size)
     return size, perarea
 
 
 # set label for image and tweet, use short species name instead of scientific name
 def set_img_label(args, bird_conf, species, species_conf, bird_size, bird_per_scr_area, color):
     if species_conf < args["sconfidence"]:  # low confidence in species
-        print('--- low {} confidence {:.2f}, bird {:.2f}'.format(species, species_conf * 100, bird_conf * 100))
+        # print('--- low {} confidence {:.2f}, bird {:.2f}'.format(species, species_conf * 100, bird_conf * 100))
         species = 'bird'  # reset species to bird due to low confidence
     species = str(species)  # make sure species is considered a string
     start = species.find('(') + 1  # find start of common name, move one character to drop (
