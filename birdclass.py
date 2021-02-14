@@ -56,7 +56,7 @@ def bird_detector(args):
                                                                                   args["inputmean"], args["inputstd"])
             for i, det_confidence in enumerate(det_confidences):
                 logtime = datetime.now().strftime('%H:%M:%S')
-                loginfo = "---saw  {}: {:.2f}%".format(det_labels[i], det_confidence * 100)
+                loginfo = "--- detected {}: {:.2f}%".format(det_labels[i], det_confidence * 100)
                 logging.info(logtime + loginfo)
                 print(loginfo, logtime)
                 if image_proc.is_low_contrast(img):
@@ -71,7 +71,7 @@ def bird_detector(args):
                     bird_size, bird_per_scr_area = birdsize(args, startX, startY, endX, endY)  # determine bird size
 
                     # extract image of bird, use crop for better species detection in models
-                    # *** need to color calobrate for species model
+                    # *** need to color calibrate for species model
                     equalizedimg = image_proc.equalize_color(img)
                     birdcrop_img = equalizedimg[startY:endY, startX:endX]
                     color = label_image.predominant_color(birdcrop_img)  # find main color of bird
@@ -135,6 +135,7 @@ def birdsize(args, startx, starty, endx, endy):
 
 
 # set label for image and tweet, use short species name instead of scientific name
+# return true if species confidence above threshold and return image label for twitter
 def set_img_label(args, bird_conf, species, species_conf, bird_size, bird_per_scr_area, color):
     if species_conf < args["sconfidence"]:  # low confidence in species
         # print('--- low {} confidence {:.2f}, bird {:.2f}'.format(species, species_conf * 100, bird_conf * 100))
@@ -148,8 +149,8 @@ def set_img_label(args, bird_conf, species, species_conf, bird_size, bird_per_sc
         common_name = species
 
     img_label = "{}: {:.2f}".format(common_name, species_conf * 100)
-    logging.info('--- ' + img_label + ' ' + bird_size + ' ' + ' ' + color + ' ' + str(bird_per_scr_area))  # log info
-    print('--- ' + img_label + ' ' + bird_size + ' ' + ' ' + color + ' ' + str(bird_per_scr_area))  # display to term
+    logging.info('--- ' + img_label + ' ' + bird_size + ' ' + ' ' + color)  # log info
+    print('--- ' + img_label + ' ' + bird_size + ' ' + ' ' + color)  # display to term
     return (species_conf >= args["sconfidence"]), img_label
 
 
