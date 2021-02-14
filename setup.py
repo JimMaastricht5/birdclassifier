@@ -1,9 +1,10 @@
 from setuptools import setup
+# PCA9685 needs to get added for pan tilt if you are using that.
 
 setup(
     name='Bird Class Python App',
     version='1.0',
-    packages=['imutils, opencv-python, numpy, oauthlib, tensorflow, tywthon, Pillow, argparse, datetime, logging, PIL, scikit-image, PCA9685'],
+    packages=['imutils, opencv-python, numpy, oauthlib, tensorflow, tflite-runtime, tywthon, Pillow, argparse, datetime, logging, PIL, scikit-image'],
     url='',
     license='',
     author='maastricht',

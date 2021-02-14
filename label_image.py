@@ -28,8 +28,10 @@ from __future__ import print_function
 import argparse
 import cv2
 import numpy as np
-import tflite_runtime.interpreter as tflite  # for pi4 with install wheel above
-# import tensorflow as tf  # TF2
+try:
+    import tflite_runtime.interpreter as tflite  # for pi4 with install wheel above
+except:
+    import tensorflow as tf  # TF2 for desktop testing
 # import time
 
 
@@ -56,8 +58,11 @@ def load_labels(filename):
 # initialize tensor flow model
 def init_tf2(model_file, num_threads, label_file):
     possible_labels = np.asarray(load_labels(label_file))  # load label file and convert to list
-    # interpreter = tf.lite.Interpreter(model_file, num_threads)
-    interpreter = tflite.Interpreter(model_file, num_threads)
+    try:  # load tensorflow lite on rasp pi
+        interpreter = tflite.Interpreter(model_file, num_threads)
+    except:  # load full tensor for desktop dev
+        interpreter = tf.lite.Interpreter(model_file, num_threads)
+
     interpreter.allocate_tensors()
     return interpreter, possible_labels
 
@@ -108,13 +113,12 @@ def set_label(img, labels, interpreter, input_mean, input_std):
     # start_time = time.time()
     interpreter.invoke()
     # stop_time = time.time()
-
+    print(output_details)
     # if floating_model:  # full tensor bird classification model
     output_data = interpreter.get_tensor(output_details[0]['index'])
     results = np.squeeze(output_data)
     cindex = np.where(results == np.amax(results))
     lindex = cindex[0]  # grab best result; np array is in max order descending
-    print(cindex, lindex)
     try:
         cresult = float(results[cindex])
         lresult = labels[lindex]
