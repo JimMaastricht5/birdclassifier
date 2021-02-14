@@ -159,7 +159,7 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     # video setup
     # ap.add_argument("-v", "--video", help="path to the video file")
-    ap.add_argument("-a", "--minarea", type=int, default=5000, help="motion threshold, lower triggers more often")
+    ap.add_argument("-a", "--minarea", type=int, default=50000, help="motion threshold, lower triggers more often")
     ap.add_argument("-sw", "--screenwidth", type=int, default=320, help="max screen width")
     ap.add_argument("-sh", "--screenheight", type=int, default=240, help="max screen height")
 
@@ -183,7 +183,7 @@ if __name__ == "__main__":
     ap.add_argument('--numthreads', default=None, type=int, help='Tensor number of threads')
 
     # confidence settings for object detection and species bconfidence
-    ap.add_argument('-bc', '--bconfidence', type=float, default=0.60)  # obj detection threshold
+    ap.add_argument('-bc', '--bconfidence', type=float, default=0.75)  # obj detection threshold
     ap.add_argument('-sc', '--sconfidence', type=float, default=0.95)
 
     logging.basicConfig(filename='birdclass.log', format='%(asctime)s - %(message)s', level=logging.INFO)
