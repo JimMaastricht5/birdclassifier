@@ -40,7 +40,7 @@ def detect(cv2, cap, first_img, min_area):
     
     cnts = imutils.grab_contours(cnts)  # set of contours showing motion
     for c in cnts:  # loop over countours if too small ignore it
-        print(cv2.contourArea(c))
+        # print(cv2.contourArea(c))
         if cv2.contourArea(c) >= min_area:
             motionb = True
 

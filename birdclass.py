@@ -137,10 +137,10 @@ def birdsize(args, startx, starty, endx, endy):
 # set label for image and tweet, use short species name instead of scientific name
 # return true if species confidence above threshold and return image label for twitter
 def set_img_label(args, bird_conf, species, species_conf, bird_size, bird_per_scr_area, color):
+    species = str(species)  # make sure species is considered a string
     if species_conf < args["sconfidence"]:  # low confidence in species
         common_name = 'bird'  # reset species to bird due to low confidence
     else:
-        species = str(species)  # make sure species is considered a string
         start = species.find('(') + 1  # find start of common name, move one character to drop (
         end = species.find(')')
         if start >= 0 and end >= 0:
@@ -159,7 +159,7 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     # video setup
     # ap.add_argument("-v", "--video", help="path to the video file")
-    ap.add_argument("-a", "--minarea", type=int, default=50000, help="motion threshold, lower triggers more often")
+    ap.add_argument("-a", "--minarea", type=int, default=50000, help="motion threshold, 50K is a good min")
     ap.add_argument("-sw", "--screenwidth", type=int, default=320, help="max screen width")
     ap.add_argument("-sh", "--screenheight", type=int, default=240, help="max screen height")
 
@@ -186,7 +186,7 @@ if __name__ == "__main__":
     ap.add_argument('-bc', '--bconfidence', type=float, default=0.75)  # obj detection threshold
     ap.add_argument('-sc', '--sconfidence', type=float, default=0.95)
 
-    logging.basicConfig(filename='birdclass.log', format='%(asctime)s - %(message)s', level=logging.INFO)
+    logging.basicConfig(filename='birdclass.log', format='%(asctime)s - %(message)s', level=logging.DEBUG)
     arguments = vars(ap.parse_args())
     print(datetime.now().strftime('%H:%M:%S'))
     bird_detector(arguments)
