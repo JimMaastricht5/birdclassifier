@@ -116,6 +116,7 @@ def set_label(img, labels, interpreter, input_mean, input_std):
         lresult = labels[lindex]
     except:
         print('array out of bounds error: confidence and label indices', cindex, lindex)
+        print('output', output_data)
         print('results', results)
         cresult = float(0)
         lresult = ''
