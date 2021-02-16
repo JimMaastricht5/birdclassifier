@@ -1,9 +1,31 @@
+# MIT License
+#
+# 2021 Jim Maastricht
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
 # motion detector with builtin bird detection and bird classification
 # built by JimMaastricht5@gmail.com
-# uses Haar Cascade for bird detection and tensorflow lite model for bird classification
-# tensor flow model built using tools from tensor in colab notebook
+# uses tflite prebuilt google model for object detection and tensorflow lite model for bird classification
+# currently using a model from coral.ai for species identification.
+# Other species models built with tensor flow  using tools from tensor in colab notebook
 # https://colab.research.google.com/drive/1taZ9JincTaZuZh_JmBSC4pAbSQavxbq5#scrollTo=D3i_6WSXjUhk
-# model trained to find birds common to feeders in WI using caltech bird dataset 201
 # special notes when setting up the code on a rasberry pi 4 9/9/20
 # install supporting libraries for directions @: https://qengineering.eu/install-opencv-4.2-on-raspberry-pi-4.html
 # install OpenCv version 4.4+
@@ -184,7 +206,7 @@ if __name__ == "__main__":
 
     # confidence settings for object detection and species bconfidence
     ap.add_argument('-bc', '--bconfidence', type=float, default=0.76)  # obj detection threshold; 76 is a good min
-    ap.add_argument('-sc', '--sconfidence', type=float, default=0.70)  # quant model is accurate down to 70 otherwise use 95
+    ap.add_argument('-sc', '--sconfidence', type=float, default=0.90)  # quant model is accurate down to 90
 
     logging.basicConfig(filename='birdclass.log', format='%(asctime)s - %(message)s', level=logging.DEBUG)
     arguments = vars(ap.parse_args())
