@@ -180,11 +180,11 @@ if __name__ == "__main__":
     # tensor flow input arguements
     ap.add_argument('--inputmean', default=127.5, type=float, help='Tensor input_mean')
     ap.add_argument('--inputstd', default=127.5, type=float, help='Tensor input standard deviation')
-    ap.add_argument('--numthreads', default=None, type=int, help='Tensor number of threads')
+    ap.add_argument('--numthreads', default=None, type=int, help='Tensor number of threads, leave at default')
 
     # confidence settings for object detection and species bconfidence
     ap.add_argument('-bc', '--bconfidence', type=float, default=0.76)  # obj detection threshold; 76 is a good min
-    ap.add_argument('-sc', '--sconfidence', type=float, default=0.95)
+    ap.add_argument('-sc', '--sconfidence', type=float, default=0.70)  # quant model is accurate down to 70 otherwise use 95
 
     logging.basicConfig(filename='birdclass.log', format='%(asctime)s - %(message)s', level=logging.DEBUG)
     arguments = vars(ap.parse_args())

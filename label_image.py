@@ -32,7 +32,6 @@ try:
     import tflite_runtime.interpreter as tflite  # for pi4 with install wheel above
 except:
     import tensorflow as tf  # TF2 for desktop testing
-# import time
 
 
 def main(args):
@@ -40,7 +39,6 @@ def main(args):
     obj_interpreter, obj_labels = init_tf2(args.obj_det_model, args.numthreads, args.obj_det_labels)
     results, labels, rects = object_detection(args.bconfidence, img, obj_labels,
                                               obj_interpreter, args.inputmean, args.inputstd)
-
     print('objects detected', results)
     print('labels detected', labels)
     print('rectangles', rects)
@@ -50,6 +48,7 @@ def main(args):
     print('final label', label)
 
 
+# load label file for obj detection or classification model
 def load_labels(filename):
     with open(filename, 'r') as f:
         return [line.strip() for line in f.readlines()]
@@ -77,12 +76,9 @@ def object_detection(min_confidence, img, labels, interpreter, input_mean, input
     output_details = interpreter.get_output_details()
     floating_model, input_data = convert_cvframe_to_ts(img, input_details, input_mean, input_std)
     interpreter.set_tensor(input_details[0]['index'], input_data)
-
-    # start_time = time.time()
     interpreter.invoke()
-    # stop_time = time.time()
 
-    if floating_model is False:  # tensor lite obj det prebuilt model
+    if floating_model is False:  # tensor lite obj detection prebuilt model
         det_rects = interpreter.get_tensor(output_details[0]['index'])
         det_labels_index = interpreter.get_tensor(output_details[1]['index'])  # labels are an array for each result
 
@@ -98,7 +94,7 @@ def object_detection(min_confidence, img, labels, interpreter, input_mean, input
                 confidences.append(det_confidence)
                 confidence_labels.append(label)
                 confidence_rects.append(det_rects[0][index])
-
+    # else full tensor model, add code here
     # print('time: {:.3f}ms'.format((stop_time - start_time) * 1000))
     return confidences, confidence_labels, confidence_rects  # confidence and best label
 
@@ -109,13 +105,8 @@ def set_label(img, labels, interpreter, input_mean, input_std):
     output_details = interpreter.get_output_details()
     floating_model, input_data = convert_cvframe_to_ts(img, input_details, input_mean, input_std)
     interpreter.set_tensor(input_details[0]['index'], input_data)
-
-    # start_time = time.time()
     interpreter.invoke()
-    # stop_time = time.time()
-    # print(output_details)
-    # if floating_model:  # full tensor bird classification model
-    # **** need to add code to deal with tf vs. full tensor model; diff in results
+
     output_data = interpreter.get_tensor(output_details[0]['index'])
     results = np.squeeze(output_data)
     cindex = np.where(results == np.amax(results))
@@ -128,6 +119,7 @@ def set_label(img, labels, interpreter, input_mean, input_std):
         print('results', results)
         cresult = float(0)
         lresult = ''
+        cv2.imwrite("debugimg.jpg", img)
 
     cresult = cresult / 100  # needed for automl or google coral.ai model
     return cresult, lresult  # highest confidence and best label
