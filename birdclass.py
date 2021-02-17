@@ -176,7 +176,7 @@ def set_img_label(args, bird_conf, species, species_conf, color):
         else:
             common_name = species
 
-    img_label = "{}: {:.2f}".format(common_name, species_conf * 100)
+    img_label = "{}: confidence score {:.0f}".format(common_name, species_conf * 100)
     logging.info('--- ' + img_label + ' ' + color + ' ' + species)  # log info
     print('--- ' + img_label + ' ' + color + ' ' + species)  # display
     return (species_conf >= args["sconfidence"]), img_label
