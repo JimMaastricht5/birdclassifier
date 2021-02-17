@@ -117,7 +117,7 @@ def bird_detector(args):
 
             # image contained a bird and species label, tweet it if the species has not been observed recently
             if speciesb:
-                species_count, species_last_seen = birdpop.census(species)
+                species_count, species_last_seen = birdpop.census(str(species))
                 if (datetime.now() - species_last_seen).total_seconds() > 1800:  # wait 30 min in seconds
                     logdate = datetime.now().strftime('%H:%M:%S')
                     logging.info('*** tweeted ' + logdate + ' ' + img_label)

@@ -27,7 +27,7 @@ from datetime import datetime
 
 def main():
     observed_time = datetime.now()
-    popdogcats = PopulationCensus()
+    popdogcats = Census()
 
     popdogcats.visitor('dog', observed_time)
     print('should be one dog', popdogcats.report_census('dog'))
