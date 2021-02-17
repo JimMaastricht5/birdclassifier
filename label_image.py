@@ -121,7 +121,7 @@ def set_label(img, labels, interpreter, input_mean, input_std):
     lindex = cindex[0]  # grab best result; np array is in max order descending
     try:
         cresult = float(results[cindex])
-        lresult = labels[lindex]
+        lresult = str(labels[lindex])  # added code to push this to a string instead of a tuple
     except:
         print('array out of bounds error: confidence and label indices', cindex, lindex)
         print('output', output_data)
