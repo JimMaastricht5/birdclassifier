@@ -36,6 +36,7 @@ import label_image  # code to init tensor flow model and classify bird type
 import motion_detector  # motion detector helper functions
 import tweeter  # twitter helper functions
 import image_proc  # lib of image enhancement functions
+import population  # population census object, tracks species total seen and last time
 import argparse  # argument parser
 import numpy as np
 from datetime import datetime
@@ -52,7 +53,9 @@ def bird_detector(args):
     # initialize the list of class labels MobileNet SSD was trained to
     # detect, then generate a set of bounding box colors for each class
     colors = np.random.uniform(0, 255, size=(11, 3))  # random colors for bounding boxes
-    starttime = datetime(2021, 1, 1, 0, 0, 0, 0)  # init start time for observation delay
+
+    # initialize species population census object
+    birdpop = population.Census()
 
     # initial video capture, screen size, and grab first image (no motion)
     cap = cv2.VideoCapture(0)  # capture video image
@@ -69,7 +72,7 @@ def bird_detector(args):
     # main loop ******
     while True:  # while escape key is not pressed
         birdb = False
-        tweetb = False
+        speciesb = False
         img_label = ''
         motionb, img, gray, graymotion, thresh = motion_detector.detect(cv2, cap, first_img, args["minarea"])
         if motionb:  # motion detected.
@@ -101,8 +104,7 @@ def bird_detector(args):
                                                                   args["inputmean"], args["inputstd"])
 
                     # draw bounding boxes and display label if it is a bird
-                    tweetb, img_label = set_img_label(args, det_confidence, species, species_conf, bird_size,
-                                                      bird_per_scr_area, color)
+                    speciesb, img_label = set_img_label(args, det_confidence, species, species_conf, color)
 
                     # add bounding boxes and labels to images
                     img = label_image.add_box_and_label(img, img_label, startX, startY, endX, endY, colors, i)
@@ -113,19 +115,23 @@ def bird_detector(args):
                 cv2.imshow('org detection', img)  # show all birds in pic with labels
                 cv2.imshow('color histogram equalized', equalizedimg)
 
-            # image contained a bird and species label, tweet it
-            if tweetb and (datetime.now() - starttime).total_seconds() > 1800:  # wait 30 min in seconds
-                starttime = datetime.now()
-                logdate = starttime.strftime('%H:%M:%S')
-                logging.info('*** tweeted ' + logdate + ' ' + img_label)
-                print('*** tweeted', logdate, img_label)
-                cv2.imshow('tweeted', equalizedimg)  # show all birds in pic with labels
-                cv2.imwrite("img.jpg", equalizedimg)  # write out image for debugging and testing
-                tw_img = open('img.jpg', 'rb')
-                tweeter.post_image(twitter, img_label, tw_img)
-            elif tweetb:
-                print('--- wait 30 min for next tweet:{:.2f}'.format(
-                    (datetime.now().timestamp() - starttime.timestamp()) / 60))
+            # image contained a bird and species label, tweet it if the species has not been observed recently
+            if speciesb:
+                species_count, species_last_seen = birdpop.census(species)
+                if (datetime.now() - species_last_seen).total_seconds() > 1800:  # wait 30 min in seconds
+                    logdate = datetime.now().strftime('%H:%M:%S')
+                    logging.info('*** tweeted ' + logdate + ' ' + img_label)
+                    print('*** tweeted', logdate, img_label)
+                    cv2.imshow('tweeted', equalizedimg)  # show all birds in pic with labels
+                    cv2.imwrite("img.jpg", equalizedimg)  # write out image for debugging and testing
+                    tw_img = open('img.jpg', 'rb')
+                    tweeter.post_image(twitter, img_label + ' ' + species_count, tw_img)
+                elif speciesb:
+                    print('--- time remaining for {} next tweet:{:.2f}'.format(species,
+                                (datetime.now().timestamp() - species_last_seen.timestamp()) / 60))
+
+                birdpop.visitor(species, datetime.now())  # update visitor count
+
 
         ret, videoimg = cap.read()
         # videoimg = cv2.flip(videoimg, -1)  # mirror image; comment out if not needed for your camera
@@ -158,7 +164,7 @@ def birdsize(args, startx, starty, endx, endy):
 
 # set label for image and tweet, use short species name instead of scientific name
 # return true if species confidence above threshold and return image label for twitter
-def set_img_label(args, bird_conf, species, species_conf, bird_size, bird_per_scr_area, color):
+def set_img_label(args, bird_conf, species, species_conf, color):
     species = str(species)  # make sure species is considered a string
     if species_conf < args["sconfidence"]:  # low confidence in species
         common_name = 'bird'  # reset species to bird due to low confidence
@@ -171,8 +177,8 @@ def set_img_label(args, bird_conf, species, species_conf, bird_size, bird_per_sc
             common_name = species
 
     img_label = "{}: {:.2f}".format(common_name, species_conf * 100)
-    logging.info('--- ' + img_label + ' ' + bird_size + ' ' + ' ' + color + ' ' + species)  # log info
-    print('--- ' + img_label + ' ' + bird_size + ' ' + color + ' ' + species)  # display to term
+    logging.info('--- ' + img_label + ' ' + color + ' ' + species + ' ' + bird_conf)  # log info
+    print('--- ' + img_label + ' ' + color + ' ' + species, + ' ' + bird_conf)  # display
     return (species_conf >= args["sconfidence"]), img_label
 
 
