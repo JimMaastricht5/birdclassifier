@@ -66,7 +66,6 @@ class Census:
     # return count of visitor by name
     def report_census(self, visitor_name):
         vindex = self.find_visitor(visitor_name)
-        print(self.census[vindex])
         if vindex >= 0:
             visitor_count = self.census[vindex][1]
             last_seen = self.census[vindex][2]
