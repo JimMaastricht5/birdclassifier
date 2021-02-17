@@ -125,7 +125,7 @@ def bird_detector(args):
                     cv2.imshow('tweeted', equalizedimg)  # show all birds in pic with labels
                     cv2.imwrite("img.jpg", equalizedimg)  # write out image for debugging and testing
                     tw_img = open('img.jpg', 'rb')
-                    tweeter.post_image(twitter, img_label + ' ' + species_count, tw_img)
+                    tweeter.post_image(twitter, img_label + ' ' + str(species_count), tw_img)
                 elif speciesb:
                     print('--- time remaining for {} next tweet:{:.2f}'.format(species,
                                 (datetime.now().timestamp() - species_last_seen.timestamp()) / 60))
