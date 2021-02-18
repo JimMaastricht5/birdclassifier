@@ -67,8 +67,7 @@ def bird_detector(args):
     interpreter, possible_labels = label_image.init_tf2(args["species_model"], args["numthreads"],
                                                         args["species_labels"])
     print('press esc to quit')
-    while True:  # while escape key is not pressed look for motion, detect birds, and determin species
-        speciesb = False
+    while True:  # while escape key is not pressed look for motion, detect birds, and determin specie
         img_label = ''
         species_conf = 0
         motionb, img, gray, graymotion, thresh = motion_detector.detect(cv2, cap, first_img, args["minarea"])
@@ -111,8 +110,8 @@ def bird_detector(args):
                     cv2.imshow('tweeted', equalizedimg)  # show all birds in pic with labels
                     cv2.imwrite("img.jpg", equalizedimg)  # write out image for debugging and testing
                     tw_img = open('img.jpg', 'rb')
-                    tweeter.post_image(twitter, tweet_label + ' ' + str(species_count + 1), tw_img)
-                elif speciesb:
+                    tweeter.post_image(twitter, tweet_label + str(species_count + 1), tw_img)
+                else:
                     print('--- {} last seen {} time to next tweet:{:.2f}'.format(species,
                                     species_last_seen.strftime('%H:%M:%S'),
                                     (1800 - datetime.now().timestamp() - last_tweet.timestamp()) / 60))
@@ -160,7 +159,7 @@ def label_text(species_threshold, species, species_conf):
             common_name = species[start:end]
         else:
             common_name = species
-    tweet_label = "{}: confidence {:.0f}".format(common_name, species_conf * 100)
+    tweet_label = "{}: confidence {:.0f} count: ".format(species, species_conf * 100)
     logging.info('--- ' + tweet_label + ' ' + species)  # log info
     print('--- ' + tweet_label + ' ' + species)  # display
     return common_name, common_name, tweet_label
