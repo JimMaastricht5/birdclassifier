@@ -80,16 +80,12 @@ def bird_detector(args):
                 loginfo = "--- detected {}: {:.2f}%".format(det_labels[i], det_confidence * 100)
                 logging.info(datetime.now().strftime('%H:%M:%S') + loginfo)
                 print(loginfo, datetime.now().strftime('%H:%M:%S'))
-                if image_proc.is_low_contrast(img):
-                    print('low contrast image')
 
                 if det_labels[i] == "bird" and not image_proc.is_low_contrast(img) \
                         and (det_confidence >= args["bconfidence"]):
                     (startX, startY, endX, endY) = label_image.scale_rect(img, det_rects[i])  # set x,y bounding box
-                    # bird_size, bird_per_scr_area = birdsize(args, startX, startY, endX, endY)  # estimate bird size
                     equalizedimg = image_proc.equalize_color(img)  # balance histogram of color intensity
                     birdcrop_img = equalizedimg[startY:endY, startX:endX]  # extract image for better species detection
-                    # color = label_image.predominant_color(birdcrop_img)  # find main color of bird
                     species_conf, species = label_image.set_label(birdcrop_img, possible_labels, interpreter,
                                                                   args["inputmean"], args["inputstd"])
 
@@ -147,7 +143,6 @@ def birdsize(args, startx, starty, endx, endy):
         size = 'M'
     else:  # small bird usually ~ 20%
         size = 'S'
-    # logging.info(str(birdarea) + ' ' + str(scrarea) + ' ' + str(perarea) + ' ' + size)
     return size, perarea
 
 
@@ -164,12 +159,10 @@ def label_text(species_threshold, species, species_conf):
             common_name = species[start:end]
         else:
             common_name = species
-
     tweet_label = "{}: confidence {:.0f}".format(common_name, species_conf * 100)
-    img_label = common_name
     logging.info('--- ' + tweet_label + ' ' + species)  # log info
     print('--- ' + tweet_label + ' ' + species)  # display
-    return common_name, img_label, tweet_label
+    return common_name, common_name, tweet_label
 
 
 if __name__ == "__main__":

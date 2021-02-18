@@ -163,39 +163,6 @@ def scale_rect(img, box):
     return (x_min, y_min, x_max, y_max)
 
 
-def predominant_color(img):
-    # from pyimagesearch.com color detection
-    # define the list of boundaries.  create sets of Green Blue Red GBR defining lower and upper bounds
-
-    i = 0
-    colorcount = [''] * 4
-    colors = np.array(['Red', 'Blue', 'Yellow', 'Gray'])
-    boundaries = [
-        ([17, 15, 100], [50, 56, 200]),  # Red
-        ([86, 31, 4], [220, 88, 50]),  # Blue
-        ([25, 146, 190], [62, 174, 250]),  # Yellow
-        ([103, 86, 65], [145, 133, 128])  # Gray
-    ]
-
-    # grab background color for initial mask
-    # bkgcolor = int(img[0, 0])  # bgr value in upper left corner
-    # bkgmask = cv2.inRange(img, bkgcolor, ...)
-
-    # loop over the boundaries
-    for (lower, upper) in boundaries:
-        lower = np.array(lower, dtype="uint8")  # create NumPy arrays from the boundaries
-        upper = np.array(upper, dtype="uint8")
-        # find the colors within the specified boundaries and apply the mask
-        mask = cv2.inRange(img, lower, upper)
-        maskimg = cv2.bitwise_and(img, img, mask=mask)
-        colorcount[i] = np.count_nonzero(maskimg, axis=None)  # count non-zero values in BGR pixels
-        i += 1
-
-    cindex = np.where(colorcount == np.amax(colorcount))  # find color with highest count
-    color = str(colors[cindex])
-    return color
-
-
 # add bounding box and label to an image
 def add_box_and_label(img, img_label, startX, startY, endX, endY, colors, coloroffset):
     cv2.rectangle(img, (startX, startY), (endX, endY), colors[coloroffset], 2)
