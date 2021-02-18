@@ -94,11 +94,11 @@ def bird_detector(args):
                     img = label_image.add_box_and_label(img, img_label, startX, startY, endX, endY, colors, i)
                     equalizedimg = label_image.add_box_and_label(equalizedimg, img_label, startX, startY,
                                                                  endX, endY, colors, i)
+                    cv2.imshow('org detection', img)  # show all birds in pic with labels
+                    cv2.imshow('color histogram equalized', equalizedimg)
 
             # all birds in image processed. Show image and tweet
             # *** fix labels for multiple birds in one post
-            cv2.imshow('org detection', img)  # show all birds in pic with labels
-            cv2.imshow('color histogram equalized', equalizedimg)
 
             # image contained a bird and species label, tweet it if the species has not been observed recently
             if species_conf >= args["sconfidence"]:
