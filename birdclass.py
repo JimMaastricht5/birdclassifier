@@ -131,8 +131,8 @@ def bird_detector(args):
         if k == 27:  # press 'ESC' to quit
             break
 
-    if args["image"] == "":  # not testing code
-        cap.release()
+    # clean up and end program
+    cap.release()
     cv2.destroyAllWindows()
 
 
@@ -175,8 +175,6 @@ def label_text(species_threshold, species, species_conf):
 if __name__ == "__main__":
     # construct the argument parser and parse the arguments
     ap = argparse.ArgumentParser()
-    # video setup
-    # ap.add_argument("-v", "--video", help="path to the video file")
     ap.add_argument("-a", "--minarea", type=int, default=50000, help="motion threshold, 50K is a good min")
     ap.add_argument("-sw", "--screenwidth", type=int, default=320, help="max screen width")
     ap.add_argument("-sh", "--screenheight", type=int, default=240, help="max screen height")
