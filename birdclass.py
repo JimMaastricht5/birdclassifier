@@ -70,6 +70,7 @@ def bird_detector(args):
     while True:  # while escape key is not pressed look for motion, detect birds, and determin species
         speciesb = False
         img_label = ''
+        species_conf = 0
         motionb, img, gray, graymotion, thresh = motion_detector.detect(cv2, cap, first_img, args["minarea"])
         if motionb:  # motion detected.
             det_confidences, det_labels, det_rects = \
