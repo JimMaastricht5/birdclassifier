@@ -172,7 +172,7 @@ def label_text(species_threshold, species, species_conf):
 if __name__ == "__main__":
     # construct the argument parser and parse the arguments
     ap = argparse.ArgumentParser()
-    ap.add_argument("-a", "--minarea", type=int, default=52000, help="motion threshold, 52K is a good min")
+    ap.add_argument("-a", "--minarea", type=int, default=50000, help="motion threshold, 50K is a good min")
     ap.add_argument("-sw", "--screenwidth", type=int, default=320, help="max screen width")
     ap.add_argument("-sh", "--screenheight", type=int, default=240, help="max screen height")
 
