@@ -159,7 +159,7 @@ def label_text(species_threshold, species, species_conf):
             common_name = species[start:end]
         else:
             common_name = species
-    tweet_label = "{}: confidence {:.0f} count: ".format(species, species_conf * 100)
+    tweet_label = "{}: confidence {:.0f} appeared: ".format(species, species_conf * 100)
     logging.info('--- ' + tweet_label + ' ' + species)  # log info
     print('--- ' + tweet_label + ' ' + species)  # display
     return common_name, common_name, tweet_label
