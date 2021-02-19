@@ -118,7 +118,7 @@ def bird_detector(args):
                     tweeter.post_image(twitter, tweet_label + str(species_count + 1), tw_img)
                 else:
                     time_r = 30 - (datetime.now().timestamp() - last_tweet.timestamp()) / 60  # minutes left on timer
-                    print(f"--- {species} seen {species_last_seen.strftime('%H:%M:%Sf')} next tweet in {time_r:.0f}")
+                    print(f"{species} seen {species_last_seen.strftime('%H:%M:%Sf')} next tweet in {time_r:.0f}")
                 birdpop.visitor(species, datetime.now())  # update visitor count
 
         # ret, videoimg = cap.read()  # read clean image
