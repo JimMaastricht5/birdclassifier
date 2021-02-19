@@ -77,7 +77,7 @@ def bird_detector(args):
                                              args["inputmean"], args["inputstd"])
 
             for i, det_confidence in enumerate(det_confidences):
-                loginfo = "--- detected {}: {:.2f}%".format(det_labels[i], det_confidence * 100)
+                loginfo = f"--- detected {det_labels[i]}: {det_confidence * 100:.0f}%"
                 logging.info(datetime.now().strftime('%H:%M:%S') + loginfo)
                 print(loginfo, datetime.now().strftime('%H:%M:%S'))
 
@@ -91,10 +91,12 @@ def bird_detector(args):
 
                     # draw bounding boxes and display label if it is a bird
                     common_name, img_label, tweet_label = label_text(args["sconfidence"], species, species_conf)
-                    img = label_image.add_box_and_label(img, img_label, startX, startY, endX, endY, colors, i)
+                    orgimg = label_image.add_box_and_label(img, img_label, startX, startY, endX, endY, colors, i)
+                    img = label_image.add_box_and_label(img, '', startX, startY, endX, endY, colors, i)  # add box 2 vid
                     equalizedimg = label_image.add_box_and_label(equalizedimg, img_label, startX, startY,
                                                                  endX, endY, colors, i)
-                    cv2.imshow('org detection', img)  # show all birds in pic with labels
+
+                    cv2.imshow('org detection', orgimg)  # show all birds in pic with labels
                     cv2.imshow('color histogram equalized', equalizedimg)
 
             # all birds in image processed. Show image and tweet
@@ -109,21 +111,21 @@ def bird_detector(args):
                     print('*** tweeted', last_tweet.strftime('%H:%M:%S'), img_label)
                     cv2.imshow('tweeted', equalizedimg)  # show all birds in pic with labels
                     cv2.imwrite("img.jpg", equalizedimg)  # write out image for debugging and testing
-                    tw_img = open('img.jpg', 'rb')
+                    tw_img = open('img.jpg', 'rb')  # reload a image for twitter, correct var type
                     tweeter.post_image(twitter, tweet_label + str(species_count + 1), tw_img)
                 else:
-                    print('--- {} last seen {} time to next tweet:{:.2f}'.format(species,
-                                    species_last_seen.strftime('%H:%M:%S'),
-                                    (1800 - datetime.now().timestamp() - last_tweet.timestamp()) / 60))
+                    time_r = (1800 - datetime.now().timestamp() - last_tweet.timestamp()) / 60
+                    print(f"--- {species} seen {species_last_seen.strftime('%H:%M:%Sf')} next tweet in {time_r:.0f}")
                 birdpop.visitor(species, datetime.now())  # update visitor count
 
-        ret, videoimg = cap.read()
+        # ret, videoimg = cap.read()  # read clean image
         # videoimg = cv2.flip(videoimg, -1)  # mirror image; comment out if not needed for your camera
-        cv2.imshow('video', videoimg)
+        # cv2.imshow('video', videoimg)
+        cv2.imshow('video', img)  # show image with box and label
 
         # check for esc key and quit if pressed
         # *** need to fix this.  stopped working
-        k = cv2.waitKey(30) & 0xff
+        k = cv2.waitKey(30)  # wait 30 milliseconds for key press
         if k == 27:  # press 'ESC' to quit
             break
 
@@ -159,9 +161,9 @@ def label_text(species_threshold, species, species_conf):
             common_name = species[start:end]
         else:
             common_name = species
-    tweet_label = "{}: confidence {:.0f} appeared: ".format(species, species_conf * 100)
-    logging.info('--- ' + tweet_label + ' ' + species)  # log info
-    print('--- ' + tweet_label + ' ' + species)  # display
+    tweet_label = f"{species}: confidence {species_conf * 100:.0f} appeared: "
+    logging.info('--- ' + tweet_label)  # log info
+    print('--- ' + tweet_label)  # display
     return common_name, common_name, tweet_label
 
 

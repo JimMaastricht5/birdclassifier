@@ -103,7 +103,7 @@ def object_detection(min_confidence, img, labels, interpreter, input_mean, input
                 confidence_labels.append(label)
                 confidence_rects.append(det_rects[0][index])
     # else full tensor model, add code here
-    # print('time: {:.3f}ms'.format((stop_time - start_time) * 1000))
+    # print(f'time: {((stop_time - start_time) * 1000):.3f}ms'
     return confidences, confidence_labels, confidence_rects  # confidence and best label
 
 
