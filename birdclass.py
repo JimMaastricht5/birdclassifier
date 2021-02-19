@@ -53,6 +53,7 @@ def bird_detector(args):
     colors = np.random.uniform(0, 255, size=(11, 3))  # random colors for bounding boxes
     birdpop = population.Census()  # initialize species population census object
     last_tweet = datetime.min  # init last tweet variable
+    motioncnt = 0
 
     # initial video capture, screen size, and grab first image (no motion)
     cap = cv2.VideoCapture(0)  # capture video image
@@ -70,7 +71,6 @@ def bird_detector(args):
     while True:  # while escape key is not pressed look for motion, detect birds, and determin specie
         img_label = ''
         species_conf = 0
-        motioncnt = 0
         motionb, img, gray, graymotion, thresh = motion_detector.detect(cv2, cap, first_img, args["minarea"])
         if motionb:  # motion detected.
             motioncnt += 1
