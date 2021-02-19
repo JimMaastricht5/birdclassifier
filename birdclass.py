@@ -74,7 +74,7 @@ def bird_detector(args):
         motionb, img, gray, graymotion, thresh = motion_detector.detect(cv2, cap, first_img, args["minarea"])
         if motionb:  # motion detected.
             motioncnt += 1
-            print(f'motion:{motioncnt}')  # indicate motion on monitor
+            print(f'motion:{motioncnt}', end='\r')  # indicate motion on monitor
             det_confidences, det_labels, det_rects = \
                 label_image.object_detection(args["bconfidence"], img, objdet_possible_labels, tfobjdet,
                                              args["inputmean"], args["inputstd"])
