@@ -70,15 +70,16 @@ def bird_detector(args):
     while True:  # while escape key is not pressed look for motion, detect birds, and determin specie
         img_label = ''
         species_conf = 0
+        motioncnt = 0
         motionb, img, gray, graymotion, thresh = motion_detector.detect(cv2, cap, first_img, args["minarea"])
         if motionb:  # motion detected.
-            print('m', end=" ")  # indicate motion on monitor
+            print(f'motion:{motioncnt}', end="\r")  # indicate motion on monitor
             det_confidences, det_labels, det_rects = \
                 label_image.object_detection(args["bconfidence"], img, objdet_possible_labels, tfobjdet,
                                              args["inputmean"], args["inputstd"])
 
             for i, det_confidence in enumerate(det_confidences):
-                loginfo = f"d{det_labels[i]}:{det_confidence * 100:.0f}%"
+                loginfo = f"detected {det_labels[i]}:{det_confidence * 100:.0f}%"
                 logging.info(datetime.now().strftime('%H:%M:%S') + loginfo)
                 print(loginfo, datetime.now().strftime('%H:%M:%S'))
 
