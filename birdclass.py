@@ -82,7 +82,7 @@ def bird_detector(args):
             for i, det_confidence in enumerate(det_confidences):
                 loginfo = f"detected {det_labels[i]}:{det_confidence * 100:.0f}%"
                 logging.info(datetime.now().strftime('%H:%M:%S') + loginfo)
-                print(loginfo, datetime.now().strftime('%H:%M:%S'))
+                print('---' + loginfo, datetime.now().strftime('%H:%M:%S'))
 
                 if det_labels[i] == "bird" and not image_proc.is_low_contrast(img) \
                         and (det_confidence >= args["bconfidence"]):
