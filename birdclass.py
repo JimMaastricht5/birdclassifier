@@ -53,7 +53,8 @@ def bird_detector(args):
     colors = np.random.uniform(0, 255, size=(11, 3))  # random colors for bounding boxes
     birdpop = population.Census()  # initialize species population census object
     last_tweet = datetime.min  # init last tweet variable
-    motioncnt = 0
+    motioncnt, tweetcnt = 0, 0
+    curr_day, curr_hr = datetime.now().day, datetime.now().hour
 
     # initial video capture, screen size, and grab first image (no motion)
     cap = cv2.VideoCapture(0)  # capture video image
@@ -69,8 +70,16 @@ def bird_detector(args):
                                                         args["species_labels"])
     print('press esc to quit')
     while True:  # while escape key is not pressed look for motion, detect birds, and determin specie
-        img_label = ''
-        species_conf = 0
+        img_label = ''  # clear img_label for next img
+        species_conf = 0  # set species confidence to zero for next loop
+        if curr_day != datetime.now().day:
+            print(population.get_census_by_count()) # print count from prior day
+            population.clear()  # clear count for new day
+            curr_day = datetime.now().day
+
+        if curr_hr != datetime.now().hour:
+            tweetcnt = 0  # reset hourly twitter limit
+
         motionb, img, gray, graymotion, thresh = motion_detector.detect(cv2, cap, first_img, args["minarea"])
         if motionb:  # motion detected.
             motioncnt += 1
@@ -108,8 +117,8 @@ def bird_detector(args):
 
             # image contained a bird and species label, tweet it if the species has not been observed recently
             if species_conf >= args["sconfidence"]:
-                species_count, species_last_seen = birdpop.report_census(species)
-                if (datetime.now() - last_tweet).total_seconds() > 1800:  # wait 30 min between tweets
+                if tweetcnt < 100:  # no more than 100 per hour
+                    species_count, species_last_seen = birdpop.report_census(species)
                     last_tweet = datetime.now()
                     logging.info(f'tweeted {last_tweet.strftime("%H:%M:%S")} {img_label}')
                     print(f' tweet: {img_label} {str(species_count + 1)}')
@@ -117,9 +126,9 @@ def bird_detector(args):
                     cv2.imwrite("img.jpg", equalizedimg)  # write out image for debugging and testing
                     tw_img = open('img.jpg', 'rb')  # reload a image for twitter, correct var type
                     tweeter.post_image(twitter, tweet_label + str(species_count + 1), tw_img)
+                    tweetcnt += 1
                 else:
-                    time_r = 30 - (datetime.now().timestamp() - last_tweet.timestamp()) / 60  # minutes left on timer
-                    print(f" {species} seen {species_last_seen.strftime('%H:%M')} next tweet in {time_r:.0f}")
+                    print(f" {species} seen {species_last_seen.strftime('%H:%M')} *** exceeded tweet limit")
                 birdpop.visitor(species, datetime.now())  # update visitor count
 
         # ret, videoimg = cap.read()  # read clean image

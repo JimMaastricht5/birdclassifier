@@ -23,6 +23,7 @@
 # feeder population census
 #
 from datetime import datetime
+from operator import itemgetter
 
 
 def main():
@@ -37,11 +38,15 @@ def main():
     popdogcats.visitor('cat', observed_time)
     print('should be one dog', popdogcats.report_census('dog'))
     print('should be two cats', popdogcats.report_census('cat'))
+    print(popdogcats.get_census_by_count())
     return
 
 
 class Census:
     def __init__(self):
+        self.clear()
+
+    def clear(self):
         self.census = []
 
     # find index for visitor by name
@@ -73,6 +78,11 @@ class Census:
             visitor_count = 0  # haven't seen this visitor by name
             last_seen = datetime.min
         return visitor_count, last_seen
+
+    # sort census by count
+    def get_census_by_count(self):
+        self.census.sort(key=itemgetter(1), reverse=True)
+        return(self.census)
 
 
 # testing code
