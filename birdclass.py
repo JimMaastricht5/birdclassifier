@@ -63,7 +63,7 @@ def bird_detector(args):
     first_img = motion_detector.init(cv2, cap)  # set motion mask
 
     # init twitter and tensor flow models
-    species_thresholds = np.asarray(label_image.load_labels(args["species_thresholds"]))
+    species_thresholds = np.genfromtxt(args["species_thresholds"], delimiter=',')
     twitter = tweeter.init(api_key, api_secret_key, access_token, access_token_secret)  # init twitter api
     tfobjdet, objdet_possible_labels = label_image.init_tf2(args["obj_det_model"], args["numthreads"],
                                                             args["obj_det_labels"])

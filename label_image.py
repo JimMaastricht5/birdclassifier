@@ -173,10 +173,11 @@ def add_box_and_label(img, img_label, startX, startY, endX, endY, colors, coloro
     return img
 
 
+# func checks threshold by each label passed as a nparray with text in col 0 and threshold in col 1
 def check_threshold(cresult, lindex, label_thresholds):
-    if label_thresholds[lindex] != -1 and cresult >= label_thresholds[lindex]:
-        return True
-    return False
+    try: return(int(label_thresholds[lindex][1]) != -1 and cresult >= int(label_thresholds[lindex][1]))
+    except: return False
+
 
 # test function
 if __name__ == '__main__':
