@@ -109,6 +109,8 @@ def object_detection(min_confidence, img, labels, interpreter, input_mean, input
 
 # input image and return best result and label
 def set_label(img, labels, label_thresholds, interpreter, input_mean, input_std):
+    cresult = float(0)
+    lresult = ''
     input_details = interpreter.get_input_details()
     output_details = interpreter.get_output_details()
     floating_model, input_data = convert_cvframe_to_ts(img, input_details, input_mean, input_std)
@@ -119,16 +121,14 @@ def set_label(img, labels, label_thresholds, interpreter, input_mean, input_std)
     results = np.squeeze(output_data)
     cindex = np.where(results == np.amax(results))
     for lindex in cindex[0]:
-        print(lindex, type(lindex))
         try:
             lresult = str(labels[lindex])  # added code to push this to a string instead of a tuple
-            cresult = float(results[cindex])
+            cresult = float(results[lindex])  # find confidence for best fit species
             if check_threshold(cresult, lindex, label_thresholds):  # compare confidence score to threshold by label
                 break
         except:  # error looking up cresult out of bounds
             print('array out of bounds error: confidence indice', cindex, lindex, lresult)
             print('results', results)
-            cresult = float(0)
             cv2.imwrite("debugimg.jpg", img)
             break
 
