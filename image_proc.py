@@ -205,6 +205,20 @@ def predominant_color(img):
     return color
 
 
+# estimate the size of the bird based on the percentage of image area consumed by the bounding box
+def objectsize(args, startx, starty, endx, endy):
+    objarea = abs((startx - endx) * (starty - endy))
+    scrarea = args['screenheight'] * args['screenwidth']
+    perarea = (objarea / scrarea) * 100
+    if perarea >= 40:  # large
+        size = 'L'
+    elif perarea >= 30:  # medium
+        size = 'M'
+    else:  # small
+        size = 'S'
+    return size, perarea
+
+
 # invoke main
 if __name__ == "__main__":
     main()
