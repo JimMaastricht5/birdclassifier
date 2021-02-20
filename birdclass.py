@@ -63,6 +63,7 @@ def bird_detector(args):
     first_img = motion_detector.init(cv2, cap)  # set motion mask
 
     # init twitter and tensor flow models
+    species_thresholds = np.asarray(label_image.load_labels(args["species_thresholds"]))
     twitter = tweeter.init(api_key, api_secret_key, access_token, access_token_secret)  # init twitter api
     tfobjdet, objdet_possible_labels = label_image.init_tf2(args["obj_det_model"], args["numthreads"],
                                                             args["obj_det_labels"])
@@ -99,8 +100,8 @@ def bird_detector(args):
                     (startX, startY, endX, endY) = label_image.scale_rect(img, det_rects[i])  # set x,y bounding box
                     equalizedimg = image_proc.equalize_color(img)  # balance histogram of color intensity
                     birdcrop_img = equalizedimg[startY:endY, startX:endX]  # extract image for better species detection
-                    species_conf, species = label_image.set_label(birdcrop_img, possible_labels, interpreter,
-                                                                  args["inputmean"], args["inputstd"])
+                    species_conf, species = label_image.set_label(birdcrop_img, possible_labels, species_thresholds,
+                                                                  interpreter, args["inputmean"], args["inputstd"])
 
                     # draw bounding boxes and display label if it is a bird
                     common_name, img_label, tweet_label = label_text(args["sconfidence"], species, species_conf)
@@ -200,6 +201,9 @@ if __name__ == "__main__":
     ap.add_argument('-l', '--species_labels',
                     default='/home/pi/PycharmProjects/pyface2/coral.ai.inat_bird_labels.txt',
                     help='name of file containing labels')
+    ap.add_argument('-l', '--species_thresholds',
+                    default='/home/pi/PycharmProjects/pyface2/coral.ai.inat_bird_thresholds.csv',
+                    help='name of file containing thresholds by label')
 
     # tensor flow input arguements
     ap.add_argument('--inputmean', default=127.5, type=float, help='Tensor input_mean')

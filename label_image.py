@@ -108,7 +108,7 @@ def object_detection(min_confidence, img, labels, interpreter, input_mean, input
 
 
 # input image and return best result and label
-def set_label(img, labels, interpreter, input_mean, input_std):
+def set_label(img, labels, label_thresholds, interpreter, input_mean, input_std):
     input_details = interpreter.get_input_details()
     output_details = interpreter.get_output_details()
     floating_model, input_data = convert_cvframe_to_ts(img, input_details, input_mean, input_std)
@@ -118,17 +118,19 @@ def set_label(img, labels, interpreter, input_mean, input_std):
     output_data = interpreter.get_tensor(output_details[0]['index'])
     results = np.squeeze(output_data)
     cindex = np.where(results == np.amax(results))
-    lindex = cindex[0]  # grab best result; np array is in max order descending
-    try:
-        cresult = float(results[cindex])
-        lresult = str(labels[lindex])  # added code to push this to a string instead of a tuple
-    except:
-        print('array out of bounds error: confidence and label indices', cindex, lindex)
-        print('output', output_data)
-        print('results', results)
-        cresult = float(0)
-        lresult = ''
-        cv2.imwrite("debugimg.jpg", img)
+    for lindex in cindex[0]:
+        print(lindex, type(lindex))
+        try:
+            lresult = str(labels[lindex])  # added code to push this to a string instead of a tuple
+            cresult = float(results[cindex])
+            if check_threshold(cresult, lindex, label_thresholds):  # compare confidence score to threshold by label
+                break
+        except:  # error looking up cresult out of bounds
+            print('array out of bounds error: confidence indice', cindex, lindex, lresult)
+            print('results', results)
+            cresult = float(0)
+            cv2.imwrite("debugimg.jpg", img)
+            break
 
     cresult = cresult / 100  # needed for automl or google coral.ai model
     return cresult, lresult  # highest confidence and best label
@@ -170,6 +172,11 @@ def add_box_and_label(img, img_label, startX, startY, endX, endY, colors, coloro
     cv2.putText(img, img_label, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors[coloroffset], 2)
     return img
 
+
+def check_threshold(cresult, lindex, label_thresholds):
+    if label_thresholds[lindex] != -1 and cresults >= label_thresholds[lindex]:
+        return True
+    return False
 
 # test function
 if __name__ == '__main__':
