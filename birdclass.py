@@ -201,7 +201,7 @@ if __name__ == "__main__":
     ap.add_argument('-l', '--species_labels',
                     default='/home/pi/PycharmProjects/pyface2/coral.ai.inat_bird_labels.txt',
                     help='name of file containing labels')
-    ap.add_argument('-l', '--species_thresholds',
+    ap.add_argument('-ts', '--species_thresholds',
                     default='/home/pi/PycharmProjects/pyface2/coral.ai.inat_bird_thresholds.csv',
                     help='name of file containing thresholds by label')
 
