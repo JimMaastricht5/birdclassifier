@@ -74,15 +74,15 @@ def bird_detector(args):
         motionb, img, gray, graymotion, thresh = motion_detector.detect(cv2, cap, first_img, args["minarea"])
         if motionb:  # motion detected.
             motioncnt += 1
-            print(f'\r motion:{motioncnt}', end=' ')  # indicate motion on monitor
+            print(f'\r motion {motioncnt}', end=' ')  # indicate motion on monitor
             det_confidences, det_labels, det_rects = \
                 label_image.object_detection(args["bconfidence"], img, objdet_possible_labels, tfobjdet,
                                              args["inputmean"], args["inputstd"])
 
             for i, det_confidence in enumerate(det_confidences):
-                loginfo = f"detected {det_labels[i]}:{det_confidence * 100:.0f}%"
+                loginfo = f"{det_labels[i]}:{det_confidence * 100:.0f}%"
                 logging.info(datetime.now().strftime('%H:%M:%S') + loginfo)
-                print('---' + loginfo, datetime.now().strftime('%H:%M:%S'))
+                print(':' + loginfo, datetime.now().strftime('%H:%M'), end = '')
 
                 if det_labels[i] == "bird" and not image_proc.is_low_contrast(img) \
                         and (det_confidence >= args["bconfidence"]):
@@ -111,15 +111,15 @@ def bird_detector(args):
                 species_count, species_last_seen = birdpop.report_census(species)
                 if (datetime.now() - last_tweet).total_seconds() > 1800:  # wait 30 min between tweets
                     last_tweet = datetime.now()
-                    logging.info('*** tweeted ' + last_tweet.strftime('%H:%M:%S') + ' ' + img_label)
-                    print('*** tweeted', last_tweet.strftime('%H:%M:%S'), img_label + str(species_count + 1))
+                    logging.info(f'tweeted {last_tweet.strftime("%H:%M:%S")} {img_label}')
+                    print(f' tweet: {img_label} {str(species_count + 1)}')
                     cv2.imshow('tweeted', equalizedimg)  # show all birds in pic with labels
                     cv2.imwrite("img.jpg", equalizedimg)  # write out image for debugging and testing
                     tw_img = open('img.jpg', 'rb')  # reload a image for twitter, correct var type
                     tweeter.post_image(twitter, tweet_label + str(species_count + 1), tw_img)
                 else:
                     time_r = 30 - (datetime.now().timestamp() - last_tweet.timestamp()) / 60  # minutes left on timer
-                    print(f"{species} seen {species_last_seen.strftime('%H:%M:%Sf')} next tweet in {time_r:.0f}")
+                    print(f" {species} seen {species_last_seen.strftime('%H:%M')} next tweet in {time_r:.0f}")
                 birdpop.visitor(species, datetime.now())  # update visitor count
 
         # ret, videoimg = cap.read()  # read clean image
