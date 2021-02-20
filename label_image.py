@@ -174,7 +174,7 @@ def add_box_and_label(img, img_label, startX, startY, endX, endY, colors, coloro
 
 
 def check_threshold(cresult, lindex, label_thresholds):
-    if label_thresholds[lindex] != -1 and cresults >= label_thresholds[lindex]:
+    if label_thresholds[lindex] != -1 and cresult >= label_thresholds[lindex]:
         return True
     return False
 

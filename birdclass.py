@@ -74,8 +74,8 @@ def bird_detector(args):
         img_label = ''  # clear img_label for next img
         species_conf = 0  # set species confidence to zero for next loop
         if curr_day != datetime.now().day:
-            print(population.get_census_by_count()) # print count from prior day
-            population.clear()  # clear count for new day
+            print(birdpop.get_census_by_count()) # print count from prior day
+            birdpop.clear()  # clear count for new day
             curr_day = datetime.now().day
 
         if curr_hr != datetime.now().hour:
