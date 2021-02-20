@@ -202,7 +202,7 @@ if __name__ == "__main__":
                     default='/home/pi/PycharmProjects/pyface2/coral.ai.inat_bird_labels.txt',
                     help='name of file containing labels')
     ap.add_argument('-ts', '--species_thresholds',
-                    default='/home/pi/PycharmProjects/pyface2/coral.ai.inat_bird_thresholds.csv',
+                    default='/home/pi/PycharmProjects/pyface2/coral.ai.inat_bird_threshold.csv',
                     help='name of file containing thresholds by label')
 
     # tensor flow input arguements
