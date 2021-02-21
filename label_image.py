@@ -124,16 +124,17 @@ def set_label(img, labels, label_thresholds, interpreter, input_mean, input_std)
         try:
             lresult = str(labels[lindex])  # added code to push this to a string instead of a tuple
             cresult = float(results[lindex])  # find confidence for best fit species
-            print(f'debug: index {str(lindex)}, {str(labels[lindex])},confidence {str(cresult)}, species threshold {str(label_thresholds[lindex])}')
-            print(check_threshold(cresult, lindex, label_thresholds))
+            print(f'try: index {str(lindex)}, confidence {str(cresult)}, species threshold {str(label_thresholds[lindex])}, {check_threshold(cresult, lindex, label_thresholds)},{str(labels[lindex])}')
             if check_threshold(cresult, lindex, label_thresholds):  # compare confidence score to threshold by label
                 break
+            else:
+                cresult = float(0)
+                lresult = ''
         except:  # error looking up cresult out of bounds
             print('array out of bounds error: confidence indice', cindex, lindex, lresult)
             print('results', results)
             cv2.imwrite("debugimg.jpg", img)
             break
-
     cresult = cresult / 100  # needed for automl or google coral.ai model
     return cresult, lresult  # highest confidence and best label
 
