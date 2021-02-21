@@ -117,13 +117,13 @@ def bird_detector(args):
                     cv2.imshow('org detection', orgimg)  # show all birds in pic with labels
                     cv2.imshow('color histogram equalized', equalizedimg)
 
-            # all birds in image processed. Show image and tweet
+            # all birds in image processed. Show image and tweet, confidence here is lowest across all species
             if species_conf >= args["sconfidence"]:
                 if tweetcnt < 100:  # no more than 100 per hour
                     species_count, species_last_seen = birdpop.report_census(species)
                     last_tweet = datetime.now()
                     logging.info(f'tweeted {last_tweet.strftime("%H:%M:%S")} {img_label}')
-                    print(f' tweet: {img_label} {species_conf} observed: {str(species_count + 1)}')
+                    print(f' tweet: {img_label} {(species_conf * 100)} observed: {str(species_count + 1)}')
                     cv2.imshow('tweeted', equalizedimg)  # show all birds in pic with labels
                     cv2.imwrite("img.jpg", equalizedimg)  # write out image for debugging and testing
                     tw_img = open('img.jpg', 'rb')  # reload a image for twitter, correct var type
@@ -190,7 +190,7 @@ if __name__ == "__main__":
 
     # confidence settings for object detection and species bconfidence
     ap.add_argument('-bc', '--bconfidence', type=float, default=0.76)  # obj detection threshold; 76 is a good min
-    ap.add_argument('-sc', '--sconfidence', type=float, default=0.95)  # quant model is accurate down to 90
+    ap.add_argument('-sc', '--sconfidence', type=float, default=0.90)  # quant model is accurate down to 90
 
     logging.basicConfig(filename='birdclass.log', format='%(asctime)s - %(message)s', level=logging.DEBUG)
     arguments = vars(ap.parse_args())
