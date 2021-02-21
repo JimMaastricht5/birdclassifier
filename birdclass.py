@@ -108,22 +108,22 @@ def bird_detector(args):
                     birdcrop_img = equalizedimg[startY:endY, startX:endX]  # extract image for better species detection
                     species_conf, species = label_image.set_label(birdcrop_img, possible_labels, species_thresholds,
                                                                   interpreter, args["inputmean"], args["inputstd"])
+                    species_count, species_last_seen = birdpop.report_census(species)
                     # draw bounding boxes and display label if it is a bird
                     common_name, img_label, tweet_label = label_text(args["sconfidence"], species, species_conf)
                     orgimg = label_image.add_box_and_label(img, img_label, startX, startY, endX, endY, colors, i)
                     img = label_image.add_box_and_label(img, '', startX, startY, endX, endY, colors, i)  # add box 2 vid
                     equalizedimg = label_image.add_box_and_label(equalizedimg, img_label, startX, startY,
                                                                  endX, endY, colors, i)
+
+                    print(f' tweet: {img_label} {(species_conf * 100)} observed: {str(species_count + 1)}')
                     cv2.imshow('org detection', orgimg)  # show all birds in pic with labels
                     cv2.imshow('color histogram equalized', equalizedimg)
 
             # all birds in image processed. Show image and tweet, confidence here is lowest across all species
             if species_conf >= args["sconfidence"]:
                 if tweetcnt < 100:  # no more than 100 per hour
-                    species_count, species_last_seen = birdpop.report_census(species)
-                    last_tweet = datetime.now()
-                    logging.info(f'tweeted {last_tweet.strftime("%H:%M:%S")} {img_label}')
-                    print(f' tweet: {img_label} {(species_conf * 100)} observed: {str(species_count + 1)}')
+                    # species_count, species_last_seen = birdpop.report_census(species)  # needed?
                     cv2.imshow('tweeted', equalizedimg)  # show all birds in pic with labels
                     cv2.imwrite("img.jpg", equalizedimg)  # write out image for debugging and testing
                     tw_img = open('img.jpg', 'rb')  # reload a image for twitter, correct var type
