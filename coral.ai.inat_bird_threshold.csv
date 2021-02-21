@@ -5,7 +5,7 @@
 4 Cyanocitta stelleri (Steller's Jay),-1
 5 Balearica regulorum (Grey Crowned Crane),0
 6 Pyrocephalus rubinus (Vermilion Flycatcher),-1
-7 Recurvirostra americana (American Avocet),0
+7 Recurvirostra americana (American Avocet),-1
 8 Ardeotis kori (Kori Bustard),0
 9 Pica nuttalli (Yellow-billed Magpie),0
 10 Perisoreus canadensis (Gray Jay),0
@@ -26,7 +26,7 @@
 25 Quiscalus major (Boat-tailed Grackle),0
 26 Branta leucopsis (Barnacle Goose),0
 27 Cyanocorax yucatanicus (Yucatan Jay),0
-28 Cyanocorax yncas (Green Jay),0
+28 Cyanocorax yncas (Green Jay),-1
 29 Oceanites oceanicus (Wilson's Storm-Petrel),0
 30 Quiscalus niger (Greater Antillean Grackle),0
 31 Psilorhinus morio (Brown Jay),0
@@ -145,7 +145,7 @@
 144 Cinclus cinclus (White-throated Dipper),0
 145 Chen rossii (Ross's Goose),0
 146 Callipepla californica (California Quail),0
-147 Quiscalus quiscula (Common Grackle),0
+147 Quiscalus quiscula (Common Grackle),-1
 148 Quiscalus mexicanus (Great-tailed Grackle),0
 149 Callipepla squamata (Scaled Quail),0
 150 Dryocopus pileatus (Pileated Woodpecker),0
@@ -295,7 +295,7 @@
 294 Cinnyris jugularis (Olive-backed Sunbird),0
 295 Xiphorhynchus flavigaster (Ivory-billed Woodcreeper),0
 296 Jacana jacana (Wattled Jacana),0
-297 Phalaropus fulicarius (Red Phalarope),0
+297 Phalaropus fulicarius (Red Phalarope),-1
 298 Streptopelia turtur (European Turtle-Dove),0
 299 Pica hudsonia (Black-billed Magpie),0
 300 Corvus cornix (Hooded Crow),0
@@ -402,7 +402,7 @@
 401 Limosa limosa (Black-tailed Godwit),0
 402 Limosa haemastica (Hudsonian Godwit),0
 403 Limosa fedoa (Marbled Godwit),0
-404 Phalaropus lobatus (Red-necked Phalarope),0
+404 Phalaropus lobatus (Red-necked Phalarope),-1
 405 Bartramia longicauda (Upland Sandpiper),0
 406 Limosa lapponica (Bar-tailed Godwit),0
 407 Aegolius acadicus (Northern Saw-whet Owl),0
@@ -710,7 +710,7 @@
 709 Setophaga palmarum (Palm Warbler),0
 710 Setophaga pinus (Pine Warbler),0
 711 Setophaga coronata (Yellow-rumped Warbler),150
-712 Setophaga dominica (Yellow-throated Warbler),0
+712 Setophaga dominica (Yellow-throated Warbler),75
 713 Campylopterus hemileucurus (Violet Sabrewing),0
 714 Vireo cassinii (Cassin's Vireo),0
 715 Setophaga nigrescens (Black-throated Gray Warbler),0
@@ -745,7 +745,7 @@
 744 Xema sabini (Sabine's Gull),0
 745 Ramphastos sulfuratus (Keel-billed Toucan),0
 746 Dacelo novaeguineae (Laughing Kookaburra),0
-747 Fulica atra (Eurasian Coot),0
+747 Fulica atra (Eurasian Coot),-1
 748 Hirundo rustica erythrogaster (American Barn Swallow),0
 749 Calypte costae (Costa's Hummingbird),0
 750 Calypte anna (Anna's Hummingbird),0
@@ -784,7 +784,7 @@
 783 Motacilla flava (Western Yellow Wagtail),0
 784 Vireo griseus (White-eyed Vireo),0
 785 Toxostoma longirostre (Long-billed Thrasher),0
-786 Calidris alba (Sanderling),0
+786 Calidris alba (Sanderling),-1
 787 Toxostoma redivivum (California Thrasher),0
 788 Gallinula galeata (Common Gallinule),0
 789 Calidris himantopus (Stilt Sandpiper),0
@@ -798,7 +798,7 @@
 797 Dumetella carolinensis (Gray Catbird),0
 798 Porphyrio hochstetteri (South Island Takahe),0
 799 Calidris fuscicollis (White-rumped Sandpiper),0
-800 Phalaropus tricolor (Wilson's Phalarope),0
+800 Phalaropus tricolor (Wilson's Phalarope),-1
 801 Colaptes auratus auratus (Yellow-shafted Flicker),0
 802 Melanotis caerulescens (Blue Mockingbird),0
 803 Tiaris olivaceus (Yellow-faced Grassquit),0
