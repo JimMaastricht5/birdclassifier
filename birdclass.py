@@ -116,7 +116,7 @@ def bird_detector(args):
                     equalizedimg = label_image.add_box_and_label(equalizedimg, img_label, startX, startY,
                                                                  endX, endY, colors, i)
 
-                    print(f' tweet: {img_label} {(species_conf * 100)} observed: {str(species_count + 1)}')
+                    print(f' best fit: {img_label} {(species_conf * 100)} observed: {str(species_count + 1)}')
                     cv2.imshow('org detection', orgimg)  # show all birds in pic with labels
                     cv2.imshow('color histogram equalized', equalizedimg)
 
@@ -143,18 +143,14 @@ def bird_detector(args):
 
 
 # set label for image and tweet, use short species name instead of scientific name
-# return true if species confidence above threshold and return image label for twitter
 def label_text(species_threshold, species, species_conf):
     species = str(species)  # make sure species is considered a string
-    if species_conf < species_threshold:  # low confidence in species
-        common_name = 'bird'  # reset species to bird due to low confidence
+    start = species.find('(') + 1  # find start of common name, move one character to drop (
+    end = species.find(')')
+    if start >= 0 and end >= 0:
+        common_name = species[start:end]
     else:
-        start = species.find('(') + 1  # find start of common name, move one character to drop (
-        end = species.find(')')
-        if start >= 0 and end >= 0:
-            common_name = species[start:end]
-        else:
-            common_name = species
+        common_name = species
     tweet_label = f"{species}: confidence {species_conf * 100:.0f} observed: "
     return common_name, common_name, tweet_label
 
