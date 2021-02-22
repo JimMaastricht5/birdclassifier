@@ -76,7 +76,7 @@
 75 Spizella atrogularis (Black-chinned Sparrow),0
 76 Pyrrhocorax graculus (Alpine Chough),0
 77 Spizella breweri (Brewer's Sparrow),0
-78 Sialia currucoides (Mountain Bluebird),0
+78 Sialia currucoides (Mountain Bluebird),-1
 79 Spizella pusilla (Field Sparrow),0
 80 Anas superciliosa (Pacific Black Duck),0
 81 Passerella iliaca (Fox Sparrow),0
@@ -230,7 +230,7 @@
 229 Volatinia jacarina (Blue-black Grassquit),0
 230 Thraupis palmarum (Palm Tanager),0
 231 Momotus mexicanus (Russet-crowned Motmot),0
-232 Euphagus cyanocephalus (Brewer's Blackbird),0
+232 Euphagus cyanocephalus (Brewer's Blackbird),150
 233 Cacatua galerita (Sulphur-crested Cockatoo),0
 234 Junco hyemalis oreganus (Oregon Junco),0
 235 Pluvialis fulva (Pacific Golden-Plover),0
@@ -305,7 +305,7 @@
 304 Ixobrychus exilis (Least Bittern),0
 305 Auriparus flaviceps (Verdin),0
 306 Geothlypis tolmiei (MacGillivray's Warbler),0
-307 Columba livia (Rock Pigeon),175
+307 Columba livia (Rock Pigeon),200
 308 Setophaga citrina (Hooded Warbler),0
 309 Setophaga cerulea (Cerulean Warbler),0
 310 Columba palumbus (Common Wood-Pigeon),0
@@ -448,7 +448,7 @@
 447 Larus livens (Yellow-footed Gull),0
 448 Larus canus (Mew Gull),0
 449 Larus glaucoides (Iceland Gull),0
-450 Larus delawarensis (Ring-billed Gull),0
+450 Larus delawarensis (Ring-billed Gull),175
 451 Trogon collaris (Collared Trogon),0
 452 Zenaida asiatica (White-winged Dove),0
 453 Larus fuscus (Lesser Black-backed Gull),0
@@ -463,7 +463,7 @@
 462 Anthornis melanura (New Zealand Bellbird),0
 463 Leptoptilos crumenifer (Marabou Stork),0
 464 Threskiornis moluccus (Australian Ibis),0
-465 Thraupis episcopus (Blue-gray Tanager),0
+465 Thraupis episcopus (Blue-gray Tanager),-1
 466 Geranoaetus albicaudatus (White-tailed Hawk),0
 467 Sterna paradisaea (Arctic Tern),0
 468 Sterna hirundo (Common Tern),0
@@ -650,7 +650,7 @@
 649 Baeolophus inornatus (Oak Titmouse),0
 650 Melospiza melodia (Song Sparrow),100
 651 Spinus spinus (Eurasian Siskin),0
-652 Motacilla alba (White Wagtail),0
+652 Motacilla alba (White Wagtail),-1
 653 Certhia americana (Brown Creeper),0
 654 Bucorvus leadbeateri (Southern Ground-Hornbill),0
 655 Anthus pratensis (Meadow Pipit),0
@@ -795,7 +795,7 @@
 794 Gallinago gallinago (Common Snipe),0
 795 Icterus spurius (Orchard Oriole),0
 796 Calidris minutilla (Least Sandpiper),0
-797 Dumetella carolinensis (Gray Catbird),0
+797 Dumetella carolinensis (Gray Catbird),110
 798 Porphyrio hochstetteri (South Island Takahe),0
 799 Calidris fuscicollis (White-rumped Sandpiper),0
 800 Phalaropus tricolor (Wilson's Phalarope),-1
@@ -860,7 +860,7 @@
 859 Netta rufina (Red-crested Pochard),0
 860 Psittacara erythrogenys (Red-masked Parakeet),0
 861 Sayornis saya (Say's Phoebe),0
-862 Aythya valisineria (Canvasback),0
+862 Aythya valisineria (Canvasback),175
 863 Picoides albolarvatus (White-headed Woodpecker),0
 864 Vermivora cyanoptera (Blue-winged Warbler),0
 865 Corvus caurinus (Northwestern Crow),0
