@@ -75,7 +75,8 @@ def bird_detector(args):
         if curr_day != datetime.now().day:
             observed = birdpop.get_census_by_count() # print count from prior day
             try:
-                tweeter.post_status(twitter, f'top 3 birds yesterday #1 {observed[0]}, #2 {observed[1]}, #3 {observed[2]}')
+                tweeter.post_status(twitter,
+                        f'top 3 birds yesterday #1 {observed[0][0:2]}, #2 {observed[1][0:2]}, #3 {observed[2][0:2]}')
             except:
                 tweeter.post_status(twitter, 'unable to post observations')
             birdpop.clear()  # clear count for new day
