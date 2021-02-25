@@ -70,10 +70,9 @@ def bird_detector(args):
                                                         args["species_labels"])
     print('press esc to quit')
     while True:  # while escape key is not pressed look for motion, detect birds, and determine species
-        img_label = ''  # clear img_label for next img
         species_conf = 0  # set species confidence to zero for next loop
         if curr_day != datetime.now().day:
-            observed = birdpop.get_census_by_count() # print count from prior day
+            observed = birdpop.get_census_by_count()  # print count from prior day
             try:
                 tweeter.post_status(twitter,
                         f'top 3 birds yesterday #1 {observed[0][0:2]}, #2 {observed[1][0:2]}, #3 {observed[2][0:2]}')
@@ -98,7 +97,7 @@ def bird_detector(args):
             for i, det_confidence in enumerate(det_confidences):
                 loginfo = f"{det_labels[i]}:{det_confidence * 100:.0f}%"
                 logging.info(datetime.now().strftime('%H:%M:%S') + loginfo)
-                print(':' + loginfo, datetime.now().strftime('%H:%M'), end = '')
+                print(':' + loginfo, datetime.now().strftime('%H:%M'), end='')
 
                 # bird observed, determine species, label images, increment population observation and tweet
                 if det_labels[i] == "bird" and not image_proc.is_low_contrast(img) \
@@ -111,7 +110,7 @@ def bird_detector(args):
                                                                   interpreter, args["inputmean"], args["inputstd"])
                     species_count, species_last_seen = birdpop.report_census(species)
                     # draw bounding boxes and display label if it is a bird
-                    common_name, img_label, tweet_label = label_text(args["sconfidence"], species, species_conf)
+                    common_name, img_label, tweet_label = label_text(species, species_conf)
                     orgimg = label_image.add_box_and_label(img, img_label, startX, startY, endX, endY, colors, i)
                     img = label_image.add_box_and_label(img, '', startX, startY, endX, endY, colors, i)  # add box 2 vid
                     equalizedimg = label_image.add_box_and_label(equalizedimg, img_label, startX, startY,
@@ -144,7 +143,7 @@ def bird_detector(args):
 
 
 # set label for image and tweet, use short species name instead of scientific name
-def label_text(species_threshold, species, species_conf):
+def label_text(species, species_conf):
     species = str(species)  # make sure species is considered a string
     start = species.find('(') + 1  # find start of common name, move one character to drop (
     end = species.find(')')
