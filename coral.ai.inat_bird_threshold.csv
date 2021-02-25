@@ -146,10 +146,10 @@
 145 Chen rossii (Ross's Goose),0
 146 Callipepla californica (California Quail),0
 147 Quiscalus quiscula (Common Grackle),-1
-148 Quiscalus mexicanus (Great-tailed Grackle),160
+148 Quiscalus mexicanus (Great-tailed Grackle),-1
 149 Callipepla squamata (Scaled Quail),0
 150 Dryocopus pileatus (Pileated Woodpecker),0
-151 Passerina caerulea (Blue Grosbeak),0
+151 Passerina caerulea (Blue Grosbeak),-1
 152 Amazilia beryllina (Berylline Hummingbird),0
 153 Geothlypis trichas (Common Yellowthroat),0
 154 Trogon melanocephalus (Black-headed Trogon),0
@@ -617,7 +617,7 @@
 616 Circaetus gallicus (Short-toed Snake-Eagle),0
 617 Chroicocephalus novaehollandiae (Silver Gull),0
 618 Chroicocephalus ridibundus (Black-headed Gull),0
-619 Leucophaeus atricilla (Laughing Gull),0
+619 Leucophaeus atricilla (Laughing Gull),-1
 620 Leucophaeus pipixcan (Franklin's Gull),0
 621 Onychoprion fuscatus (Sooty Tern),0
 622 Sternula antillarum (Least Tern),0
@@ -659,7 +659,7 @@
 658 Poecile carolinensis (Carolina Chickadee),190
 659 Poecile atricapillus (Black-capped Chickadee),85
 660 Poecile gambeli (Mountain Chickadee),0
-661 Poecile rufescens (Chestnut-backed Chickadee),0
+661 Poecile rufescens (Chestnut-backed Chickadee),-1
 662 Periparus ater (Coal Tit),0
 663 Chlorophanes spiza (Green Honeycreeper),0
 664 Estrilda astrild (Common Waxbill),0
@@ -913,7 +913,7 @@
 912 Troglodytes aedon (House Wren),0
 913 Buteo lineatus elegans (California Red-shouldered Hawk),0
 914 Thamnophilus doliatus (Barred Antshrike),0
-915 Thryomanes bewickii (Bewick's Wren),0
+915 Thryomanes bewickii (Bewick's Wren),-1
 916 Tadorna variegata (Paradise Shelduck),0
 917 Myioborus miniatus (Slate-throated Redstart),0
 918 Phalacrocorax varius varius (New Zealand Pied Shag),0

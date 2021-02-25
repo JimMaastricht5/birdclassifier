@@ -59,7 +59,7 @@ def bird_detector(args):
     cap = cv2.VideoCapture(0)  # capture video image
     cap.set(3, args["screenwidth"])  # set screen width
     cap.set(4, args["screenheight"])  # set screen height
-    first_img = motion_detector.init(cv2, cap)  # set motion mask
+    first_img = motion_detector.init(args["flipcamera"], cv2, cap)  # set gray motion mask
 
     # init twitter and tensor flow models
     species_thresholds = np.genfromtxt(args["species_thresholds"], delimiter=',')  # load species threshold file
@@ -85,7 +85,7 @@ def bird_detector(args):
         if curr_hr != datetime.now().hour:
             tweetcnt = 0  # reset hourly twitter limit
 
-        motionb, img, gray, graymotion, thresh = motion_detector.detect(cv2, cap, first_img, args["minarea"])
+        motionb, img = motion_detector.detect(args["flipcamera"], cv2, cap, first_img, args["minarea"])
         if motionb:  # motion detected.
             motioncnt += 1
             print(f'\r motion {motioncnt}', end=' ')  # indicate motion on monitor
@@ -159,6 +159,7 @@ def label_text(species_threshold, species, species_conf):
 if __name__ == "__main__":
     # construct the argument parser and parse the arguments
     ap = argparse.ArgumentParser()
+    ap.add_argument("-f", "--flipcamera", type=bool, default=False, help="flip camera image")
     ap.add_argument("-a", "--minarea", type=int, default=50000, help="motion threshold, 50K is a good min")
     ap.add_argument("-sw", "--screenwidth", type=int, default=320, help="max screen width")
     ap.add_argument("-sh", "--screenheight", type=int, default=240, help="max screen height")
