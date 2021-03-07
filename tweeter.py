@@ -2,6 +2,7 @@
 # auth.py must be located in project; protect this file as it contains keys
 # code by JimMaastricht5@gmail.com
 from twython import Twython
+import numpy as np
 from auth import (
     api_key,
     api_secret_key,
@@ -26,14 +27,19 @@ def post_image(twitter, message, img):
     twitter.update_status(status=message, media_ids=[response['media_id']])
 
 
-# get direct messages
+# get direct messages, returns numpy array with x, 2 shape
 def get_direct_messages(twitter):
-    direct_messages = twitter.get_direct_messages()
-    for dm in direct_messages['events']:
-        id = dm['id']
-        print(id, dm['message_create']['message_data']['text'])
-        # twitter.destroy_direct_message(id)
-        # break
+    dm_array = []
+    direct_messages = twitter.get_direct_messages()  # returns json
+    for dm in direct_messages['events']:  # unpack json and build list
+        dm_array.append( (dm['id'], dm['message_create']['message_data']['text']) ) # insert row of 2 columns
+    return np.array(dm_array)
+
+
+# destroy all direct messages, takes numpy array with id and text
+def destroy_direct_messages(twitter, direct_messages):
+    for dmid, dmtext in direct_messages:
+        twitter.destroy_direct_message(id=dmid)
     return
 
 
@@ -41,7 +47,11 @@ def get_direct_messages(twitter):
 def main_test():
     twitter = init(api_key, api_secret_key, access_token, access_token_secret)
 
-    get_direct_messages(twitter)
+    direct_messages = get_direct_messages(twitter)
+    print(direct_messages)
+    print(direct_messages.shape)
+    destroy_direct_messages(twitter, direct_messages)
+
     # test code to tweet a message
     # message = 'Python status'
     # post_status(twitter, message)
