@@ -26,20 +26,32 @@ def post_image(twitter, message, img):
     twitter.update_status(status=message, media_ids=[response['media_id']])
 
 
+# get direct messages
+def get_direct_messages(twitter):
+    direct_messages = twitter.get_direct_messages()
+    for dm in direct_messages['events']:
+        id = dm['id']
+        print(id, dm['message_create']['message_data']['text'])
+        # twitter.destroy_direct_message(id)
+        # break
+    return
+
+
 # test code
 def main_test():
     twitter = init(api_key, api_secret_key, access_token, access_token_secret)
 
+    get_direct_messages(twitter)
     # test code to tweet a message
-    message = 'Python status'
-    post_status(twitter, message)
-    print('tweeted: %s' % message)
-
+    # message = 'Python status'
+    # post_status(twitter, message)
+    # print('tweeted: %s' % message)
+    #
     # test code to tweet a picture
-    message = 'Python image test'
-    twtimage = open('cardinal.jpg', 'rb')
-    post_image(twitter, message, twtimage)
-    print('tweeted: %s' % message)
+    # message = 'Python image test'
+    # twtimage = open('cardinal.jpg', 'rb')
+    # post_image(twitter, message, twtimage)
+    # print('tweeted: %s' % message)
 
 
 if __name__ == "__main__":
