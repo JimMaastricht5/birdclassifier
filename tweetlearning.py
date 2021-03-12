@@ -54,7 +54,7 @@ def process_tweets(args, direct_messages, species_thresholds):
             else:
                 print(f'direct message unknown request: {dm[1]}')
         except:
-            print(f'direct message was not procesed: {dm[1]}')
+            print(f'direct message was not processed: {dm[1]}')
     return
 
 
@@ -69,7 +69,7 @@ def main(args):
     process_tweets(args, direct_messages, species_thresholds)  # parse tweet and modify thresholds
     tweeter.destroy_direct_messages(twitter, direct_messages)  # destroy direct messages so they are not processed x2
 
-    species_thresholds.to_csv(args['species_thresholds_out'], header=None, index=False)  # write out file
+    species_thresholds.to_csv(args['species_thresholds'], header=None, index=False)  # write out test file
     return
 
 
