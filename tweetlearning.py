@@ -27,6 +27,7 @@
 import tweeter  # twitter helper functions
 import argparse  # argument parser
 import numpy as np
+import pandas as pd
 from datetime import datetime
 from auth import (
     api_key,
@@ -40,31 +41,35 @@ import logging
 # read direct messages and process accordingly, return boolean true/false if an adjustment was made to the file
 def process_tweets(args, direct_messages, species_thresholds):
     for dm in direct_messages:
-        text = dm[1].lower()
-        print(text)
+        text = str(dm[1]).lower()
         try:
-            if text.substring(0, 5) == 'never':  # find species and mark as never, -1
-                species_index = int(text.substring(6, len(text)))
-                species_thresholds[species_index][1] = -1  # set to never
-                print(f'species set to never: {species_thresholds[species_index][0]}')
-            elif text == 'inc':  # increase threshold for species by 10
-                species_index = int(text.substring(4, len(text)))
-                species_thresholds[species_index][1] += 10  # increase threshold
-                print(f'species threshold inc: {species_thresholds[species_index][0]}')
+            if text[0:5] == 'never':  # find species and mark as never, -1
+                species_index = int(text[6: len(text)])
+                species_thresholds.iloc[species_index, 1] = -1  # set to never
+                print(f'species set to never: {species_thresholds.species[species_index]}')
+            elif text[0:3] == 'inc':  # increase threshold for species by 10
+                species_index = int(text[4: len(text)])
+                species_thresholds.iloc[species_index,1] += 10  # increase threshold
+                print(f'species threshold inc: {species_thresholds.species[species_index]}')
             else:
                 print(f'direct message unknown request: {dm[1]}')
         except:
             print(f'direct message was not procesed: {dm[1]}')
-    # np.savetxt(args["species_thresholds"], delimiter=',', fmt='%s')  # write out file as strings comma delimit
     return
 
 
 # testing routine
 def main(args):
-    species_thresholds = np.genfromtxt(args["species_thresholds"], delimiter=',')  # load species threshold file
+    species_thresholds = pd.read_csv(args["species_thresholds"], delimiter=',', names=('species', 'threshold'))
+
     twitter = tweeter.init(api_key, api_secret_key, access_token, access_token_secret)
     direct_messages = tweeter.get_direct_messages(twitter)
-    process_tweets(args, direct_messages, species_thresholds)
+    print('messages:')
+    print(direct_messages)
+    process_tweets(args, direct_messages, species_thresholds)  # parse tweet and modify thresholds
+    tweeter.destroy_direct_messages(twitter, direct_messages)  # destroy direct messages so they are not processed x2
+
+    species_thresholds.to_csv(args['species_thresholds_out'], header=None, index=False)  # write out file
     return
 
 
@@ -74,6 +79,9 @@ if __name__ == "__main__":
     ap.add_argument('-ts', '--species_thresholds',
                     default='c:/Users/maastricht/PycharmProjects/pyface2/coral.ai.inat_bird_threshold.csv',
                     help='name of file containing thresholds by label')
+    ap.add_argument('-to', '--species_thresholds_out',
+                    default='c:/Users/maastricht/PycharmProjects/pyface2/coral.ai.inat_bird_threshold_out.csv',
+                    help='name of file to write out')
 
     logging.basicConfig(filename='birdclass.log', format='%(asctime)s - %(message)s', level=logging.DEBUG)
     arguments = vars(ap.parse_args())

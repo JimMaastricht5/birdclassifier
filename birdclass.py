@@ -61,8 +61,10 @@ def bird_detector(args):
     cap.set(4, args["screenheight"])  # set screen height
     first_img = motion_detector.init(args["flipcamera"], cv2, cap)  # set gray motion mask
 
+    # load species threshold file, note this will not handles species as a string in the first column.
+    species_thresholds = np.genfromtxt(args["species_thresholds"], delimiter=',')
+
     # init twitter and tensor flow models
-    species_thresholds = np.genfromtxt(args["species_thresholds"], delimiter=',')  # load species threshold file
     twitter = tweeter.init(api_key, api_secret_key, access_token, access_token_secret)  # init twitter api
     tfobjdet, objdet_possible_labels = label_image.init_tf2(args["obj_det_model"], args["numthreads"],
                                                             args["obj_det_labels"])
