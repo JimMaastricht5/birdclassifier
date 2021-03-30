@@ -4,7 +4,7 @@ from setuptools import setup
 setup(
     name='Bird Class Python App',
     version='1.0',
-    packages=['imutils, opencv-python, numpy, oauthlib, tensorflow, tflite-runtime, tywthon, Pillow, argparse, datetime, logging, PIL, scikit-image'],
+    packages=['requests, imutils, opencv-python, numpy, oauthlib, tensorflow, tflite-runtime, tywthon, Pillow, argparse, datetime, logging, PIL, scikit-image'],
     url='',
     license='',
     author='maastricht',
