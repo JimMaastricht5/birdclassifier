@@ -125,7 +125,7 @@ def bird_detector(args):
                     equalizedimg = label_image.add_box_and_label(equalizedimg, img_label, startX, startY,
                                                                  endX, endY, colors, i)
 
-                    print(f'\n best fit: {img_label} {(species_conf * 100)} observed: {str(species_count + 1)}')
+                    # print(f'\n best fit: {img_label} {(species_conf * 100)} observed: {str(species_count + 1)}')
                     cv2.imshow('detection', orgimg)  # show all birds in pic with labels
                     cv2.imshow('equalized', equalizedimg)
 
