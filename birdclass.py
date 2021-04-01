@@ -60,6 +60,7 @@ def bird_detector(args):
     cap = cv2.VideoCapture(0)  # capture video image
     cap.set(3, args["screenwidth"])  # set screen width
     cap.set(4, args["screenheight"])  # set screen height
+    set_windows()
     first_img = motion_detector.init(args["flipcamera"], cv2, cap)  # set gray motion mask
 
     # load species threshold file, note this will not handles species as a string in the first column.
@@ -125,8 +126,8 @@ def bird_detector(args):
                                                                  endX, endY, colors, i)
 
                     print(f'\n best fit: {img_label} {(species_conf * 100)} observed: {str(species_count + 1)}')
-                    cv2.imshow('org detection', orgimg)  # show all birds in pic with labels
-                    cv2.imshow('color histogram equalized', equalizedimg)
+                    cv2.imshow('detection', orgimg)  # show all birds in pic with labels
+                    cv2.imshow('equalized', equalizedimg)
 
             # all birds in image processed. Show image and tweet, confidence here is lowest across all species
             if species_conf >= args["sconfidence"]:
@@ -161,6 +162,19 @@ def label_text(species, species_conf):
         common_name = species
     tweet_label = f"{species}: confidence {species_conf * 100:.0f} observed: "
     return common_name, common_name, tweet_label
+
+
+def set_windows():
+    cv2.namedWindow('video')
+    cv2.namedWindow('detection')
+    cv2.namedWindow('equalized')
+    cv2.namedWindow('tweeted')
+
+    cv2.moveWindow('video', 0, 0)
+    cv2.moveWindow('detection', 40, 0)
+    cv2.moveWindow('equalized', 80, 0)
+    cv2.moveWindow('tweeted', 120, 0)
+    return
 
 
 if __name__ == "__main__":
