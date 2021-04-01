@@ -62,7 +62,7 @@ def local_weather(city='Madison,WI,USA'):
     return isclear, sunrise, sunset, response.json()
 
 def is_cloudy(city='Madison,WI,USA'):
-    is_cloudyb, sunrise, sunset = local_weather(city)
+    is_cloudyb, sunrise, sunset, json = local_weather(city)
     return is_cloudyb
 
 
