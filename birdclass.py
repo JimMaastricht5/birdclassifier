@@ -124,9 +124,6 @@ def bird_detector(args):
                     img = label_image.add_box_and_label(img, '', startX, startY, endX, endY, colors, i)  # add box 2 vid
                     equalizedimg = label_image.add_box_and_label(equalizedimg, img_label, startX, startY,
                                                                  endX, endY, colors, i)
-
-                    # print(f'\n best fit: {img_label} {(species_conf * 100)} observed: {str(species_count + 1)}')
-                    cv2.imshow('detection', orgimg)  # show all birds in pic with labels
                     cv2.imshow('equalized', equalizedimg)
 
             # all birds in image processed. Show image and tweet, confidence here is lowest across all species
@@ -166,14 +163,12 @@ def label_text(species, species_conf):
 
 def set_windows():
     cv2.namedWindow('video')
-    cv2.namedWindow('detection')
     cv2.namedWindow('equalized')
     cv2.namedWindow('tweeted')
 
     cv2.moveWindow('video', 0, 0)
-    cv2.moveWindow('detection', 275, 0)
-    cv2.moveWindow('equalized', 550, 0)
-    cv2.moveWindow('tweeted', 775, 0)
+    cv2.moveWindow('equalized', 300, 0)
+    cv2.moveWindow('tweeted', 600, 0)
     return
 
 
