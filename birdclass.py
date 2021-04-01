@@ -167,7 +167,7 @@ if __name__ == "__main__":
     # construct the argument parser and parse the arguments
     ap = argparse.ArgumentParser()
     ap.add_argument("-f", "--flipcamera", type=bool, default=False, help="flip camera image")
-    ap.add_argument("-a", "--minarea", type=int, default=10000, help="motion threshold, 10k to 50K")
+    ap.add_argument("-a", "--minarea", type=int, default=1000, help="motion threshold")
     ap.add_argument("-sw", "--screenwidth", type=int, default=320, help="max screen width")
     ap.add_argument("-sh", "--screenheight", type=int, default=240, help="max screen height")
 
