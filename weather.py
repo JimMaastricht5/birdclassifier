@@ -29,7 +29,7 @@ from auth import (
     weather_key
 )
 import requests
-from datetime import datetime, timezone
+from datetime import datetime
 
 
 # pass in city name or default to Madison, WI
@@ -60,6 +60,10 @@ def local_weather(city='Madison,WI,USA'):
     else: isclear = False
 
     return isclear, sunrise, sunset, response.json()
+
+def is_cloudy(city='Madison,WI,USA'):
+    is_cloudyb, sunrise, sunset = local_weather(city)
+    return is_cloudyb
 
 
 def main():

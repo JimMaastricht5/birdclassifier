@@ -34,6 +34,7 @@
 import cv2  # open cv 2
 import label_image  # code to init tensor flow model and classify bird type
 import motion_detector  # motion detector helper functions
+import weather
 import tweeter  # twitter helper functions
 import image_proc  # lib of image enhancement functions
 import population  # population census object, tracks species total seen and last time
@@ -107,7 +108,11 @@ def bird_detector(args):
                         and (det_confidence >= args["bconfidence"]):
                     motioncnt = 0
                     (startX, startY, endX, endY) = label_image.scale_rect(img, det_rects[i])  # set x,y bounding box
-                    equalizedimg = image_proc.equalize_color(img)  # balance histogram of color intensity
+                    if weather.is_cloudy():
+                        equalizedimg = image_proc.equalize_color(img)  # balance histogram of color intensity
+                    else:
+                        equalizedimg = img  # no adjustment necessary
+
                     birdcrop_img = equalizedimg[startY:endY, startX:endX]  # extract image for better species detection
                     species_conf, species = label_image.set_label(birdcrop_img, possible_labels, species_thresholds,
                                                                   interpreter, args["inputmean"], args["inputstd"])
@@ -119,7 +124,7 @@ def bird_detector(args):
                     equalizedimg = label_image.add_box_and_label(equalizedimg, img_label, startX, startY,
                                                                  endX, endY, colors, i)
 
-                    print(f' best fit: {img_label} {(species_conf * 100)} observed: {str(species_count + 1)}')
+                    print(f'\n best fit: {img_label} {(species_conf * 100)} observed: {str(species_count + 1)}')
                     cv2.imshow('org detection', orgimg)  # show all birds in pic with labels
                     cv2.imshow('color histogram equalized', equalizedimg)
 
@@ -162,7 +167,7 @@ if __name__ == "__main__":
     # construct the argument parser and parse the arguments
     ap = argparse.ArgumentParser()
     ap.add_argument("-f", "--flipcamera", type=bool, default=False, help="flip camera image")
-    ap.add_argument("-a", "--minarea", type=int, default=50000, help="motion threshold, 50K is a good min")
+    ap.add_argument("-a", "--minarea", type=int, default=35000, help="motion threshold, 35k to 50K is a good min")
     ap.add_argument("-sw", "--screenwidth", type=int, default=320, help="max screen width")
     ap.add_argument("-sh", "--screenheight", type=int, default=240, help="max screen height")
 
