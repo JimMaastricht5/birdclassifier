@@ -109,7 +109,7 @@ def bird_detector(args):
                         and (det_confidence >= args["bconfidence"]):
                     motioncnt = 0
                     (startX, startY, endX, endY) = label_image.scale_rect(img, det_rects[i])  # set x,y bounding box
-                    if weather.is_cloudy():
+                    if weather.is_clear() == False:
                         equalizedimg = image_proc.equalize_color(img)  # balance histogram of color intensity
                     else:
                         equalizedimg = img  # no adjustment necessary
@@ -171,9 +171,9 @@ def set_windows():
     cv2.namedWindow('tweeted')
 
     cv2.moveWindow('video', 0, 0)
-    cv2.moveWindow('detection', 400, 0)
-    cv2.moveWindow('equalized', 800, 0)
-    cv2.moveWindow('tweeted', 1200, 0)
+    cv2.moveWindow('detection', 300, 0)
+    cv2.moveWindow('equalized', 600, 0)
+    cv2.moveWindow('tweeted', 900, 0)
     return
 
 
