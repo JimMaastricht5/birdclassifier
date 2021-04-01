@@ -167,8 +167,8 @@ def set_windows():
     cv2.namedWindow('tweeted')
 
     cv2.moveWindow('video', 0, 0)
-    cv2.moveWindow('equalized', 300, 0)
-    cv2.moveWindow('tweeted', 600, 0)
+    cv2.moveWindow('equalized', 350, 0)
+    cv2.moveWindow('tweeted', 700, 0)
     return
 
 
