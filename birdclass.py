@@ -109,7 +109,7 @@ def bird_detector(args):
                         and (det_confidence >= args["bconfidence"]):
                     motioncnt = 0
                     (startX, startY, endX, endY) = label_image.scale_rect(img, det_rects[i])  # set x,y bounding box
-                    if isclearb == False:
+                    if isclearb == False or image_proc.is_color_low_contrast(img):
                         equalizedimg = image_proc.equalize_color(img)  # balance histogram of color intensity
                     else:
                         equalizedimg = img  # no adjustment necessary

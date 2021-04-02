@@ -118,8 +118,9 @@ def enhance_sharpness(img, factor):
 # uses scikit-images is_low_contrast func on gray scale image
 # input image and threshold as a decimal with .35 or 35% being the default
 # takes an image as np or pil format
-def low_contrast_detector(grayimg, threshold=.35):
-    return is_low_contrast(grayimg, threshold)  # scikit image function
+def is_color_low_contrast(colorimg, threshold=.35):
+    grayimg = cv2.cvtColor(colorimg, cv2.COLOR_BGR2GRAY)  # convert image to gray scale BGR for OpenCv recognition
+    return is_low_contrast(grayimg, threshold)  # scikit image function, true false
 
 
 # adjust contrast of gray image to improve process

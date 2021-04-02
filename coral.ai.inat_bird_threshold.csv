@@ -347,7 +347,7 @@
 346 Platalea alba (African Spoonbill),0
 347 Bubo virginianus (Great Horned Owl),0
 348 Petrochelidon fulva (Cave Swallow),0
-349 Progne subis (Purple Martin),50
+349 Progne subis (Purple Martin),75
 350 Setophaga coronata auduboni (Audubon's Warbler),0
 351 Hirundo neoxena (Welcome Swallow),0
 352 Hirundo rustica (Barn Swallow),0
@@ -511,7 +511,7 @@
 510 Cardellina pusilla (Wilson's Warbler),0
 511 Catharus ustulatus (Swainson's Thrush),0
 512 Falco novaeseelandiae (New Zealand Falcon),0
-513 Catharus guttatus (Hermit Thrush),0
+513 Catharus guttatus (Hermit Thrush),50
 514 Catharus fuscescens (Veery),0
 515 Caracara cheriway (Crested Caracara),0
 516 Herpetotheres cachinnans (Laughing Falcon),0
@@ -779,7 +779,7 @@
 778 Sitta europaea (Eurasian Nuthatch),0
 779 Sitta pusilla (Brown-headed Nuthatch),0
 780 Apus apus (Common Swift),0
-781 Sturnus vulgaris (European Starling),0
+781 Sturnus vulgaris (European Starling),75
 782 Seiurus aurocapilla (Ovenbird),0
 783 Motacilla flava (Western Yellow Wagtail),0
 784 Vireo griseus (White-eyed Vireo),0
