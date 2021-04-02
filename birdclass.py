@@ -55,6 +55,7 @@ def bird_detector(args):
     birdpop = population.Census()  # initialize species population census object
     motioncnt, tweetcnt = 0, 0
     curr_day, curr_hr = datetime.now().day, datetime.now().hour
+    isclearb = weather.is_clear() # clear or cloudy
 
     # initial video capture, screen size, and grab first image (no motion)
     cap = cv2.VideoCapture(0)  # capture video image
@@ -72,11 +73,10 @@ def bird_detector(args):
                                                             args["obj_det_labels"])
     interpreter, possible_labels = label_image.init_tf2(args["species_model"], args["numthreads"],
                                                         args["species_labels"])
-    print('press esc to quit')
     while True:  # while escape key is not pressed look for motion, detect birds, and determine species
-        species_conf = 0  # set species confidence to zero for next loop
+        species_conf = 0  # init species confidence
         if curr_day != datetime.now().day:
-            observed = birdpop.get_census_by_count()  # print count from prior day
+            observed = birdpop.get_census_by_count()  # count from prior day
             try:
                 tweeter.post_status(twitter, f'top 3 birds for day {str(curr_day)}: #1 {observed[0][0:2]}')
                 tweeter.post_status(twitter, f'#2 {observed[1][0:2]}')
@@ -88,6 +88,7 @@ def bird_detector(args):
 
         if curr_hr != datetime.now().hour:
             tweetcnt = 0  # reset hourly twitter limit
+            isclearb = weather.is_clear()
 
         motionb, img = motion_detector.detect(args["flipcamera"], cv2, cap, first_img, args["minarea"])
         if motionb:  # motion detected.
@@ -108,7 +109,7 @@ def bird_detector(args):
                         and (det_confidence >= args["bconfidence"]):
                     motioncnt = 0
                     (startX, startY, endX, endY) = label_image.scale_rect(img, det_rects[i])  # set x,y bounding box
-                    if weather.is_clear() == False:
+                    if isclearb == False:
                         equalizedimg = image_proc.equalize_color(img)  # balance histogram of color intensity
                     else:
                         equalizedimg = img  # no adjustment necessary
