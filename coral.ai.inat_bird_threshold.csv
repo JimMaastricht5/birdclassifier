@@ -54,7 +54,7 @@
 53 Anas rubripes (American Black Duck),0
 54 Anthus novaeseelandiae novaeseelandiae (New Zealand Pipit),0
 55 Sayornis phoebe (Eastern Phoebe),0
-56 Sayornis nigricans (Black Phoebe),0
+56 Sayornis nigricans (Black Phoebe),-1
 57 Tityra semifasciata (Masked Tityra),0
 58 Dryocopus lineatus (Lineated Woodpecker),0
 59 Porphyrio melanotus (Australasian Swamphen),0
@@ -347,7 +347,7 @@
 346 Platalea alba (African Spoonbill),0
 347 Bubo virginianus (Great Horned Owl),0
 348 Petrochelidon fulva (Cave Swallow),0
-349 Progne subis (Purple Martin),0
+349 Progne subis (Purple Martin),50
 350 Setophaga coronata auduboni (Audubon's Warbler),0
 351 Hirundo neoxena (Welcome Swallow),0
 352 Hirundo rustica (Barn Swallow),0
