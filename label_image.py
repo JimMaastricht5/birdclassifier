@@ -47,11 +47,12 @@ def main(args):
     obj_interpreter, obj_labels = init_tf2(args.obj_det_model, args.numthreads, args.obj_det_labels)
     results, labels, rects = object_detection(args.bconfidence, img, obj_labels,
                                               obj_interpreter, args.inputmean, args.inputstd)
+    speciesthresholds = np.genfromtxt(args.species_thresholds, delimiter=',')
     print('objects detected', results)
     print('labels detected', labels)
     print('rectangles', rects)
     interpreter, possible_labels = init_tf2(args.species_model, args.numthreads, args.species_labels)
-    result, label = set_label(img, possible_labels, interpreter, args.inputmean, args.inputstd)
+    result, label = set_label(img, possible_labels, speciesthresholds, interpreter, args.inputmean, args.inputstd)
     print('final result', result)
     print('final label', label)
 
@@ -184,7 +185,7 @@ def check_threshold(cresult, lindex, label_thresholds):
 if __name__ == '__main__':
     ap = argparse.ArgumentParser()
     # ap.add_argument('-i', '--image', default='/home/pi/birdclass/test2.jpg',help='image to be classified')
-    ap.add_argument('-i', '--image', default='/home/pi/birdclass/cardinal.jpg', help='image to be classified')
+    ap.add_argument('-i', '--image', default='/home/pi/birdclass/test3.jpg', help='image to be classified')
 
     # object detection model setup
     ap.add_argument('-om', "--obj_det_model",
@@ -199,6 +200,9 @@ if __name__ == '__main__':
     ap.add_argument('-l', '--species_labels',
                     default='/home/pi/birdclass/coral.ai.inat_bird_labels.txt',
                     help='name of file containing labels')
+    ap.add_argument('-ts', '--species_thresholds',
+                    default='/home/pi/birdclass/coral.ai.inat_bird_threshold.csv',
+                    help='name of file containing thresholds by label')
 
     # tensor flow input arguements
     ap.add_argument('--inputmean', default=127.5, type=float, help='Tensor input_mean')

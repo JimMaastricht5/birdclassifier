@@ -70,7 +70,7 @@
 69 Melospiza lincolnii (Lincoln's Sparrow),0
 70 Podilymbus podiceps (Pied-billed Grebe),0
 71 Melospiza georgiana (Swamp Sparrow),0
-72 Meleagris gallopavo (Wild Turkey),0
+72 Meleagris gallopavo (Wild Turkey),-1
 73 Meleagris ocellata (Ocellated Turkey),0
 74 Lagopus lagopus (Willow Ptarmigan),0
 75 Spizella atrogularis (Black-chinned Sparrow),0
@@ -93,7 +93,7 @@
 92 Zonotrichia atricapilla (Golden-crowned Sparrow),0
 93 Emberiza citrinella (Yellowhammer),0
 94 Bucephala islandica (Barrow's Goldeneye),0
-95 Emberiza schoeniclus (Reed Bunting),0
+95 Emberiza schoeniclus (Reed Bunting),-1
 96 Vireo gilvus (Warbling Vireo),0
 97 Serinus serinus (European Serin),0
 98 Serinus mozambicus (Yellow-fronted Canary),0
@@ -221,7 +221,7 @@
 220 Sphyrapicus thyroideus (Williamson's Sapsucker),0
 221 Pheucticus ludovicianus (Rose-breasted Grosbeak),0
 222 Sphyrapicus ruber (Red-breasted Sapsucker),0
-223 Pheucticus melanocephalus (Black-headed Grosbeak),0
+223 Pheucticus melanocephalus (Black-headed Grosbeak),50
 224 Sphyrapicus nuchalis (Red-naped Sapsucker),0
 225 Ortalis poliocephala (West Mexican Chachalaca),0
 226 Ortalis vetula (Plain Chachalaca),0
@@ -391,7 +391,7 @@
 390 Numenius phaeopus (Whimbrel),0
 391 Phalacrocorax carbo novaehollandiae (Australasian Great Cormorant),0
 392 Petroica macrocephala macrocephala (South Island Tomtit),0
-393 Petroica australis longipes (North Island Robin),0
+393 Petroica australis longipes (North Island Robin),-1
 394 Prosthemadera novaeseelandiae novaeseelandiae (Mainland Tui),0
 395 Asio flammeus (Short-eared Owl),0
 396 Rhipidura fuliginosa fuliginosa (South Island Fantail),0
@@ -444,7 +444,7 @@
 443 Larus occidentalis (Western Gull),0
 444 Trogon massena (Slaty-tailed Trogon),0
 445 Larus thayeri (Thayer's Gull),0
-446 Larus heermanni (Heermann's Gull),0
+446 Larus heermanni (Heermann's Gull),-1
 447 Larus livens (Yellow-footed Gull),0
 448 Larus canus (Mew Gull),0
 449 Larus glaucoides (Iceland Gull),0
@@ -736,7 +736,7 @@
 735 Lonchura oryzivora (Java Sparrow),0
 736 Haematopus palliatus (American Oystercatcher),0
 737 Chloris chloris (European Greenfinch),0
-738 Accipiter cooperii (Cooper's Hawk),0
+738 Accipiter cooperii (Cooper's Hawk),-1
 739 Vireo solitarius (Blue-headed Vireo),0
 740 Selasphorus platycercus (Broad-tailed Hummingbird),0
 741 Chroicocephalus scopulinus (Red-billed Gull),0
@@ -750,7 +750,7 @@
 749 Calypte costae (Costa's Hummingbird),0
 750 Calypte anna (Anna's Hummingbird),0
 751 Colaptes auratus cafer (Red-shafted Flicker),0
-752 Sula nebouxii (Blue-footed Booby),0
+752 Sula nebouxii (Blue-footed Booby),-1
 753 Copsychus saularis (Oriental Magpie-Robin),0
 754 Selasphorus sasin (Allen's Hummingbird),0
 755 Selasphorus rufus (Rufous Hummingbird),0
@@ -817,7 +817,7 @@
 816 Cygnus columbianus (Tundra Swan),0
 817 Cygnus olor (Mute Swan),0
 818 Icterus galbula (Baltimore Oriole),0
-819 Anas platyrhynchos (Mallard),0
+819 Anas platyrhynchos (Mallard),125
 820 Anas acuta (Northern Pintail),0
 821 Anas crecca (Green-winged Teal),0
 822 Anas cyanoptera (Cinnamon Teal),0
