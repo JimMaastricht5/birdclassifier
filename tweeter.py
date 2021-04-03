@@ -40,7 +40,7 @@ class Tweeter_Class:
         self.curr_hr = datetime.now().hour
         self.tweetcnt = 0
         self.tweetmax_per_hour = 100
-        sefl.tweeted = False
+        self.tweeted = False
 
     # initialize twitter connection and login
     def init(self, api_key, api_secret_key, access_token, access_token_secret):
@@ -95,7 +95,7 @@ class Tweeter_Class:
 
 # test code
 def main_test():
-    tweeter_obj = Tweeter2()
+    tweeter_obj = Tweeter_Class()
     direct_messages = tweeter_obj.get_direct_messages()
     print(direct_messages)
     print(direct_messages.shape)
