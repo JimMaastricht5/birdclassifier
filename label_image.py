@@ -130,7 +130,7 @@ def set_label(img, labels, label_thresholds, interpreter, input_mean, input_std)
         try:
             lresult = str(labels[lindex])  # added code to push this to a string instead of a tuple
             cresult = float(results[lindex])  # find confidence for best fit object label
-            print(f'. {check_threshold(cresult, lindex, label_thresholds)} confidence {str(cresult)},{str(label_thresholds[lindex][1])} that it is a {str(labels[lindex])}.')
+            print(f'. {check_threshold(cresult, lindex, label_thresholds)} confidence {str(cresult)}  that it is a {str(labels[lindex])}.')
             if check_threshold(cresult, lindex, label_thresholds):  # compare confidence score to threshold by label
                 break  # highest confidence that meets threshold criteria
             else:
