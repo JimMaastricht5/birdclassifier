@@ -61,13 +61,13 @@ def bird_detector(args):
     cap = cv2.VideoCapture(0)  # capture video image
     cap.set(3, args["screenwidth"])  # set screen width
     cap.set(4, args["screenheight"])  # set screen height
-    set_windows()
+    set_windows()  # position output windows at top of screen
     first_img = motion_detector.init(args["flipcamera"], cv2, cap)  # set gray motion mask
 
     # load species threshold file, note this will not handles species as a string in the first column.
     species_thresholds = np.genfromtxt(args["species_thresholds"], delimiter=',')
 
-    # init twitter and tensor flow models
+    # setup twitter and tensor flow models
     twitter = tweeter.init(api_key, api_secret_key, access_token, access_token_secret)  # init twitter api
     tfobjdet, objdet_possible_labels = label_image.init_tf2(args["obj_det_model"], args["numthreads"],
                                                             args["obj_det_labels"])
@@ -75,27 +75,15 @@ def bird_detector(args):
                                                         args["species_labels"])
     while True:  # while escape key is not pressed look for motion, detect birds, and determine species
         species_conf = 0  # init species confidence
-        if curr_day != datetime.now().day:
-            observed = birdpop.get_census_by_count()  # count from prior day
-            try:
-                tweeter.post_status(twitter, f'top 3 birds for day {str(curr_day)}: #1 {observed[0][0:2]}')
-                tweeter.post_status(twitter, f'#2 {observed[1][0:2]}')
-                tweeter.post_status(twitter, f'#3 {observed[2][0:2]}')
-            except:
-                tweeter.post_status(twitter, 'unable to post observations')
-            birdpop.clear()  # clear count for new day
-            curr_day = datetime.now().day
-
-        if curr_hr != datetime.now().hour:
-            tweetcnt = 0  # reset hourly twitter limit
-            isclearb = weather.is_clear()
+        curr_day, curr_hr, isclearb, tweetcnt = hour_or_day_change(curr_day, curr_hr, tweetcnt,
+                                                                            isclearb, twitter, birdpop)
 
         motionb, img = motion_detector.detect(args["flipcamera"], cv2, cap, first_img, args["minarea"])
         if motionb:  # motion detected.
             motioncnt += 1
             print(f'\r motion {motioncnt}', end=' ')  # indicate motion on monitor
 
-            # imporve image prior to obj detection and labeling
+            # improve image prior to obj detection and labeling
             if isclearb == False or image_proc.is_color_low_contrast(img):
                 equalizedimg = image_proc.equalize_color(img)  # balance histogram of color intensity
             else:
@@ -123,7 +111,7 @@ def bird_detector(args):
                                                                  endX, endY, colors, i)  # add box and label
                     cv2.imshow('equalized', equalizedimg)
 
-            # all birds in image processed. Show image and tweet, confidence here is lowest across all species
+            # all birds in image processed. Show image and tweet, confidence here is lowest in the picture
             if species_conf >= args["sconfidence"]:
                 if tweetcnt < 100:  # no more than 100 per hour
                     # species_count, species_last_seen = birdpop.report_census(species)  # needed?
@@ -143,6 +131,25 @@ def bird_detector(args):
 
     cap.release()
     cv2.destroyAllWindows()
+
+
+# housekeeping for day and hour
+def hour_or_day_change(curr_day, curr_hr, tweetcnt, isclearb, twitter, birdpop):
+    if curr_day != datetime.now().day:
+        observed = birdpop.get_census_by_count()  # count from prior day
+        try:
+            tweeter.post_status(twitter, f'top 3 birds for day {str(curr_day)}: #1 {observed[0][0:2]}')
+            tweeter.post_status(twitter, f'#2 {observed[1][0:2]}')
+            tweeter.post_status(twitter, f'#3 {observed[2][0:2]}')
+        except:
+            tweeter.post_status(twitter, 'unable to post observations')
+        birdpop.clear()  # clear count for new day
+        curr_day = datetime.now().day
+
+    if curr_hr != datetime.now().hour:
+        tweetcnt = 0  # reset hourly twitter limit
+        isclearb = weather.is_clear()
+    return curr_day, curr_hr, tweetcnt, isclearb
 
 
 # set label for image and tweet, use short species name instead of scientific name

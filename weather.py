@@ -38,7 +38,8 @@ from datetime import datetime
 def local_weather(city='Madison,WI,USA'):
     base_url = 'http://api.openweathermap.org/data/2.5/weather?q='
     full_url = base_url + city + '&appid=' + weather_key
-    try:
+
+    try:  # handle open weather API outages
         response = requests.get(full_url)
         # grab sunrise and sundown epoch data, parse epoch and convert to date time
         fulljson = response.json()
