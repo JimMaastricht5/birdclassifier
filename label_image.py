@@ -45,16 +45,21 @@ except:
 def main(args):
     img = cv2.imread(args.image)
     obj_interpreter, obj_labels = init_tf2(args.obj_det_model, args.numthreads, args.obj_det_labels)
-    results, labels, rects = object_detection(args.bconfidence, img, obj_labels,
+    confidences, labels, rects = object_detection(args.bconfidence, img, obj_labels,
                                               obj_interpreter, args.inputmean, args.inputstd)
     speciesthresholds = np.genfromtxt(args.species_thresholds, delimiter=',')
-    print('objects detected', results)
+    print('objects detected', confidences)
     print('labels detected', labels)
     print('rectangles', rects)
+
     interpreter, possible_labels = init_tf2(args.species_model, args.numthreads, args.species_labels)
-    result, label = set_label(img, possible_labels, speciesthresholds, interpreter, args.inputmean, args.inputstd)
-    print('final result', result)
-    print('final label', label)
+    for i, det_confidence in enumerate(confidences):
+        (startX, startY, endX, endY) = scale_rect(img, rects[i])  # set x,y bounding box
+        crop_img = img[startY:endY, startX:endX]  # extract image for better species detection
+        result, label = set_label(crop_img, possible_labels, speciesthresholds, interpreter, args.inputmean, args.inputstd)
+        print('bird #', i)
+        print('confidence for species', result)
+        print('label for species', label)
 
 
 # load label file for obj detection or classification model
@@ -90,7 +95,6 @@ def object_detection(min_confidence, img, labels, interpreter, input_mean, input
     if floating_model is False:  # tensor lite obj detection prebuilt model
         det_rects = interpreter.get_tensor(output_details[0]['index'])
         det_labels_index = interpreter.get_tensor(output_details[1]['index'])  # labels are an array for each result
-
         det_confidences = interpreter.get_tensor(output_details[2]['index'])
         for index, det_confidence in enumerate(det_confidences[0]):
             if det_confidence >= min_confidence:
@@ -107,6 +111,9 @@ def object_detection(min_confidence, img, labels, interpreter, input_mean, input
 
 
 # input image and return best result and label
+# the function will sort the results and compare the confidence to the confidence for that label (species)
+# if the ML models confidence is higer than the treshold for that lable (species) it will stop searching and
+# return that best result
 def set_label(img, labels, label_thresholds, interpreter, input_mean, input_std):
     cresult = float(0)
     lresult = ''
@@ -119,13 +126,13 @@ def set_label(img, labels, label_thresholds, interpreter, input_mean, input_std)
     output_data = interpreter.get_tensor(output_details[0]['index'])
     results = np.squeeze(output_data)
     cindex = np.where(results == np.amax(results))
-    for lindex in cindex[0]:
+    for lindex in cindex:
         try:
             lresult = str(labels[lindex])  # added code to push this to a string instead of a tuple
-            cresult = float(results[lindex])  # find confidence for best fit species
+            cresult = float(results[lindex])  # find confidence for best fit object label
             print(f'. {check_threshold(cresult, lindex, label_thresholds)} confidence {str(cresult)} that it is a {str(labels[lindex])}.')
             if check_threshold(cresult, lindex, label_thresholds):  # compare confidence score to threshold by label
-                break  # found the right bird
+                break  # highest confidence that meets threshold criteria
             else:
                 cresult = float(0)
                 lresult = ''
@@ -210,7 +217,7 @@ if __name__ == '__main__':
     ap.add_argument('--numthreads', default=None, type=int, help='Tensor number of threads')
 
     # confidence settings for object detection and species bconfidence
-    ap.add_argument('-bc', '--bconfidence', type=float, default=0.80)
+    ap.add_argument('-bc', '--bconfidence', type=float, default=0.65)
     ap.add_argument('-sc', '--sconfidence', type=float, default=0.95)
 
     arguments = ap.parse_args()

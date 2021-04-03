@@ -114,7 +114,7 @@
 113 Carduelis cannabina (Eurasian Linnet),0
 114 Catharus minimus (Gray-cheeked Thrush),0
 115 Amaurornis phoenicurus (White-breasted Waterhen),0
-116 Pavo cristatus (Indian Peafowl),0
+116 Pavo cristatus (Indian Peafowl),-1
 117 Rallus crepitans (Clapper Rail),0
 118 Nestor meridionalis septentrionalis (North Island Kaka),0
 119 Pipilo chlorurus (Green-tailed Towhee),0
@@ -235,7 +235,7 @@
 234 Junco hyemalis oreganus (Oregon Junco),0
 235 Pluvialis fulva (Pacific Golden-Plover),0
 236 Molothrus aeneus (Bronzed Cowbird),0
-237 Molothrus ater (Brown-headed Cowbird),0
+237 Molothrus ater (Brown-headed Cowbird),175
 238 Merops pusillus (Little Bee-eater),0
 239 Merops apiaster (European Bee-Eater),0
 240 Pteroglossus torquatus (Collared Aracari),0
@@ -606,7 +606,7 @@
 605 Buteo swainsoni (Swainson's Hawk),0
 606 Alectoris rufa (Red-legged Partridge),0
 607 Buteo lineatus (Red-shouldered Hawk),0
-608 Buteo jamaicensis (Red-tailed Hawk),0
+608 Buteo jamaicensis (Red-tailed Hawk),100
 609 Charadrius nivosus (Snowy Plover),0
 610 Tringa incana (Wandering Tattler),0
 611 Tringa semipalmata (Willet),0
@@ -888,7 +888,7 @@
 887 Delichon urbicum (Common House-Martin),0
 888 Helmitheros vermivorum (Worm-eating Warbler),0
 889 Hylocharis leucotis (White-eared Hummingbird),0
-890 Mimus polyglottos (Northern Mockingbird),0
+890 Mimus polyglottos (Northern Mockingbird),100
 891 Gymnorhina tibicen (Australian Magpie),0
 892 Alcedo atthis (Common Kingfisher),0
 893 Streptopelia chinensis (Spotted Dove),0

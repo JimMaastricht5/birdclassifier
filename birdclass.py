@@ -95,35 +95,32 @@ def bird_detector(args):
             motioncnt += 1
             print(f'\r motion {motioncnt}', end=' ')  # indicate motion on monitor
 
-            # detect objects in image and loop thru them
+            # imporve image prior to obj detection and labeling
+            if isclearb == False or image_proc.is_color_low_contrast(img):
+                equalizedimg = image_proc.equalize_color(img)  # balance histogram of color intensity
+            else:
+                equalizedimg = img  # no adjustment necessary
+
             det_confidences, det_labels, det_rects = \
                 label_image.object_detection(args["bconfidence"], img, objdet_possible_labels, tfobjdet,
-                                             args["inputmean"], args["inputstd"])
+                                             args["inputmean"], args["inputstd"])  # detect objects
 
-            for i, det_confidence in enumerate(det_confidences):
+            for i, det_confidence in enumerate(det_confidences):  # loop thru detected objects
                 loginfo = f"{det_labels[i]}:{det_confidence * 100:.0f}%"
                 logging.info(datetime.now().strftime('%I:%M:%S %p') + loginfo)
                 print(': ' + datetime.now().strftime('%I:%M %p') + ' observed ' + loginfo, end='')
-                # bird observed, determine species, label images, increment population observation and tweet
-                if det_labels[i] == "bird" and not image_proc.is_low_contrast(img) \
-                        and (det_confidence >= args["bconfidence"]):
-                    motioncnt = 0
-                    (startX, startY, endX, endY) = label_image.scale_rect(img, det_rects[i])  # set x,y bounding box
-                    if isclearb == False or image_proc.is_color_low_contrast(img):
-                        equalizedimg = image_proc.equalize_color(img)  # balance histogram of color intensity
-                    else:
-                        equalizedimg = img  # no adjustment necessary
 
+                if det_labels[i] == "bird":  # bird observed, find species, label, and tweet
+                    motioncnt = 0  # reset motion count between birds
+                    (startX, startY, endX, endY) = label_image.scale_rect(img, det_rects[i])  # set x,y bounding box
                     birdcrop_img = equalizedimg[startY:endY, startX:endX]  # extract image for better species detection
                     species_conf, species = label_image.set_label(birdcrop_img, possible_labels, species_thresholds,
                                                                   interpreter, args["inputmean"], args["inputstd"])
-                    species_count, species_last_seen = birdpop.report_census(species)
-                    # draw bounding boxes and display label if it is a bird
+                    species_count, species_last_seen = birdpop.report_census(species)  # update census
                     common_name, img_label, tweet_label = label_text(species, species_conf)
-                    orgimg = label_image.add_box_and_label(img, img_label, startX, startY, endX, endY, colors, i)
                     img = label_image.add_box_and_label(img, '', startX, startY, endX, endY, colors, i)  # add box 2 vid
                     equalizedimg = label_image.add_box_and_label(equalizedimg, img_label, startX, startY,
-                                                                 endX, endY, colors, i)
+                                                                 endX, endY, colors, i)  # add box and label
                     cv2.imshow('equalized', equalizedimg)
 
             # all birds in image processed. Show image and tweet, confidence here is lowest across all species
