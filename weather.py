@@ -38,28 +38,32 @@ from datetime import datetime
 def local_weather(city='Madison,WI,USA'):
     base_url = 'http://api.openweathermap.org/data/2.5/weather?q='
     full_url = base_url + city + '&appid=' + weather_key
-    response = requests.get(full_url)
-    # print(response.json())  # print full weather report
-    # grab sunrise and sundown epoch data, parse epoch and convert to date time
-    sun = str(response.json()['sys'])  # find sun rise and sunset string
-    weather = str(response.json()['weather'])  # find general weather string
-
     try:
+        response = requests.get(full_url)
+        # grab sunrise and sundown epoch data, parse epoch and convert to date time
+        fulljson = response.json()
+        sun = str(response.json()['sys'])  # find sun rise and sunset string
+        weather = str(response.json()['weather'])  # find general weather string
         start = sun.find('sunrise') + 10
         sunrise = datetime.fromtimestamp(int(sun[start: start + 10]))
         start = sun.find('sunset') + 9
         sunset = datetime.fromtimestamp(int(sun[start: start + 10]))
+
+        # determine cloud conditions and return true if clear
+        start = weather.find('main') + 8
+        skycondition = weather[start: start + 5]
+        if skycondition == 'Clear':
+            isclear = True
+        else:
+            isclear = False
     except:
+        isclear = True
+        fulljson = ''
         sunrise = datetime.now()
         sunset = datetime.now()
 
-    # determine cloud conditions and return true if clear
-    start = weather.find('main') + 8
-    skycondition = weather[start: start + 5]
-    if skycondition == 'Clear': isclear = True
-    else: isclear = False
+    return isclear, sunrise, sunset, fulljson
 
-    return isclear, sunrise, sunset, response.json()
 
 def is_clear(city='Madison,WI,USA'):
     is_clearb, sunrise, sunset, json = local_weather(city)
