@@ -127,20 +127,20 @@ def set_label(img, labels, label_thresholds, interpreter, input_mean, input_std)
     results = np.squeeze(output_data)
     cindex = np.where(results == np.amax(results))
     for lindex in cindex:
-        try:
-            lresult = str(labels[lindex])  # added code to push this to a string instead of a tuple
-            cresult = float(results[lindex])  # find confidence for best fit object label
-            print(f'. {check_threshold(cresult, lindex, label_thresholds)} confidence {str(cresult)}  that it is a {str(labels[lindex])}.')
-            if check_threshold(cresult, lindex, label_thresholds):  # compare confidence score to threshold by label
-                break  # highest confidence that meets threshold criteria
-            else:
-                cresult = float(0)
-                lresult = ''
-        except:  # error looking up cresult out of bounds
-            print('array out of bounds error: confidence indice', cindex, lindex, lresult)
-            print('results', results)
-            cv2.imwrite("debugimg.jpg", img)
-            break
+        # try:
+        lresult = str(labels[lindex])  # added code to push this to a string instead of a tuple
+        cresult = float(results[lindex])  # find confidence for best fit object label
+        print(f'. {check_threshold(cresult, lindex, label_thresholds)} confidence {str(cresult)} of {label_thresholds[lindex][0][1]}  that it is a {str(labels[lindex])}.')
+        if check_threshold(cresult, lindex, label_thresholds):  # compare confidence score to threshold by label
+            break  # highest confidence that meets threshold criteria
+        else:
+            cresult = float(0)
+            lresult = ''
+        # except:  # error looking up cresult out of bounds
+        #     print('array out of bounds error: confidence indice', cindex, lindex, lresult)
+        #     print('results', results)
+        #     cv2.imwrite("debugimg.jpg", img)
+        #     break
     cresult = cresult / 100  # needed for automl or google coral.ai model
     return cresult, lresult  # highest confidence and best label
 
@@ -184,8 +184,7 @@ def add_box_and_label(img, img_label, startX, startY, endX, endY, colors, coloro
 
 # func checks threshold by each label passed as a nparray with text in col 0 and threshold in col 1
 def check_threshold(cresult, lindex, label_thresholds):
-    try: return(int(label_thresholds[lindex][1]) != -1 and cresult >= int(label_thresholds[lindex][1]))
-    except: return False
+    return(int(label_thresholds[lindex][0][1]) != -1 and cresult >= int(label_thresholds[lindex][0][1]))
 
 
 # test function
