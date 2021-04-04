@@ -129,7 +129,15 @@ def set_label(img, labels, label_thresholds, interpreter, input_mean, input_std)
     for lindex in cindex:
         # try:
         lresult = str(labels[lindex])  # added code to push this to a string instead of a tuple
-        cresult = float(results[lindex])  # find confidence for best fit object label
+        results_len = len(results[lindex])
+        try:
+            if results_len == 1:
+                cresult = float(results[lindex])  # find confidence for best fit object label
+            else:
+                cresult = float(results[lindex][0])  # take the first value in the array of mult results
+        except:
+            cresult = 0
+
         print(f'. {check_threshold(cresult, lindex, label_thresholds)} confidence {str(cresult)} of {label_thresholds[lindex][0][1]}  that it is a {str(labels[lindex])}.')
         if check_threshold(cresult, lindex, label_thresholds):  # compare confidence score to threshold by label
             break  # highest confidence that meets threshold criteria
