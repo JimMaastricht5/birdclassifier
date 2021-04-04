@@ -47,7 +47,7 @@ import logging
 def bird_detector(args):
     colors = np.random.uniform(0, 255, size=(11, 3))  # random colors for bounding boxes
     birdpop = population.Census()  # initialize species population census object
-    motioncnt, tweetcnt = 0, 0
+    motioncnt = 0
     curr_day, curr_hr = datetime.now().day, datetime.now().hour
     isclearb = weather.is_clear() # clear or cloudy
 
@@ -97,7 +97,7 @@ def bird_detector(args):
                     birdcrop_img = equalizedimg[startY:endY, startX:endX]  # extract image for better species detection
                     species_conf, species = label_image.set_label(birdcrop_img, possible_labels, species_thresholds,
                                                                   interpreter, args["inputmean"], args["inputstd"])
-                    species_count, species_last_seen = birdpop.report_census(species)  # update census
+                    birdpop.vistor(species, datetime.now())  # update census
                     common_name, img_label, tweet_label = label_text(species, species_conf)
                     img = label_image.add_box_and_label(img, '', startX, startY, endX, endY, colors, i)  # add box 2 vid
                     equalizedimg = label_image.add_box_and_label(equalizedimg, img_label, startX, startY,
@@ -105,11 +105,12 @@ def bird_detector(args):
                     cv2.imshow('equalized', equalizedimg)
 
             # all birds in image processed. Show image and tweet, confidence here is lowest in the picture
-            if species_conf >= args["sconfidence"]:
+            if species_conf >= args["sconfidence"]:  # tweet threshold
+                species_count, species_last_seen = birdpop.report_census(species)  # get census
                 if bird_tweeter.post_image(tweet_label + str(species_count + 1), equalizedimg):
                     cv2.imshow('tweeted', equalizedimg)  # show tweeted picture with labels
                 else:
-                    print(f" {species} seen {species_last_seen.strftime('%H:%M')} *** exceeded tweet limit")
+                    print(f" {species} seen {species_last_seen.strftime('%I:%M %p')} *** exceeded tweet limit")
                 birdpop.visitor(species, datetime.now())  # update visitor count
 
         cv2.imshow('video', img)  # show image with box and label use cv2.flip if image inverted
