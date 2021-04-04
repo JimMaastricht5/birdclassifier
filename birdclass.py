@@ -111,7 +111,6 @@ def bird_detector(args):
                     cv2.imshow('tweeted', equalizedimg)  # show tweeted picture with labels
                 else:
                     print(f" {species} seen {species_last_seen.strftime('%I:%M %p')} *** exceeded tweet limit")
-                birdpop.visitor(species, datetime.now())  # update visitor count
 
         cv2.imshow('video', img)  # show image with box and label use cv2.flip if image inverted
         k = cv2.waitKey(30)  # wait 30 milliseconds for key press
