@@ -97,7 +97,7 @@ def bird_detector(args):
                     birdcrop_img = equalizedimg[startY:endY, startX:endX]  # extract image for better species detection
                     species_conf, species = label_image.set_label(birdcrop_img, possible_labels, species_thresholds,
                                                                   interpreter, args["inputmean"], args["inputstd"])
-                    birdpop.vistor(species, datetime.now())  # update census
+                    birdpop.visitor(species, datetime.now())  # update census
                     common_name, img_label, tweet_label = label_text(species, species_conf)
                     img = label_image.add_box_and_label(img, '', startX, startY, endX, endY, colors, i)  # add box 2 vid
                     equalizedimg = label_image.add_box_and_label(equalizedimg, img_label, startX, startY,
