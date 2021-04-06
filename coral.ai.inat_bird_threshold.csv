@@ -646,7 +646,7 @@
 645 Ictinia mississippiensis (Mississippi Kite),0
 646 Dives dives (Melodious Blackbird),0
 647 Baeolophus atricristatus (Black-crested Titmouse),-1
-648 Baeolophus bicolor (Tufted Titmouse),0
+648 Baeolophus bicolor (Tufted Titmouse),200
 649 Baeolophus inornatus (Oak Titmouse),0
 650 Melospiza melodia (Song Sparrow),100
 651 Spinus spinus (Eurasian Siskin),0
@@ -723,7 +723,7 @@
 722 Aphelocoma coerulescens (Florida Scrub-Jay),0
 723 Melanerpes erythrocephalus (Red-headed Woodpecker),0
 724 Emberiza calandra (Corn Bunting),0
-725 Acanthis flammea (Common Redpoll),0
+725 Acanthis flammea (Common Redpoll),150
 726 Spinus pinus (Pine Siskin),130
 727 Thraupis abbas (Yellow-winged Tanager),0
 728 Spinus psaltria (Lesser Goldfinch),0
@@ -779,7 +779,7 @@
 778 Sitta europaea (Eurasian Nuthatch),0
 779 Sitta pusilla (Brown-headed Nuthatch),0
 780 Apus apus (Common Swift),0
-781 Sturnus vulgaris (European Starling),75
+781 Sturnus vulgaris (European Starling),145
 782 Seiurus aurocapilla (Ovenbird),0
 783 Motacilla flava (Western Yellow Wagtail),0
 784 Vireo griseus (White-eyed Vireo),0
@@ -795,7 +795,7 @@
 794 Gallinago gallinago (Common Snipe),0
 795 Icterus spurius (Orchard Oriole),0
 796 Calidris minutilla (Least Sandpiper),0
-797 Dumetella carolinensis (Gray Catbird),110
+797 Dumetella carolinensis (Gray Catbird),150
 798 Porphyrio hochstetteri (South Island Takahe),0
 799 Calidris fuscicollis (White-rumped Sandpiper),0
 800 Phalaropus tricolor (Wilson's Phalarope),-1
@@ -817,7 +817,7 @@
 816 Cygnus columbianus (Tundra Swan),0
 817 Cygnus olor (Mute Swan),0
 818 Icterus galbula (Baltimore Oriole),0
-819 Anas platyrhynchos (Mallard),125
+819 Anas platyrhynchos (Mallard),200
 820 Anas acuta (Northern Pintail),0
 821 Anas crecca (Green-winged Teal),0
 822 Anas cyanoptera (Cinnamon Teal),0
@@ -825,7 +825,7 @@
 824 Anas discors (Blue-winged Teal),0
 825 Anas strepera (Gadwall),0
 826 Anas clypeata (Northern Shoveler),0
-827 Anas chlorotis (Brown Teal),0
+827 Anas chlorotis (Brown Teal),-1
 828 Rhipidura leucophrys (Willie Wagtail),0
 829 Anas americana (American Wigeon),0
 830 Bucephala albeola (Bufflehead),0
@@ -949,7 +949,7 @@
 948 Cistothorus palustris (Marsh Wren),0
 949 Tyto alba (Barn Owl),0
 950 Trogon caligatus (Gartered Trogon),0
-951 Corvus monedula (Eurasian Jackdaw),0
+951 Corvus monedula (Eurasian Jackdaw),-1
 952 Corvus ossifragus (Fish Crow),0
 953 Spheniscus demersus (African Penguin),0
 954 Corvus frugilegus (Rook),0
