@@ -125,17 +125,25 @@ def bird_detector(args):
 def hour_or_day_change(curr_day, curr_hr, isclearb, bird_tweeter, birdpop):
     if curr_day != datetime.now().day:
         observed = birdpop.get_census_by_count()  # count from prior day
-        try:
-            bird_tweeter.post_status(f'top 3 birds for day {str(curr_day)}: #1 {observed[0][0:2]}')
-            bird_tweeter.post_status(f'#2 {observed[1][0:2]}')
-            bird_tweeter.post_status(f'#3 {observed[2][0:2]}')
-        except:
-            bird_tweeter.post_status('unable to post observations')
-        birdpop.clear()  # clear count for new day
-        curr_day = datetime.now().day
+        bird_tweeter.post_status(f'top 3 birds for day {str(curr_day)}')
+        index, loopcnt = 0, 1
+        while loopcnt <= 3:  # print top 3 skipping unknown species
+            if observed[index][0:2] == '':
+                index += 1
+            try:
+                bird_tweeter.post_status(f'#{str(loopcnt)} {observed[index][0:2]}')
+            except:
+                bird_tweeter.post_status('unable to post observations')
+                break
+            index += 1
+            loopcnt += 1
 
-    if curr_hr != datetime.now().hour:
+        birdpop.clear()  # clear count for new day
+        curr_day = datetime.now().day  # set new day = to current day
+
+    if curr_hr != datetime.now().hour:  # check weather pattern hourly
         isclearb = weather.is_clear()
+        curr_hr = datetime.now().hour
     return curr_day, curr_hr, isclearb
 
 
