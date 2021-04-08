@@ -107,10 +107,13 @@ def bird_detector(args):
             # all birds in image processed. Show image and tweet, confidence here is lowest in the picture
             if species_conf >= args["sconfidence"]:  # tweet threshold
                 species_count, species_last_seen = birdpop.report_census(species)  # get census
-                if bird_tweeter.post_image(tweet_label + str(species_count + 1), equalizedimg):
-                    cv2.imshow('tweeted', equalizedimg)  # show tweeted picture with labels
+                if (species_last_seen - datetime.now()).total_seconds() >= 60 * 5:
+                    if bird_tweeter.post_image(tweet_label + str(species_count + 1), equalizedimg):
+                        cv2.imshow('tweeted', equalizedimg)  # show tweeted picture with labels
+                    else:
+                        print(f" {species} seen {species_last_seen.strftime('%I:%M %p')} *** exceeded tweet limit")
                 else:
-                    print(f" {species} seen {species_last_seen.strftime('%I:%M %p')} *** exceeded tweet limit")
+                    print(f" {species} not tweeted, last seen {species_last_seen.strftime('%I:%M %p')}. wait 5 minutes")
 
         cv2.imshow('video', img)  # show image with box and label use cv2.flip if image inverted
         k = cv2.waitKey(30)  # wait 30 milliseconds for key press

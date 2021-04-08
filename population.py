@@ -83,7 +83,7 @@ class Census:
             last_seen = self.census[vindex][2]
         else:
             visitor_count = 0  # haven't seen this visitor by name
-            last_seen = datetime.min
+            last_seen = datetime.now()
         return visitor_count, last_seen
 
     # sort census by count

@@ -201,7 +201,7 @@
 200 Coccyzus minor (Mangrove Cuckoo),0
 201 Coccyzus americanus (Yellow-billed Cuckoo),0
 202 Nucifraga columbiana (Clark's Nutcracker),0
-203 Crotophaga sulcirostris (Groove-billed Ani),0
+203 Crotophaga sulcirostris (Groove-billed Ani),-1
 204 Pooecetes gramineus (Vesper Sparrow),0
 205 Arremonops rufivirgatus (Olive Sparrow),0
 206 Geococcyx californianus (Greater Roadrunner),0
@@ -479,7 +479,7 @@
 478 Alca torda (Razorbill),0
 479 Fratercula arctica (Atlantic Puffin),0
 480 Fratercula cirrhata (Tufted Puffin),0
-481 Turdus merula (Eurasian Blackbird),0
+481 Turdus merula (Eurasian Blackbird),-1
 482 Turdus plumbeus (Red-legged Thrush),0
 483 Turdus grayi (Clay-colored Thrush),0
 484 Turdus migratorius (American Robin),0
@@ -506,7 +506,7 @@
 505 Falco rufigularis (Bat Falcon),0
 506 Falco sparverius (American Kestrel),0
 507 Strix varia (Barred Owl),0
-508 Falco columbarius (Merlin),0
+508 Falco columbarius (Merlin),150
 509 Gallinula chloropus (Eurasian Moorhen),0
 510 Cardellina pusilla (Wilson's Warbler),0
 511 Catharus ustulatus (Swainson's Thrush),0
@@ -709,7 +709,7 @@
 708 Setophaga striata (Blackpoll Warbler),0
 709 Setophaga palmarum (Palm Warbler),0
 710 Setophaga pinus (Pine Warbler),0
-711 Setophaga coronata (Yellow-rumped Warbler),150
+711 Setophaga coronata (Yellow-rumped Warbler),175
 712 Setophaga dominica (Yellow-throated Warbler),75
 713 Campylopterus hemileucurus (Violet Sabrewing),0
 714 Vireo cassinii (Cassin's Vireo),0
@@ -795,7 +795,7 @@
 794 Gallinago gallinago (Common Snipe),0
 795 Icterus spurius (Orchard Oriole),0
 796 Calidris minutilla (Least Sandpiper),0
-797 Dumetella carolinensis (Gray Catbird),150
+797 Dumetella carolinensis (Gray Catbird),190
 798 Porphyrio hochstetteri (South Island Takahe),0
 799 Calidris fuscicollis (White-rumped Sandpiper),0
 800 Phalaropus tricolor (Wilson's Phalarope),-1
@@ -847,7 +847,7 @@
 846 Numenius americanus (Long-billed Curlew),0
 847 Chen caerulescens (Snow Goose),0
 848 Chamaea fasciata (Wrentit),0
-849 Branta canadensis (Canada Goose),0
+849 Branta canadensis (Canada Goose),150
 850 Thalasseus elegans (Elegant Tern),0
 851 Branta sandvicensis (Hawaiian Goose),0
 852 Aythya americana (Redhead),0
@@ -888,7 +888,7 @@
 887 Delichon urbicum (Common House-Martin),0
 888 Helmitheros vermivorum (Worm-eating Warbler),0
 889 Hylocharis leucotis (White-eared Hummingbird),0
-890 Mimus polyglottos (Northern Mockingbird),100
+890 Mimus polyglottos (Northern Mockingbird),175
 891 Gymnorhina tibicen (Australian Magpie),0
 892 Alcedo atthis (Common Kingfisher),0
 893 Streptopelia chinensis (Spotted Dove),0
