@@ -39,7 +39,7 @@ class Tweeter_Class:
         self.curr_day = datetime.now().day
         self.curr_hr = datetime.now().hour
         self.tweetcnt = 0
-        self.tweetmax_per_hour = 100
+        self.tweetmax_per_hour = 25
         self.tweeted = False
 
     # initialize twitter connection and login
