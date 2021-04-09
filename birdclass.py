@@ -69,7 +69,8 @@ def bird_detector(args):
                                                         args["species_labels"])
 
     isclear, sunrise, sunset, full_weather = weather.local_weather()
-    bird_tweeter.post_status(f'starting process at {datetime.now().strftime("%I:%M:%S %P")} conditions: {full_weather}')
+    bird_tweeter.post_status(f'starting process at {datetime.now().strftime("%I:%M:%S %P")}')
+    bird_tweeter.post_status(f'conditions: {full_weather[0:250]}')  # first 250 char of current weather json
 
     while True:  # while escape key is not pressed look for motion, detect birds, and determine species
         species_conf = 0  # init species confidence
