@@ -138,7 +138,7 @@ def set_label(img, labels, label_thresholds, interpreter, input_mean, input_std)
         except:
             cresult = 0
 
-        print(f'. {check_threshold(cresult, lindex, label_thresholds)} confidence {str(cresult)} of {label_thresholds[lindex][0][1]}  that it is a {str(labels[lindex])}.')
+        print(f'. {check_threshold(cresult, lindex, label_thresholds)} confidence {str(cresult)}/{label_thresholds[lindex][0][1]} it is {str(labels[lindex])}.')
         if check_threshold(cresult, lindex, label_thresholds):  # compare confidence score to threshold by label
             break  # highest confidence that meets threshold criteria
         else:
