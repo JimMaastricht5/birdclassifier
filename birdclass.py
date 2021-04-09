@@ -55,8 +55,11 @@ def bird_detector(args):
     cap = cv2.VideoCapture(0)  # capture video image
     cap.set(3, args["screenwidth"])  # set screen width
     cap.set(4, args["screenheight"])  # set screen height
+    set_windows()  # position output windows at top of screen and init output
     first_img = motion_detector.init(args["flipcamera"], cv2, cap)  # set gray motion mask
-    set_windows(first_img)  # position output windows at top of screen and init output
+    # cv2.imshow('video', img)
+    # cv2.imshow('equalized', img)
+    # cv2.imshow('tweeted', img)
 
     # load species threshold file, note this will not handles species as a string in the first column.
     species_thresholds = np.genfromtxt(args["species_thresholds"], delimiter=',')
@@ -167,7 +170,7 @@ def label_text(species, species_conf):
     return common_name, common_name, tweet_label
 
 
-def set_windows(img):
+def set_windows():
     cv2.namedWindow('video')
     cv2.namedWindow('equalized')
     cv2.namedWindow('tweeted')
@@ -176,9 +179,6 @@ def set_windows(img):
     cv2.moveWindow('equalized', 350, 0)
     cv2.moveWindow('tweeted', 700, 0)
 
-    cv2.imshow('video', img)
-    cv2.imshow('equalized', img)
-    cv2.imshow('tweeted', img)
     return
 
 
