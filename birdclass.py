@@ -88,7 +88,7 @@ def bird_detector(args):
             if isclearb is False or image_proc.is_color_low_contrast(img):
                 equalizedimg = image_proc.equalize_color(img)  # balance histogram of color intensity
             else:
-                equalizedimg = img  # no adjustment necessary
+                equalizedimg = img.copy()  # no adjustment necessary, create a copy of the image
 
             det_confidences, det_labels, det_rects = \
                 label_image.object_detection(args["bconfidence"], img, objdet_possible_labels, tfobjdet,
