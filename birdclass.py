@@ -68,11 +68,8 @@ def bird_detector(args):
     interpreter, possible_labels = label_image.init_tf2(args["species_model"], args["numthreads"],
                                                         args["species_labels"])
 
-    bird_tweeter.post_status(f'starting process at {datetime.now().strftime("%I:%M:%S %P")}')
     isclear, sunrise, sunset, full_weather = weather.local_weather()
-    bird_tweeter.post_status(f'sunrise at: {sunrise.strftime("%I:%M:%S %P")}')
-    bird_tweeter.post_status(f'sunset at: {sunset.strftime("%I:%M:%S %P")}')
-    bird_tweeter.post_status(full_weather)
+    bird_tweeter.post_status(f'starting process at {datetime.now().strftime("%I:%M:%S %P")} conditions: {full_weather}')
 
     while True:  # while escape key is not pressed look for motion, detect birds, and determine species
         species_conf = 0  # init species confidence
