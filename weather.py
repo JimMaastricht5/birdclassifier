@@ -33,7 +33,8 @@ from datetime import datetime
 
 # set city name or default to Madison, WI
 # boolean true if the sky is clear
-# sunrise and sunset as local time and full json string
+# sunrise and sunset as local time
+# all other variables returned as string type
 class City_Weather:
     def __init__(self):
         # set defaults
@@ -56,8 +57,14 @@ class City_Weather:
         try:  # handle open weather API outages
             response = requests.get(self.full_url)
             self.fulljson = response.json()
+            print(self.fulljson)
             self.weather = str(response.json()['weather'])  # find general weather string
-            self.temp = str(response.json()['main']['temp'])  # find general temp info
+            self.weatherdescription = str(response.json()['weather'][0]['description'])
+            self.temp = str(response.json()['main']['temp'])
+            self.pressure = str(response.json()['main']['pressure'])
+            self.humidity = str(response.json()['main']['humidity'])
+            self.visibility = str(response.json()['visibility'])
+            self.windspeed = str(response.json()['wind']['speed'])
             self.sunrise = datetime.fromtimestamp(int(response.json()['sys']['sunrise']))
             self.sunset = datetime.fromtimestamp(int(response.json()['sys']['sunset']))
             self.skycondition = int(response.json()['clouds']['all'])  # % cloudy
@@ -82,6 +89,11 @@ def main():
     print(spweather.sunrise.strftime('%H:%M:%S'))
     print(spweather.sunset.strftime('%H:%M:%S'))
     print(spweather.temp)
+    print(spweather.weatherdescription)
+    print(spweather.windspeed)
+    print(spweather.pressure)
+    print(spweather.humidity)
+    print(spweather.visibility)
 
 
 # test function
