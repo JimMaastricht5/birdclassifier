@@ -120,7 +120,7 @@ def bird_detector(args):
                     print(f" {species} not tweeted, last seen {species_last_seen.strftime('%I:%M %p')}. wait 5 minutes")
 
         cv2.imshow('video', img)  # show image with box and label use cv2.flip if image inverted
-        cv2.waitKey(0)
+        cv2.waitKey(20)  # wait 20 ms to render video, restart loop.  setting of 0 is fixed img; > 0 video
         if curr_hr == 20:  # is it 10pm, if so shut down.  cron start at 0 5 * * birdclass.sh
             break
 
