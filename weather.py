@@ -31,55 +31,62 @@ from auth import (
 import requests
 from datetime import datetime
 
-
-# pass in city name or default to Madison, WI
-# returns boolean true if the sky is clear
+# set city name or default to Madison, WI
+# boolean true if the sky is clear
 # sunrise and sunset as local time and full json string
-def local_weather(city='Madison,WI,USA'):
-    base_url = 'http://api.openweathermap.org/data/2.5/weather?q='
-    full_url = base_url + city + '&appid=' + weather_key
+class City_Weather:
+    def __init__(self):
+        self.city = 'Madison,WI,USA'
+        self.base_url = 'http://api.openweathermap.org/data/2.5/weather?q='
+        self.full_url = self.base_url + self.city + '&appid=' + weather_key
+        self.sunrise = datetime.now()
+        self.sunset = datetime.now()
+        self.isclear = True
+        self.weather = ''
+        self.temp = ''
+        self.local_weather()
 
-    try:  # handle open weather API outages
-        response = requests.get(full_url)
-        # grab sunrise and sundown epoch data, parse epoch and convert to date time
-        fulljson = response.json()
-        print(fulljson)
-        sun = str(response.json()['sys'])  # find sun rise and sunset string
-        weather = str(response.json()['weather'])  # find general weather string
-        temp = str(response.json()['main'])  # find general temp info
-        start = sun.find('sunrise') + 10
-        sunrise = datetime.fromtimestamp(int(sun[start: start + 10]))
-        start = sun.find('sunset') + 9
-        sunset = datetime.fromtimestamp(int(sun[start: start + 10]))
+    def local_weather(self):
+        try:  # handle open weather API outages
+            response = requests.get(self.full_url)
+            # grab sunrise and sundown epoch data, parse epoch and convert to date time
+            fulljson = response.json()
+            print(fulljson)
+            self.sun = str(response.json()['sys'])  # find sun rise and sunset string
+            self.weather = str(response.json()['weather'])  # find general weather string
+            self.temp = str(response.json()['main'])  # find general temp info
+            start = sun.find('sunrise') + 10
+            self.sunrise = datetime.fromtimestamp(int(sun[start: start + 10]))
+            start = sun.find('sunset') + 9
+            self.sunset = datetime.fromtimestamp(int(sun[start: start + 10]))
 
-        # determine cloud conditions and return true if clear
-        start = weather.find('main') + 8
-        skycondition = weather[start: start + 5]
-        if skycondition == 'Clear':
-            isclear = True
-        else:
-            isclear = False
-    except:
-        isclear = True
-        fulljson = ''
-        sunrise = datetime.now()
-        sunset = datetime.now()
+            # determine cloud conditions and return true if clear
+            start = weather.find('main') + 8
+            self.skycondition = weather[start: start + 5]
+            if self.skycondition == 'Clear':
+                self.isclear = True
+            else:
+                self.isclear = False
+        except:
+            self.isclear = True
+            self.sunrise = datetime.now()
+            self.sunset = datetime.now()
+        return
 
-    return isclear, sunrise, sunset, weather, temp
-
-
-def is_clear(city='Madison,WI,USA'):
-    is_clearb, sunrise, sunset, weather, temp = local_weather(city)
-    return is_clearb
+    # update weather conditions
+    def update_conditions(self):
+        self.local_weather()
+        return
 
 
 def main():
-    isclear, sunrise, sunset, weather, temp = local_weather()
-    print(isclear)
-    print(sunrise.strftime('%H:%M:%S'))
-    print(sunset.strftime('%H:%M:%S'))
-    print(weather)
-    print(temp)
+    spweather = City_Weather()
+    spweather.update_conditions()
+    print(spweather.isclear)
+    print(spweather.sunrise.strftime('%H:%M:%S'))
+    print(spweather.sunset.strftime('%H:%M:%S'))
+    print(spweather.weather)
+    print(spweather.temp)
 
 
 # test function
