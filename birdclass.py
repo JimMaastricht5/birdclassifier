@@ -55,7 +55,7 @@ def bird_detector(args):
     cap = cv2.VideoCapture(0)  # capture video image
     cap.set(3, args["screenwidth"])  # set screen width
     cap.set(4, args["screenheight"])  # set screen height
-    set_windows()  # position output windows at top of screen and init output
+    # set_windows()  # position output windows at top of screen and init output
     first_img = motion_detector.init(args["flipcamera"], cv2, cap)  # set gray motion mask
     cv2.imshow('video', first_img)
     cv2.imshow('equalized', first_img)
