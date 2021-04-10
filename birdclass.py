@@ -55,11 +55,8 @@ def bird_detector(args):
     cap = cv2.VideoCapture(0)  # capture video image
     cap.set(3, args["screenwidth"])  # set screen width
     cap.set(4, args["screenheight"])  # set screen height
-    # set_windows()  # position output windows at top of screen and init output
+    set_windows()  # position output windows at top of screen and init output
     first_img = motion_detector.init(args["flipcamera"], cv2, cap)  # set gray motion mask
-    cv2.imshow('video', first_img)
-    cv2.imshow('equalized', first_img)
-    cv2.imshow('tweeted', first_img)
 
     # load species threshold file, note this will not handles species as a string in the first column.
     species_thresholds = np.genfromtxt(args["species_thresholds"], delimiter=',')
@@ -123,9 +120,11 @@ def bird_detector(args):
                     print(f" {species} not tweeted, last seen {species_last_seen.strftime('%I:%M %p')}. wait 5 minutes")
 
         cv2.imshow('video', img)  # show image with box and label use cv2.flip if image inverted
+        cv2.waitKey(0)
         if curr_hr == 20:  # is it 10pm, if so shut down.  cron start at 0 5 * * birdclass.sh
             break
 
+    # while loop break at 10pm, shut down windows
     cap.release()
     cv2.destroyAllWindows()
 
@@ -177,7 +176,6 @@ def set_windows():
     cv2.moveWindow('video', 0, 0)
     cv2.moveWindow('equalized', 350, 0)
     cv2.moveWindow('tweeted', 700, 0)
-
     return
 
 
