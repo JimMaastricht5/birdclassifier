@@ -43,8 +43,10 @@ def local_weather(city='Madison,WI,USA'):
         response = requests.get(full_url)
         # grab sunrise and sundown epoch data, parse epoch and convert to date time
         fulljson = response.json()
+        print(fulljson)
         sun = str(response.json()['sys'])  # find sun rise and sunset string
         weather = str(response.json()['weather'])  # find general weather string
+        temp = str(response.json()['main'])  # find general temp info
         start = sun.find('sunrise') + 10
         sunrise = datetime.fromtimestamp(int(sun[start: start + 10]))
         start = sun.find('sunset') + 9
@@ -63,20 +65,21 @@ def local_weather(city='Madison,WI,USA'):
         sunrise = datetime.now()
         sunset = datetime.now()
 
-    return isclear, sunrise, sunset, fulljson
+    return isclear, sunrise, sunset, weather, temp
 
 
 def is_clear(city='Madison,WI,USA'):
-    is_clearb, sunrise, sunset, json = local_weather(city)
+    is_clearb, sunrise, sunset, weather, temp = local_weather(city)
     return is_clearb
 
 
 def main():
-    isclear, sunrise, sunset, json = local_weather()
+    isclear, sunrise, sunset, weather, temp = local_weather()
     print(isclear)
     print(sunrise.strftime('%H:%M:%S'))
     print(sunset.strftime('%H:%M:%S'))
-    print(json)
+    print(weather)
+    print(temp)
 
 
 # test function
