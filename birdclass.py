@@ -57,9 +57,9 @@ def bird_detector(args):
     cap.set(4, args["screenheight"])  # set screen height
     set_windows()  # position output windows at top of screen and init output
     first_img = motion_detector.init(args["flipcamera"], cv2, cap)  # set gray motion mask
-    # cv2.imshow('video', img)
-    # cv2.imshow('equalized', img)
-    # cv2.imshow('tweeted', img)
+    cv2.imshow('video', first_img)
+    cv2.imshow('equalized', first_img)
+    cv2.imshow('tweeted', first_img)
 
     # load species threshold file, note this will not handles species as a string in the first column.
     species_thresholds = np.genfromtxt(args["species_thresholds"], delimiter=',')
@@ -72,7 +72,7 @@ def bird_detector(args):
                                                         args["species_labels"])
 
     isclear, sunrise, sunset, clouds, temp = weather.local_weather()
-    bird_tweeter.post_status(f'starting process at {datetime.now().strftime("%I:%M:%S %P")} with conditions: {str(clouds)[0:250]}')  # first 250 char of current weather json
+    # bird_tweeter.post_status(f'starting process at {datetime.now().strftime("%I:%M:%S %P")} with conditions: {str(clouds)[0:250]}')  # first 250 char of current weather json
 
     while True:  # while escape key is not pressed look for motion, detect birds, and determine species
         species_conf = 0  # init species confidence
