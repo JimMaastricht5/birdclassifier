@@ -36,9 +36,14 @@ from datetime import datetime
 # sunrise and sunset as local time and full json string
 class City_Weather:
     def __init__(self):
+        # set defaults
         self.city = 'Madison,WI,USA'
         self.base_url = 'http://api.openweathermap.org/data/2.5/weather?q='
-        self.full_url = self.base_url + self.city + '&appid=' + weather_key
+        self.units = 'Imperial'
+        self.full_url = self.base_url + self.city + '&units=' + self.units + '&appid=' + weather_key
+        self.cloudythreshold = 60
+
+        # init variables
         self.sunrise = datetime.now()
         self.sunset = datetime.now()
         self.isclear = True
@@ -46,31 +51,22 @@ class City_Weather:
         self.temp = ''
         self.local_weather()
 
+    # grab sunrise and sundown epoch data, parse epoch and convert to date time
     def local_weather(self):
         try:  # handle open weather API outages
             response = requests.get(self.full_url)
-            # grab sunrise and sundown epoch data, parse epoch and convert to date time
-            fulljson = response.json()
-            print(fulljson)
-            self.sun = str(response.json()['sys'])  # find sun rise and sunset string
+            self.fulljson = response.json()
             self.weather = str(response.json()['weather'])  # find general weather string
-            self.temp = str(response.json()['main'])  # find general temp info
-            start = sun.find('sunrise') + 10
-            self.sunrise = datetime.fromtimestamp(int(sun[start: start + 10]))
-            start = sun.find('sunset') + 9
-            self.sunset = datetime.fromtimestamp(int(sun[start: start + 10]))
-
-            # determine cloud conditions and return true if clear
-            start = weather.find('main') + 8
-            self.skycondition = weather[start: start + 5]
-            if self.skycondition == 'Clear':
+            self.temp = str(response.json()['main']['temp'])  # find general temp info
+            self.sunrise = datetime.fromtimestamp(int(response.json()['sys']['sunrise']))
+            self.sunset = datetime.fromtimestamp(int(response.json()['sys']['sunset']))
+            self.skycondition = int(response.json()['clouds']['all'])  # % cloudy
+            if self.skycondition < self.cloudythreshold:
                 self.isclear = True
             else:
                 self.isclear = False
         except:
-            self.isclear = True
-            self.sunrise = datetime.now()
-            self.sunset = datetime.now()
+            print('weather error encountered')
         return
 
     # update weather conditions
@@ -85,7 +81,6 @@ def main():
     print(spweather.isclear)
     print(spweather.sunrise.strftime('%H:%M:%S'))
     print(spweather.sunset.strftime('%H:%M:%S'))
-    print(spweather.weather)
     print(spweather.temp)
 
 

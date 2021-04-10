@@ -49,7 +49,7 @@ def bird_detector(args):
     birdpop = population.Census()  # initialize species population census object
     motioncnt = 0
     curr_day, curr_hr = datetime.now().day, datetime.now().hour
-    isclearb = weather.is_clear() # clear or cloudy
+    spweather = weather.City_Weather()  # init class and set var based on default of Madison WI
 
     # initial video capture, screen size, and grab first image (no motion)
     cap = cv2.VideoCapture(0)  # capture video image
@@ -68,12 +68,13 @@ def bird_detector(args):
     interpreter, possible_labels = label_image.init_tf2(args["species_model"], args["numthreads"],
                                                         args["species_labels"])
 
-    isclear, sunrise, sunset, clouds, temp = weather.local_weather()
-    # bird_tweeter.post_status(f'starting process at {datetime.now().strftime("%I:%M:%S %P")} with conditions: {str(clouds)[0:250]}')  # first 250 char of current weather json
+    bird_tweeter.post_status(f'starting process at {datetime.now().strftime("%I:%M:%S %P")}' +
+                                f'with clouds of {spweather.skycondition}%' +
+                                f'and a temp of {spweather.temp}F')
 
     while True:  # while escape key is not pressed look for motion, detect birds, and determine species
         species_conf = 0  # init species confidence
-        curr_day, curr_hr, isclearb, = hour_or_day_change(curr_day, curr_hr, isclearb, bird_tweeter, birdpop)
+        curr_day, curr_hr = hour_or_day_change(curr_day, curr_hr, spweather, bird_tweeter, birdpop)
 
         motionb, img = motion_detector.detect(args["flipcamera"], cv2, cap, first_img, args["minarea"])
         if motionb:  # motion detected.
@@ -81,7 +82,7 @@ def bird_detector(args):
             print(f'\r motion {motioncnt}', end=' ')  # indicate motion on monitor
 
             # improve image prior to obj detection and labeling
-            if isclearb is False or image_proc.is_color_low_contrast(img):
+            if spweather.isclear is False or image_proc.is_color_low_contrast(img):
                 equalizedimg = image_proc.equalize_color(img)  # balance histogram of color intensity
             else:
                 equalizedimg = img.copy()  # no adjustment necessary, create a copy of the image
@@ -130,7 +131,7 @@ def bird_detector(args):
 
 
 # housekeeping for day and hour
-def hour_or_day_change(curr_day, curr_hr, isclearb, bird_tweeter, birdpop):
+def hour_or_day_change(curr_day, curr_hr, spweather, bird_tweeter, birdpop):
     if curr_day != datetime.now().day:
         observed = birdpop.get_census_by_count()  # count from prior day
         bird_tweeter.post_status(f'top 3 birds for day {str(curr_day)}')
@@ -150,9 +151,9 @@ def hour_or_day_change(curr_day, curr_hr, isclearb, bird_tweeter, birdpop):
         curr_day = datetime.now().day  # set new day = to current day
 
     if curr_hr != datetime.now().hour:  # check weather pattern hourly
-        isclearb = weather.is_clear()
+        spweather.update_conditions()
         curr_hr = datetime.now().hour
-    return curr_day, curr_hr, isclearb
+    return curr_day, curr_hr
 
 
 # set label for image and tweet, use short species name instead of scientific name
