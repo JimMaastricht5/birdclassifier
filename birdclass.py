@@ -104,7 +104,8 @@ def bird_detector(args):
                     birdcrop_img = equalizedimg[startY:endY, startX:endX]  # extract image for better species detection
                     species_conf, species = label_image.set_label(birdcrop_img, possible_labels, species_thresholds,
                                                                   interpreter, args["inputmean"], args["inputstd"])
-                    birdpop.visitor(species, datetime.now())  # update census
+                    species_last_seen = birdpop.report_census(species)  # grab last time observed
+                    birdpop.visitor(species, datetime.now())  # update census count and last time seen
                     common_name, img_label, tweet_label = label_text(species, species_conf)
                     img = label_image.add_box_and_label(img, '', startX, startY, endX, endY, colors, i)  # add box 2 vid
                     equalizedimg = label_image.add_box_and_label(equalizedimg, img_label, startX, startY,
@@ -113,7 +114,6 @@ def bird_detector(args):
 
             # all birds in image processed. Show image and tweet, confidence here is lowest in the picture
             if species_conf >= args["sconfidence"]:  # tweet threshold
-                species_count, species_last_seen = birdpop.report_census(species)  # get census
                 if (datetime.now() - species_last_seen).total_seconds() >= 60 * 5:
                     if bird_tweeter.post_image(tweet_label + str(species_count + 1), equalizedimg):
                         cv2.imshow('tweeted', equalizedimg)  # show tweeted picture with labels
