@@ -67,7 +67,7 @@ def bird_detector(args):
                                                             args["obj_det_labels"])
     interpreter, possible_labels = label_image.init_tf2(args["species_model"], args["numthreads"],
                                                         args["species_labels"])
-
+    starttime = datetime.now()  # used for total run time report
     bird_tweeter.post_status(f'Starting process at {datetime.now().strftime("%I:%M:%S %P")}, ' +
                             f'{spweather.weatherdescription} ' +
                             f'with {spweather.skycondition}% cloud cover and visibility of {spweather.visibility} ft.' +
@@ -130,7 +130,8 @@ def bird_detector(args):
     # while loop break at 10pm, shut down windows
     cap.release()
     cv2.destroyAllWindows()
-    bird_tweeter.post_status(f'Ending process at {datetime.now().strftime("%I:%M:%S %P")}.')
+    bird_tweeter.post_status(f'Ending process at {datetime.now().strftime("%I:%M:%S %P")}.  Run time was ' +
+                                f'{divmod((datetime.now() - species_last_seen).total_seconds(), 60)[0]} minutes')
 
 
 # housekeeping for day and hour
