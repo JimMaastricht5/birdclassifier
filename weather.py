@@ -57,7 +57,7 @@ class City_Weather:
         try:  # handle open weather API outages
             response = requests.get(self.full_url)
             self.fulljson = response.json()
-            print(self.fulljson)
+            # print(self.fulljson)
             self.weather = str(response.json()['weather'])  # find general weather string
             self.weatherdescription = str(response.json()['weather'][0]['description'])
             self.temp = str(response.json()['main']['temp'])
