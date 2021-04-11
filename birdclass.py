@@ -68,7 +68,7 @@ def bird_detector(args):
     interpreter, possible_labels = label_image.init_tf2(args["species_model"], args["numthreads"],
                                                         args["species_labels"])
 
-    bird_tweeter.post_status(f'starting process at {datetime.now().strftime("%I:%M:%S %P")}, ' +
+    bird_tweeter.post_status(f'Starting process at {datetime.now().strftime("%I:%M:%S %P")}, ' +
                             f'{spweather.weatherdescription} ' +
                             f'with {spweather.skycondition}% cloud cover amd visibility of {spweather.visibility} ft.' +
                             f' Temp is currently {spweather.temp}F.' +
@@ -130,6 +130,7 @@ def bird_detector(args):
     # while loop break at 10pm, shut down windows
     cap.release()
     cv2.destroyAllWindows()
+    bird_tweeter.post_status(f'Ending process at {datetime.now().strftime("%I:%M:%S %P")}.)
 
 
 # housekeeping for day and hour
