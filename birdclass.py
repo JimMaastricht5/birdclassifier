@@ -130,7 +130,7 @@ def bird_detector(args):
     # while loop break at 10pm, shut down windows
     cap.release()
     cv2.destroyAllWindows()
-    bird_tweeter.post_status(f'Ending process at {datetime.now().strftime("%I:%M:%S %P")}.)
+    bird_tweeter.post_status(f'Ending process at {datetime.now().strftime("%I:%M:%S %P")}.')
 
 
 # housekeeping for day and hour
