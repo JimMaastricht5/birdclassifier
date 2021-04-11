@@ -70,9 +70,9 @@ def bird_detector(args):
 
     bird_tweeter.post_status(f'Starting process at {datetime.now().strftime("%I:%M:%S %P")}, ' +
                             f'{spweather.weatherdescription} ' +
-                            f'with {spweather.skycondition}% cloud cover amd visibility of {spweather.visibility} ft.' +
-                            f' Temp is currently {spweather.temp}F.' +
-                            f'Wind speeds of {spweather.windspeed}F.')
+                            f'with {spweather.skycondition}% cloud cover and visibility of {spweather.visibility} ft.' +
+                            f' Temp is currently {spweather.temp}F with' +
+                            f'Wind speeds of {spweather.windspeed} MPH.')
 
     while True:  # while escape key is not pressed look for motion, detect birds, and determine species
         species_conf = 0  # init species confidence
