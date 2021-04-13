@@ -41,7 +41,6 @@ import population  # population census object, tracks species total seen and las
 import argparse  # argument parser
 import numpy as np
 from datetime import datetime
-import logging
 
 
 def bird_detector(args):
@@ -99,9 +98,8 @@ def bird_detector(args):
 
             # loop thru detected objects
             for i, det_confidence in enumerate(det_confidences):  # loop thru detected objects
-                loginfo = f"{det_labels[i]}:{det_confidence * 100:.0f}%"
-                logging.info(datetime.now().strftime('%I:%M:%S %p') + loginfo)
-                print(': ' + datetime.now().strftime('%I:%M %p') + ' observed ' + loginfo, end='')
+                print(f': {datetime.now().strftime("%I:%M %p")} observed' +
+                      f"{det_labels[i]}:{det_confidence * 100:.0f}%", end='')
 
                 if det_labels[i] == "bird":  # bird observed, find species, label, and tweet
                     motioncnt = 0  # reset motion count between birds
@@ -228,6 +226,5 @@ if __name__ == "__main__":
     ap.add_argument('-bc', '--bconfidence', type=float, default=0.65)  # obj detection threshold; 76 is a good min
     ap.add_argument('-sc', '--sconfidence', type=float, default=0.90)  # quant model is accurate down to 90
 
-    logging.basicConfig(filename='birdclass.log', format='%(asctime)s - %(message)s', level=logging.DEBUG)
     arguments = vars(ap.parse_args())
     bird_detector(arguments)
