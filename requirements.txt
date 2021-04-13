@@ -1,0 +1,12 @@
+setuptools~=50.2.0
+opencv-python~=4.4.0.42
+numpy~=1.18.5
+twython~=3.8.2
+requests~=2.24.0
+Pillow~=7.2.0
+scikit-image~=0.18.1
+tensorflow~=2.3.1
+tensorflow-gpu~=2.3.1
+ijson~=3.1.1
+pandas~=1.2.3
+imutils~=0.5.3

@@ -26,9 +26,7 @@
 # process messages and adjust species threshold file coral.ai.inat_bird_threshold.csv
 import tweeter  # twitter helper functions
 import argparse  # argument parser
-import numpy as np
 import pandas as pd
-from datetime import datetime
 from auth import (
     api_key,
     api_secret_key,
@@ -62,12 +60,13 @@ def process_tweets(args, direct_messages, species_thresholds):
 def main(args):
     species_thresholds = pd.read_csv(args["species_thresholds"], delimiter=',', names=('species', 'threshold'))
 
-    twitter = tweeter.init(api_key, api_secret_key, access_token, access_token_secret)
-    direct_messages = tweeter.get_direct_messages(twitter)
+    tweetersp = tweeter.Tweeter_Class()
+    tweetersp.init(api_key, api_secret_key, access_token, access_token_secret)
+    direct_messages = tweetersp.get_direct_messages()
     print('messages:')
     print(direct_messages)
     process_tweets(args, direct_messages, species_thresholds)  # parse tweet and modify thresholds
-    tweeter.destroy_direct_messages(twitter, direct_messages)  # destroy direct messages so they are not processed x2
+    tweetersp.destroy_direct_messages(direct_messages)  # destroy direct messages so they are not processed x2
 
     species_thresholds.to_csv(args['species_thresholds'], header=None, index=False)  # write out test file
     return

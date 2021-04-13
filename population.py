@@ -89,7 +89,7 @@ class Census:
     # sort census by count
     def get_census_by_count(self):
         self.census.sort(key=itemgetter(1), reverse=True)
-        return(self.census)
+        return self.census
 
 
 # testing code

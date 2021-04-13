@@ -69,13 +69,13 @@ def bird_detector(args):
                                                         args["species_labels"])
     starttime = datetime.now()  # used for total run time report
     bird_tweeter.post_status(f'Starting process at {datetime.now().strftime("%I:%M:%S %P")}, ' +
-                            f'{spweather.weatherdescription} ' +
-                            f'with {spweather.skycondition}% cloud cover and visibility of {spweather.visibility} ft.' +
-                            f' Temp is currently {spweather.temp}F with ' +
-                            f'wind speeds of {spweather.windspeed} MPH.')
+                             f'{spweather.weatherdescription} ' +
+                             f'with {spweather.skycondition}% cloud cover. Visibility of {spweather.visibility} ft.' +
+                             f' Temp is currently {spweather.temp}F with ' +
+                             f'wind speeds of {spweather.windspeed} MPH.')
 
     while True:  # while escape key is not pressed look for motion, detect birds, and determine species
-        species_conf = 0  # init species confidence
+        species_last_seen = datetime(2021, 1, 1, 0, 0, 0)
         curr_day, curr_hr = hour_or_day_change(curr_day, curr_hr, spweather, bird_tweeter, birdpop)
 
         motionb, img = motion_detector.detect(args["flipcamera"], cv2, cap, first_img, args["minarea"])
@@ -93,6 +93,11 @@ def bird_detector(args):
                 label_image.object_detection(args["bconfidence"], img, objdet_possible_labels, tfobjdet,
                                              args["inputmean"], args["inputstd"])  # detect objects
 
+            # ensure collection of variables used outside loop for tweet are set
+            species_conf, species_visit_count = 0, 0
+            tweet_label, species = '', ''
+
+            # loop thru detected objects
             for i, det_confidence in enumerate(det_confidences):  # loop thru detected objects
                 loginfo = f"{det_labels[i]}:{det_confidence * 100:.0f}%"
                 logging.info(datetime.now().strftime('%I:%M:%S %p') + loginfo)
@@ -124,14 +129,14 @@ def bird_detector(args):
 
         cv2.imshow('video', img)  # show image with box and label use cv2.flip if image inverted
         cv2.waitKey(20)  # wait 20 ms to render video, restart loop.  setting of 0 is fixed img; > 0 video
-        if curr_hr == 20:  # is it 10pm, if so shut down.  cron start at 0 5 * * birdclass.sh
+        if curr_hr == 1:  # 1am, if so shut down.  cron start at 0 5 * * birdclass.sh
             break
 
     # while loop break at 10pm, shut down windows
     cap.release()
     cv2.destroyAllWindows()
     bird_tweeter.post_status(f'Ending process at {datetime.now().strftime("%I:%M:%S %P")}.  Run time was ' +
-                                f'{divmod((datetime.now() - species_last_seen).total_seconds(), 60)[0]} minutes')
+                             f'{divmod((datetime.now() - starttime).total_seconds(), 60)[0]} minutes')
 
 
 # housekeeping for day and hour
