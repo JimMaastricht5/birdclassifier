@@ -76,7 +76,7 @@ class Tweeter_Class:
             self.tweeted = True
         else:
             self.tweeted = False
-        return
+        return self.tweeted
 
     # get direct messages, returns numpy array with x, 2 shape
     def get_direct_messages(self):
