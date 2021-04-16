@@ -118,9 +118,8 @@ def bird_detector(args):
             # all birds in image processed. Show image and tweet, confidence here is lowest in the picture
             if species_conf >= args["sconfidence"]:  # tweet threshold
                 if (datetime.now() - species_last_seen).total_seconds() >= 60 * 5:
-                    if bird_tweeter.post_image(tweet_label + str(species_visit_count + 1), equalizedimg):
-                        cv2.imshow('tweeted', equalizedimg)  # show tweeted picture with labels
-                    else:
+                    cv2.imshow('tweeted', equalizedimg)  # show what would we are tweeting
+                    if bird_tweeter.post_image(tweet_label + str(species_visit_count + 1), equalizedimg) is False:
                         print(f" {species} seen {species_last_seen.strftime('%I:%M %p')} *** exceeded tweet limit")
                 else:
                     print(f" {species} not tweeted, last seen {species_last_seen.strftime('%I:%M %p')}. wait 5 minutes")
