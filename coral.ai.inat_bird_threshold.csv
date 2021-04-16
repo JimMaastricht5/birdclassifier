@@ -36,7 +36,7 @@
 35 Numida meleagris (Helmeted Guineafowl),0
 36 Junco hyemalis caniceps (Gray-headed Junco),0
 37 Tyrannus vociferans (Cassin's Kingbird),0
-38 Tyrannus tyrannus (Eastern Kingbird),0
+38 Tyrannus tyrannus (Eastern Kingbird),150
 39 Tyrannus forficatus (Scissor-tailed Flycatcher),0
 40 Tyrannus crassirostris (Thick-billed Kingbird),0
 41 Tyrannus verticalis (Western Kingbird),0
@@ -202,7 +202,7 @@
 201 Coccyzus americanus (Yellow-billed Cuckoo),0
 202 Nucifraga columbiana (Clark's Nutcracker),0
 203 Crotophaga sulcirostris (Groove-billed Ani),-1
-204 Pooecetes gramineus (Vesper Sparrow),0
+204 Pooecetes gramineus (Vesper Sparrow),100
 205 Arremonops rufivirgatus (Olive Sparrow),0
 206 Geococcyx californianus (Greater Roadrunner),0
 207 Geococcyx velox (Lesser Roadrunner),0
@@ -343,7 +343,7 @@
 342 Geopelia striata (Zebra Dove),0
 343 Athene noctua (Little Owl),0
 344 Crotophaga ani (Smooth-billed Ani),0
-345 Sialia sialis (Eastern Bluebird),0
+345 Sialia sialis (Eastern Bluebird),100
 346 Platalea alba (African Spoonbill),0
 347 Bubo virginianus (Great Horned Owl),0
 348 Petrochelidon fulva (Cave Swallow),0
@@ -469,7 +469,7 @@
 468 Sterna hirundo (Common Tern),0
 469 Sterna forsteri (Forster's Tern),0
 470 Lanius excubitor (Northern Shrike),0
-471 Pharomachrus mocinno (Resplendent Quetzal),0
+471 Pharomachrus mocinno (Resplendent Quetzal),-1
 472 Sterna striata (White-fronted Tern),0
 473 Stercorarius parasiticus (Parasitic Jaeger),0
 474 Stercorarius pomarinus (Pomarine Jaeger),0
@@ -482,7 +482,7 @@
 481 Turdus merula (Eurasian Blackbird),-1
 482 Turdus plumbeus (Red-legged Thrush),0
 483 Turdus grayi (Clay-colored Thrush),0
-484 Turdus migratorius (American Robin),0
+484 Turdus migratorius (American Robin),125
 485 Turdus viscivorus (Mistle Thrush),-1
 486 Cerorhinca monocerata (Rhinoceros Auklet),0
 487 Turdus philomelos (Song Thrush),0
@@ -522,7 +522,7 @@
 521 Mycteria ibis (Yellow-billed Stork),0
 522 Sialia mexicana (Western Bluebird),-1
 523 Ephippiorhynchus senegalensis (Saddle-billed Stork),0
-524 Cathartes aura (Turkey Vulture),0
+524 Cathartes aura (Turkey Vulture),-1
 525 Myadestes townsendi (Townsend's Solitaire),-1
 526 Cathartes burrovianus (Lesser Yellow-headed Vulture),0
 527 Sarcoramphus papa (King Vulture),0
@@ -654,7 +654,7 @@
 653 Certhia americana (Brown Creeper),0
 654 Bucorvus leadbeateri (Southern Ground-Hornbill),0
 655 Anthus pratensis (Meadow Pipit),0
-656 Anthus rubescens (American Pipit),0
+656 Anthus rubescens (American Pipit),100
 657 Tachycineta albilinea (Mangrove Swallow),0
 658 Poecile carolinensis (Carolina Chickadee),-1
 659 Poecile atricapillus (Black-capped Chickadee),50
@@ -683,7 +683,7 @@
 682 Amazilia rutila (Cinnamon Hummingbird),0
 683 Zenaida aurita (Zenaida Dove),0
 684 Prunella modularis (Dunnock),0
-685 Falco tinnunculus (Rock Kestrel),0
+685 Falco tinnunculus (Rock Kestrel),-1
 686 Ixoreus naevius (Varied Thrush),0
 687 Archilochus colubris (Ruby-throated Hummingbird),0
 688 Lampornis clemenciae (Blue-throated Hummingbird),0
@@ -692,8 +692,8 @@
 691 Myiarchus tyrannulus (Brown-crested Flycatcher),0
 692 Zosterops lateralis (Silvereye),0
 693 Zonotrichia leucophrys (White-crowned Sparrow),0
-694 Agelaius phoeniceus (Red-winged Blackbird),0
-695 Parus major (Great Tit),0
+694 Agelaius phoeniceus (Red-winged Blackbird),100
+695 Parus major (Great Tit),-1
 696 Zonotrichia capensis (Rufous-collared Sparrow),0
 697 Oreothlypis peregrina (Tennessee Warbler),0
 698 Oreothlypis celata (Orange-crowned Warbler),0
