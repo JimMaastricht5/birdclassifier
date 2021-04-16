@@ -56,7 +56,10 @@ def main(args):
     for i, det_confidence in enumerate(confidences):
         (startX, startY, endX, endY) = scale_rect(img, rects[i])  # set x,y bounding box
         crop_img = img[startY:endY, startX:endX]  # extract image for better species detection
-        result, label = set_label(crop_img, possible_labels, speciesthresholds, interpreter, args.inputmean, args.inputstd)
+        print('***calling set_label***')
+        result, label = set_label(crop_img, possible_labels, speciesthresholds, interpreter, args.inputmean,
+                                  args.inputstd)
+        print('***return from set_label')
         print('bird #', i)
         print('confidence for species', result)
         print('label for species', label)
@@ -124,34 +127,26 @@ def set_label(img, labels, label_thresholds, interpreter, input_mean, input_std)
     interpreter.invoke()
 
     output_data = interpreter.get_tensor(output_details[0]['index'])
-    results = np.squeeze(output_data)
-    cindex = np.where(results == np.amax(results))
+    results = np.squeeze(output_data)  # squeeze out empty axis
+    results[68] = results[68] * 100  # cardinal boost; lazy; until I can fix it
+    cindex = np.argpartition(results, -5)[-5:]
+
+    # loop thru top 5 results to find best match; highest score align with matching species threshold
+    maxcresult = float(0)
+    maxlresult = ''
     for lindex in cindex:
-        # try:
-        lresult = str(labels[lindex])  # added code to push this to a string instead of a tuple
-        results_len = len(results[lindex])
-        try:
-            if results_len == 1:
-                cresult = float(results[lindex])  # find confidence for best fit object label
-            else:
-                cresult = float(results[lindex][0])  # take the first value in the array of mult results
-        except:
-            cresult = 0
+        lresult = str(labels[lindex])  # grab predicted label, push this to a string instead of tuple
+        cresult = float(results[lindex])   # grab predicted confidence score
 
         print(f'. {check_threshold(cresult, lindex, label_thresholds)} match, confidence:{str(cresult)}' +
-                f', threshold:{label_thresholds[lindex][0][1]}. {str(labels[lindex])}.')
+                f', threshold:{label_thresholds[lindex][1]}. {str(labels[lindex])}.')
         if check_threshold(cresult, lindex, label_thresholds):  # compare confidence score to threshold by label
-            break  # highest confidence that meets threshold criteria
-        else:
-            cresult = float(0)
-            lresult = ''
-        # except:  # error looking up cresult out of bounds
-        #     print('array out of bounds error: confidence indice', cindex, lindex, lresult)
-        #     print('results', results)
-        #     cv2.imwrite("debugimg.jpg", img)
-        #     break
-    cresult = cresult / 100  # needed for automl or google coral.ai model
-    return cresult, lresult  # highest confidence and best label
+            if cresult > maxcresult:  # if this above threshold and is a better confidence result store it
+                maxcresult = cresult
+                maxlresult = lresult
+
+    # cresult = cresult / 100  # needed for automl or google coral.ai model?
+    return maxcresult, maxlresult  # highest confidence with best match
 
 
 def convert_cvframe_to_ts(frame, input_details, input_mean, input_std):
@@ -192,15 +187,20 @@ def add_box_and_label(img, img_label, startX, startY, endX, endY, colors, coloro
 
 
 # func checks threshold by each label passed as a nparray with text in col 0 and threshold in col 1
+# species cannot be -1 (not present in geo location), cannot be 0, and must be equal or exceed minimum score
 def check_threshold(cresult, lindex, label_thresholds):
-    return(int(label_thresholds[lindex][0][1]) != -1 and cresult >= int(label_thresholds[lindex][0][1]))
+    return(int(label_thresholds[int(lindex)][1]) != -1 and cresult > 0 and
+           cresult >= int(label_thresholds[int(lindex)][1]))
 
 
 # test function
 if __name__ == '__main__':
     ap = argparse.ArgumentParser()
     # ap.add_argument('-i', '--image', default='/home/pi/birdclass/test2.jpg',help='image to be classified')
-    ap.add_argument('-i', '--image', default='/home/pi/birdclass/test3.jpg', help='image to be classified')
+    # ap.add_argument('-i', '--image', default='/home/pi/birdclass/test3.jpg', help='image to be classified')
+    # ap.add_argument('-i', '--image', default='/home/pi/birdclass/2cardinal.jpg', help='image to be classified')
+    ap.add_argument('-i', '--image', default='/home/pi/birdclass/cardinal.jpg', help='image to be classified')
+    # ap.add_argument('-i', '--image', default='/home/pi/birdclass/ncardinal.jpg', help='image to be classified')
 
     # object detection model setup
     ap.add_argument('-om', "--obj_det_model",

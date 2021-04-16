@@ -185,10 +185,7 @@ def set_windows():
     cv2.moveWindow('equalized', 350, 0)
     cv2.moveWindow('tweeted', 700, 0)
 
-    # cv2.imshow('video', img)
-    # cv2.imshow('equalized', img)
-    # cv2.imshow('tweeted', img)
-    # cv2.waitKey(20)  # wait 20 ms to render video, restart loop.  setting of 0 is fixed img; > 0 video
+    cv2.waitKey(20)  # wait 20 ms to render video, restart loop.  setting of 0 is fixed img; > 0 video
     return
 
 

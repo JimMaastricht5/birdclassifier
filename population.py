@@ -67,6 +67,8 @@ class Census:
 
     # find visitor by census name, increment count, and update time
     def visitor(self, visitor_name, time_of_visit):
+        if visitor_name == '' or visitor_name == ' ':
+            visitor_name = 'undetermined'
         vindex = self.find_visitor(visitor_name)
         if vindex >= 0:
             self.census[vindex][1] += 1
