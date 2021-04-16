@@ -8,7 +8,7 @@
 7 Recurvirostra americana (American Avocet),-1
 8 Ardeotis kori (Kori Bustard),0
 9 Pica nuttalli (Yellow-billed Magpie),0
-10 Perisoreus canadensis (Gray Jay),0
+10 Perisoreus canadensis (Gray Jay),-1
 11 Antigone canadensis (Sandhill Crane),0
 12 Parkesia noveboracensis (Northern Waterthrush),0
 13 Ardea herodias occidentalis (Great White Heron),0
@@ -53,7 +53,7 @@
 52 Pitangus sulphuratus (Great Kiskadee),0
 53 Anas rubripes (American Black Duck),0
 54 Anthus novaeseelandiae novaeseelandiae (New Zealand Pipit),0
-55 Sayornis phoebe (Eastern Phoebe),0
+55 Sayornis phoebe (Eastern Phoebe),100
 56 Sayornis nigricans (Black Phoebe),-1
 57 Tityra semifasciata (Masked Tityra),0
 58 Dryocopus lineatus (Lineated Woodpecker),0
@@ -66,7 +66,7 @@
 65 Artemisiospiza belli (Bell's Sparrow),0
 66 Gallus gallus (Red Junglefowl),0
 67 Cardinalis sinuatus (Pyrrhuloxia),0
-68 Cardinalis cardinalis (Northern Cardinal),0
+68 Cardinalis cardinalis (Northern Cardinal),1
 69 Melospiza lincolnii (Lincoln's Sparrow),0
 70 Podilymbus podiceps (Pied-billed Grebe),0
 71 Melospiza georgiana (Swamp Sparrow),0
@@ -81,13 +81,13 @@
 80 Anas superciliosa (Pacific Black Duck),0
 81 Passerella iliaca (Fox Sparrow),-1
 82 Phoenicopterus ruber (American Flamingo),0
-83 Sylvia atricapilla (Eurasian Blackcap),0
+83 Sylvia atricapilla (Eurasian Blackcap),-1
 84 Vireo bellii (Bell's Vireo),0
 85 Vireo plumbeus (Plumbeous Vireo),0
 86 Vireo philadelphicus (Philadelphia Vireo),0
 87 Vireo flavifrons (Yellow-throated Vireo),0
 88 Vireo olivaceus (Red-eyed Vireo),0
-89 Zonotrichia querula (Harris's Sparrow),0
+89 Zonotrichia querula (Harris's Sparrow),100
 90 Vireo huttoni (Hutton's Vireo),0
 91 Zonotrichia albicollis (White-throated Sparrow),0
 92 Zonotrichia atricapilla (Golden-crowned Sparrow),0
@@ -120,7 +120,7 @@
 119 Pipilo chlorurus (Green-tailed Towhee),0
 120 Pipilo maculatus (Spotted Towhee),0
 121 Pipilo erythrophthalmus (Eastern Towhee),0
-122 Cairina moschata domestica (Domestic Muscovy Duck),0
+122 Cairina moschata domestica (Domestic Muscovy Duck),200
 123 Phalacrocorax varius (Pied Cormorant),0
 124 Picoides dorsalis (American Three-toed Woodpecker),0
 125 Picoides nuttallii (Nuttall's Woodpecker),0
@@ -235,7 +235,7 @@
 234 Junco hyemalis oreganus (Oregon Junco),0
 235 Pluvialis fulva (Pacific Golden-Plover),0
 236 Molothrus aeneus (Bronzed Cowbird),0
-237 Molothrus ater (Brown-headed Cowbird),175
+237 Molothrus ater (Brown-headed Cowbird),200
 238 Merops pusillus (Little Bee-eater),0
 239 Merops apiaster (European Bee-Eater),0
 240 Pteroglossus torquatus (Collared Aracari),0
@@ -277,7 +277,7 @@
 276 Platycercus eximius (Eastern Rosella),0
 277 Protonotaria citrea (Prothonotary Warbler),0
 278 Megaceryle torquata (Ringed Kingfisher),0
-279 Nestor meridionalis (New Zealand Kaka),0
+279 Nestor meridionalis (New Zealand Kaka),-1
 280 Amazona viridigenalis (Red-crowned Parrot),0
 281 Amazona albifrons (White-fronted Parrot),0
 282 Amazona oratrix (Yellow-headed Parrot),0
@@ -347,7 +347,7 @@
 346 Platalea alba (African Spoonbill),0
 347 Bubo virginianus (Great Horned Owl),0
 348 Petrochelidon fulva (Cave Swallow),0
-349 Progne subis (Purple Martin),75
+349 Progne subis (Purple Martin),150
 350 Setophaga coronata auduboni (Audubon's Warbler),0
 351 Hirundo neoxena (Welcome Swallow),0
 352 Hirundo rustica (Barn Swallow),0
@@ -439,7 +439,7 @@
 438 Aechmophorus clarkii (Clark's Grebe),0
 439 Pelecanus onocrotalus (Great White Pelican),0
 440 Pelecanus erythrorhynchos (American White Pelican),0
-441 Zenaida macroura (Mourning Dove),0
+441 Zenaida macroura (Mourning Dove),150
 442 Vanellus miles (Masked Lapwing),0
 443 Larus occidentalis (Western Gull),0
 444 Trogon massena (Slaty-tailed Trogon),0
@@ -483,7 +483,7 @@
 482 Turdus plumbeus (Red-legged Thrush),0
 483 Turdus grayi (Clay-colored Thrush),0
 484 Turdus migratorius (American Robin),0
-485 Turdus viscivorus (Mistle Thrush),0
+485 Turdus viscivorus (Mistle Thrush),-1
 486 Cerorhinca monocerata (Rhinoceros Auklet),0
 487 Turdus philomelos (Song Thrush),0
 488 Galbula ruficauda (Rufous-tailed Jacamar),0
@@ -523,7 +523,7 @@
 522 Sialia mexicana (Western Bluebird),-1
 523 Ephippiorhynchus senegalensis (Saddle-billed Stork),0
 524 Cathartes aura (Turkey Vulture),0
-525 Myadestes townsendi (Townsend's Solitaire),0
+525 Myadestes townsendi (Townsend's Solitaire),-1
 526 Cathartes burrovianus (Lesser Yellow-headed Vulture),0
 527 Sarcoramphus papa (King Vulture),0
 528 Coragyps atratus (Black Vulture),0
@@ -570,7 +570,7 @@
 569 Nycticorax nycticorax (Black-crowned Night-Heron),0
 570 Turdus rufopalliatus (Rufous-backed Robin),0
 571 Ardeola ralloides (Squacco Heron),0
-572 Nyctanassa violacea (Yellow-crowned Night-Heron),0
+572 Nyctanassa violacea (Yellow-crowned Night-Heron),-1
 573 Aramides cajaneus (Gray-necked Wood-Rail),0
 574 Bubulcus ibis (Cattle Egret),0
 575 Butorides virescens (Green Heron),0
@@ -726,7 +726,7 @@
 725 Acanthis flammea (Common Redpoll),150
 726 Spinus pinus (Pine Siskin),130
 727 Thraupis abbas (Yellow-winged Tanager),0
-728 Spinus psaltria (Lesser Goldfinch),0
+728 Spinus psaltria (Lesser Goldfinch),75
 729 Spinus lawrencei (Lawrence's Goldfinch),0
 730 Spinus tristis (American Goldfinch),0
 731 Threskiornis aethiopicus (African Sacred Ibis),0
@@ -773,13 +773,13 @@
 772 Lanius ludovicianus (Loggerhead Shrike),0
 773 Anhinga anhinga (Anhinga),0
 774 Acridotheres tristis (Common Myna),0
-775 Sitta pygmaea (Pygmy Nuthatch),0
+775 Sitta pygmaea (Pygmy Nuthatch),-1
 776 Actophilornis africanus (African Jacana),0
 777 Sitta canadensis (Red-breasted Nuthatch),0
 778 Sitta europaea (Eurasian Nuthatch),0
 779 Sitta pusilla (Brown-headed Nuthatch),0
 780 Apus apus (Common Swift),0
-781 Sturnus vulgaris (European Starling),145
+781 Sturnus vulgaris (European Starling),150
 782 Seiurus aurocapilla (Ovenbird),0
 783 Motacilla flava (Western Yellow Wagtail),0
 784 Vireo griseus (White-eyed Vireo),0
@@ -817,7 +817,7 @@
 816 Cygnus columbianus (Tundra Swan),0
 817 Cygnus olor (Mute Swan),0
 818 Icterus galbula (Baltimore Oriole),0
-819 Anas platyrhynchos (Mallard),200
+819 Anas platyrhynchos (Mallard),250
 820 Anas acuta (Northern Pintail),0
 821 Anas crecca (Green-winged Teal),0
 822 Anas cyanoptera (Cinnamon Teal),0
@@ -828,7 +828,7 @@
 827 Anas chlorotis (Brown Teal),-1
 828 Rhipidura leucophrys (Willie Wagtail),0
 829 Anas americana (American Wigeon),0
-830 Bucephala albeola (Bufflehead),0
+830 Bucephala albeola (Bufflehead),150
 831 Mergus serrator (Red-breasted Merganser),0
 832 Mergus merganser (Common Merganser),0
 833 Anser anser (Greylag Goose),0
@@ -909,7 +909,7 @@
 908 Melozone crissalis (California Towhee),0
 909 Thryothorus ludovicianus (Carolina Wren),0
 910 Parabuteo unicinctus (Harris's Hawk),0
-911 Anas platyrhynchos domesticus (Domestic Duck),0
+911 Anas platyrhynchos domesticus (Domestic Duck),150
 912 Troglodytes aedon (House Wren),0
 913 Buteo lineatus elegans (California Red-shouldered Hawk),0
 914 Thamnophilus doliatus (Barred Antshrike),0
