@@ -128,7 +128,7 @@ def set_label(img, labels, label_thresholds, interpreter, input_mean, input_std)
 
     output_data = interpreter.get_tensor(output_details[0]['index'])
     results = np.squeeze(output_data)  # squeeze out empty axis
-    results[68] = results[68] * 100  # cardinal boost; lazy; until I can fix it
+    # results[68] = results[68] * 100  # cardinal boost; lazy; until I can fix it
     cindex = np.argpartition(results, -5)[-5:]
 
     # loop thru top 5 results to find best match; highest score align with matching species threshold
