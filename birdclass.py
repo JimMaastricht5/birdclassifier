@@ -98,11 +98,12 @@ def bird_detector(args):
 
             # loop thru detected objects
             for i, det_confidence in enumerate(det_confidences):  # loop thru detected objects
-                print(f': {datetime.now().strftime("%I:%M %p")} observed' +
-                      f"{det_labels[i]}:{det_confidence * 100:.0f}%", end='')
+                print(f': {datetime.now().strftime("%I:%M %p")} observed ' +
+                      f"{det_labels[i]}:{det_confidence * 100:.0f}% ", end='')
 
                 if det_labels[i] == "bird":  # bird observed, find species, label, and tweet
                     motioncnt = 0  # reset motion count between birds
+                    print('')  # print new line in console, species matches appear below indented
                     (startX, startY, endX, endY) = label_image.scale_rect(img, det_rects[i])  # set x,y bounding box
                     birdcrop_img = equalizedimg[startY:endY, startX:endX]  # extract image for better species detection
                     species_conf, species = label_image.set_label(birdcrop_img, possible_labels, species_thresholds,
