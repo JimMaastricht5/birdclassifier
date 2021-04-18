@@ -492,7 +492,7 @@
 491 Upupa epops (Common Hoopoe),0
 492 Euphagus carolinus (Rusty Blackbird),0
 493 Gavia pacifica (Pacific Loon),0
-494 Mimus gilvus (Tropical Mockingbird),0
+494 Mimus gilvus (Tropical Mockingbird),-1
 495 Passer italiae (Italian Sparrow),0
 496 Gavia immer (Common Loon),0
 497 Gavia stellata (Red-throated Loon),0
@@ -819,10 +819,10 @@
 818 Icterus galbula (Baltimore Oriole),0
 819 Anas platyrhynchos (Mallard),250
 820 Anas acuta (Northern Pintail),0
-821 Anas crecca (Green-winged Teal),0
-822 Anas cyanoptera (Cinnamon Teal),0
-823 Anas fulvigula (Mottled Duck),0
-824 Anas discors (Blue-winged Teal),0
+821 Anas crecca (Green-winged Teal),100
+822 Anas cyanoptera (Cinnamon Teal),-1
+823 Anas fulvigula (Mottled Duck),-1
+824 Anas discors (Blue-winged Teal),100
 825 Anas strepera (Gadwall),0
 826 Anas clypeata (Northern Shoveler),0
 827 Anas chlorotis (Brown Teal),-1

@@ -128,8 +128,8 @@ def bird_detector(args):
         cv2.imshow('video', img)  # show image with box and label use cv2.flip if image inverted
         cv2.waitKey(20)  # wait 20 ms to render video, restart loop.  setting of 0 is fixed img; > 0 video
 
-        # shut down the app if between 1:00 and 1:10 am.  Pi runs this in a loop and restarts it every 20 minutes
-        if datetime.now().hour == 1 and datetime.now().minute>= 0 and datetime.now().minute <= 10:
+        # shut down the app if between 1:00 and 1:05 am.  Pi runs this in a loop and restarts it every 20 minutes
+        if datetime.now().hour == 1 and datetime.now().minute>= 0 and datetime.now().minute <= 5:
             break
 
     # while loop break at 10pm, shut down windows
