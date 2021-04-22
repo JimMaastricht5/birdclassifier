@@ -23,7 +23,7 @@
 22 Empidonax occidentalis (Cordilleran Flycatcher),0
 23 Rallus limicola (Virginia Rail),0
 24 Grus grus (Common Crane),0
-25 Quiscalus major (Boat-tailed Grackle),0
+25 Quiscalus major (Boat-tailed Grackle),-1
 26 Branta leucopsis (Barnacle Goose),0
 27 Cyanocorax yucatanicus (Yucatan Jay),0
 28 Cyanocorax yncas (Green Jay),-1
@@ -65,8 +65,8 @@
 64 Tachybaptus dominicus (Least Grebe),0
 65 Artemisiospiza belli (Bell's Sparrow),0
 66 Gallus gallus (Red Junglefowl),0
-67 Cardinalis sinuatus (Pyrrhuloxia),0
-68 Cardinalis cardinalis (Northern Cardinal),1
+67 Cardinalis sinuatus (Pyrrhuloxia),15
+68 Cardinalis cardinalis (Northern Cardinal),10
 69 Melospiza lincolnii (Lincoln's Sparrow),0
 70 Podilymbus podiceps (Pied-billed Grebe),0
 71 Melospiza georgiana (Swamp Sparrow),0
@@ -109,7 +109,7 @@
 108 Icterus graduacauda (Audubon's Oriole),0
 109 Motacilla aguimp (African Pied Wagtail),0
 110 Anas superciliosa \xd7 platyrhynchos (Pacific Black Duck \xd7 Mallard hybrid),0
-111 Icterus pustulatus (Streak-backed Oriole),0
+111 Icterus pustulatus (Streak-backed Oriole),-1
 112 Icterus gularis (Altamira Oriole),0
 113 Carduelis cannabina (Eurasian Linnet),0
 114 Catharus minimus (Gray-cheeked Thrush),0
@@ -145,7 +145,7 @@
 144 Cinclus cinclus (White-throated Dipper),0
 145 Chen rossii (Ross's Goose),0
 146 Callipepla californica (California Quail),0
-147 Quiscalus quiscula (Common Grackle),100
+147 Quiscalus quiscula (Common Grackle),20
 148 Quiscalus mexicanus (Great-tailed Grackle),-1
 149 Callipepla squamata (Scaled Quail),0
 150 Dryocopus pileatus (Pileated Woodpecker),0
@@ -245,11 +245,11 @@
 244 Coracias garrulus (European Roller),0
 245 Coracias caudatus (Lilac-breasted Roller),0
 246 Coracias benghalensis (Indian Roller),0
-247 Xanthocephalus xanthocephalus (Yellow-headed Blackbird),0
+247 Xanthocephalus xanthocephalus (Yellow-headed Blackbird),100
 248 Chondestes grammacus (Lark Sparrow),0
 249 Dolichonyx oryzivorus (Bobolink),0
 250 Pandion haliaetus (Osprey),0
-251 Phainopepla nitens (Phainopepla),0
+251 Phainopepla nitens (Phainopepla),-1
 252 Tyrannus couchii (Couch's Kingbird),0
 253 Phylloscopus collybita (Common Chiffchaff),0
 254 Circus cyaneus hudsonius (Northern Harrier (American)),0
@@ -350,7 +350,7 @@
 349 Progne subis (Purple Martin),150
 350 Setophaga coronata auduboni (Audubon's Warbler),0
 351 Hirundo neoxena (Welcome Swallow),0
-352 Hirundo rustica (Barn Swallow),0
+352 Hirundo rustica (Barn Swallow),100
 353 Calidris virgata (Surfbird),0
 354 Calidris pugnax (Ruff),0
 355 Platalea regia (Royal Spoonbill),0
@@ -413,7 +413,7 @@
 412 Spizella passerina (Chipping Sparrow),0
 413 Pycnonotus jocosus (Red-whiskered Bulbul),0
 414 Passerina cyanea (Indigo Bunting),160
-415 Passerina versicolor (Varied Bunting),0
+415 Passerina versicolor (Varied Bunting),-1
 416 Manorina melanocephala (Noisy Miner),0
 417 Ocyphaps lophotes (Crested Pigeon),0
 418 Jabiru mycteria (Jabiru),0
@@ -582,7 +582,7 @@
 581 Melozone fusca (Canyon Towhee),0
 582 Aquila chrysaetos (Golden Eagle),0
 583 Hylocichla mustelina (Wood Thrush),0
-584 Aphelocoma wollweberi (Mexican Jay),0
+584 Aphelocoma wollweberi (Mexican Jay),-1
 585 Accipiter striatus (Sharp-shinned Hawk),0
 586 Accipiter nisus (Eurasian Sparrowhawk),0
 587 Accipiter gentilis (Northern Goshawk),0
@@ -633,7 +633,7 @@
 632 Haliaeetus vocifer (African Fish-Eagle),0
 633 Bubo scandiacus (Snowy Owl),-1
 634 Ciccaba virgata (Mottled Owl),0
-635 Bonasa umbellus (Ruffed Grouse),0
+635 Bonasa umbellus (Ruffed Grouse),100
 636 Busarellus nigricollis (Black-collared Hawk),0
 637 Rostrhamus sociabilis (Snail Kite),0
 638 Milvus milvus (Red Kite),0
@@ -800,7 +800,7 @@
 799 Calidris fuscicollis (White-rumped Sandpiper),0
 800 Phalaropus tricolor (Wilson's Phalarope),-1
 801 Colaptes auratus auratus (Yellow-shafted Flicker),0
-802 Melanotis caerulescens (Blue Mockingbird),0
+802 Melanotis caerulescens (Blue Mockingbird),-1
 803 Tiaris olivaceus (Yellow-faced Grassquit),0
 804 Oreoscoptes montanus (Sage Thrasher),0
 805 Limnodromus scolopaceus (Long-billed Dowitcher),0
@@ -876,7 +876,7 @@
 875 Elanoides forficatus (Swallow-tailed Kite),0
 876 Carduelis carduelis (European Goldfinch),0
 877 Cassiculus melanicterus (Yellow-winged Cacique),0
-878 Dendragapus fuliginosus (Sooty Grouse),0
+878 Dendragapus fuliginosus (Sooty Grouse),-1
 879 Psaltriparus minimus (Bushtit),-1
 880 Aegithalos caudatus (Long-tailed Tit),0
 881 Zosterops lateralis lateralis (Silvereye (ssp. lateralis)),0
@@ -906,7 +906,7 @@
 905 Polioptila melanura (Black-tailed Gnatcatcher),0
 906 Pelecanus occidentalis carolinensis (Eastern Brown Pelican),0
 907 Melozone aberti (Abert's Towhee),0
-908 Melozone crissalis (California Towhee),0
+908 Melozone crissalis (California Towhee),-1
 909 Thryothorus ludovicianus (Carolina Wren),0
 910 Parabuteo unicinctus (Harris's Hawk),0
 911 Anas platyrhynchos domesticus (Domestic Duck),150
@@ -937,7 +937,7 @@
 936 Buteo buteo (Common Buzzard),0
 937 Myiodynastes luteiventris (Sulphur-bellied Flycatcher),0
 938 Contopus sordidulus (Western Wood-Pewee),0
-939 Corvus corone (Carrion Crow),0
+939 Corvus corone (Carrion Crow),-1
 940 Cyanoramphus novaezelandiae (Red-crowned Parakeet),0
 941 Contopus virens (Eastern Wood-Pewee),0
 942 Contopus pertinax (Greater Pewee),0
@@ -945,7 +945,7 @@
 944 Larus argentatus (Herring Gull),0
 945 Halcyon smyrnensis (White-throated Kingfisher),0
 946 Onychognathus morio (Red-winged Starling),0
-947 Cyanocompsa parellina (Blue Bunting),0
+947 Cyanocompsa parellina (Blue Bunting),-1
 948 Cistothorus palustris (Marsh Wren),0
 949 Tyto alba (Barn Owl),0
 950 Trogon caligatus (Gartered Trogon),0

@@ -56,10 +56,15 @@ def main(args):
     for i, det_confidence in enumerate(confidences):
         (startX, startY, endX, endY) = scale_rect(img, rects[i])  # set x,y bounding box
         crop_img = img[startY:endY, startX:endX]  # extract image for better species detection
-        print('***calling set_label***')
+        print('***calling set_label with full image ***')
+        result, label = set_label(img, possible_labels, speciesthresholds, interpreter, args.inputmean,
+                                  args.inputstd)
+        print('***return from set_label with full image')
+        print('***calling set_label with crop image ***')
         result, label = set_label(crop_img, possible_labels, speciesthresholds, interpreter, args.inputmean,
                                   args.inputstd)
-        print('***return from set_label')
+        print('***return from set_label with crop image')
+
         print('bird #', i)
         print('confidence for species', result)
         print('label for species', label)
@@ -128,22 +133,21 @@ def set_label(img, labels, label_thresholds, interpreter, input_mean, input_std)
 
     output_data = interpreter.get_tensor(output_details[0]['index'])
     results = np.squeeze(output_data)  # squeeze out empty axis
-    # results[68] = results[68] * 100  # cardinal boost; lazy; until I can fix it
-    cindex = np.argpartition(results, -5)[-5:]
+    cindex = np.argpartition(results, -10)[-10:]
 
-    # loop thru top 5 results to find best match; highest score align with matching species threshold
+    # loop thru top N results to find best match; highest score align with matching species threshold
     maxcresult = float(0)
     maxlresult = ''
     for lindex in cindex:
         lresult = str(labels[lindex])  # grab predicted label, push this to a string instead of tuple
         cresult = float(results[lindex])   # grab predicted confidence score
-
-        print(f'     {check_threshold(cresult, lindex, label_thresholds)} match, confidence:{str(cresult)}' +
-                f', threshold:{label_thresholds[lindex][1]}, {str(labels[lindex])}.')
-        if check_threshold(cresult, lindex, label_thresholds):  # compare confidence score to threshold by label
-            if cresult > maxcresult:  # if this above threshold and is a better confidence result store it
-                maxcresult = cresult
-                maxlresult = lresult
+        if cresult != 0:
+            print(f'     {check_threshold(cresult, lindex, label_thresholds)} match, confidence:{str(cresult)}' +
+                    f', threshold:{label_thresholds[lindex][1]}, {str(labels[lindex])}.')
+            if check_threshold(cresult, lindex, label_thresholds):  # compare confidence score to threshold by label
+                if cresult > maxcresult:  # if this above threshold and is a better confidence result store it
+                    maxcresult = cresult
+                    maxlresult = lresult
 
     maxcresult = maxcresult / 100  # needed for automl or google coral.ai model?
     return maxcresult, maxlresult  # highest confidence with best match
@@ -196,10 +200,11 @@ def check_threshold(cresult, lindex, label_thresholds):
 # test function
 if __name__ == '__main__':
     ap = argparse.ArgumentParser()
-    # ap.add_argument('-i', '--image', default='/home/pi/birdclass/test2.jpg',help='image to be classified')
+    ap.add_argument('-i', '--image', default='/home/pi/birdclass/commongrackle.jpg',help='image to be classified')
+    # ap.add_argument('-i', '--image', default='/home/pi/birdclass/test2.jpg', help='image to be classified')
     # ap.add_argument('-i', '--image', default='/home/pi/birdclass/test3.jpg', help='image to be classified')
     # ap.add_argument('-i', '--image', default='/home/pi/birdclass/2cardinal.jpg', help='image to be classified')
-    ap.add_argument('-i', '--image', default='/home/pi/birdclass/cardinal.jpg', help='image to be classified')
+    # ap.add_argument('-i', '--image', default='/home/pi/birdclass/cardinal.jpg', help='image to be classified')
     # ap.add_argument('-i', '--image', default='/home/pi/birdclass/ncardinal.jpg', help='image to be classified')
 
     # object detection model setup
