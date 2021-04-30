@@ -1,54 +1,54 @@
-0 Haemorhous cassinii (Cassin's Finch),0
-1 Aramus guarauna (Limpkin),0
-2 Rupornis magnirostris (Roadside Hawk),0
-3 Cyanocitta cristata (Blue Jay),0
+0 Haemorhous cassinii (Cassin's Finch),-1
+1 Aramus guarauna (Limpkin),-1
+2 Rupornis magnirostris (Roadside Hawk),-1
+3 Cyanocitta cristata (Blue Jay),50
 4 Cyanocitta stelleri (Steller's Jay),-1
-5 Balearica regulorum (Grey Crowned Crane),0
+5 Balearica regulorum (Grey Crowned Crane),-1
 6 Pyrocephalus rubinus (Vermilion Flycatcher),-1
 7 Recurvirostra americana (American Avocet),-1
-8 Ardeotis kori (Kori Bustard),0
-9 Pica nuttalli (Yellow-billed Magpie),0
+8 Ardeotis kori (Kori Bustard),-1
+9 Pica nuttalli (Yellow-billed Magpie),-1
 10 Perisoreus canadensis (Gray Jay),-1
-11 Antigone canadensis (Sandhill Crane),0
-12 Parkesia noveboracensis (Northern Waterthrush),0
-13 Ardea herodias occidentalis (Great White Heron),0
-14 Porzana carolina (Sora),0
-15 Anas platyrhynchos diazi (Mexican Duck),0
-16 Motacilla cinerea (Grey Wagtail),0
-17 Empidonax difficilis (Pacific-slope Flycatcher),0
-18 Empidonax minimus (Least Flycatcher),0
-19 Empidonax fulvifrons (Buff-breasted Flycatcher),0
-20 Empidonax traillii (Willow Flycatcher),0
-21 Empidonax hammondii (Hammond's Flycatcher),0
-22 Empidonax occidentalis (Cordilleran Flycatcher),0
-23 Rallus limicola (Virginia Rail),0
-24 Grus grus (Common Crane),0
+11 Antigone canadensis (Sandhill Crane),100
+12 Parkesia noveboracensis (Northern Waterthrush),100
+13 Ardea herodias occidentalis (Great White Heron),-1
+14 Porzana carolina (Sora),100
+15 Anas platyrhynchos diazi (Mexican Duck),-1
+16 Motacilla cinerea (Grey Wagtail),-1
+17 Empidonax difficilis (Pacific-slope Flycatcher),-1
+18 Empidonax minimus (Least Flycatcher),100
+19 Empidonax fulvifrons (Buff-breasted Flycatcher),-1
+20 Empidonax traillii (Willow Flycatcher),100
+21 Empidonax hammondii (Hammond's Flycatcher),-1
+22 Empidonax occidentalis (Cordilleran Flycatcher),-1
+23 Rallus limicola (Virginia Rail),100
+24 Grus grus (Common Crane),100
 25 Quiscalus major (Boat-tailed Grackle),-1
-26 Branta leucopsis (Barnacle Goose),0
-27 Cyanocorax yucatanicus (Yucatan Jay),0
+26 Branta leucopsis (Barnacle Goose),-1
+27 Cyanocorax yucatanicus (Yucatan Jay),-1
 28 Cyanocorax yncas (Green Jay),-1
-29 Oceanites oceanicus (Wilson's Storm-Petrel),0
-30 Quiscalus niger (Greater Antillean Grackle),0
-31 Psilorhinus morio (Brown Jay),0
-32 Megarynchus pitangua (Boat-billed Flycatcher),0
-33 Gallinula tenebrosa (Dusky Moorhen),0
-34 Gallus gallus domesticus (Domestic Chicken),0
-35 Numida meleagris (Helmeted Guineafowl),0
-36 Junco hyemalis caniceps (Gray-headed Junco),0
-37 Tyrannus vociferans (Cassin's Kingbird),0
+29 Oceanites oceanicus (Wilson's Storm-Petrel),100
+30 Quiscalus niger (Greater Antillean Grackle),-1
+31 Psilorhinus morio (Brown Jay),-1
+32 Megarynchus pitangua (Boat-billed Flycatcher),-1
+33 Gallinula tenebrosa (Dusky Moorhen),-1
+34 Gallus gallus domesticus (Domestic Chicken),100
+35 Numida meleagris (Helmeted Guineafowl),-1
+36 Junco hyemalis caniceps (Gray-headed Junco),100
+37 Tyrannus vociferans (Cassin's Kingbird),-1
 38 Tyrannus tyrannus (Eastern Kingbird),150
-39 Tyrannus forficatus (Scissor-tailed Flycatcher),0
-40 Tyrannus crassirostris (Thick-billed Kingbird),0
-41 Tyrannus verticalis (Western Kingbird),0
-42 Tyrannus savana (Fork-tailed Flycatcher),0
-43 Gallirallus australis (Weka),0
-44 Calocitta formosa (White-throated Magpie-Jay),0
-45 Calocitta colliei (Black-throated Magpie-Jay),0
-46 Fulica americana (American Coot),0
-47 Pachyramphus aglaiae (Rose-throated Becard),0
-48 Buteo lagopus (Rough-legged Hawk),0
-49 Cygnus atratus (Black Swan),0
-50 Philesturnus rufusater (North Island Saddleback),0
+39 Tyrannus forficatus (Scissor-tailed Flycatcher),-1
+40 Tyrannus crassirostris (Thick-billed Kingbird),-1
+41 Tyrannus verticalis (Western Kingbird),-1
+42 Tyrannus savana (Fork-tailed Flycatcher),-1
+43 Gallirallus australis (Weka),-1
+44 Calocitta formosa (White-throated Magpie-Jay),-1
+45 Calocitta colliei (Black-throated Magpie-Jay),-1
+46 Fulica americana (American Coot),100
+47 Pachyramphus aglaiae (Rose-throated Becard),-1
+48 Buteo lagopus (Rough-legged Hawk),100
+49 Cygnus atratus (Black Swan),-1
+50 Philesturnus rufusater (North Island Saddleback),-1
 51 Larus marinus (Great Black-backed Gull),0
 52 Pitangus sulphuratus (Great Kiskadee),0
 53 Anas rubripes (American Black Duck),0
@@ -145,7 +145,7 @@
 144 Cinclus cinclus (White-throated Dipper),0
 145 Chen rossii (Ross's Goose),0
 146 Callipepla californica (California Quail),0
-147 Quiscalus quiscula (Common Grackle),20
+147 Quiscalus quiscula (Common Grackle),100
 148 Quiscalus mexicanus (Great-tailed Grackle),-1
 149 Callipepla squamata (Scaled Quail),0
 150 Dryocopus pileatus (Pileated Woodpecker),0
@@ -165,7 +165,7 @@
 164 Saltator atriceps (Black-headed Saltator),0
 165 Sicalis flaveola (Saffron Finch),0
 166 Aix galericulata (Mandarin Duck),0
-167 Junco hyemalis hyemalis (Slate-colored Junco),0
+167 Junco hyemalis hyemalis (Slate-colored Junco),100
 168 Eupsittula canicularis (Orange-fronted Parakeet),0
 169 Microcarbo melanoleucos (Little Pied Cormorant),0
 170 Piranga rubra (Summer Tanager),0
@@ -318,7 +318,7 @@
 317 Chordeiles acutipennis (Lesser Nighthawk),0
 318 Platalea leucorodia (Eurasian Spoonbill),0
 319 Phalaenoptilus nuttallii (Common Poorwill),0
-320 Haemorhous mexicanus (House Finch),190
+320 Haemorhous mexicanus (House Finch),100
 321 Haemorhous purpureus (Purple Finch),100
 322 Nyctidromus albicollis (Common Pauraque),0
 323 Campephilus guatemalensis (Pale-billed Woodpecker),0
@@ -411,7 +411,7 @@
 410 Surnia ulula (Northern Hawk Owl),0
 411 Polioptila caerulea (Blue-gray Gnatcatcher),0
 412 Spizella passerina (Chipping Sparrow),0
-413 Pycnonotus jocosus (Red-whiskered Bulbul),0
+413 Pycnonotus jocosus (Red-whiskered Bulbul),-1
 414 Passerina cyanea (Indigo Bunting),160
 415 Passerina versicolor (Varied Bunting),-1
 416 Manorina melanocephala (Noisy Miner),0
@@ -657,7 +657,7 @@
 656 Anthus rubescens (American Pipit),100
 657 Tachycineta albilinea (Mangrove Swallow),0
 658 Poecile carolinensis (Carolina Chickadee),-1
-659 Poecile atricapillus (Black-capped Chickadee),50
+659 Poecile atricapillus (Black-capped Chickadee),40
 660 Poecile gambeli (Mountain Chickadee),0
 661 Poecile rufescens (Chestnut-backed Chickadee),-1
 662 Periparus ater (Coal Tit),0
