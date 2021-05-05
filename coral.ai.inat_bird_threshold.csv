@@ -305,7 +305,7 @@
 304 Ixobrychus exilis (Least Bittern),0
 305 Auriparus flaviceps (Verdin),0
 306 Geothlypis tolmiei (MacGillivray's Warbler),0
-307 Columba livia (Rock Pigeon),225
+307 Columba livia (Rock Pigeon),250
 308 Setophaga citrina (Hooded Warbler),0
 309 Setophaga cerulea (Cerulean Warbler),0
 310 Columba palumbus (Common Wood-Pigeon),0
@@ -343,7 +343,7 @@
 342 Geopelia striata (Zebra Dove),0
 343 Athene noctua (Little Owl),0
 344 Crotophaga ani (Smooth-billed Ani),0
-345 Sialia sialis (Eastern Bluebird),100
+345 Sialia sialis (Eastern Bluebird),150
 346 Platalea alba (African Spoonbill),0
 347 Bubo virginianus (Great Horned Owl),0
 348 Petrochelidon fulva (Cave Swallow),0
@@ -589,7 +589,7 @@
 588 Egretta rufescens (Reddish Egret),0
 589 Bucephala clangula (Common Goldeneye),0
 590 Anous stolidus (Brown Noddy),0
-591 Actitis macularius (Spotted Sandpiper),150
+591 Actitis macularius (Spotted Sandpiper),250
 592 Ardea purpurea (Purple Heron),0
 593 Todiramphus chloris (Collared Kingfisher),0
 594 Grus americana (Whooping Crane),0
@@ -600,7 +600,7 @@
 599 Phalacrocorax sulcirostris (Little Black Cormorant),0
 600 Buteo albonotatus (Zone-tailed Hawk),0
 601 Butorides striata (Striated Heron),0
-602 Platalea ajaja (Roseate Spoonbill),0
+602 Platalea ajaja (Roseate Spoonbill),-1
 603 Buteo brachyurus (Short-tailed Hawk),0
 604 Ardea alba (Great Egret),0
 605 Buteo swainsoni (Swainson's Hawk),0
@@ -638,7 +638,7 @@
 637 Rostrhamus sociabilis (Snail Kite),0
 638 Milvus milvus (Red Kite),0
 639 Gyps fulvus (Eurasian Griffon),0
-640 Ficedula hypoleuca (European Pied Flycatcher),0
+640 Ficedula hypoleuca (European Pied Flycatcher),-1
 641 Momotus coeruliceps (Blue-crowned Motmot),0
 642 Charadrius semipalmatus (Semipalmated Plover),0
 643 Haliastur indus (Brahminy Kite),0
@@ -692,7 +692,7 @@
 691 Myiarchus tyrannulus (Brown-crested Flycatcher),0
 692 Zosterops lateralis (Silvereye),0
 693 Zonotrichia leucophrys (White-crowned Sparrow),0
-694 Agelaius phoeniceus (Red-winged Blackbird),230
+694 Agelaius phoeniceus (Red-winged Blackbird),250
 695 Parus major (Great Tit),-1
 696 Zonotrichia capensis (Rufous-collared Sparrow),0
 697 Oreothlypis peregrina (Tennessee Warbler),0
