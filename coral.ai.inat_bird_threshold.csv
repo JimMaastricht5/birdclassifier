@@ -145,7 +145,7 @@
 144 Cinclus cinclus (White-throated Dipper),0
 145 Chen rossii (Ross's Goose),0
 146 Callipepla californica (California Quail),0
-147 Quiscalus quiscula (Common Grackle),100
+147 Cardinalis cardinalis (Northern Cardinal),10
 148 Quiscalus mexicanus (Great-tailed Grackle),-1
 149 Callipepla squamata (Scaled Quail),0
 150 Dryocopus pileatus (Pileated Woodpecker),0
@@ -199,7 +199,7 @@
 198 Ammodramus maritimus (Seaside Sparrow),0
 199 Coccyzus erythropthalmus (Black-billed Cuckoo),0
 200 Coccyzus minor (Mangrove Cuckoo),0
-201 Coccyzus americanus (Yellow-billed Cuckoo),0
+201 Coccyzus americanus (Yellow-billed Cuckoo),150
 202 Nucifraga columbiana (Clark's Nutcracker),0
 203 Crotophaga sulcirostris (Groove-billed Ani),-1
 204 Pooecetes gramineus (Vesper Sparrow),100
@@ -509,7 +509,7 @@
 508 Falco columbarius (Merlin),150
 509 Gallinula chloropus (Eurasian Moorhen),0
 510 Cardellina pusilla (Wilson's Warbler),0
-511 Catharus ustulatus (Swainson's Thrush),0
+511 Catharus ustulatus (Swainson's Thrush),150
 512 Falco novaeseelandiae (New Zealand Falcon),0
 513 Catharus guttatus (Hermit Thrush),50
 514 Catharus fuscescens (Veery),0
@@ -958,8 +958,9 @@
 957 Larus hyperboreus (Glaucous Gull),0
 958 Columba livia domestica (Feral Pigeon),0
 959 Garrulus glandarius (Eurasian Jay),0
-960 Anser anser domesticus (Domestic Goose),0
+960 Anser anser domesticus (Domestic Goose),250
 961 Mitrephanes phaeocercus (Tufted Flycatcher),0
 962 Ardenna creatopus (Pink-footed Shearwater),0
 963 Ardenna gravis (Great Shearwater),0
 964 background,-1
+965 147 Quiscalus quiscula (Common Grackle): mislabel
