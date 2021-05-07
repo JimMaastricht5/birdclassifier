@@ -145,7 +145,7 @@
 144 Cinclus cinclus (White-throated Dipper)
 145 Chen rossii (Ross's Goose)
 146 Callipepla californica (California Quail)
-147 Quiscalus quiscula (Common Grackle)
+147 Cardinalis cardinalis (Northern Cardinal)
 148 Quiscalus mexicanus (Great-tailed Grackle)
 149 Callipepla squamata (Scaled Quail)
 150 Dryocopus pileatus (Pileated Woodpecker)
