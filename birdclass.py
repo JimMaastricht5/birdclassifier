@@ -103,7 +103,9 @@ def bird_detector(args):
                 if det_labels[i] == "bird":  # bird observed, find species, label, and tweet
                     motioncnt = 0  # reset motion count between birds
                     print('')  # print new line in console, species matches appear below indented
-                    species_conf, species = bird_observations(img, equalizedimg, det_rects[i])  # compare images
+                    species_conf, species, (startX, startY, endX, endY), (centerX, centerY) = \
+                        bird_observations(args, img, equalizedimg, det_rects[i], possible_labels, species_thresholds,
+                                          interpreter)  # compare images
                     species_visit_count, species_last_seen = birdpop.report_census(species)  # grab last time observed
                     birdpop.visitor(species, datetime.now())  # update census count and last time seen
                     common_name, img_label, tweet_label = label_text(species, species_conf)
@@ -125,7 +127,7 @@ def bird_detector(args):
         cv2.waitKey(20)  # wait 20 ms to render video, restart loop.  setting of 0 is fixed img; > 0 video
 
         # shut down the app if between 1:00 and 1:05 am.  Pi runs this in a loop and restarts it every 20 minutes
-        if datetime.now().hour == 1 and datetime.now().minute>= 0 and datetime.now().minute <= 5:
+        if datetime.now().hour == 1 and datetime.now().minute <= 5:
             break
 
     # while loop break at 10pm, shut down windows
@@ -136,19 +138,20 @@ def bird_detector(args):
 
 
 # make observations about bird using image and color equalized image
-def bird_observations(img, equalizedimg, det_rects)
+def bird_observations(args, img, equalizedimg, det_rects, possible_labels, species_thresholds, interpreter):
     (startX, startY, endX, endY), (centerX, centerY) = label_image.scale_rect(img, det_rects)  # set x,y bounding box
     birdcrop_img = img[startY:endY, startX:endX]  # extract image for better species detection
-    birdcrop_equalizedimg  = equalizedimg[startY:endY, startX:endX]  # extract image for better species detection
+    birdcrop_equalizedimg = equalizedimg[startY:endY, startX:endX]  # extract image for better species detection
     # make comparisions
     species_conf, species = label_image.set_label(birdcrop_img, possible_labels, species_thresholds,
                                                   interpreter, args["inputmean"], args["inputstd"])
     species_conf_equalized, species_equalized = label_image.set_label(birdcrop_equalizedimg, possible_labels,
-                                                  species_thresholds, interpreter, args["inputmean"], args["inputstd"])
+                                                                      species_thresholds, interpreter,
+                                                                      args["inputmean"], args["inputstd"])
     if species != species_equalized:  # must match or bad image
         species_conf = float(0)
         species = ''
-    return species_conf, species
+    return species_conf, species, (startX, startY, endX, endY), (centerX, centerY)
 
 
 # housekeeping for day and hour
