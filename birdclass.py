@@ -82,11 +82,10 @@ def bird_detector(args):
             motioncnt += 1
             print(f'\r motion {motioncnt}', end=' ')  # indicate motion on monitor
             # improve image prior to obj detection and labeling
-            if spweather.isclear is False or image_proc.is_color_low_contrast(img):
-                equalizedimg = image_proc.equalize_color(img)  # balance histogram of color intensity
-            else:
-                equalizedimg = img.copy()  # no adjustment necessary, create a copy of the image
-
+            # if spweather.isclear is False or image_proc.is_color_low_contrast(img):
+            equalizedimg = image_proc.equalize_color(img)  # balance histogram of color intensity for all frames
+            # else:
+            #     equalizedimg = img.copy()  # no adjustment necessary, create a copy of the image
             det_confidences, det_labels, det_rects = \
                 label_image.object_detection(args["bconfidence"], img, objdet_possible_labels, tfobjdet,
                                              args["inputmean"], args["inputstd"])  # detect objects
@@ -105,7 +104,7 @@ def bird_detector(args):
                     print('')  # print new line in console, species matches appear below indented
                     species_conf, species, (startX, startY, endX, endY), (centerX, centerY) = \
                         bird_observations(args, img, equalizedimg, det_rects[i], possible_labels, species_thresholds,
-                                          interpreter)  # compare images
+                                          interpreter)  # compare images for raw capture and color enhanced
                     species_visit_count, species_last_seen = birdpop.report_census(species)  # grab last time observed
                     birdpop.visitor(species, datetime.now())  # update census count and last time seen
                     common_name, img_label, tweet_label = label_text(species, species_conf)
@@ -117,7 +116,7 @@ def bird_detector(args):
             # all birds in image processed. Show image and tweet, confidence here is lowest in the picture
             if species_conf >= args["sconfidence"]:  # tweet threshold
                 if (datetime.now() - species_last_seen).total_seconds() >= 60 * 5:
-                    cv2.imshow('tweeted', equalizedimg)  # show what would we are tweeting
+                    cv2.imshow('tweeted', equalizedimg)  # show what we would be tweeting
                     if bird_tweeter.post_image(tweet_label + str(species_visit_count + 1), equalizedimg) is False:
                         print(f" {species} seen {species_last_seen.strftime('%I:%M %p')} *** exceeded tweet limit")
                 else:
@@ -142,13 +141,13 @@ def bird_observations(args, img, equalizedimg, det_rects, possible_labels, speci
     (startX, startY, endX, endY), (centerX, centerY) = label_image.scale_rect(img, det_rects)  # set x,y bounding box
     birdcrop_img = img[startY:endY, startX:endX]  # extract image for better species detection
     birdcrop_equalizedimg = equalizedimg[startY:endY, startX:endX]  # extract image for better species detection
-    # make comparisions
+    # check both raw and equalized images against one another
     species_conf, species = label_image.set_label(birdcrop_img, possible_labels, species_thresholds,
                                                   interpreter, args["inputmean"], args["inputstd"])
     species_conf_equalized, species_equalized = label_image.set_label(birdcrop_equalizedimg, possible_labels,
                                                                       species_thresholds, interpreter,
                                                                       args["inputmean"], args["inputstd"])
-    if species != species_equalized:  # must match or bad image
+    if species != species_equalized:  # must match or bad prediction
         species_conf = float(0)
         species = ''
     return species_conf, species, (startX, startY, endX, endY), (centerX, centerY)
