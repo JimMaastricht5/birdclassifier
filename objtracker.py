@@ -108,18 +108,16 @@ def main():
 
     for i in (10, 20, 30, 40, 50):
         rects = []
-        rects.append( (0 + i, 10 + i, 0 + i, 10 + i) )
-        rects.append( (100 - i, 100 - i, 200 - i, 200- i) )
+        rects.append((0 + i, 10 + i, 0 + i, 10 + i))
+        rects.append((100 - i, 100 - i, 200 - i, 200 - i))
         obj_tracker.update(rects)
         print(obj_tracker.objects, obj_tracker.disappeared)
 
-    for i in range (1, 60):
+    for i in range(1, 60):
         rects = []
         print(i)
         obj_tracker.update(rects)
         print(obj_tracker.objects)
-
-
 
 
 if __name__ == "__main__":
