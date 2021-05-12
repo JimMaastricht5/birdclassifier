@@ -36,7 +36,7 @@ class CentroidTracker:
                 self.disappeared[objectid] += 1
                 if self.disappeared[objectid] > self.maxDisappeared:  # object is missing from max consecutive frames
                     self.deregister(objectid)
-                    return self.objects  # no centroids or tracking info to update
+            return self.objects  # no centroids or tracking info to update
 
         inputcentroids = np.zeros((len(rects), 2), dtype="int")  # initialize array of input centroids for current frame
         for (i, (startX, startY, endX, endY)) in enumerate(rects):  # loop over the bounding box rectangles
@@ -96,3 +96,31 @@ class CentroidTracker:
 
         # return the set of trackable objects
         return self.objects
+
+
+def main():
+    obj_tracker = CentroidTracker()
+    rects = []
+    rects.append((5, 15, 5, 15))
+    rects.append((80, 80, 180, 180))
+    obj_tracker.update(rects)
+    print(obj_tracker.objects)
+
+    for i in (10, 20, 30, 40, 50):
+        rects = []
+        rects.append( (0 + i, 10 + i, 0 + i, 10 + i) )
+        rects.append( (100 - i, 100 - i, 200 - i, 200- i) )
+        obj_tracker.update(rects)
+        print(obj_tracker.objects, obj_tracker.disappeared)
+
+    for i in range (1, 60):
+        rects = []
+        print(i)
+        obj_tracker.update(rects)
+        print(obj_tracker.objects)
+
+
+
+
+if __name__ == "__main__":
+    main()
