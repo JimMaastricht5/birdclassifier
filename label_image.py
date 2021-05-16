@@ -54,7 +54,7 @@ def main(args):
 
     interpreter, possible_labels = init_tf2(args.species_model, args.numthreads, args.species_labels)
     for i, det_confidence in enumerate(confidences):
-        (startX, startY, endX, endY), (centerX, CenterY) = scale_rect(img, rects[i])  # set x,y bounding box
+        (startX, startY, endX, endY) = scale_rect(img, rects[i])  # set x,y bounding box
         crop_img = img[startY:endY, startX:endX]  # extract image for better species detection
         print('***calling set_label with full image ***')
         result, label = set_label(img, possible_labels, speciesthresholds, interpreter, args.inputmean,
@@ -149,7 +149,8 @@ def set_label(img, labels, label_thresholds, interpreter, input_mean, input_std)
                     maxcresult = cresult
                     maxlresult = lresult
 
-    maxcresult = maxcresult / 100  # needed for automl or google coral.ai model?
+    maxcresult = maxcresult / 100  # needed for automl or google coral.ai model
+    print(f'match returned: confidence (maxcresult), (maxlresult)')
     return maxcresult, maxlresult  # highest confidence with best match
 
 
