@@ -105,16 +105,20 @@ def bird_detector(args):
                     species_conf, species, (startX, startY, endX, endY) = \
                         bird_observations(args, img, equalizedimg, det_rects[i], possible_labels,
                                           species_thresholds, interpreter)  # compare images for raw and color enhanced
-                    birdobj.update([(startX, startY, endX, endY)], [species_conf], [species])
+
+                    # update info about bird
                     species_visit_count, species_last_seen = birdpop.report_census(species)  # grab last time observed
                     birdpop.visitor(species, datetime.now())  # update census count and last time seen
-                    common_name, img_label, tweet_label = label_text(species, species_conf)
-                    img = label_image.add_box_and_label(img, '', startX, startY, endX, endY, colors, i)  # add box 2 vid
-                    equalizedimg = label_image.add_box_and_label(equalizedimg, img_label, startX, startY,
-                                                                 endX, endY, colors, i)  # add box and label
-                    cv2.imshow('equalized', equalizedimg)
+                    common_name, tweet_label = label_text(species, species_conf)
+                    birdobj.update([(startX, startY, endX, endY)], [species_conf], [common_name])
 
-            # all birds in image processed. Show image and tweet, confidence here is lowest in the picture
+            # all birds in image processed, add all objects to equalized image and show
+            for (i, (startX, startY, endX, endY)) in enumerate(birdobj.rects):
+                equalizedimg = label_image.add_box_and_label(equalizedimg, birdobj.objnames[i], startX, startY,
+                                                             endX, endY, colors, i)
+            cv2.imshow('equalized', equalizedimg)  # show equalized image
+
+            # Show image and tweet, confidence here is lowest in the picture
             if species_conf >= args["sconfidence"]:  # tweet threshold
                 if (datetime.now() - species_last_seen).total_seconds() >= 60 * 5:
                     cv2.imshow('tweeted', equalizedimg)  # show what we would be tweeting
@@ -122,6 +126,10 @@ def bird_detector(args):
                         print(f" {species} seen {species_last_seen.strftime('%I:%M %p')} *** exceeded tweet limit")
                 else:
                     print(f" {species} not tweeted, last seen {species_last_seen.strftime('%I:%M %p')}. wait 5 minutes")
+
+        # motion processed, all birds in image processed if detected, add all known objects to image
+        for (i, (startX, startY, endX, endY)) in enumerate(birdobj.rects):
+            img = label_image.add_box_and_label(img, birdobj.objnames[i], startX, startY, endX, endY, colors, i)
 
         cv2.imshow('video', img)  # show image with box and label use cv2.flip if image inverted
         cv2.waitKey(20)  # wait 20 ms to render video, restart loop.  setting of 0 is fixed img; > 0 video
@@ -190,7 +198,7 @@ def label_text(species, species_conf):
     else:
         common_name = species
     tweet_label = f"{species}: confidence {species_conf * 100:.0f} observed: "
-    return common_name, common_name, tweet_label
+    return common_name, tweet_label
 
 
 def set_windows():
