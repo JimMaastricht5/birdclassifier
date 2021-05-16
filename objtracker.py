@@ -35,7 +35,7 @@ class CentroidTracker:
         del self.objconfidences[objectid]
         del self.objnames[objectid]
 
-    # update the object dictionaries with the newly detected objects and their rectangles
+    # update the object dictionaries with the newly detected objects and rectangles
     def update(self, rects, objconfidences, objnames):
         if len(rects) == 0:  # check to see if the list of input bounding box rectangles is empty
             for objectid in list(self.disappeared.keys()):  # loop over existing tracked objects and mark disappeared
