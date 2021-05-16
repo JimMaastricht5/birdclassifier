@@ -34,6 +34,7 @@
 import cv2  # open cv 2
 import label_image  # code to init tensor flow model and classify bird type
 import motion_detector  # motion detector helper functions
+import objtracker  # keeps track of detected objects between frames
 import weather
 import tweeter  # twitter helper functions
 import image_proc  # lib of image enhancement functions
@@ -46,6 +47,7 @@ from datetime import datetime
 def bird_detector(args):
     colors = np.random.uniform(0, 255, size=(11, 3))  # random colors for bounding boxes
     birdpop = population.Census()  # initialize species population census object
+    birdobj = objtracker.CentroidTracker()
     motioncnt = 0
     curr_day, curr_hr = datetime.now().day, datetime.now().hour
     spweather = weather.City_Weather()  # init class and set var based on default of Madison WI
@@ -84,8 +86,7 @@ def bird_detector(args):
             # improve image prior to obj detection and labeling
             # if spweather.isclear is False or image_proc.is_color_low_contrast(img):
             equalizedimg = image_proc.equalize_color(img)  # balance histogram of color intensity for all frames
-            # else:
-            #     equalizedimg = img.copy()  # no adjustment necessary, create a copy of the image
+            # else: equalizedimg = img.copy()  # no adjustment necessary, create a copy of the image
             det_confidences, det_labels, det_rects = \
                 label_image.object_detection(args["bconfidence"], img, objdet_possible_labels, tfobjdet,
                                              args["inputmean"], args["inputstd"])  # detect objects
@@ -93,7 +94,6 @@ def bird_detector(args):
             # ensure collection of variables used outside loop for tweet are set
             species_conf, species_visit_count = 0, 0
             tweet_label, species = '', ''
-
             # loop thru detected objects
             for i, det_confidence in enumerate(det_confidences):  # loop thru detected objects
                 print(f': {datetime.now().strftime("%I:%M %p")} observed ' +
@@ -102,9 +102,10 @@ def bird_detector(args):
                 if det_labels[i] == "bird":  # bird observed, find species, label, and tweet
                     motioncnt = 0  # reset motion count between birds
                     print('')  # print new line in console, species matches appear below indented
-                    species_conf, species, (startX, startY, endX, endY), (centerX, centerY) = \
-                        bird_observations(args, img, equalizedimg, det_rects[i], possible_labels, species_thresholds,
-                                          interpreter)  # compare images for raw capture and color enhanced
+                    species_conf, species, (startX, startY, endX, endY) = \
+                        bird_observations(args, img, equalizedimg, det_rects[i], possible_labels,
+                                          species_thresholds, interpreter)  # compare images for raw and color enhanced
+                    birdobj.update((startX, startY, endX, endY), species_conf, species)
                     species_visit_count, species_last_seen = birdpop.report_census(species)  # grab last time observed
                     birdpop.visitor(species, datetime.now())  # update census count and last time seen
                     common_name, img_label, tweet_label = label_text(species, species_conf)
@@ -138,7 +139,7 @@ def bird_detector(args):
 
 # make observations about bird using image and color equalized image
 def bird_observations(args, img, equalizedimg, det_rects, possible_labels, species_thresholds, interpreter):
-    (startX, startY, endX, endY), (centerX, centerY) = label_image.scale_rect(img, det_rects)  # set x,y bounding box
+    (startX, startY, endX, endY) = label_image.scale_rect(img, det_rects)  # set x,y bounding box
     birdcrop_img = img[startY:endY, startX:endX]  # extract image for better species detection
     birdcrop_equalizedimg = equalizedimg[startY:endY, startX:endX]  # extract image for better species detection
     # check both raw and equalized images against one another
@@ -150,7 +151,7 @@ def bird_observations(args, img, equalizedimg, det_rects, possible_labels, speci
     if species != species_equalized:  # must match or bad prediction
         species_conf = float(0)
         species = ''
-    return species_conf, species, (startX, startY, endX, endY), (centerX, centerY)
+    return species_conf, species, (startX, startY, endX, endY)
 
 
 # housekeeping for day and hour

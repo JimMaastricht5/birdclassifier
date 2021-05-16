@@ -142,8 +142,8 @@ def set_label(img, labels, label_thresholds, interpreter, input_mean, input_std)
         lresult = str(labels[lindex])  # grab predicted label, push this to a string instead of tuple
         cresult = float(results[lindex])   # grab predicted confidence score
         if cresult != 0:
-            print(f'     {check_threshold(cresult, lindex, label_thresholds)} match, confidence:{str(cresult)}' +
-                    f', threshold:{label_thresholds[lindex][1]}, {str(labels[lindex])}.')
+            # print(f'     {check_threshold(cresult, lindex, label_thresholds)} match, confidence:{str(cresult)}' +
+            #         f', threshold:{label_thresholds[lindex][1]}, {str(labels[lindex])}.')
             if check_threshold(cresult, lindex, label_thresholds):  # compare confidence score to threshold by label
                 if cresult > maxcresult:  # if this above threshold and is a better confidence result store it
                     maxcresult = cresult
@@ -179,9 +179,7 @@ def scale_rect(img, box):
     x_min = int(max(1, (box[1] * img_width)))
     y_max = int(min(img_height, (box[2] * img_height)))
     x_max = int(min(img_width, (box[3] * img_width)))
-    x_center = (x_min + x_max) / 2
-    y_center = (y_min + y_max) / 2
-    return (x_min, y_min, x_max, y_max), (x_center, y_center)
+    return (x_min, y_min, x_max, y_max)
 
 
 # add bounding box and label to an image
