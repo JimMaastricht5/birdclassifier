@@ -129,11 +129,11 @@ def main():
         obj_tracker.update(rects, objconfidences, objnames)
         print(obj_tracker.objects, obj_tracker.disappeared)
 
-    # for i in range(1, 60):
-    #     rects = []
-    #     print(i)
-    #     obj_tracker.update(rects, objconfidences, objnames)
-    #     print(obj_tracker.objects)
+    for i in range(1, 60):
+        rects = []
+        print(i)
+        obj_tracker.update(rects, objconfidences, objnames)
+        print(obj_tracker.objects)
 
     print('for loop')
     print(obj_tracker.rects)
