@@ -97,6 +97,9 @@ def bird_detector(args):
             species_conf, species_visit_count = 0, 0
             tweet_label, species = '', ''
             # loop thru detected objects
+            if len(det_confidence) == 0:
+                birdobj.update([], [], [])  # detected no objects, update missing from frame count
+
             for i, det_confidence in enumerate(det_confidences):  # loop thru detected objects
                 print(f': {datetime.now().strftime("%I:%M %p")} observed ' +
                       f"{det_labels[i]}:{det_confidence * 100:.0f}% ", end='')
