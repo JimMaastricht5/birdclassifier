@@ -94,7 +94,7 @@ def bird_detector(args):
             # ensure collection of variables used outside loop for tweet are set
             species_conf, species_visit_count = 0, 0
             tweet_label, species = '', ''
-            species_confs, speciess = [], []
+            species_confs, speciess, rects = [], [], []
             # loop thru detected objects
             for i, det_confidence in enumerate(det_confidences):  # loop thru detected objects
                 print(f': {datetime.now().strftime("%I:%M %p")} observed ' +
@@ -106,7 +106,7 @@ def bird_detector(args):
                     species_conf, species, (startX, startY, endX, endY) = \
                         bird_observations(args, img, equalizedimg, det_rects[i], possible_labels,
                                           species_thresholds, interpreter)  # compare images for raw and color enhanced
-                    birdobj.update((startX, startY, endX, endY), species_confs.append(species_conf),
+                    birdobj.update(rects.append((startX, startY, endX, endY)), species_confs.append(species_conf),
                                    speciess.append(species))
                     species_visit_count, species_last_seen = birdpop.report_census(species)  # grab last time observed
                     birdpop.visitor(species, datetime.now())  # update census count and last time seen
