@@ -104,9 +104,10 @@ class CentroidTracker:
 
 def main():
     obj_tracker = CentroidTracker()
-    rects = []
+    rects = list([])
     rects.append((5, 15, 5, 15))
     rects.append((80, 80, 180, 180))
+    print(type(rects))
     objconfidences, objnames = [], []
     objconfidences.append(120)
     objconfidences.append(200)
