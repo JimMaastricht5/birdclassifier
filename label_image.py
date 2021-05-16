@@ -150,7 +150,7 @@ def set_label(img, labels, label_thresholds, interpreter, input_mean, input_std)
                     maxlresult = lresult
 
     maxcresult = maxcresult / 100  # needed for automl or google coral.ai model
-    print(f'match returned: confidence (maxcresult), (maxlresult)')
+    print(f'match returned: confidence {maxcresult}, {maxlresult}')
     return maxcresult, maxlresult  # highest confidence with best match
 
 

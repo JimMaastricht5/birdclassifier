@@ -80,7 +80,9 @@ def bird_detector(args):
         curr_day, curr_hr = hour_or_day_change(curr_day, curr_hr, spweather, bird_tweeter, birdpop)
 
         motionb, img = motion_detector.detect(args["flipcamera"], cv2, cap, first_img, args["minarea"])
-        if motionb:  # motion detected.
+        if motionb is False:
+            birdobj.update([], [], [])  # detected no motion, update missing from frame count
+        else:  # motion detected.
             motioncnt += 1
             print(f'\r motion {motioncnt}', end=' ')  # indicate motion on monitor
             # improve image prior to obj detection and labeling
