@@ -105,7 +105,7 @@ def bird_detector(args):
                     species_conf, species, (startX, startY, endX, endY) = \
                         bird_observations(args, img, equalizedimg, det_rects[i], possible_labels,
                                           species_thresholds, interpreter)  # compare images for raw and color enhanced
-                    # birdobj.update(list((startX, startY, endX, endY)), list(species_conf), list(species))
+                    birdobj.update([(startX, startY, endX, endY)], [species_conf], [species])
                     species_visit_count, species_last_seen = birdpop.report_census(species)  # grab last time observed
                     birdpop.visitor(species, datetime.now())  # update census count and last time seen
                     common_name, img_label, tweet_label = label_text(species, species_conf)
