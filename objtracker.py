@@ -113,6 +113,7 @@ def main():
     rects.append((5, 15, 5, 15))
     rects.append((80, 80, 180, 180))
     print(type(rects))
+    print(rects)
     objconfidences, objnames = [], []
     objconfidences.append(120)
     objconfidences.append(200)
@@ -128,12 +129,16 @@ def main():
         obj_tracker.update(rects, objconfidences, objnames)
         print(obj_tracker.objects, obj_tracker.disappeared)
 
-    for i in range(1, 60):
-        rects = []
-        print(i)
-        obj_tracker.update(rects, objconfidences, objnames)
-        print(obj_tracker.objects)
+    # for i in range(1, 60):
+    #     rects = []
+    #     print(i)
+    #     obj_tracker.update(rects, objconfidences, objnames)
+    #     print(obj_tracker.objects)
 
+    print('for loop')
+    print(obj_tracker.rects)
+    for key in obj_tracker.rects:
+        print(key, obj_tracker.rects[key])
 
 if __name__ == "__main__":
     main()

@@ -113,10 +113,9 @@ def bird_detector(args):
                     birdobj.update([(startX, startY, endX, endY)], [species_conf], [common_name])
 
             # all birds in image processed, add all objects to equalized image and show
-            if len(birdobj.rects) > 0:
-                for (i, (startX, startY, endX, endY)) in enumerate([birdobj.rects]):
-                    equalizedimg = label_image.add_box_and_label(equalizedimg, birdobj.objnames[i], startX, startY,
-                                                                 endX, endY, colors, i)
+            for key in birdobj.rects:
+                equalizedimg = label_image.add_box_and_label(equalizedimg, birdobj.objnames[key],
+                                                                birdobj.rects[key], colors, key)
             cv2.imshow('equalized', equalizedimg)  # show equalized image
 
             # Show image and tweet, confidence here is lowest in the picture
@@ -129,13 +128,11 @@ def bird_detector(args):
                     print(f" {species} not tweeted, last seen {species_last_seen.strftime('%I:%M %p')}. wait 5 minutes")
 
         # motion processed, all birds in image processed if detected, add all known objects to image
-        if len(birdobj.rects) > 0:
-            for (i, (startX, startY, endX, endY)) in enumerate([birdobj.rects]):
-                img = label_image.add_box_and_label(img, birdobj.objnames[i], startX, startY, endX, endY, colors, i)
-
+        for key in birdobj.rects:
+            img = label_image.add_box_and_label(img, birdobj.objnames[key], birdobj.rects[key], colors, key)
         cv2.imshow('video', img)  # show image with box and label use cv2.flip if image inverted
-        cv2.waitKey(20)  # wait 20 ms to render video, restart loop.  setting of 0 is fixed img; > 0 video
 
+        cv2.waitKey(20)  # wait 20 ms to render video, restart loop.  setting of 0 is fixed img; > 0 video
         # shut down the app if between 1:00 and 1:05 am.  Pi runs this in a loop and restarts it every 20 minutes
         if datetime.now().hour == 1 and datetime.now().minute <= 5:
             break
