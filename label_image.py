@@ -136,9 +136,9 @@ def set_label(img, labels, label_thresholds, interpreter, input_mean, input_std)
     # output_data = interpreter.get_tensor(output_details[0]['index'])
     # results = np.squeeze(output_data)  # squeeze out empty axis
     # If the model is quantized (tflite uint8 data), then dequantize the results
-    if output_details['dtype'] == np.uint8:  # scale is off by 10 running local, same on PI?
+    if output_details['dtype'] == np.uint8:
         scale, zero_point = output_details['quantization']
-        output = scale * (output - zero_point)
+        output = scale * (output - zero_point) * 10  # added * 10 scale factor to try and get numbers right
 
     # cindex = np.argpartition(results, -10)[-10:]
     cindex = np.argpartition(output, -10)[-10:]
@@ -158,7 +158,6 @@ def set_label(img, labels, label_thresholds, interpreter, input_mean, input_std)
                     maxcresult = cresult
                     maxlresult = lresult
 
-    # maxcresult = maxcresult / 100  # needed for automl or google coral.ai model
     print(f'match returned: confidence {maxcresult}, {maxlresult}')
     return maxcresult, maxlresult  # highest confidence with best match
 
