@@ -136,7 +136,7 @@ def set_label(img, labels, label_thresholds, interpreter, input_mean, input_std)
     # output_data = interpreter.get_tensor(output_details[0]['index'])
     # results = np.squeeze(output_data)  # squeeze out empty axis
     # If the model is quantized (tflite uint8 data), then dequantize the results
-    if output_details['dtype'] == np.uint8:
+    if output_details['dtype'] == np.uint8:  # scale is off by 10 running local, same on PI?
         scale, zero_point = output_details['quantization']
         output = scale * (output - zero_point)
 
@@ -148,7 +148,8 @@ def set_label(img, labels, label_thresholds, interpreter, input_mean, input_std)
     maxlresult = ''
     for lindex in cindex:
         lresult = str(labels[lindex])  # grab predicted label, push this to a string instead of tuple
-        cresult = float(results[lindex])   # grab predicted confidence score
+        # cresult = float(results[lindex])   # grab predicted confidence score
+        cresult = float(output[lindex])  # grab predicted confidence score
         if cresult != 0:
             # print(f'     {check_threshold(cresult, lindex, label_thresholds)} match, confidence:{str(cresult)}' +
             #         f', threshold:{label_thresholds[lindex][1]}, {str(labels[lindex])}.')
@@ -212,12 +213,12 @@ def check_threshold(cresult, lindex, label_thresholds):
 # test function
 if __name__ == '__main__':
     ap = argparse.ArgumentParser()
-    ap.add_argument('-i', '--image', default='/home/pi/birdclass/commongrackle.jpg',help='image to be classified')
+    # ap.add_argument('-i', '--image', default='/home/pi/birdclass/commongrackle.jpg',help='image to be classified')
     # ap.add_argument('-i', '--image', default='/home/pi/birdclass/test2.jpg', help='image to be classified')
     # ap.add_argument('-i', '--image', default='/home/pi/birdclass/test3.jpg', help='image to be classified')
     # ap.add_argument('-i', '--image', default='/home/pi/birdclass/2cardinal.jpg', help='image to be classified')
     # ap.add_argument('-i', '--image', default='/home/pi/birdclass/cardinal.jpg', help='image to be classified')
-    # ap.add_argument('-i', '--image', default='/home/pi/birdclass/ncardinal.jpg', help='image to be classified')
+    ap.add_argument('-i', '--image', default='/home/pi/birdclass/ncardinal.jpg', help='image to be classified')
 
     # object detection model setup
     ap.add_argument('-om', "--obj_det_model",
