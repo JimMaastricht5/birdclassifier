@@ -129,11 +129,19 @@ def set_label(img, labels, label_thresholds, interpreter, input_mean, input_std)
     output_details = interpreter.get_output_details()
     floating_model, input_data = convert_cvframe_to_ts(img, input_details, input_mean, input_std)
     interpreter.set_tensor(input_details[0]['index'], input_data)
-    interpreter.invoke()
 
-    output_data = interpreter.get_tensor(output_details[0]['index'])
-    results = np.squeeze(output_data)  # squeeze out empty axis
-    cindex = np.argpartition(results, -10)[-10:]
+    interpreter.invoke()
+    output_details = interpreter.get_output_details()[0]
+    output = np.squeeze(interpreter.get_tensor(output_details['index']))
+    # output_data = interpreter.get_tensor(output_details[0]['index'])
+    # results = np.squeeze(output_data)  # squeeze out empty axis
+    # If the model is quantized (tflite uint8 data), then dequantize the results
+    if output_details['dtype'] == np.uint8:
+        scale, zero_point = output_details['quantization']
+        output = scale * (output - zero_point)
+
+    # cindex = np.argpartition(results, -10)[-10:]
+    cindex = np.argpartition(output, -10)[-10:]
 
     # loop thru top N results to find best match; highest score align with matching species threshold
     maxcresult = float(0)
@@ -149,7 +157,7 @@ def set_label(img, labels, label_thresholds, interpreter, input_mean, input_std)
                     maxcresult = cresult
                     maxlresult = lresult
 
-    maxcresult = maxcresult / 100  # needed for automl or google coral.ai model
+    # maxcresult = maxcresult / 100  # needed for automl or google coral.ai model
     print(f'match returned: confidence {maxcresult}, {maxlresult}')
     return maxcresult, maxlresult  # highest confidence with best match
 
