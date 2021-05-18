@@ -201,7 +201,7 @@ def label_text(species, species_conf):
         common_name = species[start:end]
     else:
         common_name = species
-    tweet_label = f"{species}: confidence {species_conf * 100:.0f} observed: "
+    tweet_label = f"{species}: confidence {species_conf * 10:.1f}% observed: "
     return common_name, tweet_label
 
 
