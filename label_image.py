@@ -153,6 +153,8 @@ def set_label(img, labels, label_thresholds, interpreter, input_mean, input_std)
         if cresult != 0:
             # print(f'     {check_threshold(cresult, lindex, label_thresholds)} match, confidence:{str(cresult)}' +
             #         f', threshold:{label_thresholds[lindex][1]}, {str(labels[lindex])}.')
+            if cresult > 1:  # still don't have scaling working 100% if the result is more than 100% drop the 1
+                cresult -= cresult
             if check_threshold(cresult, lindex, label_thresholds):  # compare confidence score to threshold by label
                 if cresult > maxcresult:  # if this above threshold and is a better confidence result store it
                     maxcresult = cresult
@@ -204,9 +206,10 @@ def add_box_and_label(img, img_label, rect, colors, coloroffset):
 
 # func checks threshold by each label passed as a nparray with text in col 0 and threshold in col 1
 # species cannot be -1 (not present in geo location), cannot be 0, and must be equal or exceed minimum score
+# cresult is a decimal % 0 - 1; lindex is % * 10 (no decimals) must / by 1000 to get same scale
 def check_threshold(cresult, lindex, label_thresholds):
     return(int(label_thresholds[int(lindex)][1]) != -1 and cresult > 0 and
-           cresult >= int(label_thresholds[int(lindex)][1]))
+           cresult >= float(label_thresholds[int(lindex)][1]) / 1000)
 
 
 # test function
