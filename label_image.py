@@ -46,7 +46,7 @@ def main(args):
     img = cv2.imread(args.image)
     obj_interpreter, obj_labels = init_tf2(args.obj_det_model, args.numthreads, args.obj_det_labels)
     confidences, labels, rects = object_detection(args.bconfidence, img, obj_labels,
-                                              obj_interpreter, args.inputmean, args.inputstd)
+                                                  obj_interpreter, args.inputmean, args.inputstd)
     speciesthresholds = np.genfromtxt(args.species_thresholds, delimiter=',')
     print('objects detected', confidences)
     print('labels detected', labels)
@@ -60,10 +60,12 @@ def main(args):
         result, label = set_label(img, possible_labels, speciesthresholds, interpreter, args.inputmean,
                                   args.inputstd)
         print('***return from set_label with full image')
+        print(result, label)
         print('***calling set_label with crop image ***')
         result, label = set_label(crop_img, possible_labels, speciesthresholds, interpreter, args.inputmean,
                                   args.inputstd)
         print('***return from set_label with crop image')
+        print(result, label)
 
         print('bird #', i)
         print('confidence for species', result)
@@ -123,8 +125,6 @@ def object_detection(min_confidence, img, labels, interpreter, input_mean, input
 # if the ML models confidence is higer than the treshold for that lable (species) it will stop searching and
 # return that best result
 def set_label(img, labels, label_thresholds, interpreter, input_mean, input_std):
-    cresult = float(0)
-    lresult = ''
     input_details = interpreter.get_input_details()
     output_details = interpreter.get_output_details()
     floating_model, input_data = convert_cvframe_to_ts(img, input_details, input_mean, input_std)
@@ -208,8 +208,12 @@ def add_box_and_label(img, img_label, rect, colors, coloroffset):
 # species cannot be -1 (not present in geo location), cannot be 0, and must be equal or exceed minimum score
 # cresult is a decimal % 0 - 1; lindex is % * 10 (no decimals) must / by 1000 to get same scale
 def check_threshold(cresult, lindex, label_thresholds):
-    return(int(label_thresholds[int(lindex)][1]) != -1 and cresult > 0 and
-           cresult >= float(label_thresholds[int(lindex)][1]) / 1000)
+    if label_thresholds[int(lindex)][1] == 0:
+        label_threshold = 900  # default value species with no tolerance 90%
+    else:
+        label_threshold = label_thresholds[int(lindex)][1]
+    return(int(label_threshold) != -1 and cresult > 0 and
+           cresult >= float(label_threshold) / 1000)
 
 
 # test function

@@ -250,7 +250,7 @@ if __name__ == "__main__":
 
     # confidence settings for object detection and species bconfidence
     ap.add_argument('-bc', '--bconfidence', type=float, default=0.50)  # obj detection threshold; 76 is a good min
-    ap.add_argument('-sc', '--sconfidence', type=float, default=0.90)  # quant model is accurate down to 90
+    ap.add_argument('-sc', '--sconfidence', type=float, default=0.80)  # twitter min threshold, adjust down more tweets
 
     arguments = vars(ap.parse_args())
     bird_detector(arguments)
