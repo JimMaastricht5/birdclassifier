@@ -101,8 +101,8 @@ def bird_detector(args):
                 birdobj.update([], [], [])  # detected no objects, update missing from frame count
 
             for i, det_confidence in enumerate(det_confidences):  # loop thru detected objects
-                print(f': {datetime.now().strftime("%I:%M %p")} observed ' +
-                      f"{det_labels[i]}:{det_confidence * 100:.0f}% ", end='')
+                # print(f': {datetime.now().strftime("%I:%M %p")} observed ' +
+                #       f"{det_labels[i]}:{det_confidence * 100:.0f}% ", end='')
 
                 if det_labels[i] == "bird":  # bird observed, find species, label, and tweet
                     motioncnt = 0  # reset motion count between birds
@@ -120,7 +120,7 @@ def bird_detector(args):
             # all birds in image processed, add all objects to equalized image and show
             for key in birdobj.rects:
                 equalizedimg = label_image.add_box_and_label(equalizedimg, birdobj.objnames[key],
-                                                                birdobj.rects[key], colors, key)
+                                                             birdobj.rects[key], colors, key)
             cv2.imshow('equalized', equalizedimg)  # show equalized image
 
             # Show image and tweet, confidence here is lowest in the picture
@@ -171,18 +171,19 @@ def bird_observations(args, img, equalizedimg, det_rects, possible_labels, speci
 def hour_or_day_change(curr_day, curr_hr, spweather, bird_tweeter, birdpop):
     if curr_day != datetime.now().day:
         observed = birdpop.get_census_by_count()  # count from prior day
-        bird_tweeter.post_status(f'top 3 birds for day {str(curr_day)}')
+        post_txt = f'top 3 birds for day {str(curr_day)}'
+        # bird_tweeter.post_status(f'top 3 birds for day {str(curr_day)}')
         index, loopcnt = 0, 1
         while loopcnt <= 3:  # print top 3 skipping unknown species
             if observed[index][0:2] == '':
                 index += 1
-            try:
-                bird_tweeter.post_status(f'#{str(loopcnt)} {observed[index][0:2]}')
-            except:
-                bird_tweeter.post_status('unable to post observations')
-                break
+            try: post_txt += f', #{str(loopcnt)} {observed[index][0:2]}'
+            except: break
             index += 1
             loopcnt += 1
+
+        try: bird_tweeter.post_status(post_txt)
+        except: pass
 
         birdpop.clear()  # clear count for new day
         curr_day = datetime.now().day  # set new day = to current day
