@@ -12,7 +12,7 @@ class CentroidTracker:
     # initialize the next unique object ID along with two ordered dictionaries used to keep track objects
     # store the number of maximum consecutive frames a given object is allowed to be marked as "disappeared" until
     # the object is deregistered from tracking
-    def __init__(self, maxdisappeared=50):
+    def __init__(self, maxdisappeared=10):
         self.nextObjectID = 0
         self.objects = OrderedDict()
         self.disappeared = OrderedDict()
