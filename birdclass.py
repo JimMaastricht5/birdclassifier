@@ -172,7 +172,6 @@ def hour_or_day_change(curr_day, curr_hr, spweather, bird_tweeter, birdpop):
     if curr_day != datetime.now().day:
         observed = birdpop.get_census_by_count()  # count from prior day
         post_txt = f'top 3 birds for day {str(curr_day)}'
-        # bird_tweeter.post_status(f'top 3 birds for day {str(curr_day)}')
         index, loopcnt = 0, 1
         while loopcnt <= 3:  # print top 3 skipping unknown species
             if observed[index][0:2] == '':
@@ -182,7 +181,7 @@ def hour_or_day_change(curr_day, curr_hr, spweather, bird_tweeter, birdpop):
             index += 1
             loopcnt += 1
 
-        try: bird_tweeter.post_status(post_txt)
+        try: bird_tweeter.post_status(post_txt[0:150])
         except: pass
 
         birdpop.clear()  # clear count for new day
