@@ -224,7 +224,7 @@
 223 Pheucticus melanocephalus (Black-headed Grosbeak),850
 224 Sphyrapicus nuchalis (Red-naped Sapsucker),0
 225 Ortalis poliocephala (West Mexican Chachalaca),0
-226 Ortalis vetula (Plain Chachalaca),0
+226 Ortalis vetula (Plain Chachalaca),-1
 227 Corvus albus (Pied Crow),0
 228 Mniotilta varia (Black-and-white Warbler),-1
 229 Volatinia jacarina (Blue-black Grassquit),0
@@ -487,7 +487,7 @@
 486 Cerorhinca monocerata (Rhinoceros Auklet),0
 487 Turdus philomelos (Song Thrush),0
 488 Galbula ruficauda (Rufous-tailed Jacamar),0
-489 Jacana spinosa (Northern Jacana),0
+489 Jacana spinosa (Northern Jacana),-1
 490 Saxicola rubicola (European Stonechat),0
 491 Upupa epops (Common Hoopoe),0
 492 Euphagus carolinus (Rusty Blackbird),0
@@ -817,7 +817,7 @@
 816 Cygnus columbianus (Tundra Swan),0
 817 Cygnus olor (Mute Swan),0
 818 Icterus galbula (Baltimore Oriole),0
-819 Anas platyrhynchos (Mallard),800
+819 Anas platyrhynchos (Mallard),950
 820 Anas acuta (Northern Pintail),0
 821 Anas crecca (Green-winged Teal),900
 822 Anas cyanoptera (Cinnamon Teal),-1
@@ -865,7 +865,7 @@
 864 Vermivora cyanoptera (Blue-winged Warbler),0
 865 Corvus caurinus (Northwestern Crow),0
 866 Asio otus (Long-eared Owl),0
-867 Corvus brachyrhynchos (American Crow),0
+867 Corvus brachyrhynchos (American Crow),900
 868 Clangula hyemalis (Long-tailed Duck),0
 869 Chenonetta jubata (Australian Wood Duck),0
 870 Thalasseus sandvicensis (Sandwich Tern),0
