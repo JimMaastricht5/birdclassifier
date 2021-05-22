@@ -164,7 +164,7 @@ def bird_observations(args, img, equalizedimg, det_rects, possible_labels, speci
                                                                       species_thresholds, interpreter,
                                                                       args["inputmean"], args["inputstd"])
     if species != species_equalized:  # predictions should match if pic quality is good
-        # pick the higher of the two provided they are correlated
+        # pick the base image if the conf is higher than the equalized image and higher then a default of .975
         if species_conf >= species_conf_equalized and species_conf >= .975:
             pass
             # species_conf = species_conf_equalized
