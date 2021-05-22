@@ -116,11 +116,14 @@ def bird_detector(args):
                     birdpop.visitor(species, datetime.now())  # update census count and last time seen
                     common_name, tweet_label = label_text(species, species_conf)
                     birdobj.update([(startX, startY, endX, endY)], [species_conf], [common_name])
+                    equalizedimg = label_image.add_box_and_label(equalizedimg, species, (startX, startY, endX, endY),
+                                                                 colors, 1)
 
             # all birds in image processed, add all objects to equalized image and show
-            for key in birdobj.rects:
-                equalizedimg = label_image.add_box_and_label(equalizedimg, birdobj.objnames[key],
-                                                             birdobj.rects[key], colors, key)
+            # for key in birdobj.rects:
+            #     equalizedimg = label_image.add_box_and_label(equalizedimg, birdobj.objnames[key],
+            #                                                  birdobj.rects[key], colors, key)
+
             cv2.imshow('equalized', equalizedimg)  # show equalized image
 
             # Show image and tweet, confidence here is lowest in the picture
