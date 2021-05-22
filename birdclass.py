@@ -160,9 +160,10 @@ def bird_observations(args, img, equalizedimg, det_rects, possible_labels, speci
     species_conf_equalized, species_equalized = label_image.set_label(birdcrop_equalizedimg, possible_labels,
                                                                       species_thresholds, interpreter,
                                                                       args["inputmean"], args["inputstd"])
-    if species != species_equalized:  # must match or bad prediction
-        species_conf = float(0)
-        species = ''
+    if species != species_equalized:  # predictions should match if they don't take the higher of the two
+        if species_conf <= species_conf_equalized:
+            species_conf = species_conf_equalized
+            species = species_equalized
     return species_conf, species, (startX, startY, endX, endY)
 
 
@@ -250,7 +251,7 @@ if __name__ == "__main__":
 
     # confidence settings for object detection and species bconfidence
     ap.add_argument('-bc', '--bconfidence', type=float, default=0.50)  # obj detection threshold; 76 is a good min
-    ap.add_argument('-sc', '--sconfidence', type=float, default=0.80)  # twitter min threshold, adjust down more tweets
+    ap.add_argument('-sc', '--sconfidence', type=float, default=0.70)  # twitter min threshold, adjust down more tweets
 
     arguments = vars(ap.parse_args())
     bird_detector(arguments)
