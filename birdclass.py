@@ -163,10 +163,14 @@ def bird_observations(args, img, equalizedimg, det_rects, possible_labels, speci
     species_conf_equalized, species_equalized = label_image.set_label(birdcrop_equalizedimg, possible_labels,
                                                                       species_thresholds, interpreter,
                                                                       args["inputmean"], args["inputstd"])
-    if species != species_equalized:  # predictions should match if they don't take the higher of the two
-        if species_conf <= species_conf_equalized:
+    if species != species_equalized:  # predictions should match if pic quality is good
+        # pick the higher of the two provided they are correlated
+        if species_conf <= species_conf_equalized and species_conf_equalized >= .9:
             species_conf = species_conf_equalized
             species = species_equalized
+        else:
+            species_conf = 0
+            species = ''
     return species_conf, species, (startX, startY, endX, endY)
 
 
