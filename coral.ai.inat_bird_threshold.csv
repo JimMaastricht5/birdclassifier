@@ -144,7 +144,7 @@
 143 Pelecanus occidentalis (Brown Pelican),0
 144 Cinclus cinclus (White-throated Dipper),0
 145 Chen rossii (Ross's Goose),0
-146 Callipepla californica (California Quail),0
+146 Callipepla californica (California Quail),-1
 147 Cardinalis cardinalis (Northern Cardinal),100
 148 Quiscalus mexicanus (Great-tailed Grackle),-1
 149 Callipepla squamata (Scaled Quail),0
@@ -305,7 +305,7 @@
 304 Ixobrychus exilis (Least Bittern),0
 305 Auriparus flaviceps (Verdin),0
 306 Geothlypis tolmiei (MacGillivray's Warbler),0
-307 Columba livia (Rock Pigeon),250
+307 Columba livia (Rock Pigeon),950
 308 Setophaga citrina (Hooded Warbler),0
 309 Setophaga cerulea (Cerulean Warbler),0
 310 Columba palumbus (Common Wood-Pigeon),0
@@ -692,7 +692,7 @@
 691 Myiarchus tyrannulus (Brown-crested Flycatcher),0
 692 Zosterops lateralis (Silvereye),0
 693 Zonotrichia leucophrys (White-crowned Sparrow),0
-694 Agelaius phoeniceus (Red-winged Blackbird),850
+694 Agelaius phoeniceus (Red-winged Blackbird),980
 695 Parus major (Great Tit),-1
 696 Zonotrichia capensis (Rufous-collared Sparrow),0
 697 Oreothlypis peregrina (Tennessee Warbler),0
