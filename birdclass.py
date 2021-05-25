@@ -114,7 +114,7 @@ def bird_detector(args):
             cv2.imshow('equalized', equalizedimg)  # show equalized image
 
             # Show image and tweet, confidence here is lowest in the picture
-            if species_conf >= args.sconfidence:  # tweet threshold
+            if species_conf >= birds.classify_bird_species_min_confidence:  # tweet threshold
                 if (datetime.now() - species_last_seen).total_seconds() >= 60 * 5:
                     cv2.imshow('tweeted', equalizedimg)  # show what we would be tweeting
                     if bird_tweeter.post_image(tweet_label + str(species_visit_count + 1), equalizedimg) is False:

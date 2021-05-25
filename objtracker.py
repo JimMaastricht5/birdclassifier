@@ -21,7 +21,6 @@ class CentroidTracker:
         self.rects = OrderedDict()
         self.maxDisappeared = maxdisappeared
 
-
     # register an object with next available object ID
     def register(self, centroid, rect, objconfidence, objname):
         self.objects[self.nextObjectID] = centroid
@@ -139,6 +138,7 @@ def main():
     print(obj_tracker.rects)
     for key in obj_tracker.rects:
         print(key, obj_tracker.rects[key])
+
 
 if __name__ == "__main__":
     main()

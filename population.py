@@ -88,7 +88,7 @@ def main():
     observed = popdogcats.get_census_by_count()  # print count from prior day
     try:
         print(f'top 3 birds yesterday #1 {observed[0][0:2]}, #2 {observed[1][0:2]}')
-    except:
+    except IndexError:
         print('unable to post observations')
 
     popdogcats.clear()  # clear count for new day

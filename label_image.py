@@ -56,7 +56,7 @@ class Bird_Detect_Classify:
         self.classifier, self.bird_possible_labels = self.init_tf2(self.classifier_file, self.classifier_labels_file)
         self.input_mean = 127.5  # recommended default
         self.input_std = 127.5  # recommended default
-        self.detect_bird_obj_min_confidence = .5
+        self.detect_bird_obj_min_confidence = 0
         self.classify_bird_species_min_confidence = .7
         self.classify_bird_species_default_confidence = .95
         self.detected_confidences = []
