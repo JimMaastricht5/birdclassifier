@@ -58,8 +58,11 @@ class Tweeter_Class:
         self.check_hour()
         if self.tweetcnt < self.tweetmax_per_hour:
             self.tweetcnt += 1
-            self.twitter.update_status(status=message)
-            self.tweeted = True
+            try:
+                self.twitter.update_status(status=message)
+                self.tweeted = True
+            except:
+                self.tweeted = False
         else:
             self.tweeted = False
         return
@@ -70,10 +73,13 @@ class Tweeter_Class:
         cv2.imwrite("img.jpg", img)  # write out image for debugging and testing
         tw_img = open('img.jpg', 'rb')  # reload a image for twitter, correct var type
         if self.tweetcnt < self.tweetmax_per_hour:
-            response = self.twitter.upload_media(media=tw_img)
-            self.twitter.update_status(status=message, media_ids=[response['media_id']])
-            self.tweetcnt += 1
-            self.tweeted = True
+            try:
+                response = self.twitter.upload_media(media=tw_img)
+                self.twitter.update_status(status=message, media_ids=[response['media_id']])
+                self.tweetcnt += 1
+                self.tweeted = True
+            except:
+                self.tweeted = False
         else:
             self.tweeted = False
         return self.tweeted
