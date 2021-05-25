@@ -40,12 +40,10 @@ import tweeter  # twitter helper functions
 import image_proc  # lib of image enhancement functions
 import population  # population census object, tracks species total seen and last time
 import argparse  # argument parser
-import numpy as np
 from datetime import datetime
 
 
 def bird_detector(args):
-    colors = np.random.uniform(0, 255, size=(11, 3))  # random colors for bounding boxes
     birdpop = population.Census()  # initialize species population census object
     birdobj = objtracker.CentroidTracker()
     motioncnt = 0
@@ -59,15 +57,9 @@ def bird_detector(args):
     first_img = motion_detector.init(args["flipcamera"], cv2, cap)  # set gray motion mask
     set_windows()  # position output windows at top of screen and init output
 
-    # load species threshold file, note this will not handles species as a string in the first column.
-    species_thresholds = np.genfromtxt(args["species_thresholds"], delimiter=',')
-
     # setup twitter and tensor flow models
     bird_tweeter = tweeter.Tweeter_Class()  # init tweeter2 class twitter handler
-    tfobjdet, objdet_possible_labels = label_image.init_tf2(args["obj_det_model"], args["numthreads"],
-                                                            args["obj_det_labels"])
-    interpreter, possible_labels = label_image.init_tf2(args["species_model"], args["numthreads"],
-                                                        args["species_labels"])
+    birds = label_image.Bird_Detect_Classify()
     starttime = datetime.now()  # used for total run time report
     bird_tweeter.post_status(f'Starting process at {datetime.now().strftime("%I:%M:%S %P")}, ' +
                              f'{spweather.weatherdescription} ' +
@@ -89,9 +81,7 @@ def bird_detector(args):
             # if spweather.isclear is False or image_proc.is_color_low_contrast(img):
             equalizedimg = image_proc.equalize_color(img)  # balance histogram of color intensity for all frames
             # else: equalizedimg = img.copy()  # no adjustment necessary, create a copy of the image
-            det_confidences, det_labels, det_rects = \
-                label_image.object_detection(args["bconfidence"], img, objdet_possible_labels, tfobjdet,
-                                             args["inputmean"], args["inputstd"])  # detect objects
+            det_confidences, det_labels, det_rects = birds.detect(img)  # detect objects
 
             # ensure collection of variables used outside loop for tweet are set
             species_conf, species_visit_count = 0, 0
@@ -108,21 +98,18 @@ def bird_detector(args):
                     motioncnt = 0  # reset motion count between birds
                     print('')  # print new line in console, species matches appear below indented
                     species_conf, species, (startX, startY, endX, endY) = \
-                        bird_observations(args, img, equalizedimg, det_rects[i], possible_labels,
-                                          species_thresholds, interpreter)  # compare images for raw and color enhanced
+                        bird_observations(birds, img, equalizedimg, det_rects[i])
 
                     # update info about bird
                     species_visit_count, species_last_seen = birdpop.report_census(species)  # grab last time observed
                     birdpop.visitor(species, datetime.now())  # update census count and last time seen
                     common_name, tweet_label = label_text(species, species_conf)
                     birdobj.update([(startX, startY, endX, endY)], [species_conf], [common_name])
-                    equalizedimg = label_image.add_box_and_label(equalizedimg, species, (startX, startY, endX, endY),
-                                                                 colors, 1)
+                    equalizedimg = birds.add_box_and_label(equalizedimg, species, (startX, startY, endX, endY))
 
             # all birds in image processed, add all objects to equalized image and show
             # for key in birdobj.rects:
-            #     equalizedimg = label_image.add_box_and_label(equalizedimg, birdobj.objnames[key],
-            #                                                  birdobj.rects[key], colors, key)
+            #     equalizedimg = label_image.add_box_and_label(equalizedimg, birdobj.objnames[key], birdobj.rects[key])
 
             cv2.imshow('equalized', equalizedimg)  # show equalized image
 
@@ -137,7 +124,7 @@ def bird_detector(args):
 
         # motion processed, all birds in image processed if detected, add all known objects to image
         for key in birdobj.rects:
-            img = label_image.add_box_and_label(img, birdobj.objnames[key], birdobj.rects[key], colors, key)
+            img = birds.add_box_and_label(img, birdobj.objnames[key], birdobj.rects[key])
         cv2.imshow('video', img)  # show image with box and label use cv2.flip if image inverted
 
         cv2.waitKey(20)  # wait 20 ms to render video, restart loop.  setting of 0 is fixed img; > 0 video
@@ -153,16 +140,13 @@ def bird_detector(args):
 
 
 # make observations about bird using image and color equalized image
-def bird_observations(args, img, equalizedimg, det_rects, possible_labels, species_thresholds, interpreter):
-    (startX, startY, endX, endY) = label_image.scale_rect(img, det_rects)  # set x,y bounding box
+def bird_observations(birds, img, equalizedimg, det_rect):
+    (startX, startY, endX, endY) = birds.scale_rect(img, det_rect)  # set x,y bounding box
     birdcrop_img = img[startY:endY, startX:endX]  # extract image for better species detection
     birdcrop_equalizedimg = equalizedimg[startY:endY, startX:endX]  # extract image for better species detection
     # check both raw and equalized images against one another
-    species_conf, species = label_image.set_label(birdcrop_img, possible_labels, species_thresholds,
-                                                  interpreter, args["inputmean"], args["inputstd"])
-    species_conf_equalized, species_equalized = label_image.set_label(birdcrop_equalizedimg, possible_labels,
-                                                                      species_thresholds, interpreter,
-                                                                      args["inputmean"], args["inputstd"])
+    species_conf, species = birds.classify(birdcrop_img)
+    species_conf_equalized, species_equalized = birds.classify(birdcrop_equalizedimg)
     if species != species_equalized:  # predictions should match if pic quality is good
         # pick the base image if the conf is higher than the equalized image and higher then a default of .975
         if species_conf >= species_conf_equalized and species_conf >= .975:
@@ -234,32 +218,6 @@ if __name__ == "__main__":
     ap.add_argument("-a", "--minarea", type=int, default=1000, help="motion threshold")
     ap.add_argument("-sw", "--screenwidth", type=int, default=320, help="max screen width")
     ap.add_argument("-sh", "--screenheight", type=int, default=240, help="max screen height")
-
-    # object detection model setup
-    ap.add_argument('-om', "--obj_det_model",
-                    default='/home/pi/birdclass/lite-model_ssd_mobilenet_v1_1_metadata_2.tflite')
-    ap.add_argument('-p', '--obj_det_labels',
-                    default='/home/pi/PycharmProjects/pyface2/lite-model_ssd_mobilenet_v1_1_metadata_2_labelmap.txt')
-
-    # species model setup
-    ap.add_argument('-m', '--species_model',
-                    default='/home/pi/PycharmProjects/pyface2/coral.ai.mobilenet_v2_1.0_224_inat_bird_quant.tflite',
-                    help='.tflite model to be executed')
-    ap.add_argument('-l', '--species_labels',
-                    default='/home/pi/PycharmProjects/pyface2/coral.ai.inat_bird_labels.txt',
-                    help='name of file containing labels')
-    ap.add_argument('-ts', '--species_thresholds',
-                    default='/home/pi/PycharmProjects/pyface2/coral.ai.inat_bird_threshold.csv',
-                    help='name of file containing thresholds by label')
-
-    # tensor flow input arguements
-    ap.add_argument('--inputmean', default=127.5, type=float, help='Tensor input_mean')
-    ap.add_argument('--inputstd', default=127.5, type=float, help='Tensor input standard deviation')
-    ap.add_argument('--numthreads', default=None, type=int, help='Tensor number of threads, leave at default')
-
-    # confidence settings for object detection and species bconfidence
-    ap.add_argument('-bc', '--bconfidence', type=float, default=0.50)  # obj detection threshold; 76 is a good min
-    ap.add_argument('-sc', '--sconfidence', type=float, default=0.70)  # twitter min threshold, adjust down more tweets
 
     arguments = vars(ap.parse_args())
     bird_detector(arguments)
