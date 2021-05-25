@@ -145,7 +145,7 @@
 144 Cinclus cinclus (White-throated Dipper),0
 145 Chen rossii (Ross's Goose),0
 146 Callipepla californica (California Quail),-1
-147 Cardinalis cardinalis (Northern Cardinal),100
+147 Cardinalis cardinalis (Northern Cardinal),400
 148 Quiscalus mexicanus (Great-tailed Grackle),-1
 149 Callipepla squamata (Scaled Quail),0
 150 Dryocopus pileatus (Pileated Woodpecker),0
@@ -215,7 +215,7 @@
 214 Crax rubra (Great Curassow),0
 215 Penelope purpurascens (Crested Guan),0
 216 Copsychus malabaricus (White-rumped Shama),0
-217 Paroaria capitata (Yellow-billed Cardinal),0
+217 Paroaria capitata (Yellow-billed Cardinal),-1
 218 Cyanerpes cyaneus (Red-legged Honeycreeper),0
 219 Microcarbo melanoleucos brevirostris (Little Shag),0
 220 Sphyrapicus thyroideus (Williamson's Sapsucker),0
@@ -289,7 +289,7 @@
 288 Chloroceryle amazona (Amazon Kingfisher),0
 289 Myiozetetes similis (Social Flycatcher),0
 290 Toxostoma curvirostre (Curve-billed Thrasher),0
-291 Megaceryle alcyon (Belted Kingfisher),250
+291 Megaceryle alcyon (Belted Kingfisher),0
 292 Eremophila alpestris (Horned Lark),0
 293 Alisterus scapularis (Australian King-Parrot),0
 294 Cinnyris jugularis (Olive-backed Sunbird),0
@@ -933,7 +933,7 @@
 932 Chloroceryle americana (Green Kingfisher),0
 933 Sturnella neglecta (Western Meadowlark),0
 934 Ramphastos ambiguus (Yellow-throated Toucan),0
-935 Paroaria coronata (Red-crested Cardinal),0
+935 Paroaria coronata (Red-crested Cardinal),-1
 936 Buteo buteo (Common Buzzard),0
 937 Myiodynastes luteiventris (Sulphur-bellied Flycatcher),0
 938 Contopus sordidulus (Western Wood-Pewee),0

@@ -47,16 +47,15 @@ except:
 class Bird_Detect_Classify:
     def __init__(self):
         self.detector_file = '/home/pi/birdclass/lite-model_ssd_mobilenet_v1_1_metadata_2.tflite'
-        self.detector_labels = '/home/pi/birdclass/lite-model_ssd_mobilenet_v1_1_metadata_2_labelmap.txt'
+        self.detector_labels_file = '/home/pi/birdclass/lite-model_ssd_mobilenet_v1_1_metadata_2_labelmap.txt'
         self.classifier_file = '/home/pi/birdclass/coral.ai.mobilenet_v2_1.0_224_inat_bird_quant.tflite'
-        self.classifier_labels = '/home/pi/birdclass/coral.ai.inat_bird_labels.txt'
+        self.classifier_labels_file = '/home/pi/birdclass/coral.ai.inat_bird_labels.txt'
         self.classifier_thresholds_file = '/home/pi/birdclass/coral.ai.inat_bird_threshold.csv'
         self.classifier_thresholds = np.genfromtxt(self.classifier_thresholds_file, delimiter=',')
-        self.detector, self.obj_detector_possible_labels = self.init_tf2(self.detector_file, self.detector_labels)
-        self.classifier, self.bird_possible_labels = self.init_tf2(self.classifier_file, self.classifier_labels)
+        self.detector, self.obj_detector_possible_labels = self.init_tf2(self.detector_file, self.detector_labels_file)
+        self.classifier, self.bird_possible_labels = self.init_tf2(self.classifier_file, self.classifier_labels_file)
         self.input_mean = 127.5  # recommended default
         self.input_std = 127.5  # recommended default
-        self.num_threads = None
         self.detect_bird_obj_min_confidence = .5
         self.classify_bird_species_min_confidence = .7
         self.classify_bird_species_default_confidence = .95
@@ -69,9 +68,9 @@ class Bird_Detect_Classify:
     def init_tf2(self, model_file, label_file_name):
         possible_labels = np.asarray(self.load_labels(label_file_name))  # load label file and convert to list
         try:  # load tensorflow lite on rasp pi
-            interpreter = tflite.Interpreter(model_file, self.num_threads)
-        except:  # load full tensor for desktop dev
-            interpreter = tf.lite.Interpreter(model_file, self.num_threads)
+            interpreter = tflite.Interpreter(model_file, None)
+        except NameError:  # load full tensor for desktop dev
+            interpreter = tf.lite.Interpreter(model_file, None)
         interpreter.allocate_tensors()
         return interpreter, possible_labels
 
@@ -100,7 +99,7 @@ class Bird_Detect_Classify:
                 if det_confidence >= self.detect_bird_obj_min_confidence:
                     labelidx = int(det_labels_index[0][index])  # get result label index for labels;
                     try:
-                        label = self.detector_labels[labelidx]  # grab text from possible labels
+                        label = self.obj_detector_possible_labels[labelidx]  # grab text from possible labels
                     except:
                         label = ""
 
@@ -134,7 +133,7 @@ class Bird_Detect_Classify:
         maxcresult = float(0)
         maxlresult = ''
         for lindex in cindex:
-            lresult = str(self.classifier_labels[lindex])  # grab predicted label, push this to a string instead of tuple
+            lresult = str(self.bird_possible_labels[lindex])  # grab predicted label,push this to a string instead of tuple
             cresult = float(output[lindex])  # grab predicted confidence score
             if cresult != 0:
                 # print(f'     {check_threshold(cresult, lindex, label_thresholds)} match, confidence:{str(cresult)}' +
@@ -146,7 +145,8 @@ class Bird_Detect_Classify:
                         maxcresult = cresult
                         maxlresult = lresult
 
-        print(f'match returned: confidence {maxcresult}, {maxlresult}')
+        if maxcresult != 0:
+            print(f'match returned: confidence {maxcresult}, {maxlresult}')
         return maxcresult, maxlresult  # highest confidence with best match
 
 
@@ -193,7 +193,7 @@ class Bird_Detect_Classify:
     # cresult is a decimal % 0 - 1; lindex is % * 10 (no decimals) must div by 1000 to get same scale
     def check_threshold(self, cresult, lindex):
         if self.classifier_thresholds[int(lindex)][1] == 0:
-            label_threshold = self.classify_bird_species_default_confidence
+            label_threshold = self.classify_bird_species_default_confidence * 1000
         else:
             label_threshold = self.classifier_thresholds[int(lindex)][1]
         return(int(label_threshold) != -1 and cresult > 0 and
@@ -210,31 +210,24 @@ def main(args):
     print('rectangles', birds.detected_rects)
 
     for i, det_confidence in enumerate(birds.detected_confidences):
+        print('bird #', i)
         (startX, startY, endX, endY) = birds.scale_rect(img, birds.detected_rects[i])  # set x,y bounding box
         crop_img = img[startY:endY, startX:endX]  # extract image for better species detection
-        print('***calling set_label with full image ***')
         result, label = birds.classify(img)
-        print('***return from set_label with full image')
-        print(result, label)
-        print('***calling set_label with crop image ***')
-        result, label = birds.classify(crop_img)
-        print('***return from set_label with crop image')
-        print(result, label)
-
-        print('bird #', i)
-        print('confidence for species', result)
-        print('label for species', label)
+        cresult, clabel = birds.classify(crop_img)
+        print(f'confidence for species: full image {result}; cropped {cresult}')
+        print(f'label for species: full image {label}; cropped {clabel}')
 
 
 # test function
 if __name__ == '__main__':
     ap = argparse.ArgumentParser()
-    # ap.add_argument('-i', '--image', default='/home/pi/birdclass/commongrackle.jpg',help='image to be classified')
-    # ap.add_argument('-i', '--image', default='/home/pi/birdclass/test2.jpg', help='image to be classified')
-    # ap.add_argument('-i', '--image', default='/home/pi/birdclass/test3.jpg', help='image to be classified')
-    # ap.add_argument('-i', '--image', default='/home/pi/birdclass/2cardinal.jpg', help='image to be classified')
-    # ap.add_argument('-i', '--image', default='/home/pi/birdclass/cardinal.jpg', help='image to be classified')
-    ap.add_argument('-i', '--image', default='/home/pi/birdclass/ncardinal.jpg', help='image to be classified')
+    ap.add_argument('-i', '--image', default='/home/pi/birdclass/commongrackle.jpg',help='grackle #147 conf .30')
+    # ap.add_argument('-i', '--image', default='/home/pi/birdclass/test2.jpg', help='house sparrow/findh + black cap (2)')
+    # ap.add_argument('-i', '--image', default='/home/pi/birdclass/test3.jpg', help='sparrows 2')
+    # ap.add_argument('-i', '--image', default='/home/pi/birdclass/2cardinal.jpg', help='male and female cardinal')
+    # ap.add_argument('-i', '--image', default='/home/pi/birdclass/cardinal.jpg', help='cropped #147 conf .8')
+    # ap.add_argument('-i', '--image', default='/home/pi/birdclass/ncardinal.jpg', help='full screen')
 
     arguments = ap.parse_args()
 

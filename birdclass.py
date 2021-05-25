@@ -168,14 +168,14 @@ def hour_or_day_change(curr_day, curr_hr, spweather, bird_tweeter, birdpop):
         while loopcnt <= 3:  # print top 3 skipping unknown species
             if observed[index][0:2] == '':
                 index += 1
-            try: post_txt += f', #{str(loopcnt)} {observed[index][0:2]}'
-            except: break
+            try:
+                post_txt += f', #{str(loopcnt)} {observed[index][0:2]}'
+            except IndexError:
+                break
             index += 1
             loopcnt += 1
 
-        try: bird_tweeter.post_status(post_txt[0:150])
-        except: pass
-
+        bird_tweeter.post_status(post_txt[0:150])
         birdpop.clear()  # clear count for new day
         curr_day = datetime.now().day  # set new day = to current day
 
