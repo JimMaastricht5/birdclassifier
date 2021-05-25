@@ -52,9 +52,9 @@ def bird_detector(args):
 
     # initial video capture, screen size, and grab first image (no motion)
     cap = cv2.VideoCapture(0)  # capture video image
-    cap.set(3, args["screenwidth"])  # set screen width
-    cap.set(4, args["screenheight"])  # set screen height
-    first_img = motion_detector.init(args["flipcamera"], cv2, cap)  # set gray motion mask
+    cap.set(3, args.screenwidth)  # set screen width
+    cap.set(4, args.screenheight)  # set screen height
+    first_img = motion_detector.init(args.flipcamera, cv2, cap)  # set gray motion mask
     set_windows()  # position output windows at top of screen and init output
 
     # setup twitter and tensor flow models
@@ -71,7 +71,7 @@ def bird_detector(args):
         species_last_seen = datetime(2021, 1, 1, 0, 0, 0)
         curr_day, curr_hr = hour_or_day_change(curr_day, curr_hr, spweather, bird_tweeter, birdpop)
 
-        motionb, img = motion_detector.detect(args["flipcamera"], cv2, cap, first_img, args["minarea"])
+        motionb, img = motion_detector.detect(args.flipcamera, cv2, cap, first_img, args.minarea)
         if motionb is False:
             birdobj.update([], [], [])  # detected no motion, update missing from frame count
         else:  # motion detected.
@@ -114,7 +114,7 @@ def bird_detector(args):
             cv2.imshow('equalized', equalizedimg)  # show equalized image
 
             # Show image and tweet, confidence here is lowest in the picture
-            if species_conf >= args["sconfidence"]:  # tweet threshold
+            if species_conf >= args.sconfidence:  # tweet threshold
                 if (datetime.now() - species_last_seen).total_seconds() >= 60 * 5:
                     cv2.imshow('tweeted', equalizedimg)  # show what we would be tweeting
                     if bird_tweeter.post_image(tweet_label + str(species_visit_count + 1), equalizedimg) is False:
@@ -219,5 +219,5 @@ if __name__ == "__main__":
     ap.add_argument("-sw", "--screenwidth", type=int, default=320, help="max screen width")
     ap.add_argument("-sh", "--screenheight", type=int, default=240, help="max screen height")
 
-    arguments = vars(ap.parse_args())
+    arguments = ap.parse_args()
     bird_detector(arguments)

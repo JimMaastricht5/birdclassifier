@@ -45,12 +45,12 @@ except:
 
 
 class Bird_Detect_Classify:
-    def __init__(self):
-        self.detector_file = '/home/pi/PycharmProjects/pyface2/lite-model_ssd_mobilenet_v1_1_metadata_2.tflite'
-        self.detector_labels_file = '/home/pi/PycharmProjects/pyface2/lite-model_ssd_mobilenet_v1_1_metadata_2_labelmap.txt'
-        self.classifier_file = '/home/pi/PycharmProjects/pyface2/coral.ai.mobilenet_v2_1.0_224_inat_bird_quant.tflite'
-        self.classifier_labels_file = '/home/pi/PycharmProjects/pyface2/coral.ai.inat_bird_labels.txt'
-        self.classifier_thresholds_file = '/home/pi/PycharmProjects/pyface2/coral.ai.inat_bird_threshold.csv'
+    def __init__(self, homedir='/home/pi/PycharmProjects/pyface2/'):
+        self.detector_file = homedir + 'lite-model_ssd_mobilenet_v1_1_metadata_2.tflite'
+        self.detector_labels_file = homedir + 'lite-model_ssd_mobilenet_v1_1_metadata_2_labelmap.txt'
+        self.classifier_file = homedir + 'coral.ai.mobilenet_v2_1.0_224_inat_bird_quant.tflite'
+        self.classifier_labels_file = homedir + 'coral.ai.inat_bird_labels.txt'
+        self.classifier_thresholds_file = homedir + 'coral.ai.inat_bird_threshold.csv'
         self.classifier_thresholds = np.genfromtxt(self.classifier_thresholds_file, delimiter=',')
         self.detector, self.obj_detector_possible_labels = self.init_tf2(self.detector_file, self.detector_labels_file)
         self.classifier, self.bird_possible_labels = self.init_tf2(self.classifier_file, self.classifier_labels_file)
@@ -202,7 +202,7 @@ class Bird_Detect_Classify:
 
 def main(args):
     img = cv2.imread(args.image)
-    birds = Bird_Detect_Classify()
+    birds = Bird_Detect_Classify(args.homedir)
     birds.detect(img)
 
     print('objects detected', birds.detected_confidences)
@@ -228,6 +228,7 @@ if __name__ == '__main__':
     # ap.add_argument('-i', '--image', default='/home/pi/birdclass/2cardinal.jpg', help='male and female cardinal')
     # ap.add_argument('-i', '--image', default='/home/pi/birdclass/cardinal.jpg', help='cropped #147 conf .8')
     # ap.add_argument('-i', '--image', default='/home/pi/birdclass/ncardinal.jpg', help='full screen')
+    ap.add_argument('-dir', '--homedir', default='c:/Users/maastricht/PycharmProjects/pyface2/', help='loc files')
 
     arguments = ap.parse_args()
 
