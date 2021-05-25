@@ -102,7 +102,6 @@ def bird_detector(args):
 
                     # update info about bird
                     species_visit_count, species_last_seen = birdpop.report_census(species)  # grab last time observed
-                    birdpop.visitor(species, datetime.now())  # update census count and last time seen
                     common_name, tweet_label = label_text(species, species_conf)
                     birdobj.update([(startX, startY, endX, endY)], [species_conf], [common_name])
                     equalizedimg = birds.add_box_and_label(equalizedimg, species, (startX, startY, endX, endY))
@@ -116,6 +115,7 @@ def bird_detector(args):
             # Show image and tweet, confidence here is lowest in the picture
             if species_conf >= birds.classify_bird_species_min_confidence:  # tweet threshold
                 if (datetime.now() - species_last_seen).total_seconds() >= 60 * 5:
+                    birdpop.visitor(species, datetime.now())  # update census count and last time seen / tweeted
                     cv2.imshow('tweeted', equalizedimg)  # show what we would be tweeting
                     if bird_tweeter.post_image(tweet_label + str(species_visit_count + 1), equalizedimg) is False:
                         print(f" {species} seen {species_last_seen.strftime('%I:%M %p')} *** exceeded tweet limit")
@@ -148,14 +148,12 @@ def bird_observations(birds, img, equalizedimg, det_rect):
     species_conf, species = birds.classify(birdcrop_img)
     species_conf_equalized, species_equalized = birds.classify(birdcrop_equalizedimg)
     if species != species_equalized:  # predictions should match if pic quality is good
-        # pick the base image if the conf is higher than the equalized image and higher then a default of .975
-        if species_conf >= species_conf_equalized and species_conf >= .975:
+        # pick the result with highest confidence
+        if species_conf >= species_conf_equalized:
             pass
-            # species_conf = species_conf_equalized
-            # species = species_equalized
         else:
-            species_conf = 0
-            species = ''
+            species_conf = species_conf_equalized
+            species = species_equalized
     return species_conf, species, (startX, startY, endX, endY)
 
 
