@@ -95,18 +95,18 @@ def bird_detector(args):
                     species_visit_count, species_last_seen = birdpop.report_census(species)  # grab last time observed
                     common_name, tweet_label = label_text(species, species_conf)
                     birdobj.update([(startX, startY, endX, endY)], [species_conf], [common_name])
-                    # equalizedimg = birds.add_box_and_label(equalizedimg, species, (startX, startY, endX, endY))
+                    img_label = label_text(species, species_conf)
+                    equalizedimg = birds.add_box_and_label(equalizedimg, img_label, (startX, startY, endX, endY))
 
             if birdb is False:
                 birdobj.update([], [], [])  # detected no birds in frame, update missing from frame count
 
             # all birds in image processed, add all objects to equalized image and show
             for key in birdobj.rects:
-                equalizedimg = birds.add_box_and_label(equalizedimg, birdobj.objnames[key], birdobj.rects[key])
-
-            cv2.imshow('equalized', equalizedimg)  # show equalized image
+                img = birds.add_box_and_label(img, birdobj.objnames[key], birdobj.rects[key])
 
             # Show image and tweet, confidence here is lowest in the picture
+            cv2.imshow('equalized', equalizedimg)  # show equalized image
             if species_conf >= birds.classify_bird_species_min_confidence:  # tweet threshold
                 if (datetime.now() - species_last_seen).total_seconds() >= 60 * 5:
                     birdpop.visitor(species, datetime.now())  # update census count and last time seen / tweeted
