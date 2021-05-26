@@ -131,7 +131,8 @@ def main():
     for i in range(1, 60):
         rects = []
         print(i)
-        obj_tracker.update(rects, objconfidences, objnames)
+        # obj_tracker.update(rects, objconfidences, objnames)
+        obj_tracker.update([], [], [])
         print(obj_tracker.objects)
 
     print('for loop')

@@ -73,30 +73,21 @@ def bird_detector(args):
 
         motionb, img = motion_detector.detect(args.flipcamera, cv2, cap, first_img, args.minarea)
         if motionb is False:
-            birdobj.update([], [], [])  # detected no motion, update missing from frame count
+            birdobj.update([], [], [])  # detected no motion and no birds in frame, update missing from frame count
         else:  # motion detected.
             motioncnt += 1
-            print(f'\r motion {motioncnt}', end=' ')  # indicate motion on monitor
-            # improve image prior to obj detection and labeling
-            # if spweather.isclear is False or image_proc.is_color_low_contrast(img):
+            # print(f'\r motion {motioncnt}', end=' ')  # indicate motion on monitor
             equalizedimg = image_proc.equalize_color(img)  # balance histogram of color intensity for all frames
-            # else: equalizedimg = img.copy()  # no adjustment necessary, create a copy of the image
             det_confidences, det_labels, det_rects = birds.detect(img)  # detect objects
-
             # ensure collection of variables used outside loop for tweet are set
             species_conf, species_visit_count = 0, 0
             tweet_label, species = '', ''
-            # loop thru detected objects
-            if len(det_confidences) == 0:  # *** need to handle det_conf>0, but no birds
-                birdobj.update([], [], [])  # detected no objects, update missing from frame count
-
+            birdb = False
             for i, det_confidence in enumerate(det_confidences):  # loop thru detected objects
-                # print(f': {datetime.now().strftime("%I:%M %p")} observed ' +
-                #       f"{det_labels[i]}:{det_confidence * 100:.0f}% ", end='')
-
                 if det_labels[i] == "bird":  # bird observed, find species, label, and tweet
+                    birdb = True
                     motioncnt = 0  # reset motion count between birds
-                    print('')  # print new line in console, species matches appear below indented
+                    # print('')  # print new line in console, species matches appear below indented
                     species_conf, species, (startX, startY, endX, endY) = \
                         bird_observations(birds, img, equalizedimg, det_rects[i])
 
@@ -104,11 +95,14 @@ def bird_detector(args):
                     species_visit_count, species_last_seen = birdpop.report_census(species)  # grab last time observed
                     common_name, tweet_label = label_text(species, species_conf)
                     birdobj.update([(startX, startY, endX, endY)], [species_conf], [common_name])
-                    equalizedimg = birds.add_box_and_label(equalizedimg, species, (startX, startY, endX, endY))
+                    # equalizedimg = birds.add_box_and_label(equalizedimg, species, (startX, startY, endX, endY))
+
+            if birdb is False:
+                birdobj.update([], [], [])  # detected no birds in frame, update missing from frame count
 
             # all birds in image processed, add all objects to equalized image and show
-            # for key in birdobj.rects:
-            #     equalizedimg = label_image.add_box_and_label(equalizedimg, birdobj.objnames[key], birdobj.rects[key])
+            for key in birdobj.rects:
+                equalizedimg = birds.add_box_and_label(equalizedimg, birdobj.objnames[key], birdobj.rects[key])
 
             cv2.imshow('equalized', equalizedimg)  # show equalized image
 
