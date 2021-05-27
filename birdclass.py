@@ -76,10 +76,9 @@ def bird_detector(args):
             birdobj.update([], [], [])  # detected no motion and no birds in frame, update missing from frame count
         else:  # motion detected.
             motioncnt += 1
-            # print(f'\r motion {motioncnt}', end=' ')  # indicate motion on monitor
+            print(f'\r motion {motioncnt}', end=' ')  # indicate motion on monitor
             equalizedimg = image_proc.equalize_color(img)  # balance histogram of color intensity for all frames
             det_confidences, det_labels, det_rects = birds.detect(img)  # detect objects
-            # ensure collection of variables used outside loop for tweet are set
             species_conf, species_visit_count = 0, 0
             tweet_label, species = '', ''
             birdb = False
@@ -87,7 +86,7 @@ def bird_detector(args):
                 if det_labels[i] == "bird":  # bird observed, find species, label, and tweet
                     birdb = True
                     motioncnt = 0  # reset motion count between birds
-                    # print('')  # print new line in console, species matches appear below indented
+                    print('')  # print new line in console, species matches appear below indented
                     species_conf, species, (startX, startY, endX, endY) = \
                         bird_observations(birds, img, equalizedimg, det_rects[i])
 
@@ -102,8 +101,8 @@ def bird_detector(args):
                 birdobj.update([], [], [])  # detected no birds in frame, update missing from frame count
 
             # all birds in image processed, add all objects to equalized image and show
-            for key in birdobj.rects:
-                img = birds.add_box_and_label(img, birdobj.objnames[key], birdobj.rects[key])
+            # for key in birdobj.rects:
+            #     img = birds.add_box_and_label(img, birdobj.objnames[key], birdobj.rects[key])
 
             # Show image and tweet, confidence here is lowest in the picture
             cv2.imshow('equalized', equalizedimg)  # show equalized image
