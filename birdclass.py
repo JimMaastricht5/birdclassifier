@@ -95,25 +95,25 @@ def bird_detector(args):
                     common_name, tweet_label = label_text(species, species_conf)
                     birdobj.update([(startX, startY, endX, endY)], [species_conf], [common_name])
                     img_label = label_text(species, species_conf)
-                    equalizedimg = birds.add_box_and_label(equalizedimg, img_label, (startX, startY, endX, endY))
+                    break  # lets just process one bird for now
 
             if birdb is False:
                 birdobj.update([], [], [])  # detected no birds in frame, update missing from frame count
-
-            # all birds in image processed, add all objects to equalized image and show
-            # for key in birdobj.rects:
-            #     img = birds.add_box_and_label(img, birdobj.objnames[key], birdobj.rects[key])
-
-            # Show image and tweet, confidence here is lowest in the picture
-            cv2.imshow('equalized', equalizedimg)  # show equalized image
-            if species_conf >= birds.classify_bird_species_min_confidence:  # tweet threshold
-                if (datetime.now() - species_last_seen).total_seconds() >= 60 * 5:
-                    birdpop.visitor(species, datetime.now())  # update census count and last time seen / tweeted
-                    cv2.imshow('tweeted', equalizedimg)  # show what we would be tweeting
-                    if bird_tweeter.post_image(tweet_label + str(species_visit_count + 1), equalizedimg) is False:
-                        print(f" {species} seen {species_last_seen.strftime('%I:%M %p')} *** exceeded tweet limit")
-                else:
-                    print(f" {species} not tweeted, last seen {species_last_seen.strftime('%I:%M %p')}. wait 5 minutes")
+            else:  # saw a bird
+                equalizedimg = birds.add_box_and_label(equalizedimg, img_label, (startX, startY, endX, endY))
+                # all birds in image processed, add all objects to equalized image and show
+                # for key in birdobj.rects:
+                #     img = birds.add_box_and_label(img, birdobj.objnames[key], birdobj.rects[key])
+                # Show image and tweet, confidence here is lowest in the picture
+                cv2.imshow('equalized', equalizedimg)  # show equalized image
+                if species_conf >= birds.classify_bird_species_min_confidence:  # tweet threshold
+                    if (datetime.now() - species_last_seen).total_seconds() >= 60 * 5:
+                        birdpop.visitor(species, datetime.now())  # update census count and last time seen / tweeted
+                        cv2.imshow('tweeted', equalizedimg)  # show what we would be tweeting
+                        if bird_tweeter.post_image(tweet_label + str(species_visit_count + 1), equalizedimg) is False:
+                            print(f" {species} seen {species_last_seen.strftime('%I:%M %p')} *** exceeded tweet limit")
+                    else:
+                        print(f" {species} not tweeted, last seen {species_last_seen.strftime('%I:%M %p')}. wait 5 minutes")
 
         # motion processed, all birds in image processed if detected, add all known objects to image
         for key in birdobj.rects:
