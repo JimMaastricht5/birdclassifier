@@ -68,52 +68,36 @@ def bird_detector(args):
                              f'wind speeds of {spweather.windspeed} MPH.')
 
     while True:  # while escape key is not pressed look for motion, detect birds, and determine species
-        species_last_seen = datetime(2021, 1, 1, 0, 0, 0)
         curr_day, curr_hr = hour_or_day_change(curr_day, curr_hr, spweather, bird_tweeter, birdpop)
-
         motionb, img = motion_detector.detect(args.flipcamera, cv2, cap, first_img, args.minarea)
-        if motionb is False:
-            birdobj.update([], [], [])  # detected no motion and no birds in frame, update missing from frame count
-        else:  # motion detected.
-            motioncnt += 1
-            print(f'\r motion {motioncnt}', end=' ')  # indicate motion on monitor
-            equalizedimg = image_proc.equalize_color(img)  # balance histogram of color intensity for all frames
-            det_confidences, det_labels, det_rects = birds.detect(img)  # detect objects
-            species_conf, species_visit_count = 0, 0
-            tweet_label, species = '', ''
-            birdb = False
-            for i, det_confidence in enumerate(det_confidences):  # loop thru detected objects
-                if det_labels[i] == "bird":  # bird observed, find species, label, and tweet
-                    birdb = True
-                    motioncnt = 0  # reset motion count between birds
-                    print('')  # print new line in console, species matches appear below indented
-                    species_conf, species, (startX, startY, endX, endY) = \
-                        bird_observations(birds, img, equalizedimg, det_rects[i])
+        if motionb is True and birds.detect(img):  # motion with birds
+            motioncnt = 0  # reset motion count between detected birds
+            print('')  # print new lines between birds detection for motion counter
+            birds.classify()
+            birdobj.update(birds.classified_rects, birds.classified_confidences, birds.classified_labels)
+            common_names, tweet_label = label_text(birds.classified_labels, birds.classified_confidences)
+            bird_visit_count_array, bird_last_seen_array = birdpop.report_census(birds.classified_labels)  # grab last time observed
+        else:  # no birds detected in frame, update missing from frame count
+            birdobj.update([], [], [])
+            if motionb is True:  # motion but no birds
+                motioncnt += 1
+                print(f'\r motion {motioncnt}', end=' ')  # indicate motion on monitor
 
-                    # update info about bird
-                    species_visit_count, species_last_seen = birdpop.report_census(species)  # grab last time observed
-                    common_name, tweet_label = label_text(species, species_conf)
-                    birdobj.update([(startX, startY, endX, endY)], [species_conf], [common_name])
-                    img_label = label_text(species, species_conf)
-                    break  # lets just process one bird for now
-
-            if birdb is False:
-                birdobj.update([], [], [])  # detected no birds in frame, update missing from frame count
-            else:  # saw a bird
-                equalizedimg = birds.add_box_and_label(equalizedimg, img_label, (startX, startY, endX, endY))
-                # all birds in image processed, add all objects to equalized image and show
-                # for key in birdobj.rects:
-                #     img = birds.add_box_and_label(img, birdobj.objnames[key], birdobj.rects[key])
-                # Show image and tweet, confidence here is lowest in the picture
-                cv2.imshow('equalized', equalizedimg)  # show equalized image
-                if species_conf >= birds.classify_bird_species_min_confidence:  # tweet threshold
-                    if (datetime.now() - species_last_seen).total_seconds() >= 60 * 5:
-                        birdpop.visitor(species, datetime.now())  # update census count and last time seen / tweeted
-                        cv2.imshow('tweeted', equalizedimg)  # show what we would be tweeting
-                        if bird_tweeter.post_image(tweet_label + str(species_visit_count + 1), equalizedimg) is False:
-                            print(f" {species} seen {species_last_seen.strftime('%I:%M %p')} *** exceeded tweet limit")
-                    else:
-                        print(f" {species} not tweeted, last seen {species_last_seen.strftime('%I:%M %p')}. wait 5 minutes")
+        if birds.target_object_found is True:  # saw a bird
+            equalizedimg = birds.add_box_and_label(equalizedimg, img_label, (startX, startY, endX, endY))
+            # all birds in image processed, add all objects to equalized image and show
+            # for key in birdobj.rects:
+            #     img = birds.add_box_and_label(img, birdobj.objnames[key], birdobj.rects[key])
+            # Show image and tweet, confidence here is lowest in the picture
+            cv2.imshow('equalized', equalizedimg)  # show equalized image
+            if species_conf >= birds.classify_bird_species_min_confidence:  # tweet threshold
+                if (datetime.now() - species_last_seen).total_seconds() >= 60 * 5:
+                    birdpop.visitor(species, datetime.now())  # update census count and last time seen / tweeted
+                    cv2.imshow('tweeted', equalizedimg)  # show what we would be tweeting
+                    if bird_tweeter.post_image(tweet_label + str(species_visit_count + 1), equalizedimg) is False:
+                        print(f" {species} seen {species_last_seen.strftime('%I:%M %p')} *** exceeded tweet limit")
+                else:
+                    print(f" {species} not tweeted, last seen {species_last_seen.strftime('%I:%M %p')}. wait 5 minutes")
 
         # motion processed, all birds in image processed if detected, add all known objects to image
         for key in birdobj.rects:
@@ -130,24 +114,6 @@ def bird_detector(args):
     cv2.destroyAllWindows()
     bird_tweeter.post_status(f'Ending process at {datetime.now().strftime("%I:%M:%S %P")}.  Run time was ' +
                              f'{divmod((datetime.now() - starttime).total_seconds(), 60)[0]} minutes')
-
-
-# make observations about bird using image and color equalized image
-def bird_observations(birds, img, equalizedimg, det_rect):
-    (startX, startY, endX, endY) = birds.scale_rect(img, det_rect)  # set x,y bounding box
-    birdcrop_img = img[startY:endY, startX:endX]  # extract image for better species detection
-    birdcrop_equalizedimg = equalizedimg[startY:endY, startX:endX]  # extract image for better species detection
-    # check both raw and equalized images against one another
-    species_conf, species = birds.classify(birdcrop_img)
-    species_conf_equalized, species_equalized = birds.classify(birdcrop_equalizedimg)
-    if species != species_equalized:  # predictions should match if pic quality is good
-        # pick the result with highest confidence
-        if species_conf >= species_conf_equalized:
-            pass
-        else:
-            species_conf = species_conf_equalized
-            species = species_equalized
-    return species_conf, species, (startX, startY, endX, endY)
 
 
 # housekeeping for day and hour
@@ -178,15 +144,19 @@ def hour_or_day_change(curr_day, curr_hr, spweather, bird_tweeter, birdpop):
 
 # set label for image and tweet, use short species name instead of scientific name
 def label_text(species, species_conf):
-    species = str(species)  # make sure species is considered a string
-    start = species.find('(') + 1  # find start of common name, move one character to drop (
-    end = species.find(')')
-    if start >= 0 and end >= 0:
-        common_name = species[start:end]
-    else:
-        common_name = species
-    tweet_label = f"{species}: confidence {species_conf * 100:.1f}% observed: "
-    return common_name, tweet_label
+    common_names = ''
+    tweet_label = ''
+    for i in enumerate(species):
+        species_str = str(species[i])  # make sure species is considered a string
+        start = species_str.find('(') + 1  # find start of common name, move one character to drop (
+        end = species_str.find(')')
+        if start >= 0 and end >= 0:
+            name = f'{species_str[start:end] }'
+        else:
+            name = f'{species_str} '
+        common_names += name
+        tweet_label += f"{name}: confidence {species_conf[i] * 100:.1f}% "
+    return common_names, tweet_label
 
 
 def set_windows():

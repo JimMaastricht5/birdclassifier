@@ -28,38 +28,6 @@ import cv2
 import numpy as np
 from skimage.exposure import is_low_contrast
 
-
-# testing code
-def main():
-    imgnp = cv2.imread('/home/pi/birdclass/test2.jpg')
-    cv2.imshow('org', imgnp)  # show orginal image
-
-    # test image bad contrast and equalization
-    grayimg = cv2.cvtColor(imgnp, cv2.COLOR_BGR2GRAY)
-    print(is_low_contrast(grayimg))
-    equalizedimg1 = equalize_gray(grayimg, type=1)
-    equalizedimg2 = equalize_gray(grayimg, type=2)
-    cv2.imshow('equalized simple 1', equalizedimg1)
-    cv2.imshow('equalized simple 2', equalizedimg2)
-
-    # color equalize
-    equalizedcolorimg = equalize_color(imgnp)
-    cv2.imshow('color histogram equalization', equalizedcolorimg)
-    # convert image to pil, test scheme to adjust pil or np images
-    # imgpil = Image.fromarray(cv2.imread('/home/pi/birdclass/test2.jpg'))  # need to pass a PIL Image vs. Numpy array
-    # img_clr, img_clr_brt, img_clr_brt_con = enhancements(imgnp)
-    # img_clr, img_clr_brt, img_clr_brt_con = enhancements(imgpil)
-    # cv2.imshow('color', img_clr)
-    # cv2.imshow('color brt', img_clr_brt)
-    # cv2.imshow('color brt con', img_clr_brt_con)
-
-    # check for esc key and quit if pressed
-    while True:
-        k = cv2.waitKey(30) & 0xff
-        if k == 27:  # press 'ESC' to quit
-            break
-
-
 # pillow requires a pillow image to work
 # func provides both formats for conversion
 # default conversion is to numpy array
@@ -218,6 +186,37 @@ def objectsize(args, startx, starty, endx, endy):
     else:  # small
         size = 'S'
     return size, perarea
+
+
+# testing code
+def main():
+    imgnp = cv2.imread('/home/pi/birdclass/test2.jpg')
+    cv2.imshow('org', imgnp)  # show orginal image
+
+    # test image bad contrast and equalization
+    grayimg = cv2.cvtColor(imgnp, cv2.COLOR_BGR2GRAY)
+    print(is_low_contrast(grayimg))
+    equalizedimg1 = equalize_gray(grayimg, type=1)
+    equalizedimg2 = equalize_gray(grayimg, type=2)
+    cv2.imshow('equalized simple 1', equalizedimg1)
+    cv2.imshow('equalized simple 2', equalizedimg2)
+
+    # color equalize
+    equalizedcolorimg = equalize_color(imgnp)
+    cv2.imshow('color histogram equalization', equalizedcolorimg)
+    # convert image to pil, test scheme to adjust pil or np images
+    # imgpil = Image.fromarray(cv2.imread('/home/pi/birdclass/test2.jpg'))  # need to pass a PIL Image vs. Numpy array
+    # img_clr, img_clr_brt, img_clr_brt_con = enhancements(imgnp)
+    # img_clr, img_clr_brt, img_clr_brt_con = enhancements(imgpil)
+    # cv2.imshow('color', img_clr)
+    # cv2.imshow('color brt', img_clr_brt)
+    # cv2.imshow('color brt con', img_clr_brt_con)
+
+    # check for esc key and quit if pressed
+    while True:
+        k = cv2.waitKey(30) & 0xff
+        if k == 27:  # press 'ESC' to quit
+            break
 
 
 # invoke main

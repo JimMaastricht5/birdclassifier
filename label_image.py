@@ -38,6 +38,7 @@ import cv2
 import numpy as np
 import math
 import random
+import image_proc
 try:
     import tflite_runtime.interpreter as tflite  # for pi4 with install wheel above
 except:
@@ -48,6 +49,8 @@ class Bird_Detect_Classify:
     def __init__(self, homedir='/home/pi/PycharmProjects/pyface2/'):
         self.detector_file = homedir + 'lite-model_ssd_mobilenet_v1_1_metadata_2.tflite'
         self.detector_labels_file = homedir + 'lite-model_ssd_mobilenet_v1_1_metadata_2_labelmap.txt'
+        self.target_objects = ['bird']
+        self.target_object_found = False
         self.classifier_file = homedir + 'coral.ai.mobilenet_v2_1.0_224_inat_bird_quant.tflite'
         self.classifier_labels_file = homedir + 'coral.ai.inat_bird_labels.txt'
         self.classifier_thresholds_file = homedir + 'coral.ai.inat_bird_threshold.csv'
@@ -58,10 +61,13 @@ class Bird_Detect_Classify:
         self.input_std = 127.5  # recommended default
         self.detect_bird_obj_min_confidence = 0
         self.classify_bird_species_min_confidence = .7
-        self.classify_bird_species_default_confidence = .95
+        self.classify_bird_species_default_confidence = .98
         self.detected_confidences = []
         self.detected_labels = []
         self.detected_rects = []
+        self.classified_confidences = []
+        self.classified_labels = []
+        self.classified_rects = []
         self.colors = np.random.uniform(0, 255, size=(11, 3))  # random colors for bounding boxes
 
     # initialize tensor flow model
@@ -79,41 +85,43 @@ class Bird_Detect_Classify:
         with open(filename, 'r') as f:
             return [line.strip() for line in f.readlines()]
 
-    # input image and return best result and label
+    # set working image, add equalized img, detect objects, return boolean if detected objecets in
+    # target list.  Create color equalized version of img
+    # fill detected_confidences, detected_labels, and detected_rects if in target object list
     def detect(self, img):
+        self.img = img
+        self.equalizedimg = image_proc.equalize_color(img)  # balance histogram of color intensity for all frames
         self.detected_confidences = []
         self.detected_labels = []  # possible object labels
         self.detected_rects = []
+        self.target_object_found = False
 
         input_details = self.detector.get_input_details()
         output_details = self.detector.get_output_details()
-        floating_model, input_data = self.convert_cvframe_to_ts(img, input_details)
+        floating_model, input_data = self.convert_cvframe_to_ts(self.img, input_details)
         self.detector.set_tensor(input_details[0]['index'], input_data)
         self.detector.invoke()
 
         if floating_model is False:  # tensor lite obj detection prebuilt model
             det_rects = self.detector.get_tensor(output_details[0]['index'])
-            det_labels_index = self.detector.get_tensor(output_details[1]['index'])  # labels are an array for each result
+            det_labels_index = self.detector.get_tensor(output_details[1]['index'])  # label array for each result
             det_confidences = self.detector.get_tensor(output_details[2]['index'])
             for index, det_confidence in enumerate(det_confidences[0]):
-                if det_confidence >= self.detect_bird_obj_min_confidence:
-                    labelidx = int(det_labels_index[0][index])  # get result label index for labels;
-                    try:
-                        label = self.obj_detector_possible_labels[labelidx]  # grab text from possible labels
-                    except:
-                        label = ""
-
+                labelidx = int(det_labels_index[0][index])  # get result label index for labels;
+                label = self.obj_detector_possible_labels[labelidx]  # grab text from possible labels
+                if det_confidence >= self.detect_bird_obj_min_confidence and \
+                        label in self.target_objects:
+                    self.target_object_found = True
                     self.detected_confidences.append(det_confidence)
                     self.detected_labels.append(label)
                     self.detected_rects.append(det_rects[0][index])
-        return self.detected_confidences, self.detected_labels, self.detected_rects  # confidence and best label
-
+        return self.target_object_found
 
     # input image and return best result and label
     # the function will sort the results and compare the confidence to the confidence for that label (species)
     # if the ML models confidence is higer than the treshold for that lable (species) it will stop searching and
     # return that best result
-    def classify(self, img):
+    def classify_obj(self, img):
         input_details = self.classifier.get_input_details()
         output_details = self.classifier.get_output_details()
         floating_model, input_data = self.convert_cvframe_to_ts(img, input_details)
@@ -144,11 +152,9 @@ class Bird_Detect_Classify:
                     if cresult > maxcresult:  # if this above threshold and is a better confidence result store it
                         maxcresult = cresult
                         maxlresult = lresult
-
         if maxcresult != 0:
             print(f'match returned: confidence {maxcresult}, {maxlresult}')
         return maxcresult, maxlresult  # highest confidence with best match
-
 
     def convert_cvframe_to_ts(self, frame, input_details):
         # check the type of the input tensor
@@ -168,7 +174,6 @@ class Bird_Detect_Classify:
             input_data = image_np_expanded.astype('uint8')
         return floating_model, input_data
 
-
     def scale_rect(self, img, box):
         (img_height, img_width, img_layers) = img.shape
         y_min = int(max(1, (box[0] * img_height)))
@@ -176,7 +181,6 @@ class Bird_Detect_Classify:
         y_max = int(min(img_height, (box[2] * img_height)))
         x_max = int(min(img_width, (box[3] * img_width)))
         return (x_min, y_min, x_max, y_max)
-
 
     # add bounding box and label to an image
     def add_box_and_label(self, img, img_label, rect):
@@ -187,7 +191,6 @@ class Bird_Detect_Classify:
         print(f'img_label {img_label}, rect {(startX, y)}, colors {color}')
         cv2.putText(img, str(img_label), (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
         return img
-
 
     # func checks threshold by each label passed as a nparray with text in col 0 and threshold in col 1
     # species cannot be -1 (not present in geo location), cannot be 0, and must be equal or exceed minimum score
@@ -200,6 +203,30 @@ class Bird_Detect_Classify:
         return(int(label_threshold) != -1 and cresult > 0 and
                cresult >= float(label_threshold) / 1000)
 
+    # make classifications using img and detect results
+    # compare img and equalized images
+    # use self.detected_confidences,detected_labels, detected_rects lists
+    def classify(self):
+        self.classified_rects = []
+        self.classified_confidences = []
+        self.classified_labels = []
+        for i, det_confidence in enumerate(self.detected_confidences):  # loop thru detected target objects
+            (startX, startY, endX, endY) = self.scale_rect(self.img, self.detected_rects[i])  # set x,y bounding box
+            crop_img = self.img[startY:endY, startX:endX]  # extract image for better classification
+            crop_equalizedimg = self.equalizedimg[startY:endY, startX:endX]
+            classify_conf, classify_label = self.classify_obj(crop_img)
+            classify_conf_equalized, classify_label_equalized = self.classify_obj(crop_equalizedimg)
+            if classify_label != classify_label_equalized:  # predictions should match if pic quality is good
+                # pick the result with highest confidence
+                if classify_conf >= classify_conf_equalized:
+                    pass
+                else:
+                    classify_conf = classify_conf_equalized
+                    classify_label = classify_label_equalized
+                self.classified_labels.append(classify_label)
+                self.classified_confidences.append(classify_conf)
+                self.classified_rects.append((startX, startY, endX, endY))
+        return
 
 def main(args):
     img = cv2.imread(args.image)
