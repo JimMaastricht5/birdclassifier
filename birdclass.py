@@ -83,8 +83,7 @@ def bird_detector(args):
 
         if birds.target_object_found is True:  # saw at least one bird
             common_names, tweet_label = label_text(birds.classified_labels, birds.classified_confidences)
-            birds.equalizedimg = birds.add_boxes_and_labels(img=birds.equalizedimg, labels=common_names,
-                                                            rects=birds.classified_rects)
+            birds.equalizedimg = birds.add_boxes_and_labels(birds.equalizedimg, common_names, birds.classified_rects)
             cv2.imshow('equalized', birds.equalizedimg)  # show equalized image
 
             # Show image and tweet, confidence here is lowest in the picture

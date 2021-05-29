@@ -214,6 +214,7 @@ class Detect_Classify:
         self.classified_labels = []
         for i, det_confidence in enumerate(self.detected_confidences):  # loop thru detected target objects
             (startX, startY, endX, endY) = self.scale_rect(self.img, self.detected_rects[i])  # set x,y bounding box
+            rect = (startX, startY, endX, endY)
             crop_img = self.img[startY:endY, startX:endX]  # extract image for better classification
             crop_equalizedimg = self.equalizedimg[startY:endY, startX:endX]
             classify_conf, classify_label = self.classify_obj(crop_img)
@@ -225,9 +226,10 @@ class Detect_Classify:
                 else:
                     classify_conf = classify_conf_equalized
                     classify_label = classify_label_equalized
-                self.classified_labels.append(classify_label)
-                self.classified_confidences.append(classify_conf)
-                self.classified_rects.append((startX, startY, endX, endY))
+
+            self.classified_labels.append(classify_label)
+            self.classified_confidences.append(classify_conf)
+            self.classified_rects.append(rect)
         return
 
 def main(args):
