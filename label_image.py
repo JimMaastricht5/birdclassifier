@@ -188,7 +188,10 @@ class Detect_Classify:
     def add_boxes_and_labels(self, img, labels, rects):
         for i, rect in enumerate(rects):
             print(f'boxes and labels i, rect:{i}, {rect}')
-            (startX, startY, endX, endY) = rect
+            try:
+                (startX, startY, endX, endY) = rect
+            except TypeError:
+                return
             color = self.colors[random.randint(0, (len(self.colors)) - 1)]
             cv2.rectangle(img, (startX, startY), (endX, endY), color, 2)
             y = startY - 15 if startY - 15 > 15 else startY + 15  # adjust label loc if too low

@@ -76,7 +76,7 @@ def bird_detector(args):
             birdobj.update(birds.classified_rects, birds.classified_confidences, birds.classified_labels)
             bird_counts, birds_last_seen = birdpop.report_census(birds.classified_labels)
         else:  # no birds detected in frame, update missing from frame count
-            birdobj.update([(0, 0, 0, 0)], [], [])
+            birdobj.update_null()
             if motionb is True:  # motion but no birds
                 motioncnt += 1
                 print(f'\r motion {motioncnt}', end=' ')  # indicate motion on monitor

@@ -38,6 +38,12 @@ class CentroidTracker:
         del self.objnames[objectid]
         del self.rects[objectid]
 
+    def update_null(self):
+        rects = []
+        # rects.append((0, 0, 0, 0))
+        self.update(rects, [], [])
+        return
+
     # update the object dictionaries with the newly detected objects and rectangles
     # expects object of type list as input
     def update(self, rects, objconfidences, objnames):
@@ -108,6 +114,7 @@ class CentroidTracker:
 
 def main():
     obj_tracker = CentroidTracker()
+    obj_tracker.update_null()
     rects = list([])
     rects.append((5, 15, 5, 15))
     rects.append((80, 80, 180, 180))
