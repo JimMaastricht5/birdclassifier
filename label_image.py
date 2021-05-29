@@ -69,6 +69,8 @@ class Detect_Classify:
         self.classified_labels = []
         self.classified_rects = []
         self.colors = np.random.uniform(0, 255, size=(11, 3))  # random colors for bounding boxes
+        self.img = np.zeros((100,100,3), dtype=np.uint8)
+        self.equalizedimg = np.zeros((100,100,3), dtype=np.uint8)
 
     # initialize tensor flow model
     def init_tf2(self, model_file, label_file_name):
@@ -248,8 +250,8 @@ def main(args):
 # test function
 if __name__ == '__main__':
     ap = argparse.ArgumentParser()
-    ap.add_argument('-i', '--image', default='/home/pi/birdclass/commongrackle.jpg',help='grackle #147 conf .30')
-    # ap.add_argument('-i', '--image', default='/home/pi/birdclass/test2.jpg', help='house sparrow/findh + black cap (2)')
+    # ap.add_argument('-i', '--image', default='/home/pi/birdclass/commongrackle.jpg',help='grackle #147 conf .30')
+    ap.add_argument('-i', '--image', default='/home/pi/birdclass/test2.jpg', help='house sparrow/findh + black cap (2)')
     # ap.add_argument('-i', '--image', default='/home/pi/birdclass/test3.jpg', help='sparrows 2')
     # ap.add_argument('-i', '--image', default='/home/pi/birdclass/2cardinal.jpg', help='male and female cardinal')
     # ap.add_argument('-i', '--image', default='/home/pi/birdclass/cardinal.jpg', help='cropped #147 conf .8')
