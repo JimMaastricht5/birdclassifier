@@ -45,7 +45,7 @@ except:
     import tensorflow as tf  # TF2 for desktop testing
 
 
-class Bird_Detect_Classify:
+class Detect_Classify:
     def __init__(self, homedir='/home/pi/PycharmProjects/pyface2/'):
         self.detector_file = homedir + 'lite-model_ssd_mobilenet_v1_1_metadata_2.tflite'
         self.detector_labels_file = homedir + 'lite-model_ssd_mobilenet_v1_1_metadata_2_labelmap.txt'
@@ -56,12 +56,12 @@ class Bird_Detect_Classify:
         self.classifier_thresholds_file = homedir + 'coral.ai.inat_bird_threshold.csv'
         self.classifier_thresholds = np.genfromtxt(self.classifier_thresholds_file, delimiter=',')
         self.detector, self.obj_detector_possible_labels = self.init_tf2(self.detector_file, self.detector_labels_file)
-        self.classifier, self.bird_possible_labels = self.init_tf2(self.classifier_file, self.classifier_labels_file)
+        self.classifier, self.classifier_possible_labels = self.init_tf2(self.classifier_file, self.classifier_labels_file)
         self.input_mean = 127.5  # recommended default
         self.input_std = 127.5  # recommended default
-        self.detect_bird_obj_min_confidence = 0
-        self.classify_bird_species_min_confidence = .7
-        self.classify_bird_species_default_confidence = .98
+        self.detect_obj_min_confidence = .6
+        self.classify_min_confidence = .7
+        self.classify_default_confidence = .98
         self.detected_confidences = []
         self.detected_labels = []
         self.detected_rects = []
@@ -109,7 +109,7 @@ class Bird_Detect_Classify:
             for index, det_confidence in enumerate(det_confidences[0]):
                 labelidx = int(det_labels_index[0][index])  # get result label index for labels;
                 label = self.obj_detector_possible_labels[labelidx]  # grab text from possible labels
-                if det_confidence >= self.detect_bird_obj_min_confidence and \
+                if det_confidence >= self.detect_obj_min_confidence and \
                         label in self.target_objects:
                     self.target_object_found = True
                     self.detected_confidences.append(det_confidence)
@@ -141,7 +141,7 @@ class Bird_Detect_Classify:
         maxcresult = float(0)
         maxlresult = ''
         for lindex in cindex:
-            lresult = str(self.bird_possible_labels[lindex])  # grab predicted label,push this to a string instead of tuple
+            lresult = str(self.classifier_possible_labels[lindex])  # grab predicted label,push this to a string instead of tuple
             cresult = float(output[lindex])  # grab predicted confidence score
             if cresult != 0:
                 # print(f'     {check_threshold(cresult, lindex, label_thresholds)} match, confidence:{str(cresult)}' +
@@ -188,7 +188,7 @@ class Bird_Detect_Classify:
         color = self.colors[random.randint(0, (len(self.colors)) - 1)]
         cv2.rectangle(img, (startX, startY), (endX, endY), color, 2)
         y = startY - 15 if startY - 15 > 15 else startY + 15  # adjust label loc if too low
-        print(f'img_label {img_label}, rect {(startX, y)}, colors {color}')
+        # print(f'img_label {img_label}, rect {(startX, y)}, colors {color}')
         cv2.putText(img, str(img_label), (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
         return img
 
@@ -197,7 +197,7 @@ class Bird_Detect_Classify:
     # cresult is a decimal % 0 - 1; lindex is % * 10 (no decimals) must div by 1000 to get same scale
     def check_threshold(self, cresult, lindex):
         if self.classifier_thresholds[int(lindex)][1] == 0:
-            label_threshold = self.classify_bird_species_default_confidence * 1000
+            label_threshold = self.classify_default_confidence * 1000
         else:
             label_threshold = self.classifier_thresholds[int(lindex)][1]
         return(int(label_threshold) != -1 and cresult > 0 and

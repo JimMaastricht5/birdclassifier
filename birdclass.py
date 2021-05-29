@@ -59,7 +59,7 @@ def bird_detector(args):
 
     # setup twitter and tensor flow models
     bird_tweeter = tweeter.Tweeter_Class()  # init tweeter2 class twitter handler
-    birds = label_image.Bird_Detect_Classify()
+    birds = label_image.Detect_Classify()
     starttime = datetime.now()  # used for total run time report
     bird_tweeter.post_status(f'Starting process at {datetime.now().strftime("%I:%M:%S %P")}, ' +
                              f'{spweather.weatherdescription} ' +
@@ -75,27 +75,28 @@ def bird_detector(args):
             print('')  # print new lines between birds detection for motion counter
             birds.classify()
             birdobj.update(birds.classified_rects, birds.classified_confidences, birds.classified_labels)
-            common_names, tweet_label = label_text(birds.classified_labels, birds.classified_confidences)
-            bird_visit_count_array, bird_last_seen_array = birdpop.report_census(birds.classified_labels)  # grab last time observed
         else:  # no birds detected in frame, update missing from frame count
             birdobj.update([], [], [])
             if motionb is True:  # motion but no birds
                 motioncnt += 1
                 print(f'\r motion {motioncnt}', end=' ')  # indicate motion on monitor
 
-        if birds.target_object_found is True:  # saw a bird
-            equalizedimg = birds.add_box_and_label(equalizedimg, img_label, (startX, startY, endX, endY))
+    # *** stopped refactoring here ***
+        if birds.target_object_found is True:  # saw at least one bird
+            common_names, tweet_label = label_text(birds.classified_labels, birds.classified_confidences)
+            bird_visit_count_array, bird_last_seen_array = birdpop.report_census(birds.classified_labels)
+            equalizedimg = birds.add_boxes_and_labels(equalizedimg, birds.classified_labels, birds.classified_rects)
             # all birds in image processed, add all objects to equalized image and show
             # for key in birdobj.rects:
             #     img = birds.add_box_and_label(img, birdobj.objnames[key], birdobj.rects[key])
             # Show image and tweet, confidence here is lowest in the picture
             cv2.imshow('equalized', equalizedimg)  # show equalized image
-            if species_conf >= birds.classify_bird_species_min_confidence:  # tweet threshold
+            if species_conf >= birds.classify_min_confidence:  # tweet threshold
                 if (datetime.now() - species_last_seen).total_seconds() >= 60 * 5:
                     birdpop.visitor(species, datetime.now())  # update census count and last time seen / tweeted
                     cv2.imshow('tweeted', equalizedimg)  # show what we would be tweeting
-                    if bird_tweeter.post_image(tweet_label + str(species_visit_count + 1), equalizedimg) is False:
-                        print(f" {species} seen {species_last_seen.strftime('%I:%M %p')} *** exceeded tweet limit")
+                    # if bird_tweeter.post_image(tweet_label + str(species_visit_count + 1), equalizedimg) is False:
+                    #     print(f" {species} seen {species_last_seen.strftime('%I:%M %p')} *** exceeded tweet limit")
                 else:
                     print(f" {species} not tweeted, last seen {species_last_seen.strftime('%I:%M %p')}. wait 5 minutes")
 
@@ -122,7 +123,7 @@ def hour_or_day_change(curr_day, curr_hr, spweather, bird_tweeter, birdpop):
         observed = birdpop.get_census_by_count()  # count from prior day
         post_txt = f'top 3 birds for day {str(curr_day)}'
         index, loopcnt = 0, 1
-        while loopcnt <= 3:  # print top 3 skipping unknown species
+        while loopcnt <= 3:  # top 3 skipping unknown species
             if observed[index][0:2] == '':
                 index += 1
             try:
