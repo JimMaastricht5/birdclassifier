@@ -58,7 +58,7 @@ def bird_detector(args):
 
     # setup twitter and tensor flow models
     bird_tweeter = tweeter.Tweeter_Class()  # init tweeter2 class twitter handler
-    birds = label_image.Detect_Classify()
+    birds = label_image.DetectClassify()
     starttime = datetime.now()  # used for total run time report
     bird_tweeter.post_status(f'Starting process at {datetime.now().strftime("%I:%M:%S %P")}, ' +
                              f'{spweather.weatherdescription} ' +
@@ -74,7 +74,7 @@ def bird_detector(args):
             print('')  # print new lines between birds detection for motion counter
             birds.classify()
             birdobj.update(birds.classified_rects, birds.classified_confidences, birds.classified_labels)
-            bird_counts, birds_last_seen = birdpop.report_census(birds.classified_labels)
+            # bird_counts, birds_last_seen = birdpop.report_census(birds.classified_labels)
         else:  # no birds detected in frame, update missing from frame count
             birdobj.update_null()
             if motionb is True:  # motion but no birds
@@ -90,7 +90,7 @@ def bird_detector(args):
 
             if all(conf >= birds.classify_min_confidence for conf in birds.classified_confidences):  # tweet threshold
                 if (datetime.now() - last_tweet).total_seconds() >= 60 * 5:
-                    birdpop.visitors(birds.classified_labels, datetime.now())  # update census count and last time seen / tweeted
+                    birdpop.visitors(birds.classified_labels, datetime.now())  # update census count and last tweeted
                     cv2.imshow('tweeted', birds.equalizedimg)  # show what we would be tweeting
                     last_tweet = datetime.now()
                     if bird_tweeter.post_image(tweet_label, birds.equalizedimg) is False:
