@@ -142,17 +142,17 @@ def hour_or_day_change(curr_day, curr_hr, spweather, bird_tweeter, birdpop):
 
 
 # set label for image and tweet, use short species name instead of scientific name
-def label_text(species, species_conf):
+def label_text(species_names, species_confs):
     common_names = ''
     tweet_label = ''
-    for i in enumerate(species):
-        species_str = str(species[i])  # make sure species is considered a string
-        start = species_str.find('(') + 1  # find start of common name, move one character to drop (
-        end = species_str.find(')')
+    for i, species_name in enumerate(species_names):
+        species_name = str(species_name)  # make sure species is considered a string
+        start = species_name.find('(') + 1  # find start of common name, move one character to drop (
+        end = species_name.find(')')
         if start >= 0 and end >= 0:
-            name = f'{species_str[start:end] }'
+            name = f'{species_name[start:end] }'
         else:
-            name = f'{species_str} '
+            name = f'{species_name} '
         common_names += name
         tweet_label += f"{name}: confidence {species_conf[i] * 100:.1f}% "
     return common_names, tweet_label
