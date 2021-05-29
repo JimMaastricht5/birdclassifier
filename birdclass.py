@@ -76,7 +76,7 @@ def bird_detector(args):
             birdobj.update(birds.classified_rects, birds.classified_confidences, birds.classified_labels)
             bird_counts, birds_last_seen = birdpop.report_census(birds.classified_labels)
         else:  # no birds detected in frame, update missing from frame count
-            birdobj.update([], [], [])
+            birdobj.update([(0, 0, 0, 0)], [], [])
             if motionb is True:  # motion but no birds
                 motioncnt += 1
                 print(f'\r motion {motioncnt}', end=' ')  # indicate motion on monitor
@@ -99,8 +99,7 @@ def bird_detector(args):
                     print(f" {tweet_label} not tweeted, last tweet {last_tweet.strftime('%I:%M %p')}. wait 5 minutes")
 
         # motion processed, all birds in image processed if detected, add all known objects to image
-        if len(birdobj.objnames) and len(birdobj.rects) > 0:
-            birds.img = birds.add_boxes_and_labels(birds.img, birdobj.objnames, birdobj.rects)
+        birds.img = birds.add_boxes_and_labels(birds.img, birdobj.objnames, birdobj.rects)
 
         cv2.imshow('video', birds.img)  # show image with box and label use cv2.flip if image inverted
 
