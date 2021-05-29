@@ -99,10 +99,9 @@ def bird_detector(args):
                     print(f" {tweet_label} not tweeted, last tweet {last_tweet.strftime('%I:%M %p')}. wait 5 minutes")
 
         # motion processed, all birds in image processed if detected, add all known objects to image
-        try:
+        if len(birdobj.objnames) and len(birdobj.rects) > 0:
             birds.img = birds.add_boxes_and_labels(birds.img, birdobj.objnames, birdobj.rects)
-        except:
-            pass
+
         cv2.imshow('video', birds.img)  # show image with box and label use cv2.flip if image inverted
 
         cv2.waitKey(20)  # wait 20 ms to render video, restart loop.  setting of 0 is fixed img; > 0 video
