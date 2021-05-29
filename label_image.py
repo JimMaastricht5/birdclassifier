@@ -45,7 +45,7 @@ except:
     import tensorflow as tf  # TF2 for desktop testing
 
 
-class Detect_Classify:
+class DetectClassify:
     def __init__(self, homedir='/home/pi/PycharmProjects/pyface2/'):
         self.detector_file = homedir + 'lite-model_ssd_mobilenet_v1_1_metadata_2.tflite'
         self.detector_labels_file = homedir + 'lite-model_ssd_mobilenet_v1_1_metadata_2_labelmap.txt'
@@ -56,7 +56,8 @@ class Detect_Classify:
         self.classifier_thresholds_file = homedir + 'coral.ai.inat_bird_threshold.csv'
         self.classifier_thresholds = np.genfromtxt(self.classifier_thresholds_file, delimiter=',')
         self.detector, self.obj_detector_possible_labels = self.init_tf2(self.detector_file, self.detector_labels_file)
-        self.classifier, self.classifier_possible_labels = self.init_tf2(self.classifier_file, self.classifier_labels_file)
+        self.classifier, self.classifier_possible_labels = self.init_tf2(self.classifier_file,
+                                                                         self.classifier_labels_file)
         self.input_mean = 127.5  # recommended default
         self.input_std = 127.5  # recommended default
         self.detect_obj_min_confidence = .6
@@ -69,8 +70,8 @@ class Detect_Classify:
         self.classified_labels = []
         self.classified_rects = []
         self.colors = np.random.uniform(0, 255, size=(11, 3))  # random colors for bounding boxes
-        self.img = np.zeros((100,100,3), dtype=np.uint8)
-        self.equalizedimg = np.zeros((100,100,3), dtype=np.uint8)
+        self.img = np.zeros((100, 100, 3), dtype=np.uint8)
+        self.equalizedimg = np.zeros((100, 100, 3), dtype=np.uint8)
 
     # initialize tensor flow model
     def init_tf2(self, model_file, label_file_name):
@@ -125,7 +126,7 @@ class Detect_Classify:
     # return that best result
     def classify_obj(self, img):
         input_details = self.classifier.get_input_details()
-        output_details = self.classifier.get_output_details()
+        # output_details = self.classifier.get_output_details()
         floating_model, input_data = self.convert_cvframe_to_ts(img, input_details)
         self.classifier.set_tensor(input_details[0]['index'], input_data)
 
@@ -143,7 +144,7 @@ class Detect_Classify:
         maxcresult = float(0)
         maxlresult = ''
         for lindex in cindex:
-            lresult = str(self.classifier_possible_labels[lindex])  # grab predicted label,push this to a string instead of tuple
+            lresult = str(self.classifier_possible_labels[lindex])  # grab label,push to string instead of tuple
             cresult = float(output[lindex])  # grab predicted confidence score
             if cresult != 0:
                 # print(f'     {check_threshold(cresult, lindex, label_thresholds)} match, confidence:{str(cresult)}' +
@@ -239,7 +240,7 @@ class Detect_Classify:
 def main(args):
     img = cv2.imread(args.image)
     cv2.imshow('input', img)
-    birds = Detect_Classify(args.homedir)
+    birds = DetectClassify(args.homedir)
     birds.detect(img)
 
     print('objects detected', birds.detected_confidences)
