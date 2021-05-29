@@ -186,7 +186,9 @@ class Detect_Classify:
 
     # add bounding box and label to an image
     def add_boxes_and_labels(self, img, labels, rects):
+        print(f'boxes and labels rects: {rects}')
         for i, rect in enumerate(rects):
+            print(f'boxes and labels i, rect:{i}, {rect}')
             (startX, startY, endX, endY) = rect
             color = self.colors[random.randint(0, (len(self.colors)) - 1)]
             cv2.rectangle(img, (startX, startY), (endX, endY), color, 2)
