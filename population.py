@@ -44,27 +44,34 @@ class Census:
         return loc
 
     # find visitor by census name, increment count, and update time
-    def visitor(self, visitor_name, time_of_visit):
-        if visitor_name == '' or visitor_name == ' ':
-            visitor_name = 'undetermined'
-        vindex = self.find_visitor(visitor_name)
-        if vindex >= 0:
-            self.census[vindex][1] += 1
-            self.census[vindex][2] = time_of_visit
-        else:  # add
-            self.census.append([visitor_name, 1, time_of_visit])
+    def visitors(self, visitor_names, time_of_visit):
+        for i, visitor_name in enumerate(visitor_names):
+            if visitor_name == '' or visitor_name == ' ':
+                visitor_name = 'undetermined'
+            vindex = self.find_visitor(visitor_name)
+            if vindex >= 0:
+                self.census[vindex][1] += 1
+                self.census[vindex][2] = time_of_visit
+            else:  # add
+                self.census.append([visitor_name, 1, time_of_visit])
         return
 
-    # return count of visitor by name
-    def report_census(self, visitor_name):
-        vindex = self.find_visitor(visitor_name)
-        if vindex >= 0:
-            visitor_count = self.census[vindex][1]
-            last_seen = self.census[vindex][2]
-        else:
-            visitor_count = 0  # haven't seen this visitor by name
-            last_seen = datetime(2021, 1, 1, 0, 0, 0)  # initialize to a time that is not today
-        return visitor_count, last_seen
+    # return count of visitors by name along with last seen date time
+    def report_census(self, visitor_names):
+        last_seen = datetime(2021, 1, 1, 0, 0, 0)
+        visitors_count = []
+        visitors_last_seen = []
+        for i, visitor_name in enumerate(visitor_names):
+            vindex = self.find_visitor(visitor_name)
+            if vindex >= 0:
+                visitor_count = self.census[vindex][1]
+                last_seen = self.census[vindex][2]
+            else:
+                visitor_count = 0  # haven't seen this visitor by name
+
+            visitors_count.append(visitor_count)
+            visitors_last_seen.append(last_seen)
+        return visitors_count, visitors_last_seen
 
     # sort census by count
     def get_census_by_count(self):
@@ -76,12 +83,12 @@ def main():
     observed_time = datetime.now()
     popdogcats = Census()
 
-    popdogcats.visitor('dog', observed_time)
+    popdogcats.visitors('dog', observed_time)
     print('should be one dog', popdogcats.report_census('dog'))
     print('should be zero cats', popdogcats.report_census('cat'))
 
-    popdogcats.visitor('cat', observed_time)
-    popdogcats.visitor('cat', observed_time)
+    popdogcats.visitors('cat', observed_time)
+    popdogcats.visitors('cat', observed_time)
     print('should be one dog', popdogcats.report_census('dog'))
     print('should be two cats', popdogcats.report_census('cat'))
     print(popdogcats.get_census_by_count())

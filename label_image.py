@@ -183,13 +183,13 @@ class Detect_Classify:
         return (x_min, y_min, x_max, y_max)
 
     # add bounding box and label to an image
-    def add_box_and_label(self, img, img_label, rect):
-        (startX, startY, endX, endY) = rect
-        color = self.colors[random.randint(0, (len(self.colors)) - 1)]
-        cv2.rectangle(img, (startX, startY), (endX, endY), color, 2)
-        y = startY - 15 if startY - 15 > 15 else startY + 15  # adjust label loc if too low
-        # print(f'img_label {img_label}, rect {(startX, y)}, colors {color}')
-        cv2.putText(img, str(img_label), (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+    def add_boxes_and_labels(self, img, labels, rects):
+        for i, rect in enumerate(rects):
+            (startX, startY, endX, endY) = rect
+            color = self.colors[random.randint(0, (len(self.colors)) - 1)]
+            cv2.rectangle(img, (startX, startY), (endX, endY), color, 2)
+            y = startY - 15 if startY - 15 > 15 else startY + 15  # adjust label loc if too low
+            cv2.putText(img, str(labels[i]), (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
         return img
 
     # func checks threshold by each label passed as a nparray with text in col 0 and threshold in col 1
@@ -230,22 +230,19 @@ class Detect_Classify:
 
 def main(args):
     img = cv2.imread(args.image)
-    birds = Bird_Detect_Classify(args.homedir)
+    cv2.imshow('input', img)
+    birds = Detect_Classify(args.homedir)
     birds.detect(img)
 
     print('objects detected', birds.detected_confidences)
     print('labels detected', birds.detected_labels)
     print('rectangles', birds.detected_rects)
 
-    for i, det_confidence in enumerate(birds.detected_confidences):
-        print('bird #', i)
-        (startX, startY, endX, endY) = birds.scale_rect(img, birds.detected_rects[i])  # set x,y bounding box
-        crop_img = img[startY:endY, startX:endX]  # extract image for better species detection
-        result, label = birds.classify(img)
-        cresult, clabel = birds.classify(crop_img)
-        birds.add_box_and_label(img, str(clabel), (startX, startY, endX, endY))
-        print(f'confidence for species: full image {result}; cropped {cresult}')
-        print(f'label for species: full image {label}; cropped {clabel}')
+    birds.classify()
+    img = birds.add_boxes_and_labels(img, birds.classified_labels, birds.classified_rects)
+    cv2.imshow('test', img)
+    while True:
+        pass
 
 
 # test function

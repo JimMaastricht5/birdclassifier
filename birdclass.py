@@ -37,7 +37,6 @@ import motion_detector  # motion detector helper functions
 import objtracker  # keeps track of detected objects between frames
 import weather
 import tweeter  # twitter helper functions
-import image_proc  # lib of image enhancement functions
 import population  # population census object, tracks species total seen and last time
 import argparse  # argument parser
 from datetime import datetime
@@ -47,7 +46,7 @@ def bird_detector(args):
     birdpop = population.Census()  # initialize species population census object
     birdobj = objtracker.CentroidTracker()
     motioncnt = 0
-    curr_day, curr_hr = datetime.now().day, datetime.now().hour
+    curr_day, curr_hr, last_tweet = datetime.now().day, datetime.now().hour, datetime(2021, 1, 1, 0, 0, 0)
     spweather = weather.City_Weather()  # init class and set var based on default of Madison WI
 
     # initial video capture, screen size, and grab first image (no motion)
@@ -75,35 +74,34 @@ def bird_detector(args):
             print('')  # print new lines between birds detection for motion counter
             birds.classify()
             birdobj.update(birds.classified_rects, birds.classified_confidences, birds.classified_labels)
+            bird_counts, birds_last_seen = birdpop.report_census(birds.classified_labels)
         else:  # no birds detected in frame, update missing from frame count
             birdobj.update([], [], [])
             if motionb is True:  # motion but no birds
                 motioncnt += 1
                 print(f'\r motion {motioncnt}', end=' ')  # indicate motion on monitor
 
-    # *** stopped refactoring here ***
         if birds.target_object_found is True:  # saw at least one bird
             common_names, tweet_label = label_text(birds.classified_labels, birds.classified_confidences)
-            bird_visit_count_array, bird_last_seen_array = birdpop.report_census(birds.classified_labels)
-            equalizedimg = birds.add_boxes_and_labels(equalizedimg, birds.classified_labels, birds.classified_rects)
-            # all birds in image processed, add all objects to equalized image and show
-            # for key in birdobj.rects:
-            #     img = birds.add_box_and_label(img, birdobj.objnames[key], birdobj.rects[key])
+            birds.equalizedimg = birds.add_boxes_and_labels(img=birds.equalizedimg, labels=common_names,
+                                                            rects=birds.classified_rects)
+            cv2.imshow('equalized', birds.equalizedimg)  # show equalized image
+
             # Show image and tweet, confidence here is lowest in the picture
-            cv2.imshow('equalized', equalizedimg)  # show equalized image
-            if species_conf >= birds.classify_min_confidence:  # tweet threshold
-                if (datetime.now() - species_last_seen).total_seconds() >= 60 * 5:
-                    birdpop.visitor(species, datetime.now())  # update census count and last time seen / tweeted
-                    cv2.imshow('tweeted', equalizedimg)  # show what we would be tweeting
-                    # if bird_tweeter.post_image(tweet_label + str(species_visit_count + 1), equalizedimg) is False:
-                    #     print(f" {species} seen {species_last_seen.strftime('%I:%M %p')} *** exceeded tweet limit")
+
+            if all(conf >= birds.classify_min_confidence for conf in birds.classified_confidences):  # tweet threshold
+                if (datetime.now() - last_tweet).total_seconds() >= 60 * 5:
+                    birdpop.visitors(birds.classified_labels, datetime.now())  # update census count and last time seen / tweeted
+                    cv2.imshow('tweeted', birds.equalizedimg)  # show what we would be tweeting
+                    last_tweet = datetime.now()
+                    if bird_tweeter.post_image(tweet_label, birds.equalizedimg) is False:
+                        print(f"*** exceeded tweet limit")
                 else:
-                    print(f" {species} not tweeted, last seen {species_last_seen.strftime('%I:%M %p')}. wait 5 minutes")
+                    print(f" {tweet_label} not tweeted, last tweet {last_tweet.strftime('%I:%M %p')}. wait 5 minutes")
 
         # motion processed, all birds in image processed if detected, add all known objects to image
-        for key in birdobj.rects:
-            img = birds.add_box_and_label(img, birdobj.objnames[key], birdobj.rects[key])
-        cv2.imshow('video', img)  # show image with box and label use cv2.flip if image inverted
+        birds.img = birds.add_boxes_and_labels(birds.img, birdobj.objnames, birdobj.rects)
+        cv2.imshow('video', birds.img)  # show image with box and label use cv2.flip if image inverted
 
         cv2.waitKey(20)  # wait 20 ms to render video, restart loop.  setting of 0 is fixed img; > 0 video
         # shut down the app if between 1:00 and 1:05 am.  Pi runs this in a loop and restarts it every 20 minutes
