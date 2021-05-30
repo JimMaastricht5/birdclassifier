@@ -99,9 +99,9 @@ def bird_detector(args):
                     print(f" {tweet_label} not tweeted, last tweet {last_tweet.strftime('%I:%M %p')}. wait 5 minutes")
 
         # motion processed, all birds in image processed if detected, add all known objects to image
-        birds.img = birds.add_boxes_and_labels(birds.img, birdobj.objnames, birdobj.rects)
+        # birds.img = birds.add_boxes_and_labels(birds.img, birdobj.objnames, birdobj.rects)
         try:
-            cv2.imshow('video', birds.img)  # show image with box and label use cv2.flip if image inverted
+            cv2.imshow('unaltered video', img)  # show image with box and label use cv2.flip if image inverted
         except:
             pass
 
@@ -152,11 +152,11 @@ def label_text(species_names, species_confs):
         start = species_name.find('(') + 1  # find start of common name, move one character to drop (
         end = species_name.find(')')
         if start >= 0 and end >= 0:
-            name = f'{species_name[start:end] }'
+            name = f'{species_name[start:end], }'
         else:
-            name = f'{species_name} '
+            name = f'{species_name}, '
         common_names += name
-        tweet_label += f"{name}: confidence {species_confs[i] * 100:.1f}% "
+        tweet_label += f"{name} {species_confs[i] * 100:.1f}%, "
     return common_names, tweet_label
 
 

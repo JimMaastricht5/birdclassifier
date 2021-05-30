@@ -92,7 +92,7 @@ class DetectClassify:
     # target list.  Create color equalized version of img
     # fill detected_confidences, detected_labels, and detected_rects if in target object list
     def detect(self, img):
-        self.img = img
+        self.img = img.copy()
         self.equalizedimg = image_proc.equalize_color(img)  # balance histogram of color intensity for all frames
         self.detected_confidences = []
         self.detected_labels = []  # possible object labels
