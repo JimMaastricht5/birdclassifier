@@ -100,8 +100,10 @@ def bird_detector(args):
 
         # motion processed, all birds in image processed if detected, add all known objects to image
         birds.img = birds.add_boxes_and_labels(birds.img, birdobj.objnames, birdobj.rects)
-        if type(birds.img) is not None:
+        try:
             cv2.imshow('video', birds.img)  # show image with box and label use cv2.flip if image inverted
+        except AssertionError:
+            pass
 
         cv2.waitKey(20)  # wait 20 ms to render video, restart loop.  setting of 0 is fixed img; > 0 video
         # shut down the app if between 1:00 and 1:05 am.  Pi runs this in a loop and restarts it every 20 minutes
