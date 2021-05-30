@@ -69,6 +69,7 @@ def bird_detector(args):
     while True:  # while escape key is not pressed look for motion, detect birds, and determine species
         curr_day, curr_hr = hour_or_day_change(curr_day, curr_hr, spweather, bird_tweeter, birdpop)
         motionb, img = motion_detector.detect(args.flipcamera, cv2, cap, first_img, args.minarea)
+        cv2.imshow('video', img)  # show video w no boxes or labels use cv2.flip if image inverted
         if motionb is True and birds.detect(img):  # motion with birds
             motioncnt = 0  # reset motion count between detected birds
             print('')  # print new lines between birds detection for motion counter
@@ -100,10 +101,11 @@ def bird_detector(args):
 
         # motion processed, all birds in image processed if detected, add all known objects to image
         # birds.img = birds.add_boxes_and_labels(birds.img, birdobj.objnames, birdobj.rects)
-        try:
-            cv2.imshow('unaltered video', img)  # show image with box and label use cv2.flip if image inverted
-        except:
-            pass
+        print('*** bird detect and classify results')
+        print(birds.classified_labels, birds.classified_rects)
+        print('*** bird object results')
+        print(birdobj.objnames, birdobj.rects)
+        print('*** end loop')
 
         cv2.waitKey(20)  # wait 20 ms to render video, restart loop.  setting of 0 is fixed img; > 0 video
         # shut down the app if between 1:00 and 1:05 am.  Pi runs this in a loop and restarts it every 20 minutes
