@@ -100,7 +100,7 @@ def bird_detector(args):
 
         # motion processed, all birds in image processed if detected, add all known objects to image
         birds.img = birds.add_boxes_and_labels(birds.img, birdobj.objnames, birdobj.rects)
-        if birds.img.shape[0] > 0 and birds.img.shape[1] > 0 and birds.img.shape[2] > 0:
+        if type(birds.img) is not None:
             cv2.imshow('video', birds.img)  # show image with box and label use cv2.flip if image inverted
 
         cv2.waitKey(20)  # wait 20 ms to render video, restart loop.  setting of 0 is fixed img; > 0 video
