@@ -102,7 +102,7 @@ def bird_detector(args):
         birds.img = birds.add_boxes_and_labels(birds.img, birdobj.objnames, birdobj.rects)
         try:
             cv2.imshow('video', birds.img)  # show image with box and label use cv2.flip if image inverted
-        except AssertionError:
+        except:
             pass
 
         cv2.waitKey(20)  # wait 20 ms to render video, restart loop.  setting of 0 is fixed img; > 0 video
