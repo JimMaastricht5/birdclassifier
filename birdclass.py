@@ -100,11 +100,11 @@ def bird_detector(args):
                     print(f" {tweet_label} not tweeted, last tweet {last_tweet.strftime('%I:%M %p')}. wait 5 minutes")
 
         # motion processed, all birds in image processed if detected, add all known objects to image
-        # birds.img = birds.add_boxes_and_labels(birds.img, birdobj.objnames, birdobj.rects)
+        # birds.img = birds.add_boxes_and_labels(birds.img, list(birdobj.objnames), list(birdobj.rects))
         print('*** bird detect and classify results')
         print(birds.classified_labels, birds.classified_rects)
         print('*** bird object results')
-        print(birdobj.objnames, birdobj.rects)
+        print(list(birdobj.objnames), list(birdobj.rects))
         print('*** end loop')
 
         cv2.waitKey(20)  # wait 20 ms to render video, restart loop.  setting of 0 is fixed img; > 0 video
@@ -149,7 +149,9 @@ def hour_or_day_change(curr_day, curr_hr, spweather, bird_tweeter, birdpop):
 def label_text(species_names, species_confs):
     common_names = ''
     tweet_label = ''
+    print('***in label text')
     for i, species_name in enumerate(species_names):
+        print(species_name)
         species_name = str(species_name)  # make sure species is considered a string
         start = species_name.find('(') + 1  # find start of common name, move one character to drop (
         end = species_name.find(')')
@@ -157,7 +159,8 @@ def label_text(species_names, species_confs):
             name = f'{species_name[start:end], }'
         else:
             name = f'{species_name}, '
-        common_names += name
+        print(name)
+        common_names = common_names + name
         tweet_label += f"{name} {species_confs[i] * 100:.1f}%, "
     return common_names, tweet_label
 
