@@ -47,7 +47,7 @@ class CentroidTracker:
     # update the object dictionaries with the newly detected objects and rectangles
     # expects object of type list as input
     def update(self, rects, objconfidences, objnames):
-        print(f'*** object tracker update {rects}')
+
         if len(rects) == 0:  # check to see if the list of input bounding box rectangles is empty
             for objectid in list(self.disappeared.keys()):  # loop over existing tracked objects and mark disappeared
                 self.disappeared[objectid] += 1
@@ -55,6 +55,7 @@ class CentroidTracker:
                     self.deregister(objectid)
             return
 
+        print(f'*** object tracker update {rects}')
         inputcentroids = np.zeros((len(rects), 2), dtype="int")  # initialize array of input centroids for current frame
         for (i, (startX, startY, endX, endY)) in enumerate(rects):  # loop over the bounding box rectangles
             print(f'coordinate: {startX, startY, endX, endY}')
