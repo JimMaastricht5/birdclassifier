@@ -105,7 +105,7 @@ def bird_detector(args):
             print('*** bird detect and classify results')
             print(birds.classified_labels, birds.classified_rects)
         # print(birdobj.objnames, birdobj.rects)
-        for i, objname in birdobj.objnames:
+        for i, objname in enumerate(birdobj.objnames):
             print(f'bird object results: {objname}')
 
         cv2.waitKey(20)  # wait 20 ms to render video, restart loop.  setting of 0 is fixed img; > 0 video
