@@ -104,7 +104,9 @@ def bird_detector(args):
         print('*** bird detect and classify results')
         print(birds.classified_labels, birds.classified_rects)
         print('*** bird object results')
-        print(list(birdobj.objnames), list(birdobj.rects))
+        print(birdobj.objnames, birdobj.rects)
+        for i, objname in birdobj.objnames:
+            print(objname)
         print('*** end')
 
         cv2.waitKey(20)  # wait 20 ms to render video, restart loop.  setting of 0 is fixed img; > 0 video
@@ -154,10 +156,10 @@ def label_text(species_names, species_confs):
         start = species_name.find('(') + 1  # find start of common name, move one character to drop (
         end = species_name.find(')')
         if start >= 0 and end >= 0:
-            name = f'{species_name[start:end], }'
+            name = str(f'{species_name[start:end], }')
         else:
-            name = f'{species_name}, '
-        common_names = common_names + name
+            name = str('{species_name}, ')
+        common_names = common_names + str(name)
         tweet_label += f"{name} {species_confs[i] * 100:.1f}%, "
     return common_names, tweet_label
 

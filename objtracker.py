@@ -57,7 +57,7 @@ class CentroidTracker:
 
         inputcentroids = np.zeros((len(rects), 2), dtype="int")  # initialize array of input centroids for current frame
         for (i, (startX, startY, endX, endY)) in enumerate(rects):  # loop over the bounding box rectangles
-            print(f'coordinate: {startX, startY, endX, endY}')
+            # print(f'coordinate: {startX, startY, endX, endY}')
             cx = int((startX + endX) / 2.0)
             cy = int((startY + endY) / 2.0)
             inputcentroids[i] = (cx, cy)  # use the bounding box coordinates to derive the centroid
@@ -111,7 +111,7 @@ class CentroidTracker:
             else:  # otherwise input > existing centroid, register new trackable object
                 for col in unused_cols:
                     self.register(inputcentroids[col], rects[col], objconfidences[col], objnames[col])
-        print(f'*** in update object rects{self.rects}')
+        # print(f'*** in update object rects{self.rects}')
         return
 
 
