@@ -152,15 +152,19 @@ def label_text(species_names, species_confs):
     tweet_label = ''
     name = ''
     for i, species_name in enumerate(species_names):
+        if i > 0:
+            common_names += ', '
+            tweet_label += ', '
+
         species_name = str(species_name)  # make sure species is considered a string
         start = species_name.find('(') + 1  # find start of common name, move one character to drop (
         end = species_name.find(')')
         if start >= 0 and end >= 0:
-            name = f'{species_name[start:end], }'
+            name = species_name[start:end]
         else:
-            name = f'{species_name}, '
+            name = species_name
         common_names = common_names + name
-        tweet_label += f"{name} {species_confs[i] * 100:.1f}%, "
+        tweet_label += name + ' ' + f'{species_confs[i] * 100:.1f}%'
     return common_names, tweet_label
 
 
