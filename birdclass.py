@@ -41,6 +41,7 @@ import population  # population census object, tracks species total seen and las
 import argparse  # argument parser
 from datetime import datetime
 from gpiozero import CPUTemperature
+from subprocess import call
 
 
 def bird_detector(args):
@@ -142,9 +143,12 @@ def hour_or_day_change(curr_day, curr_hr, spweather, bird_tweeter, birdpop):
 
     if curr_hr != datetime.now().hour:  # check weather and CPU temp hourly
         spweather.update_conditions()
+        curr_hr = datetime.now().hour
         cputemp = CPUTemperature()
         print(f'hourly temp check. cpu temp is: {cputemp}')
-        curr_hr = datetime.now().hour
+        try:
+            if int(cputemp) > 85:
+                call("sudo shutdown -poweroff")
     return curr_day, curr_hr
 
 
