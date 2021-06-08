@@ -72,7 +72,7 @@ class CentroidTracker:
 
             # compute the distance between each pair of object centroids and input centroids, respectively
             # (1) find the smallest value in each row and then (2) sort the row indexes based on their minimum values
-            # so that the row with the smallest value is at the *front* of the index list (3) performsame on columns
+            # so that the row with the smallest value is at the *front* of the index list (3) perform same on columns
             d = dist.cdist(np.array(object_centroids), inputcentroids)
             rows = d.min(axis=1).argsort()
             cols = d.argmin(axis=1)[rows]
@@ -91,6 +91,9 @@ class CentroidTracker:
                 # otherwise, grab the object ID for the current row, set its new centroid, reset disappeared counter
                 objectid = object_ids[row]
                 self.objects[objectid] = inputcentroids[col]
+                self.objnames[objectid] = objnames[col]
+                self.objconfidences[objectid] = objconfidences[col]
+                self.rects[objectid] = rects[col]
                 self.disappeared[objectid] = 0
                 # indicate that we have examined each of the row and column indexes, respectively
                 used_rows.add(row)
@@ -118,7 +121,7 @@ class CentroidTracker:
 def main():
     obj_tracker = CentroidTracker()
     obj_tracker.update_null()
-    rects = list([])
+    rects = []
     rects.append((5, 15, 5, 15))
     rects.append((80, 80, 180, 180))
     print(type(rects))
@@ -129,14 +132,16 @@ def main():
     objnames.append('bird 1')
     objnames.append('bird 2')
     obj_tracker.update(rects, objconfidences, objnames)
-    print(obj_tracker.objects, obj_tracker.rects, obj_tracker.objnames, obj_tracker.objconfidences)
+    print(obj_tracker.objects, obj_tracker.rects, obj_tracker.objnames, obj_tracker.objconfidences,
+          obj_tracker.disappeared)
 
     for i in (10, 20, 30, 40, 50):
         rects = []
         rects.append((0 + i, 10 + i, 0 + i, 10 + i))
         rects.append((100 - i, 100 - i, 200 - i, 200 - i))
         obj_tracker.update(rects, objconfidences, objnames)
-        print(obj_tracker.objects, obj_tracker.disappeared)
+        print(obj_tracker.objects, obj_tracker.rects, obj_tracker.objnames, obj_tracker.objconfidences,
+              obj_tracker.disappeared)
 
     print('***test rect loop')
     for i, rect in enumerate(rects):
@@ -149,12 +154,14 @@ def main():
         print(i)
         # obj_tracker.update(rects, objconfidences, objnames)
         obj_tracker.update([], [], [])
-        print(obj_tracker.objects)
+        print(obj_tracker.objects, obj_tracker.rects, obj_tracker.objnames, obj_tracker.objconfidences,
+              obj_tracker.disappeared)
 
     print('for loop')
     print(obj_tracker.rects)
     for key in obj_tracker.rects:
-        print(key, obj_tracker.rects[key])
+        print(obj_tracker.objects, obj_tracker.rects, obj_tracker.objnames, obj_tracker.objconfidences,
+              obj_tracker.disappeared)
 
 
 if __name__ == "__main__":
