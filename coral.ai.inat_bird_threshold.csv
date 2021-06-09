@@ -1,7 +1,7 @@
 0 Haemorhous cassinii (Cassin's Finch),-1
 1 Aramus guarauna (Limpkin),-1
 2 Rupornis magnirostris (Roadside Hawk),-1
-3 Cyanocitta cristata (Blue Jay),50
+3 Cyanocitta cristata (Blue Jay),0
 4 Cyanocitta stelleri (Steller's Jay),-1
 5 Balearica regulorum (Grey Crowned Crane),-1
 6 Pyrocephalus rubinus (Vermilion Flycatcher),-1
@@ -65,8 +65,8 @@
 64 Tachybaptus dominicus (Least Grebe),0
 65 Artemisiospiza belli (Bell's Sparrow),0
 66 Gallus gallus (Red Junglefowl),0
-67 Cardinalis sinuatus (Pyrrhuloxia),100
-68 Cardinalis cardinalis (Northern Cardinal),100
+67 Cardinalis sinuatus (Pyrrhuloxia),0
+68 Cardinalis cardinalis (Northern Cardinal),0
 69 Melospiza lincolnii (Lincoln's Sparrow),0
 70 Podilymbus podiceps (Pied-billed Grebe),0
 71 Melospiza georgiana (Swamp Sparrow),0
@@ -145,7 +145,7 @@
 144 Cinclus cinclus (White-throated Dipper),0
 145 Chen rossii (Ross's Goose),0
 146 Callipepla californica (California Quail),-1
-147 Cardinalis cardinalis (Northern Cardinal),700
+147 Cardinalis cardinalis (Northern Cardinal),775
 148 Quiscalus mexicanus (Great-tailed Grackle),-1
 149 Callipepla squamata (Scaled Quail),0
 150 Dryocopus pileatus (Pileated Woodpecker),0
