@@ -128,12 +128,14 @@ def hour_or_day_change(curr_day, curr_hr, spweather, bird_tweeter, birdpop):
         post_txt = f'top 3 birds for day {str(curr_day)}'
         index, loopcnt = 0, 1
         while loopcnt <= 3:  # top 3 skipping unknown species
+            birdstr = ''  # used to force tuple to string
             if observed[index][0:2] == '':
                 index += 1
             try:
-                post_txt += f', #{str(loopcnt)} {observed[index][0:2]}'
+                birdstr = f', #{str(loopcnt)} {observed[index][0:2]}'
             except IndexError:
                 break
+            post_txt = post_txt + birdstr
             index += 1
             loopcnt += 1
 
