@@ -146,11 +146,11 @@ def hour_or_day_change(curr_day, curr_hr, spweather, bird_tweeter, birdpop):
     if curr_hr != datetime.now().hour:  # check weather and CPU temp hourly
         spweather.update_conditions()
         curr_hr = datetime.now().hour
-        cputemp = CPUTemperature()
-        print(f'hourly temp check. cpu temp is: {cputemp}')
+        cpu = CPUTemperature()
+        print(f'hourly temp check. cpu temp is: {cpu.temperature}C {(cpu.temperature * 9/5) + 32}F')
         try:
-            if int(cputemp) > 85:
-                bird_tweeter.post_status(f'shut down. temp: {int(cputemp)}')
+            if int(cpu.temperature) >= 86:  # limit is 85 C
+                bird_tweeter.post_status(f'shut down. temp: {cpu.temperature}')
                 call("sudo shutdown -poweroff")
         except:
             pass
