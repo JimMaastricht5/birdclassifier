@@ -123,6 +123,7 @@ def bird_detector(args):
 
 # housekeeping for day and hour
 def hour_or_day_change(curr_day, curr_hr, spweather, bird_tweeter, birdpop):
+    post_txt = ''  # force to string
     if curr_day != datetime.now().day:
         observed = birdpop.get_census_by_count()  # count from prior day
         post_txt = f'top 3 birds for day {str(curr_day)}'
@@ -147,10 +148,10 @@ def hour_or_day_change(curr_day, curr_hr, spweather, bird_tweeter, birdpop):
         spweather.update_conditions()
         curr_hr = datetime.now().hour
         cpu = CPUTemperature()
-        print(f'hourly temp check. cpu temp is: {cpu.temperature}C {(cpu.temperature * 9/5) + 32}F')
+        print(f'***hourly temp check. cpu temp is: {cpu.temperature}C {(cpu.temperature * 9/5) + 32}F')
         try:
             if int(cpu.temperature) >= 86:  # limit is 85 C
-                bird_tweeter.post_status(f'shut down. temp: {cpu.temperature}')
+                bird_tweeter.post_status(f'***shut down. temp: {cpu.temperature}')
                 call("sudo shutdown -poweroff")
         except:
             pass

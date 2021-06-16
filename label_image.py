@@ -63,6 +63,7 @@ class DetectClassify:
         self.detect_obj_min_confidence = .6
         self.classify_min_confidence = .7
         self.classify_default_confidence = .98
+        self.classify_mismatch_reduction = .30
         self.detected_confidences = []
         self.detected_labels = []
         self.detected_rects = []
@@ -119,6 +120,39 @@ class DetectClassify:
                     self.detected_labels.append(label)
                     self.detected_rects.append(det_rects[0][index])
         return self.target_object_found
+
+        # make classifications using img and detect results
+        # compare img and equalized images
+        # use self.detected_confidences,detected_labels, detected_rects lists
+
+    def classify(self):
+        self.classified_rects = []
+        self.classified_confidences = []
+        self.classified_labels = []
+        for i, det_confidence in enumerate(self.detected_confidences):  # loop thru detected target objects
+            (startX, startY, endX, endY) = self.scale_rect(self.img, self.detected_rects[i])  # set x,y bounding box
+            rect = (startX, startY, endX, endY)
+            crop_img = self.img[startY:endY, startX:endX]  # extract image for better classification
+            crop_equalizedimg = self.equalizedimg[startY:endY, startX:endX]
+            classify_conf, classify_label = self.classify_obj(crop_img)
+            classify_conf_equalized, classify_label_equalized = self.classify_obj(crop_equalizedimg)
+            if classify_label != classify_label_equalized:  # predictions should match if pic quality is good
+                # pick the result with highest confidence and reduce the confidence of the highest
+                if classify_conf >= classify_conf_equalized:
+                    pass
+                else:
+                    classify_conf = classify_conf_equalized
+                    classify_label = classify_label_equalized
+                classify_conf -= self.classify_mismatch_reduction  # reduce confidence on mismatch
+            else:  # increase confidence on match
+                classify_conf += classify_conf_equalized
+                if classify_conf > 1:
+                    classify_conf = 1
+
+            self.classified_labels.append(classify_label)
+            self.classified_confidences.append(classify_conf)
+            self.classified_rects.append(rect)
+        return
 
     # input image and return best result and label
     # the function will sort the results and compare the confidence to the confidence for that label (species)
@@ -209,32 +243,6 @@ class DetectClassify:
         return(int(label_threshold) != -1 and cresult > 0 and
                cresult >= float(label_threshold) / 1000)
 
-    # make classifications using img and detect results
-    # compare img and equalized images
-    # use self.detected_confidences,detected_labels, detected_rects lists
-    def classify(self):
-        self.classified_rects = []
-        self.classified_confidences = []
-        self.classified_labels = []
-        for i, det_confidence in enumerate(self.detected_confidences):  # loop thru detected target objects
-            (startX, startY, endX, endY) = self.scale_rect(self.img, self.detected_rects[i])  # set x,y bounding box
-            rect = (startX, startY, endX, endY)
-            crop_img = self.img[startY:endY, startX:endX]  # extract image for better classification
-            crop_equalizedimg = self.equalizedimg[startY:endY, startX:endX]
-            classify_conf, classify_label = self.classify_obj(crop_img)
-            classify_conf_equalized, classify_label_equalized = self.classify_obj(crop_equalizedimg)
-            if classify_label != classify_label_equalized:  # predictions should match if pic quality is good
-                # pick the result with highest confidence
-                if classify_conf >= classify_conf_equalized:
-                    pass
-                else:
-                    classify_conf = classify_conf_equalized
-                    classify_label = classify_label_equalized
-
-            self.classified_labels.append(classify_label)
-            self.classified_confidences.append(classify_conf)
-            self.classified_rects.append(rect)
-        return
 
 def main(args):
     img = cv2.imread(args.image)

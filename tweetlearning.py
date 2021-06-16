@@ -47,7 +47,7 @@ def process_tweets(args, direct_messages, species_thresholds):
                 print(f'species set to never: {species_thresholds.species[species_index]}')
             elif text[0:3] == 'inc':  # increase threshold for species by 10
                 species_index = int(text[4: len(text)])
-                species_thresholds.iloc[species_index,1] += 10  # increase threshold
+                species_thresholds.iloc[species_index, 1] += 10  # increase threshold
                 print(f'species threshold inc: {species_thresholds.species[species_index]}')
             else:
                 print(f'direct message unknown request: {dm[1]}')
