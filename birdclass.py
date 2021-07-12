@@ -87,14 +87,19 @@ def bird_detector(args):
             common_names, tweet_label = label_text(birds.classified_labels, birds.classified_confidences)
             birds.equalizedimg = birds.add_boxes_and_labels(birds.equalizedimg, common_names, birds.classified_rects)
             # birds.img = birds.add_boxes_and_labels(birds.img, common_names, birds.classified_rects)
-            cv2.imshow('equalized', birds.equalizedimg)  # show equalized image
+            if args.enhanceimg:
+                cv2.imshow('predicted', birds.equalizedimg)  # show equalized image
+            else:
+                cv2.imshow('predicted', birds.img)
 
-            # Show image and tweet, confidence here is lowest in the picture
-
+            # Show image and tweet, confidence
             if all(conf >= birds.classify_min_confidence for conf in birds.classified_confidences):  # tweet threshold
                 if (datetime.now() - last_tweet).total_seconds() >= 60 * 5:
                     birdpop.visitors(birds.classified_labels, datetime.now())  # update census count and last tweeted
-                    cv2.imshow('tweeted', birds.equalizedimg)  # show what we would be tweeting
+                    if args.enhanceimg:
+                        cv2.imshow('tweeted', birds.equalizedimg)
+                    else:
+                        cv2.imshow('tweeted', birds.img)
                     last_tweet = datetime.now()
                     if bird_tweeter.post_image(tweet_label, birds.equalizedimg) is False:
                         print(f"*** exceeded tweet limit")
@@ -180,11 +185,11 @@ def label_text(species_names, species_confs):
 
 def set_windows():
     cv2.namedWindow('video')
-    cv2.namedWindow('equalized')
+    cv2.namedWindow('predicted')
     cv2.namedWindow('tweeted')
 
     cv2.moveWindow('video', 0, 0)
-    cv2.moveWindow('equalized', 350, 0)
+    cv2.moveWindow('predicted', 350, 0)
     cv2.moveWindow('tweeted', 700, 0)
 
     cv2.waitKey(20)  # wait 20 ms to render video, restart loop.  setting of 0 is fixed img; > 0 video
@@ -195,6 +200,7 @@ if __name__ == "__main__":
     # construct the argument parser and parse the arguments
     ap = argparse.ArgumentParser()
     ap.add_argument("-f", "--flipcamera", type=bool, default=False, help="flip camera image")
+    ap.add_argument("-e", "--enhanceimg", type=bool, default=False, help="flip camera image")
     ap.add_argument("-a", "--minarea", type=int, default=1000, help="motion threshold")
     ap.add_argument("-sw", "--screenwidth", type=int, default=320, help="max screen width")
     ap.add_argument("-sh", "--screenheight", type=int, default=240, help="max screen height")
