@@ -53,8 +53,8 @@ def bird_detector(args):
 
     # initial video capture, screen size, and grab first image (no motion)
     cap = cv2.VideoCapture(0)  # capture video image
-    cap.set(3, args.screenwidth)  # set screen width
-    cap.set(4, args.screenheight)  # set screen height
+    # cap.set(3, args.screenwidth)  # set screen width
+    # cap.set(4, args.screenheight)  # set screen height
     first_img = motion_detector.init(args.flipcamera, cv2, cap)  # set gray motion mask
     set_windows()  # position output windows at top of screen and init output
 
