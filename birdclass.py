@@ -96,12 +96,14 @@ def bird_detector(args):
             if all(conf >= birds.classify_min_confidence for conf in birds.classified_confidences):  # tweet threshold
                 if (datetime.now() - last_tweet).total_seconds() >= 60 * 5:
                     birdpop.visitors(birds.classified_labels, datetime.now())  # update census count and last tweeted
+                    last_tweet = datetime.now()
                     if args.enhanceimg:
                         cv2.imshow('tweeted', birds.equalizedimg)
+                        tweetedb = bird_tweeter.post_image(tweet_label, birds.equalizedimg)
                     else:
                         cv2.imshow('tweeted', birds.img)
-                    last_tweet = datetime.now()
-                    if bird_tweeter.post_image(tweet_label, birds.equalizedimg) is False:
+                        tweetedb = bird_tweeter.post_image(tweet_label, birds.img)
+                    if tweetedb == False:
                         print(f"*** exceeded tweet limit")
                 else:
                     print(f" {tweet_label} not tweeted, last tweet {last_tweet.strftime('%I:%M %p')}. wait 5 minutes")
