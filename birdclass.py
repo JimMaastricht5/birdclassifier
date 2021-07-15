@@ -97,6 +97,7 @@ def bird_detector(args):
                 if (datetime.now() - last_tweet).total_seconds() >= 60 * 5:
                     birdpop.visitors(birds.classified_labels, datetime.now())  # update census count and last tweeted
                     last_tweet = datetime.now()
+                    # decide what to tweet
                     if args.enhanceimg:
                         cv2.imshow('tweeted', birds.equalizedimg)
                         tweetedb = bird_tweeter.post_image(tweet_label, birds.equalizedimg)
