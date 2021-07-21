@@ -92,7 +92,7 @@ def bird_detector(args):
                                                                 birds.classified_rects)
                 cv2.imshow('predicted', birds.equalizedimg)  # show equalized image
             else:
-                birds.img = image_proc.enhance_brightness_cv2(birds.img)  # default 10% increase
+                birds.img = image_proc.enhance_brightness_cv2(birds.img, brightness=20)  # default 10% increase
                 birds.img = birds.add_boxes_and_labels(birds.img, common_names, birds.classified_rects)
                 cv2.imshow('predicted', birds.img)
 
