@@ -32,6 +32,8 @@
 # packages: twitter use twython package, auth.py must be in project for import auth
 #   oauthlib,
 import cv2  # open cv 2
+
+import image_proc
 import label_image  # code to init tensor flow model and classify bird type
 import motion_detector  # motion detector helper functions
 import objtracker  # keeps track of detected objects between frames
@@ -85,11 +87,13 @@ def bird_detector(args):
 
         if birds.target_object_found is True:  # saw at least one bird
             common_names, tweet_label = label_text(birds.classified_labels, birds.classified_confidences)
-            birds.equalizedimg = birds.add_boxes_and_labels(birds.equalizedimg, common_names, birds.classified_rects)
-            # birds.img = birds.add_boxes_and_labels(birds.img, common_names, birds.classified_rects)
             if args.enhanceimg:
+                birds.equalizedimg = birds.add_boxes_and_labels(birds.equalizedimg, common_names,
+                                                                birds.classified_rects)
                 cv2.imshow('predicted', birds.equalizedimg)  # show equalized image
             else:
+                birds.img = image_proc.enhance_brightness_cv2(birds.img)  # default 10% increase
+                birds.img = birds.add_boxes_and_labels(birds.img, common_names, birds.classified_rects)
                 cv2.imshow('predicted', birds.img)
 
             # Show image and tweet, confidence
@@ -110,10 +114,10 @@ def bird_detector(args):
                     print(f" {tweet_label} not tweeted, last tweet {last_tweet.strftime('%I:%M %p')}. wait 5 minutes")
 
         # motion processed, all birds in image processed if detected, add all known objects to image
-        try:
-            birds.img = birds.add_boxes_and_labels(birds.img, birdobj.objnames, birdobj.rects)
-        except:
-            print('*** error in boxes and labels using image tracker')
+        # try:
+        #    birds.img = birds.add_boxes_and_labels(birds.img, birdobj.objnames, birdobj.rects)
+        # except:
+        #    print('*** error in boxes and labels using image tracker')
         # if birds.target_object_found:
         #     print('*** bird detect and classify results')
         #     print(birds.classified_labels, birds.classified_rects)

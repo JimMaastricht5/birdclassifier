@@ -45,8 +45,8 @@ def convert(img, convert_to = 'np'):
 # take either a pil image or nparray and returns nparray
 def enhancements(img):
     img = convert(img, 'PIL')  # converts to PIL format if necessary
-    img_clr = enhance_color(img, 2.5)
-    img_clr_brt = enhance_brightness(img_clr, 1.0)
+    img_clr = enhance_color(img, 1.0)
+    img_clr_brt = enhance_brightness(img_clr, 1.2)
     img_clr_brt_con = enhance_contrast(img_clr_brt, 1.0)
     return convert(img_clr), convert(img_clr_brt), convert(img_clr_brt_con)  # return numpy arrays
 
@@ -81,6 +81,12 @@ def enhance_contrast(img, factor):
 def enhance_sharpness(img, factor):
     return ImageEnhance.Sharpness(img).enhance(factor)
 
+
+# use opencv2 to enhance the brightness of an image
+# contrast between 1.0 and 3.0
+# brightness between 0 and 100
+def enhance_brightness_cv2(img, contrast=1, brightness=10):
+    return cv2.convertScaleAbs(img, alpha=contrast, beta=brightness)
 
 # check in image to see if is low contrast, return True or False
 # uses scikit-images is_low_contrast func on gray scale image

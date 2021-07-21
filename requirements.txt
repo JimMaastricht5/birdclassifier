@@ -1,6 +1,6 @@
 setuptools~=50.2.0
 opencv-python~=4.4.0.42
-numpy~=1.18.5
+numpy
 twython~=3.8.2
 requests~=2.24.0
 Pillow~=7.2.0
