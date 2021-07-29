@@ -93,7 +93,8 @@ def bird_detector(args):
                                                                 birds.classified_rects)
                 cv2.imshow('predicted', birds.equalizedimg)  # show equalized image
             else:
-                birds.img = image_proc.enhance_brightness_cv2(birds.img, contrast=1.05, brightness=25)
+                birds.img = image_proc.enhance_brightness_cv2(birds.img, contrast=args.contrast,
+                                                              brightness=args.brightness)
                 birds.img = birds.add_boxes_and_labels(birds.img, common_names, birds.classified_rects)
                 cv2.imshow('predicted', birds.img)
 
@@ -109,7 +110,7 @@ def bird_detector(args):
                     else:
                         cv2.imshow('tweeted', birds.img)
                         tweetedb = bird_tweeter.post_image(tweet_label, birds.img)
-                    if tweetedb == False:
+                    if tweetedb is False:
                         print(f"*** exceeded tweet limit")
                 else:
                     print(f" {tweet_label} not tweeted, last tweet {last_tweet.strftime('%I:%M %p')}. wait 5 minutes")
@@ -208,12 +209,14 @@ if __name__ == "__main__":
     # construct the argument parser and parse the arguments
     ap = argparse.ArgumentParser()
     ap.add_argument("-f", "--flipcamera", type=bool, default=False, help="flip camera image")
-    ap.add_argument("-e", "--enhanceimg", type=bool, default=True, help="flip camera image")
+    ap.add_argument("-e", "--enhanceimg", type=bool, default=False, help="flip camera image")
     ap.add_argument("-a", "--minarea", type=int, default=1000, help="motion threshold")
     # ap.add_argument("-sw", "--screenwidth", type=int, default=320, help="max screen width")
     # ap.add_argument("-sh", "--screenheight", type=int, default=240, help="max screen height")
     ap.add_argument("-sw", "--screenwidth", type=int, default=0, help="max screen width")
     ap.add_argument("-sh", "--screenheight", type=int, default=0, help="max screen height")
+    ap.add_argument("-b", "--brightness", type=int, default=0, help="brightness boost")
+    ap.add_argument("-c", "--contrast", type=float, default=1.05, help="contrast boost")
 
     arguments = ap.parse_args()
     bird_detector(arguments)
