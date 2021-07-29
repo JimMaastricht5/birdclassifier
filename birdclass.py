@@ -55,8 +55,9 @@ def bird_detector(args):
 
     # initial video capture, screen size, and grab first image (no motion)
     cap = cv2.VideoCapture(0)  # capture video image
-    # cap.set(3, args.screenwidth)  # set screen width
-    # cap.set(4, args.screenheight)  # set screen height
+    if args.screenwidth != 0:  # if the screen width and height are zero use the camera default and skip this code
+        cap.set(3, args.screenwidth)  # set screen width
+        cap.set(4, args.screenheight)  # set screen height
     first_img = motion_detector.init(args.flipcamera, cv2, cap)  # set gray motion mask
     set_windows()  # position output windows at top of screen and init output
 
@@ -92,7 +93,7 @@ def bird_detector(args):
                                                                 birds.classified_rects)
                 cv2.imshow('predicted', birds.equalizedimg)  # show equalized image
             else:
-                birds.img = image_proc.enhance_brightness_cv2(birds.img, brightness=20)  # default 10% increase
+                birds.img = image_proc.enhance_brightness_cv2(birds.img, contrast=1.2, brightness=25)
                 birds.img = birds.add_boxes_and_labels(birds.img, common_names, birds.classified_rects)
                 cv2.imshow('predicted', birds.img)
 
@@ -209,8 +210,10 @@ if __name__ == "__main__":
     ap.add_argument("-f", "--flipcamera", type=bool, default=False, help="flip camera image")
     ap.add_argument("-e", "--enhanceimg", type=bool, default=False, help="flip camera image")
     ap.add_argument("-a", "--minarea", type=int, default=1000, help="motion threshold")
-    ap.add_argument("-sw", "--screenwidth", type=int, default=320, help="max screen width")
-    ap.add_argument("-sh", "--screenheight", type=int, default=240, help="max screen height")
+    # ap.add_argument("-sw", "--screenwidth", type=int, default=320, help="max screen width")
+    # ap.add_argument("-sh", "--screenheight", type=int, default=240, help="max screen height")
+    ap.add_argument("-sw", "--screenwidth", type=int, default=0, help="max screen width")
+    ap.add_argument("-sh", "--screenheight", type=int, default=0, help="max screen height")
 
     arguments = ap.parse_args()
     bird_detector(arguments)
