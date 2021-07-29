@@ -215,8 +215,8 @@ if __name__ == "__main__":
     # ap.add_argument("-sh", "--screenheight", type=int, default=240, help="max screen height")
     ap.add_argument("-sw", "--screenwidth", type=int, default=0, help="max screen width")
     ap.add_argument("-sh", "--screenheight", type=int, default=0, help="max screen height")
-    ap.add_argument("-b", "--brightness", type=int, default=0, help="brightness boost")
-    ap.add_argument("-c", "--contrast", type=float, default=1.02, help="contrast boost")
+    ap.add_argument("-b", "--brightness", type=int, default=10, help="brightness boost")  # % boost 0 to 100
+    ap.add_argument("-c", "--contrast", type=float, default=1.03, help="contrast boost")  # contrast between 1.0 and 3.0
 
     arguments = ap.parse_args()
     bird_detector(arguments)
