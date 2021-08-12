@@ -195,12 +195,12 @@ def label_text(species_names, species_confs):
 
 def set_windows():
     cv2.namedWindow('video')
-    cv2.namedWindow('predicted')
-    cv2.namedWindow('tweeted')
+    # cv2.namedWindow('predicted')
+    # cv2.namedWindow('tweeted')
 
     cv2.moveWindow('video', 0, 0)
-    cv2.moveWindow('predicted', 350, 0)
-    cv2.moveWindow('tweeted', 700, 0)
+    # cv2.moveWindow('predicted', 350, 0)
+    # cv2.moveWindow('tweeted', 700, 0)
 
     cv2.waitKey(20)  # wait 20 ms to render video, restart loop.  setting of 0 is fixed img; > 0 video
     return
