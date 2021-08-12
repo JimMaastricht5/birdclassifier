@@ -31,7 +31,7 @@
 # install OpenCv version 4.4+
 # packages: twitter use twython package, auth.py must be in project for import auth
 #   oauthlib,
-import numpy.core.multiarray
+import numpy.core.multiarray  # may be needed to avoid error with opencv multiarray
 import numpy as np
 import cv2  # open cv 2
 
