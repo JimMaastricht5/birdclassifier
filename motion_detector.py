@@ -26,44 +26,65 @@
 # compare gray scale image to first image.  If different than motion
 # return image captured, gray scale, guassian blured version, thresholds, first_img, and countours
 # code by JimMaastricht5@gmail.com based on https://www.pyimagesearch.com/category/object-tracking/
-# import cv2
 import imutils
+import io
+import time
+from PIL import Image
 
+import image_proc
+
+try:
+    import picamera
+    import picamera.array
+except:
+    print('picamera import fails on windows')
+    pass
+
+# create in-memory stream
+def capture_image(flipb, camera):
+    with picamera.array.PiRGBArray(camera) as stream:
+        camera.capture(stream, format='rgb')
+        img = stream.array # At this point the image is available as stream.array
+        if flipb:
+            img = image_proc.flip(img)
+    return img
 
 # capture first image and gray scale/blur for baseline motion detection
-def init(flipb, cv2, cap):
-    ret, img = cap.read()  # capture an image from the camera
-    if flipb:
-        img = cv2.flip(img, -1)  # mirror image; comment out if not needed for your camera
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)  # convert image to gray scale BGR for OpenCv recognition
-    graymotion = cv2.GaussianBlur(gray, (21, 21), 0)  # smooth out image for motion detection
-    return graymotion
+# Create the in-memory stream
+def init(flipb):
+    with picamera.PiCamera() as camera:
+        camera.start_preview()
+        time.sleep(2)
+        img = capture_image(flipb, camera)
+    gray = image_proc.grayscale(img)  # convert image to gray scale for motion detection
+    graymotion = image_proc.gaussianblur(gray)  # smooth out image for motion detection
+    return camera, graymotion
 
 
 # once first image is captured call motion detector in a loop to find each subsequent image
 # compare image to first img; if different than motion
-def detect(flipb, cv2, cap, first_img, min_area):
+def detect(flipb, camera, first_img, min_area):
     motionb = False
-    ret, img = cap.read()  # capture an image from the camera
-    if flipb:
-        img = cv2.flip(img, -1)  # mirror image; comment out if not needed for your camera
-    grayimg = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)  # convert image to gray scale BGR for OpenCv recognition
-    grayblur = cv2.GaussianBlur(grayimg, (21, 21), 0)  # smooth out image for motion detection
+    img = capture_image(flipb, camera)
+    img = capture_image(flipb, camera)
+    grayimg = image_proc.grayscale(img)  # convert image to gray scale
+    grayblur = image_proc.gaussianblur(img)  # smooth out image for motion detection
 
     # motion detection, compute the absolute difference between the current frame and first frame
-    imgdelta = cv2.absdiff(first_img, grayblur)
-    threshimg = cv2.threshold(imgdelta, 25, 255, cv2.THRESH_BINARY)[1]
+    # imgdelta = cv2.absdiff(first_img, grayblur)
+    # threshimg = cv2.threshold(imgdelta, 25, 255, cv2.THRESH_BINARY)[1]
 
     # dilate the thresholded image to fill in holes, then find contours on the image
-    threshimg = cv2.dilate(threshimg, None, iterations=2)
-    cnts = cv2.findContours(threshimg.copy(), cv2.RETR_EXTERNAL,
-                            cv2.CHAIN_APPROX_SIMPLE)
+    # threshimg = cv2.dilate(threshimg, None, iterations=2)
+    # cnts = cv2.findContours(threshimg.copy(), cv2.RETR_EXTERNAL,
+    #                         cv2.CHAIN_APPROX_SIMPLE)
     
-    cnts = imutils.grab_contours(cnts)  # set of contours showing motion
-    for c in cnts:  # loop over countours if too small ignore it
-        # print(cv2.contourArea(c))
-        if cv2.contourArea(c) >= min_area:
-            motionb = True
+    # cnts = imutils.grab_contours(cnts)  # set of contours showing motion
+    # for c in cnts:  # loop over countours if too small ignore it
+    #     print(cv2.contourArea(c))
+        # if cv2.contourArea(c) >= min_area:
+        #     motionb = True
 
     # return motionb, img, grayimg, grayblur, threshimg
+    motionb = True
     return motionb, img

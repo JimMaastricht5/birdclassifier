@@ -23,7 +23,6 @@
 # JimMaastricht5@gmail.com
 # refactored for object detection and object classification
 # blended tensor and tensor flow lite capabilities
-# added conversion of cv2 frame to tensor
 # added scale rect results from obj detection to apply to full image
 # added code for detailed object detection and for general classification
 # ==============================================================================
@@ -34,20 +33,32 @@ from __future__ import division
 from __future__ import print_function
 
 import argparse
-import numpy.core.multiarray
 import numpy as np
-import cv2
 import math
 import random
+from matplotlib import pyplot
+from PIL import Image as PILImage
+# from PIL import ImageFont as PILImageFont
+from PIL import ImageDraw as PILImageDraw
 import image_proc
+
+# attempt to load picamera, fails on windows
+try:
+    import picamera
+except:
+    pass
+
+# attempt to load tensor flow lite,will fail if not raspberry pi, switch to full tensorflow for windows
 try:
     import tflite_runtime.interpreter as tflite  # for pi4 with install wheel above
+    tfliteb = True
 except:
     import tensorflow as tf  # TF2 for desktop testing
+    tfliteb = False
 
 
 class DetectClassify:
-    def __init__(self, homedir='/home/pi/PycharmProjects/pyface2/'):
+    def __init__(self, homedir='/home/pi/PycharmProjects/pyface2/', default_confidece = .98):
         self.detector_file = homedir + 'lite-model_ssd_mobilenet_v1_1_metadata_2.tflite'
         self.detector_labels_file = homedir + 'lite-model_ssd_mobilenet_v1_1_metadata_2_labelmap.txt'
         self.target_objects = ['bird']
@@ -63,7 +74,7 @@ class DetectClassify:
         self.input_std = 127.5  # recommended default
         self.detect_obj_min_confidence = .6
         self.classify_min_confidence = .7
-        self.classify_default_confidence = .98
+        self.classify_default_confidence = default_confidece
         self.classify_mismatch_reduction = .30
         self.detected_confidences = []
         self.detected_labels = []
@@ -72,8 +83,14 @@ class DetectClassify:
         self.classified_labels = []
         self.classified_rects = []
         self.colors = np.random.uniform(0, 255, size=(11, 3))  # random colors for bounding boxes
-        self.img = np.zeros((100, 100, 3), dtype=np.uint8)
-        self.equalizedimg = np.zeros((100, 100, 3), dtype=np.uint8)
+        self.img = np.zeros((640, 480, 3), dtype=np.uint8)
+        self.equalizedimg = np.zeros((640, 480, 3), dtype=np.uint8)
+        try:
+            self.camera = picamera.PiCamera()
+            self.camera.resolution(640, 480)
+            self.camera.framerate = 30
+        except:
+            pass
 
     # initialize tensor flow model
     def init_tf2(self, model_file, label_file_name):
@@ -103,7 +120,7 @@ class DetectClassify:
 
         input_details = self.detector.get_input_details()
         output_details = self.detector.get_output_details()
-        floating_model, input_data = self.convert_cvframe_to_ts(self.img, input_details)
+        floating_model, input_data = self.convert_img_to_tf(self.img, input_details)
         self.detector.set_tensor(input_details[0]['index'], input_data)
         self.detector.invoke()
 
@@ -133,8 +150,8 @@ class DetectClassify:
         for i, det_confidence in enumerate(self.detected_confidences):  # loop thru detected target objects
             (startX, startY, endX, endY) = self.scale_rect(self.img, self.detected_rects[i])  # set x,y bounding box
             rect = (startX, startY, endX, endY)
-            crop_img = self.img[startY:endY, startX:endX]  # extract image for better classification
-            crop_equalizedimg = self.equalizedimg[startY:endY, startX:endX]
+            crop_img = self.img.crop((startX, startY, endX, endY))  # extract image for better classification
+            crop_equalizedimg = self.equalizedimg.crop((startX, startY, endX, endY))
             classify_conf, classify_label = self.classify_obj(crop_img)
             classify_conf_equalized, classify_label_equalized = self.classify_obj(crop_equalizedimg)
             if classify_label != classify_label_equalized:  # predictions should match if pic quality is good
@@ -162,7 +179,7 @@ class DetectClassify:
     def classify_obj(self, img):
         input_details = self.classifier.get_input_details()
         # output_details = self.classifier.get_output_details()
-        floating_model, input_data = self.convert_cvframe_to_ts(img, input_details)
+        floating_model, input_data = self.convert_img_to_tf(img, input_details)
         self.classifier.set_tensor(input_details[0]['index'], input_data)
 
         self.classifier.invoke()
@@ -174,7 +191,6 @@ class DetectClassify:
             output = scale * (output - zero_point) * 10  # added * 10 scale factor to try and get numbers right
 
         cindex = np.argpartition(output, -10)[-10:]
-
         # loop thru top N results to find best match; highest score align with matching species threshold
         maxcresult = float(0)
         maxlresult = ''
@@ -184,8 +200,11 @@ class DetectClassify:
             if cresult != 0:
                 # print(f'     {check_threshold(cresult, lindex, label_thresholds)} match, confidence:{str(cresult)}' +
                 #         f', threshold:{label_thresholds[lindex][1]}, {str(labels[lindex])}.')
-                if cresult > 1:  # still don't have scaling working 100% if the result is more than 100% drop the 1
-                    cresult -= math.floor(cresult)
+                if cresult > 1:  # still don't have scaling working 100% if the result is more than 100% adjust
+                    if tfliteb:
+                       cresult -= math.floor(cresult)
+                    else:
+                        cresult = cresult / 10
                 if self.check_threshold(cresult, lindex):  # comp confidence>=threshold by label
                     if cresult > maxcresult:  # if this above threshold and is a better confidence result store it
                         maxcresult = cresult
@@ -194,16 +213,18 @@ class DetectClassify:
             print(f'match returned: confidence {maxcresult}, {maxlresult}')
         return maxcresult, maxlresult  # highest confidence with best match
 
-    def convert_cvframe_to_ts(self, frame, input_details):
+    # takes a PIL image type and converts it to np array for tensor
+    # resize for classification model
+    def convert_img_to_tf(self, PIL_img, input_details):
         # check the type of the input tensor
         floating_model = input_details[0]['dtype'] == np.float32
         # NxHxWxC, H:1, W:2
         height = input_details[0]['shape'][1]
         width = input_details[0]['shape'][2]
 
-        inp_img = cv2.resize(frame, (width, height), interpolation=cv2.INTER_CUBIC)
-        reshape_image = inp_img.reshape(width, height, 3)
-        image_np_expanded = np.expand_dims(reshape_image, axis=0)
+        reshape_image = PIL_img.resize((width, height), PILImageDraw.Image.LANCZOS)
+        image_np = image_proc.convert(reshape_image, 'np')
+        image_np_expanded = np.expand_dims(image_np, axis=0)
 
         if floating_model:
             input_data = image_np_expanded.astype('float32')
@@ -213,7 +234,7 @@ class DetectClassify:
         return floating_model, input_data
 
     def scale_rect(self, img, box):
-        (img_height, img_width, img_layers) = img.shape
+        img_width, img_height = img.size
         y_min = int(max(1, (box[0] * img_height)))
         x_min = int(max(1, (box[1] * img_width)))
         y_max = int(min(img_height, (box[2] * img_height)))
@@ -227,10 +248,11 @@ class DetectClassify:
                 (startX, startY, endX, endY) = rect
             except TypeError:
                 return
-            color = self.colors[random.randint(0, (len(self.colors)) - 1)]
-            cv2.rectangle(img, (startX, startY), (endX, endY), color, 2)
-            y = startY - 15 if startY - 15 > 15 else startY + 15  # adjust label loc if too low
-            cv2.putText(img, str(label), (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+            # color = self.colors[random.randint(0, (len(self.colors)) - 1)]
+            draw = PILImageDraw.Draw(img)
+            font = draw.getfont()
+            draw.text((startX, startY), label, font=font, color='red')
+            draw.rectangle([(startX, startY), (endX, endY)],  outline='red', width=1)
         return img
 
     # func checks threshold by each label passed as a nparray with text in col 0 and threshold in col 1
@@ -246,32 +268,30 @@ class DetectClassify:
 
 
 def main(args):
-    img = cv2.imread(args.image)
-    cv2.imshow('input', img)
-    birds = DetectClassify(args.homedir)
-    birds.detect(img)
+    img = PILImage.open(args.image)  # load image
+    birds = DetectClassify(args.homedir, default_confidece= .9)  # setup obj
+    birds.detect(img)  # run object detection
 
     print('objects detected', birds.detected_confidences)
     print('labels detected', birds.detected_labels)
     print('rectangles', birds.detected_rects)
 
-    birds.classify()
-    img = birds.add_boxes_and_labels(img, birds.classified_labels, birds.classified_rects)
-    cv2.imshow('test', img)
-    while True:
-        pass
+    birds.classify()  # classify species
+    print(birds.classified_labels)
+    label = birds.classified_labels[0]
+    if len(label) == 0:
+        label = "no classification text"
+    print(label)
+    img = birds.add_boxes_and_labels(img, label, birds.classified_rects)
+    img.show()
 
 
 # test function
 if __name__ == '__main__':
     ap = argparse.ArgumentParser()
     # ap.add_argument('-i', '--image', default='/home/pi/birdclass/commongrackle.jpg',help='grackle #147 conf .30')
-    ap.add_argument('-i', '--image', default='/home/pi/birdclass/test2.jpg', help='house sparrow/findh + black cap (2)')
-    # ap.add_argument('-i', '--image', default='/home/pi/birdclass/test3.jpg', help='sparrows 2')
-    # ap.add_argument('-i', '--image', default='/home/pi/birdclass/2cardinal.jpg', help='male and female cardinal')
-    # ap.add_argument('-i', '--image', default='/home/pi/birdclass/cardinal.jpg', help='cropped #147 conf .8')
-    # ap.add_argument('-i', '--image', default='/home/pi/birdclass/ncardinal.jpg', help='full screen')
-    ap.add_argument('-dir', '--homedir', default='c:/Users/maastricht/PycharmProjects/pyface2/', help='loc files')
+    ap.add_argument('-i', '--image', default='/home/pi/birdclass/test2.jpg', help='cardinal')
+    ap.add_argument('-dir', '--homedir', default='c:/Users/jimma/PycharmProjects/birdclassifier/', help='loc files')
 
     arguments = ap.parse_args()
 

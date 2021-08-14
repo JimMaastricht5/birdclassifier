@@ -22,19 +22,32 @@
 #
 # lib of image enhancement and processing techniques
 # required Pillow, scikit-image library in project
-
-from PIL import ImageEnhance, Image
-import cv2
+from PIL import ImageEnhance, Image, ImageOps, ImageStat, ImageFilter
 import numpy as np
 from skimage.exposure import is_low_contrast
 
-# pillow requires a pillow image to work
+
+# Pillow img to flip
+def flip(img):
+    return ImageOps.flip(img)
+
+
+# create a gray scale image
+def grayscale(img):
+    return ImageOps.grayscale(img)
+
+
+# blur the image
+def gaussianblur(img):
+    return ImageFilter.GaussianBlur(img)
+
+
 # func provides both formats for conversion
 # default conversion is to numpy array
-def convert(img, convert_to = 'np'):
-    if isinstance(img,(Image.Image)) and convert_to == 'np':
+def convert(img, convert_to='np'):
+    if isinstance(img, (Image.Image)) and convert_to == 'np':
         img = np.array(img)
-    elif isinstance(img,(np.ndarray)) and convert_to == 'PIL':
+    elif isinstance(img, (np.ndarray)) and convert_to == 'PIL':
         img = Image.fromarray(img)
     # else requires no conversion
     return img
@@ -82,102 +95,34 @@ def enhance_sharpness(img, factor):
     return ImageEnhance.Sharpness(img).enhance(factor)
 
 
-# use opencv2 to enhance the brightness of an image
-# contrast between 1.0 and 3.0
-# brightness between 0 and 100
-def enhance_brightness_cv2(img, contrast=1, brightness=10):
-    return cv2.convertScaleAbs(img, alpha=contrast, beta=brightness)
-
 # check in image to see if is low contrast, return True or False
-# uses scikit-images is_low_contrast func on gray scale image
 # input image and threshold as a decimal with .35 or 35% being the default
-# takes an image as np or pil format
+# takes an image as pil format
 def is_color_low_contrast(colorimg, threshold=.35):
-    grayimg = cv2.cvtColor(colorimg, cv2.COLOR_BGR2GRAY)  # convert image to gray scale BGR for OpenCv recognition
-    return is_low_contrast(grayimg, threshold)  # scikit image function, true false
-
+    stats = ImageStat.Stat(colorimg)
+    if stats.stdev < threshold:
+        return False
+    else:
+        return True
 
 # adjust contrast of gray image to improve process
 # apply histogram equalization to boost contrast
-# uses type: simple (1) or adaptive (2) equalization
-# calc intensity of gray scale image and spread equaly
-def equalize_gray(grayimg, type=2):
-    if type == 1:
-        equalizedgrayimg = cv2.equalizeHist(grayimg)
-    else:
-        # create clahe algorithm object, clipLimit is the threshold for contract limiting
-        # tileGridsize divides the image in M x N tiles then applies the histogram
-        clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize= (8,8))
-        equalizedgrayimg = clahe.apply(grayimg)
-    return equalizedgrayimg
+def equalize_gray(grayimg):
+    return ImageOps.equalize(grayimg)
 
 
 # color histogram equalization
-# no standard cv2 functions for color equalization.
-# can be accomplished by splitting colors and manually adjusting each
-# credit to....
-# https://towardsdatascience.com/histogram-equalization-a-simple-way-to-improve-the-contrast-of-your-image-bcd66596d815
 def equalize_color(img):
-    # segregate color streams
-    b, g, r = cv2.split(img)
-    h_b, bin_b = np.histogram(b.flatten(), 256, [0, 256])
-    h_g, bin_g = np.histogram(g.flatten(), 256, [0, 256])
-    h_r, bin_r = np.histogram(r.flatten(), 256, [0, 256])
-    # calculate cdf
-    cdf_b = np.cumsum(h_b)
-    cdf_g = np.cumsum(h_g)
-    cdf_r = np.cumsum(h_r)
-
-    # mask all pixels with value=0 and replace it with mean of the pixel values
-    cdf_m_b = np.ma.masked_equal(cdf_b, 0)
-    cdf_m_b = (cdf_m_b - cdf_m_b.min()) * 255 / (cdf_m_b.max() - cdf_m_b.min())
-    cdf_final_b = np.ma.filled(cdf_m_b, 0).astype('uint8')
-
-    cdf_m_g = np.ma.masked_equal(cdf_g, 0)
-    cdf_m_g = (cdf_m_g - cdf_m_g.min()) * 255 / (cdf_m_g.max() - cdf_m_g.min())
-    cdf_final_g = np.ma.filled(cdf_m_g, 0).astype('uint8')
+    return ImageOps.equalize(img)
 
 
-    cdf_m_r = np.ma.masked_equal(cdf_r, 0)
-    cdf_m_r = (cdf_m_r - cdf_m_r.min()) * 255 / (cdf_m_r.max() - cdf_m_r.min())
-    cdf_final_r = np.ma.filled(cdf_m_r, 0).astype('uint8')
-    # merge the images in the three channels
-    img_b = cdf_final_b[b]
-    img_g = cdf_final_g[g]
-    img_r = cdf_final_r[r]
-    return cv2.merge((img_b, img_g, img_r))
-
-
-def predominant_color(img):
-    # from pyimagesearch.com color detection
-    # define the list of boundaries.  create sets of Green Blue Red GBR defining lower and upper bounds
-    i = 0
-    colorcount = [''] * 4
-    colors = np.array(['Red', 'Blue', 'Yellow', 'Gray'])
-    boundaries = [
-        ([17, 15, 100], [50, 56, 200]),  # Red
-        ([86, 31, 4], [220, 88, 50]),  # Blue
-        ([25, 146, 190], [62, 174, 250]),  # Yellow
-        ([103, 86, 65], [145, 133, 128])  # Gray
-    ]
-
-    # grab background color for initial mask
-    # bkgcolor = int(img[0, 0])  # bgr value in upper left corner
-    # bkgmask = cv2.inRange(img, bkgcolor, ...)
-
-    # loop over the boundaries
-    for (lower, upper) in boundaries:
-        lower = np.array(lower, dtype="uint8")  # create NumPy arrays from the boundaries
-        upper = np.array(upper, dtype="uint8")
-        # find the colors within the specified boundaries and apply the mask
-        mask = cv2.inRange(img, lower, upper)
-        maskimg = cv2.bitwise_and(img, img, mask=mask)
-        colorcount[i] = np.count_nonzero(maskimg, axis=None)  # count non-zero values in BGR pixels
-        i += 1
-
-    cindex = np.where(colorcount == np.amax(colorcount))  # find color with highest count
-    color = str(colors[cindex])
-    return color
+# from pyimagesearch.com color detection
+def predominant_color(pil_img):
+    img = pil_img.copy()
+    img.convert("RGB")
+    img.resize((1, 1), resample=0)
+    dominant_color = img.getpixel((0, 0))
+    return dominant_color
 
 
 # estimate the size of the bird based on the percentage of image area consumed by the bounding box
@@ -196,33 +141,19 @@ def objectsize(args, startx, starty, endx, endy):
 
 # testing code
 def main():
-    imgnp = cv2.imread('/home/pi/birdclass/test2.jpg')
-    cv2.imshow('org', imgnp)  # show orginal image
+    imgnp = Image.open('/home/pi/birdclass/test2.jpg')
+    imgnp.show()
 
     # test image bad contrast and equalization
-    grayimg = cv2.cvtColor(imgnp, cv2.COLOR_BGR2GRAY)
+    grayimg = ImageOps.grayscale(imgnp)
     print(is_low_contrast(grayimg))
-    equalizedimg1 = equalize_gray(grayimg, type=1)
-    equalizedimg2 = equalize_gray(grayimg, type=2)
-    cv2.imshow('equalized simple 1', equalizedimg1)
-    cv2.imshow('equalized simple 2', equalizedimg2)
+    equalizedimg1 = equalize_gray(grayimg)
+    equalizedimg1.show()
 
     # color equalize
     equalizedcolorimg = equalize_color(imgnp)
-    cv2.imshow('color histogram equalization', equalizedcolorimg)
-    # convert image to pil, test scheme to adjust pil or np images
-    # imgpil = Image.fromarray(cv2.imread('/home/pi/birdclass/test2.jpg'))  # need to pass a PIL Image vs. Numpy array
-    # img_clr, img_clr_brt, img_clr_brt_con = enhancements(imgnp)
-    # img_clr, img_clr_brt, img_clr_brt_con = enhancements(imgpil)
-    # cv2.imshow('color', img_clr)
-    # cv2.imshow('color brt', img_clr_brt)
-    # cv2.imshow('color brt con', img_clr_brt_con)
-
-    # check for esc key and quit if pressed
-    while True:
-        k = cv2.waitKey(30) & 0xff
-        if k == 27:  # press 'ESC' to quit
-            break
+    equalizedcolorimg.show()
+    print(predominant_color(equalizedcolorimg))
 
 
 # invoke main

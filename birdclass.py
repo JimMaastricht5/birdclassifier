@@ -31,10 +31,10 @@
 # install OpenCv version 4.4+
 # packages: twitter use twython package, auth.py must be in project for import auth
 #   oauthlib,
-import numpy.core.multiarray  # may be needed to avoid error with opencv multiarray
+# import numpy.core.multiarray  # may be needed to avoid error with opencv multiarray
 import numpy as np
-import cv2  # open cv 2
-
+import picamera
+import time
 import image_proc
 import label_image  # code to init tensor flow model and classify bird type
 import motion_detector  # motion detector helper functions
@@ -56,11 +56,11 @@ def bird_detector(args):
     spweather = weather.City_Weather()  # init class and set var based on default of Madison WI
 
     # initial video capture, screen size, and grab first image (no motion)
-    cap = cv2.VideoCapture(0)  # capture video image
-    if args.screenwidth != 0:  # if the screen width and height are zero use the camera default and skip this code
-        cap.set(3, args.screenwidth)  # set screen width
-        cap.set(4, args.screenheight)  # set screen height
-    first_img = motion_detector.init(args.flipcamera, cv2, cap)  # set gray motion mask
+    # cap = cv2.VideoCapture(0)  # capture video image
+    # if args.screenwidth != 0:  # if the screen width and height are zero use the camera default and skip this code
+    #     cap.set(3, args.screenwidth)  # set screen width
+    #     cap.set(4, args.screenheight)  # set screen height
+    camera, first_img = motion_detector.init(args.flipcamera)  # set gray motion mask
     set_windows()  # position output windows at top of screen and init output
 
     # setup twitter and tensor flow models
@@ -75,7 +75,7 @@ def bird_detector(args):
 
     while True:  # while escape key is not pressed look for motion, detect birds, and determine species
         curr_day, curr_hr = hour_or_day_change(curr_day, curr_hr, spweather, bird_tweeter, birdpop)
-        motionb, img = motion_detector.detect(args.flipcamera, cv2, cap, first_img, args.minarea)
+        motionb, img = motion_detector.detect(args.flipcamera, camera, first_img, args.minarea)
         # cv2.imshow('video', img)  # show video w no boxes or labels use cv2.flip if image inverted
         if motionb is True and birds.detect(img):  # motion with birds
             motioncnt = 0  # reset motion count between detected birds
@@ -95,8 +95,7 @@ def bird_detector(args):
                                                                 birds.classified_rects)
                 # cv2.imshow('predicted', birds.equalizedimg)  # show equalized image
             else:
-                birds.img = image_proc.enhance_brightness_cv2(birds.img, contrast=args.contrast,
-                                                              brightness=args.brightness)
+                birds.img = image_proc.enhance_brightness(birds.img, factor=args.brightness)
                 birds.img = birds.add_boxes_and_labels(birds.img, common_names, birds.classified_rects)
                 # cv2.imshow('predicted', birds.img)
 
@@ -125,15 +124,15 @@ def bird_detector(args):
         # if birds.target_object_found:
         #     print('*** bird detect and classify results')
         #     print(birds.classified_labels, birds.classified_rects)
-        cv2.imshow('video', img)  # show video w boxes and labels use cv2.flip if image inverted
-        cv2.waitKey(20)  # wait 20 ms to render video, restart loop.  setting of 0 is fixed img; > 0 video
+        # cv2.imshow('video', img)  # show video w boxes and labels use cv2.flip if image inverted
+        # cv2.waitKey(20)  # wait 20 ms to render video, restart loop.  setting of 0 is fixed img; > 0 video
         # shut down the app if between 1:00 and 1:05 am.  Pi runs this in a loop and restarts it every 20 minutes
         if datetime.now().hour == 1 and datetime.now().minute <= 5:
             break
 
     # while loop break at 10pm, shut down windows
-    cap.release()
-    cv2.destroyAllWindows()
+    # cap.release()
+    # cv2.destroyAllWindows()
     bird_tweeter.post_status(f'Ending process at {datetime.now().strftime("%I:%M:%S %P")}.  Run time was ' +
                              f'{divmod((datetime.now() - starttime).total_seconds(), 60)[0]} minutes')
 
@@ -196,15 +195,16 @@ def label_text(species_names, species_confs):
 
 
 def set_windows():
-    cv2.namedWindow('video')
+    # cv2.namedWindow('video')
     # cv2.namedWindow('predicted')
     # cv2.namedWindow('tweeted')
 
-    cv2.moveWindow('video', 0, 0)
+    # cv2.moveWindow('video', 0, 0)
     # cv2.moveWindow('predicted', 350, 0)
     # cv2.moveWindow('tweeted', 700, 0)
 
-    cv2.waitKey(20)  # wait 20 ms to render video, restart loop.  setting of 0 is fixed img; > 0 video
+    # cv2.waitKey(20)  # wait 20 ms to render video, restart loop.  setting of 0 is fixed img; > 0 video
+    time.sleep(20/1000000)
     return
 
 
