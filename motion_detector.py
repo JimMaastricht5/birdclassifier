@@ -39,7 +39,7 @@ except:
     print('picamera import fails on windows')
     pass
 
-# create in-memory stream
+# create in-memory stream, close stream when operation is complete
 def capture_image(flipb, camera):
     with picamera.array.PiRGBArray(camera) as stream:
         camera.capture(stream, format='rgb')
@@ -49,13 +49,13 @@ def capture_image(flipb, camera):
             img = image_proc.flip(img)
     return img
 
+# Create the camera object
 # capture first image and gray scale/blur for baseline motion detection
-# Create the in-memory stream
 def init(flipb):
-    with picamera.PiCamera() as camera:
-        camera.start_preview()
-        time.sleep(2)
-        img = capture_image(flipb, camera)
+    camera = picamera.PiCamera()
+    camera.start_preview()
+    time.sleep(2)
+    img = capture_image(flipb, camera)
     img = image_proc.convert(img, "PIL")
     gray = image_proc.grayscale(img)  # convert image to gray scale for motion detection
     graymotion = image_proc.gaussianblur(gray)  # smooth out image for motion detection
