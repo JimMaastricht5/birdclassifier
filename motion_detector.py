@@ -71,7 +71,7 @@ def detect(flipb, camera, first_img, min_area):
     grayblur = image_proc.gaussianblur(img)  # smooth out image for motion detection
 
     # motion detection, compute the absolute difference between the current frame and first frame
-    imgdelta = image_proc.compare_images(first_img, grayblur)
+    # imgdelta = image_proc.compare_images(first_img, grayblur)
     # threshimg = cv2.threshold(imgdelta, 25, 255, cv2.THRESH_BINARY)[1]
     # dilate the thresholded image to fill in holes, then find contours on the image
     # threshimg = cv2.dilate(threshimg, None, iterations=2)
