@@ -149,6 +149,8 @@ def objectsize(args, startx, starty, endx, endy):
 # compare two PIL images for differences
 # returns an array of the differences
 def compare_images(img1, img2):
+    img1.show()
+    img2.show()
     return ImageChops.difference(img2, img1)
 
 
