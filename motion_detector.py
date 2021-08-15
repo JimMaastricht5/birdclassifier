@@ -26,7 +26,6 @@
 # compare gray scale image to first image.  If different than motion
 # return image captured, gray scale, guassian blured version, thresholds, first_img, and countours
 # code by JimMaastricht5@gmail.com based on https://www.pyimagesearch.com/category/object-tracking/
-import imutils
 import io
 import time
 from PIL import Image

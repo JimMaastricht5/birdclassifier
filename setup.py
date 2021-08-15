@@ -26,7 +26,7 @@ from setuptools import setup
 setup(
     name='Bird Class Python App',
     version='1.0',
-    packages=['scipy, requests, imutils, numpy, oauthlib, picamera'
+    packages=['scipy, requests, numpy, oauthlib, picamera'
               'tywthon, Pillow, argparse, datetime, logging, scikit-image'],
     url='',
     license='',
