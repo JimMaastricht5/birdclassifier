@@ -22,7 +22,7 @@
 #
 # lib of image enhancement and processing techniques
 # required Pillow, scikit-image library in project
-from PIL import ImageEnhance, Image, ImageOps, ImageStat, ImageFilter
+from PIL import ImageEnhance, Image, ImageOps, ImageStat, ImageFilter, ImageChops
 import numpy as np
 from skimage.exposure import is_low_contrast
 
@@ -39,7 +39,14 @@ def grayscale(img):
 
 # blur the image
 def gaussianblur(img):
-    return ImageFilter.GaussianBlur(img)
+    img.filter(ImageFilter.GaussianBlur)
+    return img
+
+
+# find countours of the image
+def contour(img):
+    img.filter(ImageFilter.CONTOUR)
+    return img
 
 
 # func provides both formats for conversion
@@ -137,6 +144,25 @@ def objectsize(args, startx, starty, endx, endy):
     else:  # small
         size = 'S'
     return size, perarea
+
+
+# compare two PIL images for differences
+# returns an array of the differences
+def compare_images(img1, img2):
+    return ImageChops.difference(img2, img1)
+
+
+# compare two gray scale images
+# https://stackoverflow.com/questions/189943/how-can-i-quantify-difference-between-two-images
+def compare_images2(img1, img2):
+    # normalize to compensate for exposure difference
+    img1 = equalize_gray(img1)
+    img2 = equalize_gray(img2)
+    # calculate the difference and its norms
+    diff = img1 - img2  # elementwise for scipy arrays
+    m_norm = sum(abs(diff))  # Manhattan norm
+    # z_norm = norm(diff.ravel(), 0)  # Zero norm ravel from scipy?
+    return m_norm
 
 
 # testing code

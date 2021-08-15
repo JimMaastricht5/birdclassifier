@@ -67,11 +67,11 @@ def bird_detector(args):
     bird_tweeter = tweeter.Tweeter_Class()  # init tweeter2 class twitter handler
     birds = label_image.DetectClassify()  # init detection and classifier object
     starttime = datetime.now()  # used for total run time report
-    bird_tweeter.post_status(f'Starting process at {datetime.now().strftime("%I:%M:%S %P")}, ' +
-                             f'{spweather.weatherdescription} ' +
-                             f'with {spweather.skycondition}% cloud cover. Visibility of {spweather.visibility} ft.' +
-                             f' Temp is currently {spweather.temp}F with ' +
-                             f'wind speeds of {spweather.windspeed} MPH.')
+    # bird_tweeter.post_status(f'Starting process at {datetime.now().strftime("%I:%M:%S %P")}, ' +
+    #                          f'{spweather.weatherdescription} ' +
+    #                          f'with {spweather.skycondition}% cloud cover. Visibility of {spweather.visibility} ft.' +
+    #                          f' Temp is currently {spweather.temp}F with ' +
+    #                          f'wind speeds of {spweather.windspeed} MPH.')
 
     while True:  # while escape key is not pressed look for motion, detect birds, and determine species
         curr_day, curr_hr = hour_or_day_change(curr_day, curr_hr, spweather, bird_tweeter, birdpop)
