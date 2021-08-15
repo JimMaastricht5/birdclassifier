@@ -23,7 +23,6 @@
 # code by JimMaastricht5@gmail.com
 from twython import Twython
 import numpy as np
-import cv2
 from datetime import datetime
 from auth import (
     api_key,
@@ -70,7 +69,7 @@ class Tweeter_Class:
     # set status and add an image
     def post_image(self, message, img):
         self.check_hour()
-        cv2.imwrite("img.jpg", img)  # write out image for debugging and testing
+        img.save("img.jpg")
         tw_img = open('img.jpg', 'rb')  # reload a image for twitter, correct var type
         if self.tweetcnt < self.tweetmax_per_hour:
             try:
