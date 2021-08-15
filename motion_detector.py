@@ -44,6 +44,7 @@ def capture_image(flipb, camera):
     with picamera.array.PiRGBArray(camera) as stream:
         camera.capture(stream, format='rgb')
         img = stream.array # At this point the image is available as stream.array
+        img = image_proc.convert(img, "PIL")
         if flipb:
             img = image_proc.flip(img)
     return img
@@ -55,6 +56,7 @@ def init(flipb):
         camera.start_preview()
         time.sleep(2)
         img = capture_image(flipb, camera)
+    img = image_proc.convert(img, "PIL")
     gray = image_proc.grayscale(img)  # convert image to gray scale for motion detection
     graymotion = image_proc.gaussianblur(gray)  # smooth out image for motion detection
     return camera, graymotion
