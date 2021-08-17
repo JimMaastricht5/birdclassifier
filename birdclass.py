@@ -60,7 +60,7 @@ def bird_detector(args):
     # if args.screenwidth != 0:  # if the screen width and height are zero use the camera default and skip this code
     #     cap.set(3, args.screenwidth)  # set screen width
     #     cap.set(4, args.screenheight)  # set screen height
-    camera, first_img = motion_detector.init(args.flipcamera)  # set gray motion mask
+    camera, first_img = motion_detector.init(args)  # set gray motion mask
     set_windows()  # position output windows at top of screen and init output
 
     # setup twitter and tensor flow models
@@ -213,15 +213,20 @@ def set_windows():
 if __name__ == "__main__":
     # construct the argument parser and parse the arguments
     ap = argparse.ArgumentParser()
+
+    # camera settings
     ap.add_argument("-f", "--flipcamera", type=bool, default=False, help="flip camera image")
-    ap.add_argument("-e", "--enhanceimg", type=bool, default=False, help="flip camera image")
-    ap.add_argument("-a", "--minarea", type=int, default=1000, help="motion threshold")
-    # ap.add_argument("-sw", "--screenwidth", type=int, default=320, help="max screen width")
-    # ap.add_argument("-sh", "--screenheight", type=int, default=240, help="max screen height")
-    ap.add_argument("-sw", "--screenwidth", type=int, default=0, help="max screen width")
-    ap.add_argument("-sh", "--screenheight", type=int, default=0, help="max screen height")
+    ap.add_argument("-sw", "--screenwidth", type=int, default=640, help="max screen width")
+    ap.add_argument("-sh", "--screenheight", type=int, default=480, help="max screen height")
+    ap.add_argument("-fr", "--framerate", type=int, default=15, help="frame rate for camera")
+    # ap.add_argument("-sw", "--screenwidth", type=int, default=0, help="max screen width")
+    # ap.add_argument("-sh", "--screenheight", type=int, default=0, help="max screen height")
+
+    # motion and image processing settings
     ap.add_argument("-b", "--brightness", type=int, default=15, help="brightness boost")  # % boost 0 to 100
     ap.add_argument("-c", "--contrast", type=float, default=1.035, help="contrast boost")  # contrast between 1.0 & 3.0
+    ap.add_argument("-e", "--enhanceimg", type=bool, default=False, help="flip camera image")
+    ap.add_argument("-a", "--minarea", type=int, default=1000, help="motion threshold")
 
     arguments = ap.parse_args()
     bird_detector(arguments)

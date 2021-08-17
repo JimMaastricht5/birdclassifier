@@ -28,6 +28,7 @@
 # code by JimMaastricht5@gmail.com based on https://www.pyimagesearch.com/category/object-tracking/
 import io
 import time
+import argparse
 from PIL import Image
 
 import image_proc
@@ -40,28 +41,34 @@ except:
     pass
 
 # create in-memory stream, close stream when operation is complete
-def capture_image(flipb, camera):
+def capture_image(camera):
     # with picamera.array.PiRGBArray(camera) as stream:
     stream = io.BytesIO()
     camera.capture(stream, 'jpeg')
     stream.seek(0)
     img = Image.open(stream)
-    # stream.truncate()
-    # img = image_proc.convert(img, "PIL")
-    img.save('testcap_motion.jpg')
-    if flipb:
-        img = image_proc.flip(img)
+    # stream.truncate() ??
+    # img.save('testcap_motion.jpg')
     return img
 
 # Create the camera object
 # capture first image and gray scale/blur for baseline motion detection
-def init(flipb):
+def init(args):
     camera = picamera.PiCamera()
-    camera.resolution = (640, 480)
-    # camera.start_preview()
-    time.sleep(2)
-    img = capture_image(flipb, camera)
-    # img = image_proc.convert(img, "PIL")
+    camera.resolution = (args.screenheight, args.screenwidth)
+    camera.vflip = args.flipb
+    camera.framerate = args.framerate
+    # camera.start_preview()  # can't see preview on VNC viewer
+
+    # capture consistent images, wait and fix values
+    # time.sleep(2)  # Wait for the automatic gain control to settle
+    # camera.shutter_speed = camera.exposure_speed
+    # camera.exposure_mode = 'off'
+    # g = camera.awb_gains
+    # camera.awb_mode = 'off'
+    # camera.awb_gains = g
+
+    img = capture_image(camera)  # capture img of type PIL
     gray = image_proc.grayscale(img)  # convert image to gray scale for motion detection
     graymotion = image_proc.gaussianblur(gray)  # smooth out image for motion detection
     return camera, graymotion

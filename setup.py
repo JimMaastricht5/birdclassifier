@@ -13,10 +13,6 @@ from setuptools import setup
 # sudo apt-get update
 # sudo apt-get install python3-tflite-runtime
 
-# opencv-python must be installed on a raspberry pi using the direction noted in label_impage.py and also linked here
-# special notes when setting up the code on a rasberry pi 4 9/9/20
-# install supporting libraries for directions @: https://qengineering.eu/install-opencv-4.2-on-raspberry-pi-4.html
-# install OpenCv version 4.4+
 
 # to install picamera on windows for dev
 # Open terminal (if you have a virtual env, activate it)
