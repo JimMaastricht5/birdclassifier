@@ -61,7 +61,7 @@ def init(args):
     # camera.start_preview()  # can't see preview on VNC viewer
 
     # capture consistent images, wait and fix values
-    # time.sleep(2)  # Wait for the automatic gain control to settle
+    time.sleep(2)  # Wait for the automatic gain control to settle
     # camera.shutter_speed = camera.exposure_speed
     # camera.exposure_mode = 'off'
     # g = camera.awb_gains
@@ -78,7 +78,7 @@ def init(args):
 # compare image to first img; if different than motion
 def detect(flipb, camera, first_img, min_area):
     motionb = False
-    img = capture_image(flipb, camera)
+    img = capture_image(camera)
     grayimg = image_proc.grayscale(img)  # convert image to gray scale
     grayblur = image_proc.gaussianblur(img)  # smooth out image for motion detection
 
