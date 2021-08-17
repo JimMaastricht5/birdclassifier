@@ -44,15 +44,18 @@ def capture_image(flipb, camera):
     with picamera.array.PiRGBArray(camera) as stream:
         camera.capture(stream, format='rgb')
         img = stream.array # At this point the image is available as stream.array
-        img = image_proc.convert(img, "PIL")
-        if flipb:
-            img = image_proc.flip(img)
+        stream.seek(0)
+        stream.truncate()
+    img = image_proc.convert(img, "PIL")
+    if flipb:
+        img = image_proc.flip(img)
     return img
 
 # Create the camera object
 # capture first image and gray scale/blur for baseline motion detection
 def init(flipb):
     camera = picamera.PiCamera()
+    camera.resolution = (640, 480)
     camera.start_preview()
     time.sleep(2)
     img = capture_image(flipb, camera)
