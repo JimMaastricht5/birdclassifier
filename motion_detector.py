@@ -56,7 +56,7 @@ def capture_image(flipb, camera):
 def init(flipb):
     camera = picamera.PiCamera()
     camera.resolution = (640, 480)
-    camera.start_preview()
+    # camera.start_preview()
     time.sleep(2)
     img = capture_image(flipb, camera)
     img = image_proc.convert(img, "PIL")

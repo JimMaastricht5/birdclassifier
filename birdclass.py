@@ -133,7 +133,7 @@ def bird_detector(args):
     # while loop break at 10pm, shut down windows
     # cap.release()
     # cv2.destroyAllWindows()
-    camera.stop_preview()
+    # camera.stop_preview()
     camera.close()
     bird_tweeter.post_status(f'Ending process at {datetime.now().strftime("%I:%M:%S %P")}.  Run time was ' +
                              f'{divmod((datetime.now() - starttime).total_seconds(), 60)[0]} minutes')
