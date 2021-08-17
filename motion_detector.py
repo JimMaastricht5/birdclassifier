@@ -46,7 +46,7 @@ def capture_image(flipb, camera):
     camera.capture(stream, 'jpeg')
     stream.seek(0)
     img = Image.open(stream)
-    stream.truncate()
+    # stream.truncate()
     # img = image_proc.convert(img, "PIL")
     if flipb:
         img = image_proc.flip(img)
