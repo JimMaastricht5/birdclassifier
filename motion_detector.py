@@ -48,7 +48,7 @@ def capture_image(flipb, camera):
     img = Image.open(stream)
     # stream.truncate()
     # img = image_proc.convert(img, "PIL")
-    print(img)  # sledgehammer!
+    img.save('testcap_motion.jpg')
     if flipb:
         img = image_proc.flip(img)
     return img
