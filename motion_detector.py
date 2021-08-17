@@ -56,7 +56,7 @@ def capture_image(camera):
 def init(args):
     camera = picamera.PiCamera()
     camera.resolution = (args.screenheight, args.screenwidth)
-    camera.vflip = args.flipb
+    camera.vflip = args.flipcamera
     camera.framerate = args.framerate
     # camera.start_preview()  # can't see preview on VNC viewer
 
