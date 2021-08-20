@@ -81,7 +81,7 @@ class DetectClassify:
         self.classified_confidences = []
         self.classified_labels = []
         self.classified_rects = []
-        self.colors = np.random.uniform(0, 255, size=(11, 3))  # random colors for bounding boxes
+        self.colors = np.random.uniform(0, 255, size=(11, 3)).astype(int)  # random colors for bounding boxes
         self.img = np.zeros((640, 480, 3), dtype=np.uint8)
         self.equalizedimg = np.zeros((640, 480, 3), dtype=np.uint8)
         try:
