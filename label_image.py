@@ -242,7 +242,7 @@ class DetectClassify:
 
     # add bounding box and label to an image
     def add_boxes_and_labels(self, img, label, rects):
-        transparent_fill = (255, 255, 255, 0)  # black with transparent alpha
+        transparent_fill = (0, 0, 0, 0)  # white with transparent alpha
         for i, rect in enumerate(rects):
             try:
                 (startX, startY, endX, endY) = rect
@@ -253,7 +253,7 @@ class DetectClassify:
 
             draw = PILImageDraw.Draw(img)
             font = draw.getfont()
-            # draw.text((startX, startY), label, font=font, color=color, fill=transparent_fill)
+            draw.text((startX, startY), label, font=font, color=color, fill=transparent_fill)
             # draw.rectangle([(startX, startY), (endX, endY)],  outline=color, width=1, fill=transparent_fill)
         return img
 
@@ -291,7 +291,6 @@ def main(args):
 # test function
 if __name__ == '__main__':
     ap = argparse.ArgumentParser()
-    # ap.add_argument('-i', '--image', default='/home/pi/birdclass/commongrackle.jpg',help='grackle #147 conf .30')
     ap.add_argument('-i', '--image', default='/home/pi/birdclass/test2.jpg', help='cardinal')
     ap.add_argument('-dir', '--homedir', default='c:/Users/jimma/PycharmProjects/birdclassifier/', help='loc files')
 
