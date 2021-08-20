@@ -132,18 +132,18 @@ def predominant_color(pil_img):
     return dominant_color
 
 
-# estimate the size of the bird based on the percentage of image area consumed by the bounding box
-def objectsize(args, startx, starty, endx, endy):
-    objarea = abs((startx - endx) * (starty - endy))
-    scrarea = args['screenheight'] * args['screenwidth']
-    perarea = (objarea / scrarea) * 100
-    if perarea >= 40:  # large
-        size = 'L'
-    elif perarea >= 30:  # medium
-        size = 'M'
-    else:  # small
-        size = 'S'
-    return size, perarea
+# # estimate the size of the bird based on the percentage of image area consumed by the bounding box
+# def objectsize(args, startx, starty, endx, endy):
+#     objarea = abs((startx - endx) * (starty - endy))
+#     scrarea = args['screenheight'] * args['screenwidth']
+#     perarea = (objarea / scrarea) * 100
+#     if perarea >= 66:  # large
+#         size = 'L'
+#     elif perarea >= 33:  # medium
+#         size = 'M'
+#     else:  # small
+#         size = 'S'
+#     return size, perarea
 
 
 # compare two PIL images for differences
@@ -152,32 +152,39 @@ def compare_images(img1, img2):
     return ImageChops.difference(img2, img1)
 
 
-# compare two gray scale images
-# https://stackoverflow.com/questions/189943/how-can-i-quantify-difference-between-two-images
-def compare_images2(img1, img2):
-    # normalize to compensate for exposure difference
-    img1 = equalize_gray(img1)
-    img2 = equalize_gray(img2)
-    # calculate the difference and its norms
-    diff = img1 - img2  # elementwise for scipy arrays
-    m_norm = sum(abs(diff))  # Manhattan norm
-    # z_norm = norm(diff.ravel(), 0)  # Zero norm ravel from scipy?
-    return m_norm
+# # compare two gray scale images
+# # https://stackoverflow.com/questions/189943/how-can-i-quantify-difference-between-two-images
+# def compare_images2(img1, img2):
+#     # normalize to compensate for exposure difference
+#     img1 = equalize_gray(img1)
+#     img2 = equalize_gray(img2)
+#     # calculate the difference and its norms
+#     diff = img1 - img2  # elementwise for scipy arrays
+#     m_norm = sum(abs(diff))  # Manhattan norm
+#     # z_norm = norm(diff.ravel(), 0)  # Zero norm ravel from scipy?
+#     return m_norm
 
 
 # testing code
 def main():
-    imgnp = Image.open('/home/pi/birdclass/test2.jpg')
-    imgnp.show()
+    img = Image.open('/home/pi/birdclass/test2.jpg')
+    img.show()
 
+    img_clr = enhance_color(img, 1.5)
+    img_clr_brt = enhance_brightness(img_clr, 1.2)
+    img_clr_brt_con = enhance_contrast(img_clr_brt, 1.2)
+
+    img_clr.show()
+    img_clr_brt.show()
+    img_clr_brt_con.show()
     # test image bad contrast and equalization
-    grayimg = ImageOps.grayscale(imgnp)
+    grayimg = ImageOps.grayscale(img)
     print(is_low_contrast(grayimg))
     equalizedimg1 = equalize_gray(grayimg)
     equalizedimg1.show()
 
     # color equalize
-    equalizedcolorimg = equalize_color(imgnp)
+    equalizedcolorimg = equalize_color(img)
     equalizedcolorimg.show()
     print(predominant_color(equalizedcolorimg))
 
