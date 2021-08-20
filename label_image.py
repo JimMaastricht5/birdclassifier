@@ -252,7 +252,7 @@ class DetectClassify:
             draw = PILImageDraw.Draw(img)
             font = draw.getfont()
             draw.text((startX, startY), label, font=font, color='red')
-            draw.rectangle([(startX, startY), (endX, endY)],  outline='red', width=1)
+            # draw.rectangle([(startX, startY), (endX, endY)],  outline='red', width=1)
         return img
 
     # func checks threshold by each label passed as a nparray with text in col 0 and threshold in col 1

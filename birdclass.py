@@ -36,7 +36,7 @@ import numpy as np
 import picamera
 import time
 import image_proc
-import label_image  # code to init tensor flow model and classify bird type
+import label_image  # code to init tensor flow model and classify bird type, bird object
 import motion_detector  # motion detector helper functions
 import objtracker  # keeps track of detected objects between frames
 import weather
