@@ -285,6 +285,7 @@ def main(args):
         label = "no classification text"
     print(label)
     img = birds.add_boxes_and_labels(img, label, birds.classified_rects)
+    img.save('imgtest.jpg')
     img.show()
 
 
