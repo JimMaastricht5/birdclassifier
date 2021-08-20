@@ -84,11 +84,11 @@ def detect(camera, first_img, min_area):
 
     # motion detection, compute the absolute difference between the current frame and first frame
     imgdelta = image_proc.compare_images(first_img, grayblur)
-    print(f'motion image entropy is{image_entropy(imgdelta)}')
-    if min_area > 0:
-        motionb = True
+    # print(f'motion image entropy is{image_entropy(imgdelta)}')
+    if image_entropy(imgdelta) >= min_area:
+        motionb = True  # difference in image indicates motion
     else:
-        motionb = False
+        motionb = False  # not enough diff for motion
     return motionb, img
 
 

@@ -248,7 +248,8 @@ class DetectClassify:
                 (startX, startY, endX, endY) = rect
             except TypeError:
                 return
-            color = self.colors[random.randint(0, (len(self.colors)) - 1)]
+            color = tuple(self.colors[random.randint(0, (len(self.colors)) - 1)])
+            print(color)
 
             draw = PILImageDraw.Draw(img)
             font = draw.getfont()
