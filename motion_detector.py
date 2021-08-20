@@ -28,7 +28,7 @@
 # code by JimMaastricht5@gmail.com based on https://www.pyimagesearch.com/category/object-tracking/
 import io
 import time
-import argparse
+import math
 from PIL import Image
 
 import image_proc
@@ -39,6 +39,7 @@ try:
 except:
     print('picamera import fails on windows')
     pass
+
 
 # create in-memory stream, close stream when operation is complete
 def capture_image(camera):
@@ -51,6 +52,7 @@ def capture_image(camera):
     # img.save('testcap_motion.jpg')
     return img
 
+
 # Create the camera object
 # capture first image and gray scale/blur for baseline motion detection
 def init(args):
@@ -58,7 +60,6 @@ def init(args):
     camera.resolution = (args.screenheight, args.screenwidth)
     camera.vflip = args.flipcamera
     camera.framerate = args.framerate
-    # camera.start_preview()  # can't see preview on VNC viewer
 
     # capture consistent images, wait and fix values
     time.sleep(2)  # Wait for the automatic gain control to settle
@@ -76,26 +77,31 @@ def init(args):
 
 # once first image is captured call motion detector in a loop to find each subsequent image
 # compare image to first img; if different than motion
-def detect(flipb, camera, first_img, min_area):
-    motionb = False
+def detect(camera, first_img, min_area):
     img = capture_image(camera)
     grayimg = image_proc.grayscale(img)  # convert image to gray scale
-    grayblur = image_proc.gaussianblur(img)  # smooth out image for motion detection
+    grayblur = image_proc.gaussianblur(grayimg)  # smooth out image for motion detection
 
     # motion detection, compute the absolute difference between the current frame and first frame
-    # imgdelta = image_proc.compare_images(first_img, grayblur)
-    # threshimg = cv2.threshold(imgdelta, 25, 255, cv2.THRESH_BINARY)[1]
-    # dilate the thresholded image to fill in holes, then find contours on the image
-    # threshimg = cv2.dilate(threshimg, None, iterations=2)
-    # cnts = cv2.findContours(threshimg.copy(), cv2.RETR_EXTERNAL,
-    #                         cv2.CHAIN_APPROX_SIMPLE)
-    
-    # cnts = imutils.grab_contours(cnts)  # set of contours showing motion
-    # for c in cnts:  # loop over countours if too small ignore it
-    #     print(cv2.contourArea(c))
-        # if cv2.contourArea(c) >= min_area:
-        #     motionb = True
-
-    # return motionb, img, grayimg, grayblur, threshimg
-    motionb = True
+    imgdelta = image_proc.compare_images(first_img, grayblur)
+    print(f'motion image entropy is{image_entropy(imgdelta)}')
+    if min_area > 0:
+        motionb = True
+    else:
+        motionb = False
     return motionb, img
+
+
+# def image_entropy2(image):
+#     w, h = image.size
+#     a = np.array(image.convert('RGB')).reshape((w * h, 3))
+#     h, e = np.histogramdd(a, bins=(16,) * 3, range=((0, 256),) * 3)
+#     prob = h / np.sum(h)
+#     return -np.sum(np.log2(prob[prob > 0]))
+
+
+def image_entropy(image):
+    histogram = image.histogram()
+    histlength = sum(histogram)
+    probability = [float(h) / histlength for h in histogram]
+    return -sum([p * math.log(p, 2) for p in probability if p != 0])

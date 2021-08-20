@@ -32,8 +32,6 @@
 # packages: twitter use twython package, auth.py must be in project for import auth
 #   oauthlib,
 # import numpy.core.multiarray  # may be needed to avoid error with opencv multiarray
-import numpy as np
-import picamera
 import time
 import image_proc
 import label_image  # code to init tensor flow model and classify bird type, bird object
@@ -75,7 +73,7 @@ def bird_detector(args):
 
     while True:  # while escape key is not pressed look for motion, detect birds, and determine species
         curr_day, curr_hr = hour_or_day_change(curr_day, curr_hr, spweather, bird_tweeter, birdpop)
-        motionb, img = motion_detector.detect(args.flipcamera, camera, first_img, args.minarea)
+        motionb, img = motion_detector.detect(camera, first_img, args.minarea)
         # cv2.imshow('video', img)  # show video w no boxes or labels use cv2.flip if image inverted
         if motionb is True and birds.detect(img):  # motion with birds
             motioncnt = 0  # reset motion count between detected birds

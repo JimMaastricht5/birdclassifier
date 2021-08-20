@@ -36,7 +36,6 @@ import argparse
 import numpy as np
 import math
 import random
-from matplotlib import pyplot
 from PIL import Image as PILImage
 # from PIL import ImageFont as PILImageFont
 from PIL import ImageDraw as PILImageDraw
@@ -58,7 +57,7 @@ except:
 
 
 class DetectClassify:
-    def __init__(self, homedir='/home/pi/PycharmProjects/pyface2/', default_confidece = .98):
+    def __init__(self, homedir='/home/pi/PycharmProjects/pyface2/', default_confidece=.98):
         self.detector_file = homedir + 'lite-model_ssd_mobilenet_v1_1_metadata_2.tflite'
         self.detector_labels_file = homedir + 'lite-model_ssd_mobilenet_v1_1_metadata_2_labelmap.txt'
         self.target_objects = ['bird']
@@ -202,7 +201,7 @@ class DetectClassify:
                 #         f', threshold:{label_thresholds[lindex][1]}, {str(labels[lindex])}.')
                 if cresult > 1:  # still don't have scaling working 100% if the result is more than 100% adjust
                     if tfliteb:
-                       cresult -= math.floor(cresult)
+                        cresult -= math.floor(cresult)
                     else:
                         cresult = cresult / 10
                 if self.check_threshold(cresult, lindex):  # comp confidence>=threshold by label
@@ -215,14 +214,14 @@ class DetectClassify:
 
     # takes a PIL image type and converts it to np array for tensor
     # resize for classification model
-    def convert_img_to_tf(self, PIL_img, input_details):
+    def convert_img_to_tf(self, pil_img, input_details):
         # check the type of the input tensor
         floating_model = input_details[0]['dtype'] == np.float32
         # NxHxWxC, H:1, W:2
         height = input_details[0]['shape'][1]
         width = input_details[0]['shape'][2]
 
-        reshape_image = PIL_img.resize((width, height), PILImageDraw.Image.LANCZOS)
+        reshape_image = pil_img.resize((width, height), PILImageDraw.Image.LANCZOS)
         image_np = image_proc.convert(reshape_image, 'np')
         image_np_expanded = np.expand_dims(image_np, axis=0)
 
@@ -243,16 +242,18 @@ class DetectClassify:
 
     # add bounding box and label to an image
     def add_boxes_and_labels(self, img, label, rects):
+        transparent_fill = (255, 255, 255, 0)  # black with transparent alpha
         for i, rect in enumerate(rects):
             try:
                 (startX, startY, endX, endY) = rect
             except TypeError:
                 return
-            # color = self.colors[random.randint(0, (len(self.colors)) - 1)]
+            color = self.colors[random.randint(0, (len(self.colors)) - 1)]
+
             draw = PILImageDraw.Draw(img)
             font = draw.getfont()
-            draw.text((startX, startY), label, font=font, color='red')
-            # draw.rectangle([(startX, startY), (endX, endY)],  outline='red', width=1)
+            draw.text((startX, startY), label, font=font, color=color, fill=transparent_fill)
+            draw.rectangle([(startX, startY), (endX, endY)],  outline=color, width=1, fill=transparent_fill)
         return img
 
     # func checks threshold by each label passed as a nparray with text in col 0 and threshold in col 1
@@ -269,7 +270,7 @@ class DetectClassify:
 
 def main(args):
     img = PILImage.open(args.image)  # load image
-    birds = DetectClassify(args.homedir, default_confidece= .9)  # setup obj
+    birds = DetectClassify(args.homedir, default_confidece=.9)  # setup obj
     birds.detect(img)  # run object detection
 
     print('objects detected', birds.detected_confidences)
