@@ -242,19 +242,24 @@ class DetectClassify:
 
     # add bounding box and label to an image
     def add_boxes_and_labels(self, img, label, rects):
-        transparent_fill = (0, 0, 0, 0)  # white with transparent alpha
         for i, rect in enumerate(rects):
             try:
                 (startX, startY, endX, endY) = rect
+                textX = startX
+                textY = startY
+                startX += -25
+                startY += -25
+                endX += 25
+                endY += 25
             except TypeError:
                 return
             color = tuple(self.colors[random.randint(0, (len(self.colors)) - 1)])
-            print(color)
-
             draw = PILImageDraw.Draw(img)
             font = draw.getfont()
-            draw.text((startX, startY), label, font=font, color=color, fill=transparent_fill)
-            # draw.rectangle([(startX, startY), (endX, endY)],  outline=color, width=1, fill=transparent_fill)
+            draw.text((textX, textY), label, font=font, color=color)
+            draw.line([(startX,startY), (startX, endY), (startX, endY), (endX, endY),
+                       (endX, endY), (endX,startY), (endX, startY), (startX, startY)],
+                      fill=color, width=2)
         return img
 
     # func checks threshold by each label passed as a nparray with text in col 0 and threshold in col 1
