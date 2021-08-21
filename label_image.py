@@ -57,7 +57,9 @@ except:
 
 
 class DetectClassify:
-    def __init__(self, homedir='/home/pi/PycharmProjects/pyface2/', default_confidece=.98):
+    def __init__(self, homedir='/home/pi/PycharmProjects/pyface2/', default_confidence=.98, screenheight=640,
+                 screenwidth=480, contrast_chg=1.0, color_chg=1.0, brightness_chg=1.0, sharpness_chg=1.0,
+                 framerate=15, mismatch_penalty=0.3):
         self.detector_file = homedir + 'lite-model_ssd_mobilenet_v1_1_metadata_2.tflite'
         self.detector_labels_file = homedir + 'lite-model_ssd_mobilenet_v1_1_metadata_2_labelmap.txt'
         self.target_objects = ['bird']
@@ -73,8 +75,8 @@ class DetectClassify:
         self.input_std = 127.5  # recommended default
         self.detect_obj_min_confidence = .6
         self.classify_min_confidence = .7
-        self.classify_default_confidence = default_confidece
-        self.classify_mismatch_reduction = .30
+        self.classify_default_confidence = default_confidence
+        self.classify_mismatch_reduction = mismatch_penalty
         self.detected_confidences = []
         self.detected_labels = []
         self.detected_rects = []
@@ -82,12 +84,19 @@ class DetectClassify:
         self.classified_labels = []
         self.classified_rects = []
         self.colors = np.random.uniform(0, 255, size=(11, 3)).astype(int)  # random colors for bounding boxes
-        self.img = np.zeros((640, 480, 3), dtype=np.uint8)
-        self.equalizedimg = np.zeros((640, 480, 3), dtype=np.uint8)
+
+        # set image adjustment parameters
+        self.contrast_chg = contrast_chg
+        self.brightness_chg = brightness_chg
+        self.color_chg = color_chg
+        self.sharpness_chg = sharpness_chg
+
+        self.img = np.zeros((screenheight, screenwidth, 3), dtype=np.uint8)
+        self.equalizedimg = np.zeros((screenheight, screenwidth, 3), dtype=np.uint8)
         try:
             self.camera = picamera.PiCamera()
-            self.camera.resolution(640, 480)
-            self.camera.framerate = 30
+            self.camera.resolution(screenheight, screenwidth)
+            self.camera.framerate = framerate
         except:
             pass
 
@@ -111,7 +120,8 @@ class DetectClassify:
     # fill detected_confidences, detected_labels, and detected_rects if in target object list
     def detect(self, img):
         self.img = img.copy()
-        self.equalizedimg = image_proc.equalize_color(img)  # balance histogram of color intensity for all frames
+        self.equalizedimg = image_proc.enhance(img, brightness=self.brightness_chg, contrast=self.contrast_chg,
+                                               color=self.color_chg, shaprness=self.sharpness_chg)
         self.detected_confidences = []
         self.detected_labels = []  # possible object labels
         self.detected_rects = []
