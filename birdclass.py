@@ -63,14 +63,15 @@ def bird_detector(args):
     starttime = datetime.now()  # used for total run time report
     bird_tweeter.post_status(f'Starting process at {datetime.now().strftime("%I:%M:%S %P")}, ' +
                              f'{cityweather.weatherdescription} ' +
-                             f'with {cityweather.skycondition}% cloud cover. Visibility of {cityweather.visibility} ft.' +
+                             f'with {cityweather.skycondition}% cloud cover. Visibility of' +
+                             '{cityweather.visibility} ft.' +
                              f' Temp is currently {cityweather.temp}F with ' +
                              f'wind speeds of {cityweather.windspeed} MPH.')
 
     while True:  # while escape key is not pressed look for motion, detect birds, and determine species
         curr_day, curr_hr = hour_or_day_change(curr_day, curr_hr, cityweather, bird_tweeter, birdpop)
         motionb, img = motion_detector.detect(camera, first_img, args.minarea)
-        if cityweather.is_daytime() == False:  # skip motion detection if it is not daylight
+        if cityweather.is_daytime() is False:  # skip motion detection if it is not daylight
             motionb = False
 
         # placeholder to show video w no boxes or labels here
@@ -212,7 +213,7 @@ if __name__ == "__main__":
     ap.add_argument("-b", "--brightness", type=int, default=1, help="brightness boost")  # 1 no chg,< 1 reduces > 1 inc
     ap.add_argument("-c", "--contrast", type=float, default=1, help="contrast boost")  # contrast between 1.0 & 3.0
     ap.add_argument("-e", "--enhanceimg", type=bool, default=False, help="low light or winter enhancement")
-    ap.add_argument("-a", "--minarea", type=float, default=5.9, help="motion entropy threshold") # < no motion
+    ap.add_argument("-a", "--minarea", type=float, default=5.50, help="motion entropy threshold")  # < no motion
 
     arguments = ap.parse_args()
     bird_detector(arguments)
