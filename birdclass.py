@@ -51,13 +51,9 @@ def bird_detector(args):
     birdobj = objtracker.CentroidTracker()
     motioncnt = 0
     curr_day, curr_hr, last_tweet = datetime.now().day, datetime.now().hour, datetime(2021, 1, 1, 0, 0, 0)
-    spweather = weather.City_Weather()  # init class and set var based on default of Madison WI
+    cityweather = weather.City_Weather()  # init class and set var based on default of Madison WI
 
     # initial video capture, screen size, and grab first image (no motion)
-    # cap = cv2.VideoCapture(0)  # capture video image
-    # if args.screenwidth != 0:  # if the screen width and height are zero use the camera default and skip this code
-    #     cap.set(3, args.screenwidth)  # set screen width
-    #     cap.set(4, args.screenheight)  # set screen height
     camera, first_img = motion_detector.init(args)  # set gray motion mask
     set_windows()  # position output windows at top of screen and init output
 
@@ -66,22 +62,26 @@ def bird_detector(args):
     birds = label_image.DetectClassify()  # init detection and classifier object
     starttime = datetime.now()  # used for total run time report
     # bird_tweeter.post_status(f'Starting process at {datetime.now().strftime("%I:%M:%S %P")}, ' +
-    #                          f'{spweather.weatherdescription} ' +
-    #                          f'with {spweather.skycondition}% cloud cover. Visibility of {spweather.visibility} ft.' +
-    #                          f' Temp is currently {spweather.temp}F with ' +
-    #                          f'wind speeds of {spweather.windspeed} MPH.')
+    #                          f'{cityweather.weatherdescription} ' +
+    #                          f'with {cityweather.skycondition}% cloud cover. Visibility of {cityweather.visibility} ft.' +
+    #                          f' Temp is currently {cityweather.temp}F with ' +
+    #                          f'wind speeds of {cityweather.windspeed} MPH.')
 
     while True:  # while escape key is not pressed look for motion, detect birds, and determine species
-        curr_day, curr_hr = hour_or_day_change(curr_day, curr_hr, spweather, bird_tweeter, birdpop)
+        curr_day, curr_hr = hour_or_day_change(curr_day, curr_hr, cityweather, bird_tweeter, birdpop)
         motionb, img = motion_detector.detect(camera, first_img, args.minarea)
-        # cv2.imshow('video', img)  # show video w no boxes or labels use cv2.flip if image inverted
-        if motionb is True and birds.detect(img):  # motion with birds
+        if cityweather.is_daytime() == False:  # skip motion detection if it is not daylight
+            motionb = False
+
+        # placeholder to show video w no boxes or labels here
+        if motionb and birds.detect(img):  # daytime with motion and birds
             motioncnt = 0  # reset motion count between detected birds
             print('')  # print new lines between birds detection for motion counter
             birds.classify()
             birdobj.update(birds.classified_rects, birds.classified_confidences, birds.classified_labels)
         else:  # no birds detected in frame, update missing from frame count
             birdobj.update_null()
+            birds.target_object_found = False  # may not have run motion detection if not daylight
             if motionb is True:  # motion but no birds
                 motioncnt += 1
                 print(f'\r motion {motioncnt}', end=' ')  # indicate motion on monitor
@@ -91,11 +91,11 @@ def bird_detector(args):
             if args.enhanceimg:
                 birds.equalizedimg = birds.add_boxes_and_labels(birds.equalizedimg, common_names,
                                                                 birds.classified_rects)
-                # cv2.imshow('predicted', birds.equalizedimg)  # show equalized image
+                # place holder to show predicted birds.equalizedimg
             else:
                 birds.img = image_proc.enhance_brightness(birds.img, factor=args.brightness)
                 birds.img = birds.add_boxes_and_labels(birds.img, common_names, birds.classified_rects)
-                # cv2.imshow('predicted', birds.img)
+                # place holder to show predicted birds.img
 
             # Show image and tweet, confidence
             if all(conf >= birds.classify_min_confidence for conf in birds.classified_confidences):  # tweet threshold
@@ -104,10 +104,10 @@ def bird_detector(args):
                     last_tweet = datetime.now()
                     # decide what to tweet
                     if args.enhanceimg:
-                        # cv2.imshow('tweeted', birds.equalizedimg)
+                        # place holder to show tweeted birds.equalizedimg
                         tweetedb = bird_tweeter.post_image(tweet_label, birds.equalizedimg)
                     else:
-                        # cv2.imshow('tweeted', birds.img)
+                        # place holder to show tweeted birds.img
                         tweetedb = bird_tweeter.post_image(tweet_label, birds.img)
                     if tweetedb is False:
                         print(f"*** exceeded tweet limit")
@@ -122,15 +122,13 @@ def bird_detector(args):
         # if birds.target_object_found:
         #     print('*** bird detect and classify results')
         #     print(birds.classified_labels, birds.classified_rects)
-        # cv2.imshow('video', img)  # show video w boxes and labels use cv2.flip if image inverted
-        # cv2.waitKey(20)  # wait 20 ms to render video, restart loop.  setting of 0 is fixed img; > 0 video
+        # place holder show video w boxes and labels
+
         # shut down the app if between 1:00 and 1:05 am.  Pi runs this in a loop and restarts it every 20 minutes
         if datetime.now().hour == 1 and datetime.now().minute <= 5:
             break
 
     # while loop break at 10pm, shut down windows
-    # cap.release()
-    # cv2.destroyAllWindows()
     # camera.stop_preview()
     camera.close()
     bird_tweeter.post_status(f'Ending process at {datetime.now().strftime("%I:%M:%S %P")}.  Run time was ' +
@@ -138,30 +136,30 @@ def bird_detector(args):
 
 
 # housekeeping for day and hour
-def hour_or_day_change(curr_day, curr_hr, spweather, bird_tweeter, birdpop):
+def hour_or_day_change(curr_day, curr_hr, cityweather, bird_tweeter, birdpop):
     post_txt = ''  # force to string
     if curr_day != datetime.now().day:
         observed = birdpop.get_census_by_count()  # count from prior day
         post_txt = f'top 3 birds for day {str(curr_day)}'
         index, loopcnt = 0, 1
-        while loopcnt <= 3:  # top 3 skipping unknown species
-            birdstr = ''  # used to force tuple to string
-            if observed[index][0:2] == '':
+        try:
+            while loopcnt <= 3:  # top 3 skipping unknown species
+                birdstr = ''  # used to force tuple to string
+                if observed[index][0:2] == '':  # skip the unknown species category
+                    index += 1
+                birdstr = f', #{str(loopcnt)} {observed[index][0:2]}'  # grab top bird count and species name
+                post_txt = post_txt + birdstr  # aggregate text for post
                 index += 1
-            try:
-                birdstr = f', #{str(loopcnt)} {observed[index][0:2]}'
-            except IndexError:
-                break
-            post_txt = post_txt + birdstr
-            index += 1
-            loopcnt += 1
+                loopcnt += 1
+            bird_tweeter.post_status(post_txt[0:150])  # grab full text up to 150 characters
+        except IndexError:
+            pass
 
-        bird_tweeter.post_status(post_txt[0:150])
         birdpop.clear()  # clear count for new day
         curr_day = datetime.now().day  # set new day = to current day
 
     if curr_hr != datetime.now().hour:  # check weather and CPU temp hourly
-        spweather.update_conditions()
+        cityweather.update_conditions()
         curr_hr = datetime.now().hour
         cpu = CPUTemperature()
         print(f'***hourly temp check. cpu temp is: {cpu.temperature}C {(cpu.temperature * 9/5) + 32}F')
@@ -195,15 +193,7 @@ def label_text(species_names, species_confs):
 
 
 def set_windows():
-    # cv2.namedWindow('video')
-    # cv2.namedWindow('predicted')
-    # cv2.namedWindow('tweeted')
-
-    # cv2.moveWindow('video', 0, 0)
-    # cv2.moveWindow('predicted', 350, 0)
-    # cv2.moveWindow('tweeted', 700, 0)
-
-    # cv2.waitKey(20)  # wait 20 ms to render video, restart loop.  setting of 0 is fixed img; > 0 video
+    # placeholder to title and position any preview windows at startup
     time.sleep(20/1000000)
     return
 
@@ -217,8 +207,6 @@ if __name__ == "__main__":
     ap.add_argument("-sw", "--screenwidth", type=int, default=640, help="max screen width")
     ap.add_argument("-sh", "--screenheight", type=int, default=480, help="max screen height")
     ap.add_argument("-fr", "--framerate", type=int, default=15, help="frame rate for camera")
-    # ap.add_argument("-sw", "--screenwidth", type=int, default=0, help="max screen width")
-    # ap.add_argument("-sh", "--screenheight", type=int, default=0, help="max screen height")
 
     # motion and image processing settings
     ap.add_argument("-b", "--brightness", type=int, default=1, help="brightness boost")  # 1 no chg,< 1 reduces > 1 inc

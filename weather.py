@@ -36,13 +36,13 @@ from datetime import datetime
 # sunrise and sunset as local time
 # all other variables returned as string type
 class City_Weather:
-    def __init__(self):
+    def __init__(self, city='Madison,WI,USA', units='Imperial', iscloudy=60 ):
         # set defaults
-        self.city = 'Madison,WI,USA'
+        self.city = city
         self.base_url = 'http://api.openweathermap.org/data/2.5/weather?q='
-        self.units = 'Imperial'
+        self.units = units
         self.full_url = self.base_url + self.city + '&units=' + self.units + '&appid=' + weather_key
-        self.cloudythreshold = 60
+        self.cloudythreshold = iscloudy
 
         # init variables
         self.sunrise = datetime.now()
@@ -76,6 +76,12 @@ class City_Weather:
             print('weather error encountered')
         return
 
+
+    # is it daylight, now must be between sunrise and sunset
+    def is_daytime(self):
+        return (datetime.now() > self.sunrise or datetime.now() < self.sunset)
+
+
     # update weather conditions
     def update_conditions(self):
         self.local_weather()
@@ -94,6 +100,7 @@ def main():
     print(spweather.pressure)
     print(spweather.humidity)
     print(spweather.visibility)
+    print(spweather.is_daytime())
 
 
 # test function

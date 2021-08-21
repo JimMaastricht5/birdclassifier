@@ -57,7 +57,8 @@ def capture_image(camera):
 # capture first image and gray scale/blur for baseline motion detection
 def init(args):
     camera = picamera.PiCamera()
-    camera.resolution = (args.screenheight, args.screenwidth)
+    if args.screenwidth != 0:  # use specified height and width or default values if not passed
+        camera.resolution = (args.screenheight, args.screenwidth)
     camera.vflip = args.flipcamera
     camera.framerate = args.framerate
 
