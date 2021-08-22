@@ -121,7 +121,7 @@ class DetectClassify:
     def detect(self, img):
         self.img = img.copy()
         self.equalizedimg = image_proc.enhance(img, brightness=self.brightness_chg, contrast=self.contrast_chg,
-                                               color=self.color_chg, shaprness=self.sharpness_chg)
+                                               color=self.color_chg, sharpness=self.sharpness_chg)
         self.detected_confidences = []
         self.detected_labels = []  # possible object labels
         self.detected_rects = []
