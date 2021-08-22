@@ -156,6 +156,7 @@ class DetectClassify:
         self.classified_rects = []
         self.classified_confidences = []
         self.classified_labels = []
+        overlap_perc = 0.0
         for i, det_confidence in enumerate(self.detected_confidences):  # loop thru detected target objects
             (startX, startY, endX, endY) = self.scale_rect(self.img, self.detected_rects[i])  # set x,y bounding box
             rect = (startX, startY, endX, endY)
@@ -175,6 +176,14 @@ class DetectClassify:
                 classify_conf += classify_conf_equalized
                 if classify_conf > 1:
                     classify_conf = 1
+
+            # detect overlapping rectangles/same bird and skip it
+            if i > 0:  # not the first loop
+                overlap_perc = image_proc.overlap_area(prior_rect, rect)  # compare current rect and prior rect
+            prior_rect = rect
+            if overlap_perc > .8:  # 0.0 in first loop, if 80% overlap skip bird
+                classify_conf = 0
+                classify_label = ""
 
             self.classified_labels.append(classify_label)
             self.classified_confidences.append(classify_conf)

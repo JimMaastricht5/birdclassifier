@@ -85,7 +85,7 @@ def detect(camera, first_img, min_area):
 
     # motion detection, compute the absolute difference between the current frame and first frame
     imgdelta = image_proc.compare_images(first_img, grayblur)
-    print(f'image entropy is{image_entropy(imgdelta)}')
+    # print(f'image entropy is{image_entropy(imgdelta)}')
     if image_entropy(imgdelta) >= min_area:
         motionb = True  # difference in image indicates motion
     else:
@@ -93,14 +93,7 @@ def detect(camera, first_img, min_area):
     return motionb, img
 
 
-# def image_entropy2(image):
-#     w, h = image.size
-#     a = np.array(image.convert('RGB')).reshape((w * h, 3))
-#     h, e = np.histogramdd(a, bins=(16,) * 3, range=((0, 256),) * 3)
-#     prob = h / np.sum(h)
-#     return -np.sum(np.log2(prob[prob > 0]))
-
-
+# determine change between static image and new frame
 def image_entropy(image):
     histogram = image.histogram()
     histlength = sum(histogram)
