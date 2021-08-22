@@ -61,7 +61,7 @@ def bird_detector(args):
     # init detection and classifier object
     birds = label_image.DetectClassify(default_confidence=args.default_confidence,
                                        mismatch_penalty=args.mismatch_penalty,
-                                       screenheight=args.screenheight, screenwidth=args.screenwidht,
+                                       screenheight=args.screenheight, screenwidth=args.screenwidth,
                                        framerate=args.framerate, color_chg=args.color_chg,
                                        contrast_chg=args.contrast_chg, sharpness_chg=args.sharpness_chg)
     starttime = datetime.now()  # used for total run time report
