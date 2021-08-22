@@ -55,11 +55,15 @@ def bird_detector(args):
 
     # initial video capture, screen size, and grab first image (no motion)
     camera, first_img = motion_detector.init(args)  # set gray motion mask
-    set_windows()  # position output windows at top of screen and init output
+    # set_windows()  # position output windows at top of screen and init output
 
-    # setup twitter and tensor flow models
     bird_tweeter = tweeter.Tweeter_Class()  # init tweeter2 class twitter handler
-    birds = label_image.DetectClassify()  # init detection and classifier object
+    # init detection and classifier object
+    birds = label_image.DetectClassify(default_confidence=args.default_confidence,
+                                       mismatch_penalty=args.mismatch_penalty,
+                                       screenheight=args.screenheight, screenwidth=args.screenwidht,
+                                       framerate=args.framerate, color_chg=args.color_chg,
+                                       contrast_chg=args.contrast_chg, sharpness_chg=args.sharpness_chg)
     starttime = datetime.now()  # used for total run time report
     bird_tweeter.post_status(f'Starting process at {datetime.now().strftime("%I:%M:%S %P")}, ' +
                              f'{cityweather.weatherdescription} ' +
@@ -210,9 +214,15 @@ if __name__ == "__main__":
     ap.add_argument("-fr", "--framerate", type=int, default=15, help="frame rate for camera")
 
     # motion and image processing settings
-    ap.add_argument("-b", "--brightness", type=int, default=1, help="brightness boost")  # 1 no chg,< 1 reduces > 1 inc
-    ap.add_argument("-c", "--contrast", type=float, default=1, help="contrast boost")  # contrast between 1.0 & 3.0
-    ap.add_argument("-e", "--enhanceimg", type=bool, default=False, help="low light or winter enhancement")
+    ap.add_argument("-b", "--brightness_chg", type=int, default=1, help="brightness boost")  # 1 no chg,< 1 -, > 1 +
+    ap.add_argument("-c", "--contrast_chg", type=float, default=1.2, help="contrast boost")  # 1 no chg,< 1 -, > 1 +
+    ap.add_argument("-cl", "--color_chg", type=float, default=1.2, help="color boost")  # 1 no chg,< 1 -, > 1 +
+    ap.add_argument("-sp", "--sharpness_chg", type=float, default=1.2, help="sharpeness")  # 1 no chg,< 1 -, > 1 +
+    ap.add_argument("-mi", "--mismatch_penalty", type=float, default=.3,
+                    help="confidence penalty if predictions from img and enhance img dont match ")
+    ap.add_argument("-e", "--enhanceimg", type=bool, default=True, help="offset waterproof box blur and enhance img")
+
+    ap.add_argument("-co", "--default_confidence", type=float, default=.98, help="confidence threshold")
     ap.add_argument("-a", "--minarea", type=float, default=5.50, help="motion entropy threshold")  # < no motion
 
     arguments = ap.parse_args()

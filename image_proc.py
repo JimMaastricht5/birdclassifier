@@ -60,31 +60,36 @@ def convert(img, convert_to='np'):
     return img
 
 
-# enhance color, brightness, and contrast
-# provides all three stages back for viewing
-# take either a pil image or nparray and returns nparray
-def enhancements(img):
-    img = convert(img, 'PIL')  # converts to PIL format if necessary
-    img_clr = enhance_color(img, 1.0)
-    img_clr_brt = enhance_brightness(img_clr, 1.2)
-    img_clr_brt_con = enhance_contrast(img_clr_brt, 1.0)
-    return convert(img_clr), convert(img_clr_brt), convert(img_clr_brt_con)  # return numpy arrays
+# enhance color, brightness, sharpness, and contrast
+# take either a pil image
+def enhance(img, brightness=1.0, sharpness=1.0, contrast=1.0, color=1.0):
+    img = enhance_brightness(img, brightness)
+    img = enhance_sharpness(img, sharpness)
+    img = enhance_contrast(img, contrast)
+    img = enhance_color(img, color)
+    return img
 
 
 # color enhance image
 # factor of 1 is no change. < 1 reduces color,  > 1 increases color
-# recommended values for color pop of 1.5 or 3
-# recommended values for reductions 0.8, 0.4
-# B&W is 0
+# recommended values for color pop of 1.2
+# recommended values for reductions 0.8
 def enhance_color(img, factor):
     return ImageEnhance.Color(img).enhance(factor)
 
 
 # brighten or darken an image
 # factor of 1 is no change. < 1 reduces color,  > 1 increases color
-# recommended values for brightness of 1.2 or 0.8
+# recommended values of 1.2 or 0.8
 def enhance_brightness(img, factor):
     return ImageEnhance.Brightness(img).enhance(factor)
+
+
+# sharpen an image
+# factor of 1 is no change. < 1 blurs,  > 1 sharpens contours
+# recommended values of 1.2 or 0.8
+def enhance_sharpness(img, factor):
+    return ImageEnhance.Sharpness(img).enhance(factor)
 
 
 # increases or decreases contrast
@@ -167,26 +172,27 @@ def compare_images(img1, img2):
 
 # testing code
 def main():
-    img = Image.open('/home/pi/birdclass/test2.jpg')
+    img = Image.open('/home/pi/birdclass/unadjusted20210821.jpg')
     img.show()
 
-    img_clr = enhance_color(img, 1.5)
-    img_clr_brt = enhance_brightness(img_clr, 1.2)
-    img_clr_brt_con = enhance_contrast(img_clr_brt, 1.2)
+    # img = enhance_brightness(img, 1)
+    # img = enhance_sharpness(img, 1.2)
+    # img = enhance_contrast(img, 1.2)
+    # img = enhance_color(img, 1.2)
+    # img = equalize_color(img)
+    img = enhance(img, brightness=1.3, sharpness=1.2, contrast=1.2, color=1.2)
+    img.show()
 
-    img_clr.show()
-    img_clr_brt.show()
-    img_clr_brt_con.show()
     # test image bad contrast and equalization
-    grayimg = ImageOps.grayscale(img)
-    print(is_low_contrast(grayimg))
-    equalizedimg1 = equalize_gray(grayimg)
-    equalizedimg1.show()
-
-    # color equalize
-    equalizedcolorimg = equalize_color(img)
-    equalizedcolorimg.show()
-    print(predominant_color(equalizedcolorimg))
+    # grayimg = ImageOps.grayscale(img)
+    # print(is_low_contrast(grayimg))
+    # equalizedimg1 = equalize_gray(grayimg)
+    # equalizedimg1.show()
+    #
+    # # color equalize
+    # equalizedcolorimg = equalize_color(img)
+    # equalizedcolorimg.show()
+    # print(predominant_color(equalizedcolorimg))
 
 
 # invoke main
