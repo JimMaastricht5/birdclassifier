@@ -137,18 +137,26 @@ def predominant_color(pil_img):
     return dominant_color
 
 
-# # estimate the size of the bird based on the percentage of image area consumed by the bounding box
-# def objectsize(args, startx, starty, endx, endy):
-#     objarea = abs((startx - endx) * (starty - endy))
-#     scrarea = args['screenheight'] * args['screenwidth']
-#     perarea = (objarea / scrarea) * 100
-#     if perarea >= 66:  # large
-#         size = 'L'
-#     elif perarea >= 33:  # medium
-#         size = 'M'
-#     else:  # small
-#         size = 'S'
-#     return size, perarea
+# find area of an image
+def area(rect):
+    (startX, startY, endX, endY) = rect
+    return (abs(endX - startX) * abs(endY - startY))
+
+
+# find the % area in 2 rectangles that overlap
+def overlap_area(rect1, rect2):
+    (startX, startY, endX, endY) = rect1
+    area1 = area(rect1)
+    (startX2, startY2, endX2, endY2) = rect2
+    area2 = area(rect2)
+
+    x_dist = min(endX, endX2) - max(startX, startX2)
+    y_dist = min(endY, endY2) - max(startY, startY2)
+    if x_dist > 0 and y_dist > 0:
+        areaI = x_dist * y_dist
+    else:
+        areaI = 0
+    return ( (area1 + area2 - areaI) / (area1 + area2))
 
 
 # compare two PIL images for differences
@@ -172,16 +180,18 @@ def compare_images(img1, img2):
 
 # testing code
 def main():
-    img = Image.open('/home/pi/birdclass/unadjusted20210821.jpg')
-    img.show()
+    print(area( (1,1,4,4)) )
+    print(overlap_area((1,1,4,4), (1,1,2,2)))
+    # img = Image.open('/home/pi/birdclass/unadjusted20210821.jpg')
+    # img.show()
 
     # img = enhance_brightness(img, 1)
     # img = enhance_sharpness(img, 1.2)
     # img = enhance_contrast(img, 1.2)
     # img = enhance_color(img, 1.2)
     # img = equalize_color(img)
-    img = enhance(img, brightness=1.3, sharpness=1.2, contrast=1.2, color=1.2)
-    img.show()
+    # img = enhance(img, brightness=1.3, sharpness=1.2, contrast=1.2, color=1.2)
+    # img.show()
 
     # test image bad contrast and equalization
     # grayimg = ImageOps.grayscale(img)
