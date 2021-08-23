@@ -59,6 +59,7 @@ class Tweeter_Class:
             self.tweetcnt += 1
             try:
                 self.twitter.update_status(status=message)
+                print(message)
                 self.tweeted = True
             except:
                 self.tweeted = False
@@ -75,6 +76,7 @@ class Tweeter_Class:
             try:
                 response = self.twitter.upload_media(media=tw_img)
                 self.twitter.update_status(status=message, media_ids=[response['media_id']])
+                print(message)
                 self.tweetcnt += 1
                 self.tweeted = True
             except:
