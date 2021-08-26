@@ -117,7 +117,8 @@ def bird_detector(args):
                     if tweetedb is False:
                         print(f"*** exceeded tweet limit")
                 else:
-                    print(f" {tweet_label} not tweeted, last tweet {last_tweet.strftime('%I:%M %p')}. wait 5 minutes")
+                    # print(f" {tweet_label} not tweeted, last tweet {last_tweet.strftime('%I:%M %p')}. wait 5 minutes")
+                    pass
 
         # motion processed, all birds in image processed if detected, add all known objects to image
         # try:
