@@ -59,7 +59,7 @@ except:
 class DetectClassify:
     def __init__(self, homedir='/home/pi/PycharmProjects/pyface2/', default_confidence=.98, screenheight=640,
                  screenwidth=480, contrast_chg=1.0, color_chg=1.0, brightness_chg=1.0, sharpness_chg=1.0,
-                 framerate=15, mismatch_penalty=0.3):
+                 framerate=15, mismatch_penalty=0.3, overlap_perc_tolerance=0.7):
         self.detector_file = homedir + 'lite-model_ssd_mobilenet_v1_1_metadata_2.tflite'
         self.detector_labels_file = homedir + 'lite-model_ssd_mobilenet_v1_1_metadata_2_labelmap.txt'
         self.target_objects = ['bird']
@@ -90,6 +90,7 @@ class DetectClassify:
         self.brightness_chg = brightness_chg
         self.color_chg = color_chg
         self.sharpness_chg = sharpness_chg
+        self.overlap_perc_tolerance = overlap_perc_tolerance
 
         self.img = np.zeros((screenheight, screenwidth, 3), dtype=np.uint8)
         self.equalizedimg = np.zeros((screenheight, screenwidth, 3), dtype=np.uint8)
@@ -148,10 +149,9 @@ class DetectClassify:
                     self.detected_rects.append(det_rects[0][index])
         return self.target_object_found
 
-        # make classifications using img and detect results
-        # compare img and equalized images
-        # use self.detected_confidences,detected_labels, detected_rects lists
-
+    # make classifications using img and detect results
+    # compare img and equalized images
+    # use self.detected_confidences,detected_labels, detected_rects lists
     def classify(self):
         self.classified_rects = []
         self.classified_confidences = []
@@ -181,7 +181,7 @@ class DetectClassify:
             if i > 0:  # not the first loop
                 overlap_perc = image_proc.overlap_area(prior_rect, rect)  # compare current rect and prior rect
             prior_rect = rect
-            if overlap_perc > .8:  # 0.0 in first loop, if 80% overlap skip bird
+            if overlap_perc > self.overlap_perc_tolerance:  # 0.0 in first loop, if 80% overlap skip bird
                 classify_conf = 0
                 classify_label = ""
 
@@ -251,6 +251,7 @@ class DetectClassify:
             input_data = image_np_expanded.astype('uint8')
         return floating_model, input_data
 
+    # create bounding coordinates for rectangle and text position from image size
     def scale_rect(self, img, box):
         img_width, img_height = img.size
         y_min = int(max(1, (box[0] * img_height)))
@@ -295,7 +296,7 @@ class DetectClassify:
 
 def main(args):
     img = PILImage.open(args.image)  # load image
-    birds = DetectClassify(args.homedir, default_confidece=.9)  # setup obj
+    birds = DetectClassify(args.homedir, default_confidence=.9)  # setup obj
     birds.detect(img)  # run object detection
 
     print('objects detected', birds.detected_confidences)
