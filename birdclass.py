@@ -223,7 +223,7 @@ if __name__ == "__main__":
                     help="confidence penalty if predictions from img and enhance img dont match ")
     ap.add_argument("-e", "--enhanceimg", type=bool, default=True, help="offset waterproof box blur and enhance img")
 
-    ap.add_argument("-co", "--default_confidence", type=float, default=.98, help="confidence threshold")
+    ap.add_argument("-co", "--default_confidence", type=float, default=.95, help="confidence threshold")
     ap.add_argument("-a", "--minarea", type=float, default=5.50, help="motion entropy threshold")  # < no motion
 
     arguments = ap.parse_args()
