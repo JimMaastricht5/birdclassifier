@@ -63,7 +63,8 @@ def bird_detector(args):
                                        mismatch_penalty=args.mismatch_penalty,
                                        screenheight=args.screenheight, screenwidth=args.screenwidth,
                                        framerate=args.framerate, color_chg=args.color_chg,
-                                       contrast_chg=args.contrast_chg, sharpness_chg=args.sharpness_chg)
+                                       contrast_chg=args.contrast_chg, sharpness_chg=args.sharpness_chg,
+                                       overlap_perc_tolerance=args.overlap_perc_tolerance)
     starttime = datetime.now()  # used for total run time report
     bird_tweeter.post_status(f'Starting process at {datetime.now().strftime("%I:%M:%S %P")}, ' +
                              f'{cityweather.weatherdescription} ' +
@@ -222,8 +223,8 @@ if __name__ == "__main__":
     ap.add_argument("-mi", "--mismatch_penalty", type=float, default=.3,
                     help="confidence penalty if predictions from img and enhance img dont match ")
     ap.add_argument("-e", "--enhanceimg", type=bool, default=True, help="offset waterproof box blur and enhance img")
-
     ap.add_argument("-co", "--default_confidence", type=float, default=.95, help="confidence threshold")
+    ap.add_argument("-a", "--overlap_perc_tolerance", type=float, default=0.6, help="% box overlap to flag as dup")
     ap.add_argument("-a", "--minarea", type=float, default=5.50, help="motion entropy threshold")  # < no motion
 
     arguments = ap.parse_args()
