@@ -43,12 +43,10 @@ except:
 
 # create in-memory stream, close stream when operation is complete
 def capture_image(camera):
-    # with picamera.array.PiRGBArray(camera) as stream:
     stream = io.BytesIO()
     camera.capture(stream, 'jpeg')
     stream.seek(0)
     img = Image.open(stream)
-    # stream.truncate() ??
     # img.save('testcap_motion.jpg')
     return img
 
@@ -61,15 +59,13 @@ def init(args):
         camera.resolution = (args.screenheight, args.screenwidth)
     camera.vflip = args.flipcamera
     camera.framerate = args.framerate
-
-    # capture consistent images, wait and fix values
+    # to capture consistent images, wait and fix values
     time.sleep(2)  # Wait for the automatic gain control to settle
     # camera.shutter_speed = camera.exposure_speed
     # camera.exposure_mode = 'off'
     # g = camera.awb_gains
     # camera.awb_mode = 'off'
     # camera.awb_gains = g
-
     img = capture_image(camera)  # capture img of type PIL
     gray = image_proc.grayscale(img)  # convert image to gray scale for motion detection
     graymotion = image_proc.gaussianblur(gray)  # smooth out image for motion detection
@@ -77,20 +73,14 @@ def init(args):
 
 
 # once first image is captured call motion detector in a loop to find each subsequent image
-# compare image to first img; if different than motion
+# motion detection, compute the absolute difference between the current frame and first frame
 def detect(camera, first_img, min_area):
     img = capture_image(camera)
     grayimg = image_proc.grayscale(img)  # convert image to gray scale
     grayblur = image_proc.gaussianblur(grayimg)  # smooth out image for motion detection
-
-    # motion detection, compute the absolute difference between the current frame and first frame
     imgdelta = image_proc.compare_images(first_img, grayblur)
     # print(f'image entropy is{image_entropy(imgdelta)}')
-    if image_entropy(imgdelta) >= min_area:
-        motionb = True  # difference in image indicates motion
-    else:
-        motionb = False  # not enough diff for motion
-    return motionb, img
+    return (image_entropy(imgdelta) >= min_area), img
 
 
 # determine change between static image and new frame

@@ -45,6 +45,7 @@ import image_proc
 try:
     import picamera
 except:
+    print('picamera import fails on windows')
     pass
 
 # attempt to load tensor flow lite,will fail if not raspberry pi, switch to full tensorflow for windows
@@ -199,8 +200,7 @@ class DetectClassify:
         # output_details = self.classifier.get_output_details()
         floating_model, input_data = self.convert_img_to_tf(img, input_details)
         self.classifier.set_tensor(input_details[0]['index'], input_data)
-
-        self.classifier.invoke()
+        self.classifier.invoke()  # invoke classification
         output_details = self.classifier.get_output_details()[0]
         output = np.squeeze(self.classifier.get_tensor(output_details['index']))
         # If the model is quantized (tflite uint8 data), then dequantize the results

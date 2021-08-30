@@ -26,24 +26,17 @@
 # currently using a model from coral.ai for species identification.
 # Other species models built with tensor flow  using tools from tensor in colab notebook
 # https://colab.research.google.com/drive/1taZ9JincTaZuZh_JmBSC4pAbSQavxbq5#scrollTo=D3i_6WSXjUhk
-# special notes when setting up the code on a rasberry pi 4 9/9/20
-# install supporting libraries for directions @: https://qengineering.eu/install-opencv-4.2-on-raspberry-pi-4.html
-# install OpenCv version 4.4+
 # packages: twitter use twython package, auth.py must be in project for import auth
 #   oauthlib,
-# import numpy.core.multiarray  # may be needed to avoid error with opencv multiarray
-import time
 import image_proc
 import label_image  # code to init tensor flow model and classify bird type, bird object
 import motion_detector  # motion detector helper functions
 import objtracker  # keeps track of detected objects between frames
-import weather
 import tweeter  # twitter helper functions
 import population  # population census object, tracks species total seen and last time
+import dailychores  # handles tasks that occur once per day or per hour
 import argparse  # argument parser
 from datetime import datetime
-from gpiozero import CPUTemperature
-from subprocess import call
 
 
 def bird_detector(args):
@@ -51,13 +44,10 @@ def bird_detector(args):
     birdobj = objtracker.CentroidTracker()
     motioncnt = 0
     curr_day, curr_hr, last_tweet = datetime.now().day, datetime.now().hour, datetime(2021, 1, 1, 0, 0, 0)
-    cityweather = weather.City_Weather()  # init class and set var based on default of Madison WI
-
     # initial video capture, screen size, and grab first image (no motion)
     camera, first_img = motion_detector.init(args)  # set gray motion mask
-    # set_windows()  # position output windows at top of screen and init output
-
     bird_tweeter = tweeter.Tweeter_Class()  # init tweeter2 class twitter handler
+    chores = dailychores.DailyChores(bird_tweeter, birdpop)
     # init detection and classifier object
     birds = label_image.DetectClassify(default_confidence=args.default_confidence,
                                        mismatch_penalty=args.mismatch_penalty,
@@ -65,21 +55,13 @@ def bird_detector(args):
                                        framerate=args.framerate, color_chg=args.color_chg,
                                        contrast_chg=args.contrast_chg, sharpness_chg=args.sharpness_chg,
                                        overlap_perc_tolerance=args.overlap_perc_tolerance)
-    starttime = datetime.now()  # used for total run time report
-    bird_tweeter.post_status(f'Starting process at {datetime.now().strftime("%I:%M:%S %P")}, ' +
-                             f'{cityweather.weatherdescription} ' +
-                             f'with {cityweather.skycondition}% cloud cover. Visibility of' +
-                             '{cityweather.visibility} ft.' +
-                             f' Temp is currently {cityweather.temp}F with ' +
-                             f'wind speeds of {cityweather.windspeed} MPH.')
 
-    while True:  # while escape key is not pressed look for motion, detect birds, and determine species
-        curr_day, curr_hr = hour_or_day_change(curr_day, curr_hr, cityweather, bird_tweeter, birdpop)
+    while True:  # look for motion, detect birds, and determine species; break at end of day
+        chores.hourly_and_daily()  # perform chores that take place hourly or daily such as weather reporting
         motionb, img = motion_detector.detect(camera, first_img, args.minarea)
-        if cityweather.is_daytime() is False:  # skip motion detection if it is not daylight
+        if chores.cityweather.is_daytime():  # skip motion detection if it is not daylight
             motionb = False
 
-        # placeholder to show video w no boxes or labels here
         if motionb and birds.detect(img):  # daytime with motion and birds
             motioncnt = 0  # reset motion count between detected birds
             print('')  # print new lines between birds detection for motion counter
@@ -135,48 +117,9 @@ def bird_detector(args):
         if datetime.now().hour == 1 and datetime.now().minute <= 5:
             break
 
-    # while loop break at 10pm, shut down windows
     # camera.stop_preview()
     camera.close()
-    bird_tweeter.post_status(f'Ending process at {datetime.now().strftime("%I:%M:%S %P")}.  Run time was ' +
-                             f'{divmod((datetime.now() - starttime).total_seconds(), 60)[0]} minutes')
-
-
-# housekeeping for day and hour
-def hour_or_day_change(curr_day, curr_hr, cityweather, bird_tweeter, birdpop):
-    post_txt = ''  # force to string
-    if curr_day != datetime.now().day:
-        observed = birdpop.get_census_by_count()  # count from prior day
-        post_txt = f'top 3 birds for day {str(curr_day)}'
-        index, loopcnt = 0, 1
-        try:
-            while loopcnt <= 3:  # top 3 skipping unknown species
-                birdstr = ''  # used to force tuple to string
-                if observed[index][0:2] == '':  # skip the unknown species category
-                    index += 1
-                birdstr = f', #{str(loopcnt)} {observed[index][0:2]}'  # grab top bird count and species name
-                post_txt = post_txt + birdstr  # aggregate text for post
-                index += 1
-                loopcnt += 1
-            bird_tweeter.post_status(post_txt[0:150])  # grab full text up to 150 characters
-        except IndexError:
-            pass
-
-        birdpop.clear()  # clear count for new day
-        curr_day = datetime.now().day  # set new day = to current day
-
-    if curr_hr != datetime.now().hour:  # check weather and CPU temp hourly
-        cityweather.update_conditions()
-        curr_hr = datetime.now().hour
-        cpu = CPUTemperature()
-        print(f'***hourly temp check. cpu temp is: {cpu.temperature}C {(cpu.temperature * 9/5) + 32}F')
-        try:
-            if int(cpu.temperature) >= 86:  # limit is 85 C
-                bird_tweeter.post_status(f'***shut down. temp: {cpu.temperature}')
-                call("sudo shutdown -poweroff")
-        except:
-            pass
-    return curr_day, curr_hr
+    chores.end_report()  # post a report on run time of the process
 
 
 # set label for image and tweet, use short species name instead of scientific name
@@ -197,12 +140,6 @@ def label_text(species_names, species_confs):
         common_names = common_names + cname
         tweet_label += sname + ' ' + f'{species_confs[i] * 100:.1f}%'
     return common_names, tweet_label
-
-
-def set_windows():
-    # placeholder to title and position any preview windows at startup
-    time.sleep(20/1000000)
-    return
 
 
 if __name__ == "__main__":
