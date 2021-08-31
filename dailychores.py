@@ -80,15 +80,14 @@ class DailyChores:
         while loopcnt <= 3:  # top 3 skipping unknown species
             if observed[index][0:2] == '':  # skip the unknown species category
                 index += 1
-            birdstr = f', #{str(loopcnt)} {observed[index][0:2]}'  # grab top bird count and species name
-            # *** change this to common name at some point!!!
-            # sname = str(sname)  # make sure species is considered a string
-            # start = sname.find('(') + 1  # find start of common name, move one character to drop (
-            # end = sname.find(')')
-            # if start >= 0 and end >= 0:
-            #     cname = sname[start:end]
-            # else:
-            #     cname = sname
+            birdstr = str(observed[index][0])  # grab top species name
+            start = birdstr.find('(') + 1  # find start of common name, move one character to drop (
+            end = birdstr.find(')')
+            if start >= 0 and end >= 0:
+                cname = birdstr[start:end]
+            else:
+                cname = birdstr
+            birdstr = str(f', #{str(loopcnt)} {cname} {observed[index][1]} ')  # grab top bird count and species name
             post_txt = post_txt + birdstr  # aggregate text for post
             index += 1
             loopcnt += 1
