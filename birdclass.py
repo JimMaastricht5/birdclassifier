@@ -147,7 +147,7 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
 
     # camera settings
-    ap.add_argument("-f", "--flipcamera", type=bool, default=False, help="flip camera image")
+    ap.add_argument("-fc", "--flipcamera", type=bool, default=False, help="flip camera image")
     ap.add_argument("-sw", "--screenwidth", type=int, default=640, help="max screen width")
     ap.add_argument("-sh", "--screenheight", type=int, default=480, help="max screen height")
     ap.add_argument("-fr", "--framerate", type=int, default=15, help="frame rate for camera")
@@ -157,12 +157,12 @@ if __name__ == "__main__":
     ap.add_argument("-c", "--contrast_chg", type=float, default=1.2, help="contrast boost")  # 1 no chg,< 1 -, > 1 +
     ap.add_argument("-cl", "--color_chg", type=float, default=1.2, help="color boost")  # 1 no chg,< 1 -, > 1 +
     ap.add_argument("-sp", "--sharpness_chg", type=float, default=1.2, help="sharpeness")  # 1 no chg,< 1 -, > 1 +
-    ap.add_argument("-mi", "--mismatch_penalty", type=float, default=.3,
+    ap.add_argument("-mp", "--mismatch_penalty", type=float, default=.3,
                     help="confidence penalty if predictions from img and enhance img dont match ")
-    ap.add_argument("-e", "--enhanceimg", type=bool, default=True, help="offset waterproof box blur and enhance img")
+    ap.add_argument("-ei", "--enhanceimg", type=bool, default=True, help="offset waterproof box blur and enhance img")
     ap.add_argument("-co", "--default_confidence", type=float, default=.95, help="confidence threshold")
-    ap.add_argument("-a", "--overlap_perc_tolerance", type=float, default=0.6, help="% box overlap to flag as dup")
-    ap.add_argument("-a", "--minarea", type=float, default=5.50, help="motion entropy threshold")  # < no motion
+    ap.add_argument("-op", "--overlap_perc_tolerance", type=float, default=0.6, help="% box overlap to flag as dup")
+    ap.add_argument("-ma", "--minarea", type=float, default=5.50, help="motion entropy threshold")  # < no motion
 
     arguments = ap.parse_args()
     bird_detector(arguments)
