@@ -63,7 +63,7 @@ class DailyChores:
         self.tweeter.post_status(f'current time and weather: {datetime.now().strftime("%I:%M:%S %P")}, ' +
                                  f'{self.cityweather.weatherdescription} ' +
                                  f'with {self.cityweather.skycondition}% cloud cover. Visibility of' +
-                                 '{cityweather.visibility} ft.' +
+                                 f'{self.cityweather.visibility} ft.' +
                                  f' Temp is currently {self.cityweather.temp}F with ' +
                                  f'wind speeds of {self.cityweather.windspeed} MPH.')
         return

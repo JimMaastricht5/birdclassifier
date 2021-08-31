@@ -153,7 +153,7 @@ if __name__ == "__main__":
     ap.add_argument("-fr", "--framerate", type=int, default=15, help="frame rate for camera")
 
     # motion and image processing settings
-    ap.add_argument("-b", "--brightness_chg", type=int, default=1, help="brightness boost")  # 1 no chg,< 1 -, > 1 +
+    ap.add_argument("-b", "--brightness_chg", type=int, default=1.05, help="brightness boost")  # 1 no chg,< 1 -, > 1 +
     ap.add_argument("-c", "--contrast_chg", type=float, default=1.2, help="contrast boost")  # 1 no chg,< 1 -, > 1 +
     ap.add_argument("-cl", "--color_chg", type=float, default=1.2, help="color boost")  # 1 no chg,< 1 -, > 1 +
     ap.add_argument("-sp", "--sharpness_chg", type=float, default=1.2, help="sharpeness")  # 1 no chg,< 1 -, > 1 +
