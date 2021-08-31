@@ -59,8 +59,8 @@ def bird_detector(args):
     while True:  # look for motion, detect birds, and determine species; break at end of day
         chores.hourly_and_daily()  # perform chores that take place hourly or daily such as weather reporting
         motionb, img = motion_detector.detect(camera, first_img, args.minarea)
-        if chores.cityweather.is_daytime():  # skip motion detection if it is not daylight
-            motionb = False
+        # if chores.cityweather.is_daytime():  # skip motion detection if it is not daylight
+        #     motionb = False
 
         if motionb and birds.detect(img):  # daytime with motion and birds
             motioncnt = 0  # reset motion count between detected birds
