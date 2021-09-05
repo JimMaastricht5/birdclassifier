@@ -76,21 +76,19 @@ class DailyChores:
         birdstr = ''  # used to force tuple to string
         observed = self.birdpop.get_census_by_count()
         post_txt = f'top 3 birds for day {str(self.curr_day)}'
-        index, loopcnt = 0, 1
-        while loopcnt <= 3:  # top 3 skipping unknown species
-            if observed[index][0:2] == '':  # skip the unknown species category
-                index += 1
-            birdstr = str(observed[index][0])  # grab top species name
-            start = birdstr.find('(') + 1  # find start of common name, move one character to drop (
-            end = birdstr.find(')')
-            if start >= 0 and end >= 0:
-                cname = birdstr[start:end]
-            else:
-                cname = birdstr
-            birdstr = str(f', #{str(loopcnt)} {cname} {observed[index][1]} ')  # grab top bird count and species name
-            post_txt = post_txt + birdstr  # aggregate text for post
+        index = 0
+        while index <= 2:  # top 3 skipping unknown species
+            if observed[index][0:2] != '':  # skip the unknown species category
+                birdstr = str(observed[index][0])  # grab top species name
+                start = birdstr.find('(') + 1  # find start of common name, move one character to drop (
+                end = birdstr.find(')')
+                if start >= 0 and end >= 0:
+                    cname = birdstr[start:end]
+                else:
+                    cname = birdstr
+                birdstr = str(f', #{str(index + 1)} {cname} {observed[index][1]} ')  # top bird count & species name
+                post_txt = post_txt + birdstr  # aggregate text for post
             index += 1
-            loopcnt += 1
         self.tweeter.post_status(post_txt[0:150])  # grab full text up to 150 characters
         return
 
@@ -103,7 +101,8 @@ class DailyChores:
             self.weather_report()
             self.weather_reported = True
 
-        if self.pop_reported is False and self.cityweather.is_daytime is False:
+        if self.pop_reported is False and \
+                (self.cityweather.is_daytime is False or datetime.now().hour >= 22):
             self.pop_reported = True
             self.top_pop_report()
             self.birdpop.clear()  # clear count for new day
