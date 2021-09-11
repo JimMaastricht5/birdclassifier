@@ -137,8 +137,8 @@ def label_text(species_names, species_confs):
             cname = sname[start:end]
         else:
             cname = sname
-        common_names = common_names + cname
-        tweet_label += sname + ' ' + f'{species_confs[i] * 100:.1f}%'
+        common_names += f'{cname} {species_confs[i] * 100:.1f}%'
+        tweet_label += f'{sname} {species_confs[i] * 100:.1f}%'
     return common_names, tweet_label
 
 
