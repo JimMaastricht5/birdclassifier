@@ -35,6 +35,7 @@ import objtracker  # keeps track of detected objects between frames
 import tweeter  # twitter helper functions
 import population  # population census object, tracks species total seen and last time
 import dailychores  # handles tasks that occur once per day or per hour
+import weather
 import argparse  # argument parser
 from datetime import datetime
 
@@ -44,10 +45,16 @@ def bird_detector(args):
     birdobj = objtracker.CentroidTracker()
     motioncnt = 0
     curr_day, curr_hr, last_tweet = datetime.now().day, datetime.now().hour, datetime(2021, 1, 1, 0, 0, 0)
+    cityweather = weather.City_Weather()  # init class and set var based on default of Madison WI
+
+    # wait here until the sun is up before initialize the camera
+    while datetime.now() < cityweather.sunrise:
+        sleep(1800)  # wait 30 minutes
+
     # initial video capture, screen size, and grab first image (no motion)
     camera, first_img = motion_detector.init(args)  # set gray motion mask
     bird_tweeter = tweeter.Tweeter_Class()  # init tweeter2 class twitter handler
-    chores = dailychores.DailyChores(bird_tweeter, birdpop)
+    chores = dailychores.DailyChores(bird_tweeter, birdpop, cityweather)
     # init detection and classifier object
     birds = label_image.DetectClassify(default_confidence=args.default_confidence,
                                        mismatch_penalty=args.mismatch_penalty,

@@ -61,6 +61,7 @@ def init(args):
     camera.framerate = args.framerate
     # to capture consistent images, wait and fix values
     time.sleep(2)  # Wait for the automatic gain control to settle
+    print(f'camera shutter speed is {camera.shutter_speed}')
     # camera.shutter_speed = camera.exposure_speed
     # camera.exposure_mode = 'off'
     # g = camera.awb_gains

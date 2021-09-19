@@ -31,14 +31,14 @@ from subprocess import call
 
 class DailyChores:
 
-    def __init__(self, tweeter_obj, birdpop):
+    def __init__(self, tweeter_obj, birdpop, city_weather):
         self.curr_day = datetime.now().day
         self.curr_hr = datetime.now().hour
         self.starttime = datetime.now()
         self.weather_reported = False
         self.pop_reported = False
         self.tweeter = tweeter_obj
-        self.cityweather = weather.City_Weather()  # init class and set var based on default of Madison WI
+        self.cityweather = city_weather
         self.birdpop = birdpop
 
     # end of process report
