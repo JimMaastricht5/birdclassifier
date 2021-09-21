@@ -38,6 +38,7 @@ import dailychores  # handles tasks that occur once per day or per hour
 import weather
 import argparse  # argument parser
 from datetime import datetime
+import time
 
 
 def bird_detector(args):
@@ -49,7 +50,7 @@ def bird_detector(args):
 
     # wait here until the sun is up before initialize the camera
     while datetime.now() < cityweather.sunrise:
-        sleep(1800)  # wait 30 minutes
+        time.sleep(1800)  # wait 30 minutes
 
     # initial video capture, screen size, and grab first image (no motion)
     camera, first_img = motion_detector.init(args)  # set gray motion mask
