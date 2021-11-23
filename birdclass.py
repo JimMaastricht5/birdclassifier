@@ -49,7 +49,7 @@ def bird_detector(args):
     cityweather = weather.City_Weather()  # init class and set var based on default of Madison WI
 
     # wait here until the sun is up before initialize the camera
-    while datetime.now() > cityweather.sunset and datetime.now() < cityweather.sunrise:
+    while datetime.now() > cityweather.sunrise and datetime.now() < cityweather.sunset:
         time.sleep(1800)  # wait 30 minutes and check again to see if the sun is up
 
     # initial video capture, screen size, and grab first image (no motion)
