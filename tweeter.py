@@ -103,16 +103,16 @@ class Tweeter_Class:
 # test code
 def main_test():
     tweeter_obj = Tweeter_Class()
-    direct_messages = tweeter_obj.get_direct_messages()
-    print(direct_messages)
-    print(direct_messages.shape)
-    tweeter_obj.destroy_direct_messages(direct_messages)
+    # direct_messages = tweeter_obj.get_direct_messages()
+    # print(direct_messages)
+    # print(direct_messages.shape)
+    # tweeter_obj.destroy_direct_messages(direct_messages)
 
     # test code to tweet a message
-    # message = 'Python status'
-    # tweeter_obj.post_status(message)
-    # print('tweeted: %s' % message)
-    #
+    message = 'Python status'
+    tweeter_obj.post_status(message)
+    print('tweeted: %s' % message)
+
     # test code to tweet a picture
     # message = 'Python image test'
     # twtimage = open('cardinal.jpg', 'rb')
