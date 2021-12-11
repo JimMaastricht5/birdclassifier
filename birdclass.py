@@ -48,9 +48,9 @@ def bird_detector(args):
     curr_day, curr_hr, last_tweet = datetime.now().day, datetime.now().hour, datetime(2021, 1, 1, 0, 0, 0)
     cityweather = weather.City_Weather()  # init class and set var based on default of Madison WI
 
-    print(f'It is now {datetime.now()}.  Sunrise at {cityweather.sunrise} and sunset at {cityweather.sunset}.')
+    print(f'It is now {datetime.now()}.  \nSunrise at {cityweather.sunrise} and sunset at {cityweather.sunset}.')
     # wait here until the sun is up before initialize the camera
-    while datetime.now() > cityweather.sunrise and datetime.now() < cityweather.sunset:
+    while cityweather.sunrise < datetime.now() < cityweather.sunset:
         time.sleep(1800)  # wait 30 minutes and check again to see if the sun is up
 
     # initial video capture, screen size, and grab first image (no motion)
@@ -68,22 +68,18 @@ def bird_detector(args):
     while True:  # look for motion, detect birds, and determine species; break at end of day
         chores.hourly_and_daily()  # perform chores that take place hourly or daily such as weather reporting
         motionb, img = motion_detector.detect(camera, first_img, args.minarea)
-        if chores.cityweather.is_daytime() is False:  # skip motion detection if it is not daylight
-            motionb = False
-            print('It is not daylight.  Skipping motion detection.')
-            time.sleep(60*15)  # sleep for 15 minutes
+        if motionb is True:  # motion but no birds
+            motioncnt += 1
+            print(f'\r motion {motioncnt}', end=' ')  # indicate motion on monitor
 
         if motionb and birds.detect(img):  # daytime with motion and birds
             motioncnt = 0  # reset motion count between detected birds
             print('')  # print new lines between birds detection for motion counter
             birds.classify()
             birdobj.update(birds.classified_rects, birds.classified_confidences, birds.classified_labels)
-        else:  # no birds detected in frame, update missing from frame count
+        else:  # no birds detected in frame or not daytime, update missing from frame count
             birdobj.update_null()
             birds.target_object_found = False  # may not have run motion detection if not daylight
-            if motionb is True:  # motion but no birds
-                motioncnt += 1
-                print(f'\r motion {motioncnt}', end=' ')  # indicate motion on monitor
 
         if birds.target_object_found is True:  # saw at least one bird
             common_names, tweet_label = label_text(birds.classified_labels, birds.classified_confidences)
