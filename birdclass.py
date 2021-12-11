@@ -48,6 +48,7 @@ def bird_detector(args):
     curr_day, curr_hr, last_tweet = datetime.now().day, datetime.now().hour, datetime(2021, 1, 1, 0, 0, 0)
     cityweather = weather.City_Weather()  # init class and set var based on default of Madison WI
 
+    print(f'It is now {datetime.now()}.  Sunrise at {cityweather.sunrise} and sunset at {cityweather.sunset}.')
     # wait here until the sun is up before initialize the camera
     while datetime.now() > cityweather.sunrise and datetime.now() < cityweather.sunset:
         time.sleep(1800)  # wait 30 minutes and check again to see if the sun is up
@@ -69,6 +70,8 @@ def bird_detector(args):
         motionb, img = motion_detector.detect(camera, first_img, args.minarea)
         if chores.cityweather.is_daytime() is False:  # skip motion detection if it is not daylight
             motionb = False
+            print('It is not daylight.  Skipping motion detection.')
+            time.sleep(60*15)  # sleep for 15 minutes
 
         if motionb and birds.detect(img):  # daytime with motion and birds
             motioncnt = 0  # reset motion count between detected birds
