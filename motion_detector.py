@@ -68,6 +68,7 @@ def init(args):
     # camera.awb_mode = 'off'
     # camera.awb_gains = g
     img = capture_image(camera)  # capture img of type PIL
+    img.save('testcap_motion.jpg')
     gray = image_proc.grayscale(img)  # convert image to gray scale for motion detection
     graymotion = image_proc.gaussianblur(gray)  # smooth out image for motion detection
     return camera, graymotion
