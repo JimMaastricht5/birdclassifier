@@ -31,6 +31,7 @@ from auth import (
     access_token_secret
 )
 
+
 class Tweeter_Class:
 
     def __init__(self):

@@ -51,6 +51,7 @@ def bird_detector(args):
     print(f'It is now {datetime.now()}.  \nSunrise at {cityweather.sunrise} and sunset at {cityweather.sunset}.')
     # wait here until the sun is up before initialize the camera
     while cityweather.sunrise < datetime.now() < cityweather.sunset:
+        print('taking a 30 minutes nap to wait for sun rise or the end of the day')
         time.sleep(1800)  # wait 30 minutes and check again to see if the sun is up
 
     # initial video capture, screen size, and grab first image (no motion)

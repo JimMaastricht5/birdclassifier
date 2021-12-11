@@ -23,7 +23,7 @@
 # motion detector with builtin bird detection and bird classification
 # built by JimMaastricht5@gmail.com
 # class takes a tweeter.py class and population.py class as input on init
-import weather
+# import weather
 from datetime import datetime
 from gpiozero import CPUTemperature
 from subprocess import call

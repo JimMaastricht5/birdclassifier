@@ -31,12 +31,13 @@ from auth import (
 import requests
 from datetime import datetime
 
+
 # set city name or default to Madison, WI
 # boolean true if the sky is clear
 # sunrise and sunset as local time
 # all other variables returned as string type
 class City_Weather:
-    def __init__(self, city='Madison,WI,USA', units='Imperial', iscloudy=60 ):
+    def __init__(self, city='Madison,WI,USA', units='Imperial', iscloudy=60):
         # set defaults
         self.city = city
         self.base_url = 'http://api.openweathermap.org/data/2.5/weather?q='
@@ -76,11 +77,9 @@ class City_Weather:
             print('weather error encountered')
         return
 
-
     # is it daylight, now must be between sunrise and sunset
     def is_daytime(self):
-        return (datetime.now() > self.sunrise or datetime.now() < self.sunset)
-
+        return datetime.now() > self.sunrise or datetime.now() < self.sunset
 
     # update weather conditions
     def update_conditions(self):
