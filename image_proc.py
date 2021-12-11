@@ -24,7 +24,7 @@
 # required Pillow, scikit-image library in project
 from PIL import ImageEnhance, Image, ImageOps, ImageStat, ImageFilter, ImageChops
 import numpy as np
-from skimage.exposure import is_low_contrast
+# from skimage.exposure import is_low_contrast
 
 
 # Pillow img to flip
