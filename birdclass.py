@@ -65,6 +65,7 @@ def bird_detector(args):
                                        contrast_chg=args.contrast_chg, sharpness_chg=args.sharpness_chg,
                                        overlap_perc_tolerance=args.overlap_perc_tolerance)
 
+    camera.start_preview()  # lets see what is going on....
     while True:  # look for motion, detect birds, and determine species; break at end of day
         chores.hourly_and_daily()  # perform chores that take place hourly or daily such as weather reporting
         motionb, img = motion_detector.detect(camera, first_img, args.minarea)
@@ -125,6 +126,7 @@ def bird_detector(args):
             break
 
     # camera.stop_preview()
+    camera.stop_preview()
     camera.close()
     chores.end_report()  # post a report on run time of the process
 
