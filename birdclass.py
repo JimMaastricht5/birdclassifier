@@ -66,7 +66,7 @@ def bird_detector(args):
                                        contrast_chg=args.contrast_chg, sharpness_chg=args.sharpness_chg,
                                        overlap_perc_tolerance=args.overlap_perc_tolerance)
 
-    camera.start_preview()  # lets see what is going on....
+    # camera.start_preview()  # lets see what is going on....
     while True:  # look for motion, detect birds, and determine species; break at end of day
         chores.hourly_and_daily()  # perform chores that take place hourly or daily such as weather reporting
         motionb, img = motion_detector.detect(camera, first_img, args.minarea)
@@ -99,8 +99,7 @@ def bird_detector(args):
                 if (datetime.now() - last_tweet).total_seconds() >= 60 * 5:
                     birdpop.visitors(birds.classified_labels, datetime.now())  # update census count and last tweeted
                     last_tweet = datetime.now()
-                    # decide what to tweet
-                    if args.enhanceimg:
+                    if args.enhanceimg:  # decide what to tweet
                         # place holder to show tweeted birds.equalizedimg
                         tweetedb = bird_tweeter.post_image(tweet_label, birds.equalizedimg)
                     else:
@@ -122,13 +121,13 @@ def bird_detector(args):
         #     print(birds.classified_labels, birds.classified_rects)
         # place holder show video w boxes and labels
 
-        # shut down the app if between 1:00 and 1:05 am.  Pi runs this in a loop and restarts it every 20 minutes
-        if datetime.now().hour == 1 and datetime.now().minute <= 5:
+        # shut down the app after sunset
+        if datetime.now().time() >= cityweather.sunset.time():
             break
 
     # camera.stop_preview()
-    camera.stop_preview()
     camera.close()
+    chores.hourly_and_daily(report_pop=True)
     chores.end_report()  # post a report on run time of the process
 
 
@@ -160,7 +159,7 @@ if __name__ == "__main__":
     ap.add_argument("-fc", "--flipcamera", type=bool, default=False, help="flip camera image")
     ap.add_argument("-sw", "--screenwidth", type=int, default=640, help="max screen width")
     ap.add_argument("-sh", "--screenheight", type=int, default=480, help="max screen height")
-    ap.add_argument("-fr", "--framerate", type=int, default=15, help="frame rate for camera")
+    ap.add_argument("-fr", "--framerate", type=int, default=30, help="frame rate for camera")
 
     # motion and image processing settings
     ap.add_argument("-b", "--brightness_chg", type=int, default=1.05, help="brightness boost")  # 1 no chg,< 1 -, > 1 +

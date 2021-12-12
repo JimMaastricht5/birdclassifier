@@ -59,16 +59,10 @@ def init(args):
         camera.resolution = (args.screenheight, args.screenwidth)
     camera.vflip = args.flipcamera
     camera.framerate = args.framerate
-    # to capture consistent images, wait and fix values
     time.sleep(2)  # Wait for the automatic gain control to settle
-    print(f'camera shutter speed is {camera.shutter_speed}')
-    # camera.shutter_speed = camera.exposure_speed
-    # camera.exposure_mode = 'off'
-    # g = camera.awb_gains
-    # camera.awb_mode = 'off'
-    # camera.awb_gains = g
+    print(f'shutter speed is {camera.exposure_speed}')
     img = capture_image(camera)  # capture img of type PIL
-    img.save('testcap_motion.jpg')
+    # img.save('testcap_motion.jpg')
     gray = image_proc.grayscale(img)  # convert image to gray scale for motion detection
     graymotion = image_proc.gaussianblur(gray)  # smooth out image for motion detection
     return camera, graymotion
@@ -91,3 +85,22 @@ def image_entropy(image):
     histlength = sum(histogram)
     probability = [float(h) / histlength for h in histogram]
     return -sum([p * math.log(p, 2) for p in probability if p != 0])
+
+
+def capture_stream(camera, stream_frames=10):
+    """
+    function returns a list of images
+
+    :param camera: picamera object
+    :param stream_frames: int value with number of frames to capture
+    :return images: images is a list containing a number of PIL jpg image
+    :return gif: animated gif of images in images list
+    """
+    images = []
+    stream = io.BytesIO()
+    for image_num in (0, stream_frames):
+        camera.capture(stream, 'jpeg')
+        stream.seek(0)
+        images.append(Image.open(stream))
+        # imageio.mimsave('../animation/gif/movie.gif', images)
+    return images

@@ -72,37 +72,52 @@ class DailyChores:
     # takes in a list of tuple objects
     # position 0 in tuple is bird name, 1 is count, 2 is last seen
     def top_pop_report(self):
-        post_txt = ''  # force to string
-        birdstr = ''  # used to force tuple to string
-        observed = self.birdpop.get_census_by_count()
-        post_txt = f'top 3 birds for day {str(self.curr_day)}'
-        index = 0
-        while index <= 2:  # top 3 skipping unknown species
-            if observed[index][0:2] != '':  # skip the unknown species category
-                birdstr = str(observed[index][0])  # grab top species name
-                start = birdstr.find('(') + 1  # find start of common name, move one character to drop (
-                end = birdstr.find(')')
-                if start >= 0 and end >= 0:
-                    cname = birdstr[start:end]
-                else:
-                    cname = birdstr
-                birdstr = str(f', #{str(index + 1)} {cname} {observed[index][1]} ')  # top bird count & species name
-                post_txt = post_txt + birdstr  # aggregate text for post
-            index += 1
-        self.tweeter.post_status(post_txt[0:150])  # grab full text up to 150 characters
+        try:
+            post_txt = ''  # force to string
+            birdstr = ''  # used to force tuple to string
+            observed = self.birdpop.get_census_by_count()
+            post_txt = f'top 3 birds for day {str(self.curr_day)}'
+            index = 0
+            for birdpop in observed:  # bird pop is a multidimensional array with 0th item species name
+                if birdpop[0:2] != '':  # skip the unknown species caregory
+                    birdstr = str(birdpop[0])
+                    start = birdstr.find('(') + 1  # find start of common name, move one character to drop (
+                    end = birdstr.find(')')
+                    if start >= 0 and end >= 0:
+                        cname = birdstr[start:end]
+                    else:
+                        cname = birdstr
+                    birdstr = str(f', #{str(index + 1)} {cname} {observed[index][1]} ')  # top bird count & species name
+                    post_txt = post_txt + birdstr  # aggregate text for post
+                index += 1
+            # old code block rewritten to avoid premature end of list
+            # while index <= 2:  # top 3 skipping unknown species
+            #     if observed[index][0:2] != '':  # skip the unknown species category
+            #         birdstr = str(observed[index][0])  # grab top species name
+            #         start = birdstr.find('(') + 1  # find start of common name, move one character to drop (
+            #         end = birdstr.find(')')
+            #         if start >= 0 and end >= 0:
+            #             cname = birdstr[start:end]
+            #         else:
+            #             cname = birdstr
+            #         birdstr = str(f', #{str(index + 1)} {cname} {observed[index][1]} ')  # top bird count & species name
+            #         post_txt = post_txt + birdstr  # aggregate text for post
+            #     index += 1
+            self.tweeter.post_status(post_txt[0:150])  # grab full text up to 150 characters
+        except:
+            pass  # just keep going....
         return
 
     # housekeeping for day and hour
     # takes a pointer to the population tracking object
-    def hourly_and_daily(self):
+    def hourly_and_daily(self, report_pop=False):
         # post the weather once per day at 6am
         if self.weather_reported is False and self.cityweather.is_daytime() and \
                 datetime.now().hour > 6 and datetime.now().minute >= 0:
             self.weather_report()
             self.weather_reported = True
 
-        if self.pop_reported is False and \
-                (self.cityweather.is_daytime is False or datetime.now().hour >= 22):
+        if report_pop:  # process is ending report populations observations
             self.pop_reported = True
             self.top_pop_report()
             self.birdpop.clear()  # clear count for new day
