@@ -30,8 +30,8 @@ import io
 import time
 import math
 from PIL import Image
-
 import image_proc
+import argparse
 
 try:
     import picamera
@@ -87,20 +87,40 @@ def image_entropy(image):
     return -sum([p * math.log(p, 2) for p in probability if p != 0])
 
 
-def capture_stream(camera, stream_frames=10):
+def capture_stream(camera, frame_rate=30, stream_frames=30):
     """
     function returns a list of images
 
     :param camera: picamera object
+    :param frame_rate: int value with number of images per second from camera setting
     :param stream_frames: int value with number of frames to capture
-    :return images: images is a list containing a number of PIL jpg image
+    :return frames: images is a list containing a number of PIL jpg image
     :return gif: animated gif of images in images list
     """
-    images = []
+    frames = []
     stream = io.BytesIO()
     for image_num in (0, stream_frames):
         camera.capture(stream, 'jpeg')
         stream.seek(0)
-        images.append(Image.open(stream))
-        # imageio.mimsave('../animation/gif/movie.gif', images)
-    return images
+        frames.append(Image.open(stream))
+        frame_one = frames[0]
+        ml_sec = 1/1000000 * stream_frames * frame_rate
+        # duration in ml second for 1/30 of a second frame rate with 30 shots; should be 33,333?
+        frame_one.save("birds.gif", format="GIF", append_images=frames,
+                       save_all=True, duration=ml_sec, loop=0)  # duration in ml sec, loop zero loops the image forever
+        gif = open('birds.gif', 'rb')  # reload gih
+    return frames, gif
+
+
+if __name__== '__main__':
+    # construct the argument parser and parse the arguments
+    ap = argparse.ArgumentParser()
+    # camera settings
+    ap.add_argument("-fc", "--flipcamera", type=bool, default=False, help="flip camera image")
+    ap.add_argument("-sw", "--screenwidth", type=int, default=640, help="max screen width")
+    ap.add_argument("-sh", "--screenheight", type=int, default=480, help="max screen height")
+    ap.add_argument("-fr", "--framerate", type=int, default=30, help="frame rate for camera")
+    arguments = ap.parse_args()
+
+    camera, graymotion = init(arguments)
+    frames, gif = capture_stream(camera)
