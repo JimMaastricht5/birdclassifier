@@ -51,7 +51,7 @@ def bird_detector(args):
     print(f'It is now {datetime.now()}.  \nSunrise at {cityweather.sunrise} and sunset at {cityweather.sunset}.')
     # wait here until the sun is up before initialize the camera
     while cityweather.sunrise.time() < datetime.now().time() is False:
-        waittime = cityweather.sunrise.time() - datetime.now.time()
+        waittime = cityweather.sunrise.time() - datetime.now().time()
         print(f'taking a {waittime.total_seconds} second to wait for sun rise')
         time.sleep(waittime.total_seconds)  # wait until the sun comes up
 
