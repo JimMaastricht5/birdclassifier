@@ -47,7 +47,6 @@ def capture_image(camera):
     camera.capture(stream, 'jpeg')
     stream.seek(0)
     img = Image.open(stream)
-    # img.save('testcap_motion.jpg')
     return img
 
 
@@ -62,6 +61,7 @@ def init(args):
     time.sleep(2)  # Wait for the automatic gain control to settle
     print(f'shutter speed is {camera.exposure_speed}')
     img = capture_image(camera)  # capture img of type PIL
+    print('camera initialized and gray image created... ')
     # img.save('testcap_motion.jpg')
     gray = image_proc.grayscale(img)  # convert image to gray scale for motion detection
     graymotion = image_proc.gaussianblur(gray)  # smooth out image for motion detection
