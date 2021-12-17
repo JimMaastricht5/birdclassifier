@@ -50,10 +50,10 @@ def bird_detector(args):
 
     print(f'It is now {datetime.now()}.  \nSunrise at {cityweather.sunrise} and sunset at {cityweather.sunset}.')
     # wait here until the sun is up before initialize the camera
-    while cityweather.sunrise.time() < datetime.now().time() is False:
-        waittime = cityweather.sunrise.time() - datetime.now().time()
-        print(f'taking a {waittime.total_seconds} second to wait for sun rise')
-        time.sleep(waittime.total_seconds)  # wait until the sun comes up
+    if datetime.now().time() < cityweather.sunrise.time():
+        waittime = (cityweather.sunrise - datetime.now()).total_seconds()
+        print(f'taking a {waittime} second to wait for sun rise')
+        time.sleep(waittime)  # wait until the sun comes up
 
     # initial video capture, screen size, and grab first image (no motion)
     camera, first_img = motion_detector.init(args)  # set gray motion mask
