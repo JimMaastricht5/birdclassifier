@@ -49,7 +49,7 @@ def bird_detector(args):
     cityweather = weather.City_Weather()  # init class and set var based on default of Madison WI
 
     print(f'It is now {datetime.now()}.  \nSunrise at {cityweather.sunrise} and sunset at {cityweather.sunset}.')
-    # wait here until the sun is up before initialize the camera
+    # wait here until the sun is up before initialize the camera, after sunset will fall thru while loop
     if datetime.now().time() < cityweather.sunrise.time():
         waittime = (cityweather.sunrise - datetime.now()).total_seconds()
         print(f'taking a {waittime} second to wait for sun rise')
@@ -70,7 +70,8 @@ def bird_detector(args):
 
     # camera.start_preview()  # lets see what is going on....
     print('starting while loop until sun set..... ')
-    while True:  # look for motion, detect birds, and determine species; break at end of day
+    # loop while the sun is up, look for motion, detect birds, determine species
+    while cityweather.sunrise.time() < datetime.now().time() < cityweather.sunset.time():
         chores.hourly_and_daily()  # perform chores that take place hourly or daily such as weather reporting
         motionb, img = motion_detector.detect(camera, first_img, args.minarea)
         if motionb is True:  # motion but no birds
@@ -123,10 +124,6 @@ def bird_detector(args):
         #     print('*** bird detect and classify results')
         #     print(birds.classified_labels, birds.classified_rects)
         # place holder show video w boxes and labels
-
-        # shut down the app after sunset
-        if datetime.now().time() >= cityweather.sunset.time():
-            break
 
     # camera.stop_preview()
     camera.close()
