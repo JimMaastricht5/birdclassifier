@@ -30,13 +30,15 @@ from auth import (
 )
 import requests
 from datetime import datetime
+from datetime import timedelta
+import time
 
 
 # set city name or default to Madison, WI
 # boolean true if the sky is clear
 # sunrise and sunset as local time
 # all other variables returned as string type
-class City_Weather:
+class CityWeather:
     def __init__(self, city='Madison,WI,USA', units='Imperial', iscloudy=60):
         # set defaults
         self.city = city
@@ -51,6 +53,13 @@ class City_Weather:
         self.isclear = True
         self.weather = ''
         self.temp = ''
+        self.visibility = ''
+        self.windspeed = ''
+        self.skycondition = 0
+        self.weatherdescription = ''
+        self.pressure = ''
+        self.humidity = ''
+        # call for weather and fill variables
         self.local_weather()
 
     # grab sunrise and sundown epoch data, parse epoch and convert to date time
@@ -86,9 +95,26 @@ class City_Weather:
         self.local_weather()
         return
 
+    # wait here until after midnight and then wait for sunrise
+    def wait_until_midnight(self):
+        if datetime.now().time() > self.sunset.time():
+            waittime = (datetime.combine(datetime.now().date() + timedelta(days=1),
+                                         datetime.strptime("0000", "%H%M").time()) - datetime.now()).total_seconds()
+            print(f'taking a {waittime} second +60 second nap until after midnight')
+            time.sleep(waittime + 60)  # wait until after midnight with a small pad just to be sure
+        return
+
+    # wait here until the sun is up before initialize the camera
+    def wait_until_sunrise(self):
+        if datetime.now().time() < self.sunrise.time():
+            waittime = (self.sunrise - datetime.now()).total_seconds()
+            print(f'taking a {waittime} second nap to wait for sun rise')
+            time.sleep(waittime)  # wait until the sun comes up
+        return
+
 
 def main():
-    spweather = City_Weather()
+    spweather = CityWeather()
     spweather.update_conditions()
     print(spweather.isclear)
     print(spweather.sunrise.strftime('%H:%M:%S'))
@@ -100,6 +126,8 @@ def main():
     print(spweather.humidity)
     print(spweather.visibility)
     print(spweather.is_daytime())
+    spweather.wait_until_midnight()
+    spweather.wait_until_sunrise()
 
 
 # test function

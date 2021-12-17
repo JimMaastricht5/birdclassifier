@@ -38,8 +38,6 @@ import dailychores  # handles tasks that occur once per day or per hour
 import weather
 import argparse  # argument parser
 from datetime import datetime
-from datetime import timedelta
-import time
 
 
 def bird_detector(args):
@@ -47,21 +45,11 @@ def bird_detector(args):
     birdobj = objtracker.CentroidTracker()
     motioncnt = 0
     curr_day, curr_hr, last_tweet = datetime.now().day, datetime.now().hour, datetime(2021, 1, 1, 0, 0, 0)
-    cityweather = weather.City_Weather()  # init class and set var based on default of Madison WI
 
+    cityweather = weather.CityWeather()  # init class and set var based on default of Madison WI
     print(f'It is now {datetime.now()}.  \nSunrise at {cityweather.sunrise} and sunset at {cityweather.sunset}.')
-    # wait here until after midnight and then wait for sunrise
-    if datetime.now().time() > cityweather.sunset.time():
-        waittime = (datetime.combine(datetime.now().date() + timedelta(days=1),
-                                     datetime.strptime("0000", "%H%M").time()) - datetime.now()).total_seconds()
-        print(f'taking a {waittime} second +60 second nap until after midnight')
-        time.sleep(waittime + 60)  # wait until after midnight with a small pad just to be sure
-
-    # wait here until the sun is up before initialize the camera
-    if datetime.now().time() < cityweather.sunrise.time():
-        waittime = (cityweather.sunrise - datetime.now()).total_seconds()
-        print(f'taking a {waittime} second nap to wait for sun rise')
-        time.sleep(waittime)  # wait until the sun comes up
+    cityweather.wait_until_midnight()  # if after sunset, wait here until after midnight
+    cityweather.wait_until_sunrise()  # if before sun rise, wait here
 
     # initial video capture, screen size, and grab first image (no motion)
     camera, first_img = motion_detector.init(args)  # set gray motion mask
