@@ -46,6 +46,9 @@ def bird_detector(args):
     motioncnt = 0
     curr_day, curr_hr, last_tweet = datetime.now().day, datetime.now().hour, datetime(2021, 1, 1, 0, 0, 0)
 
+    # while loop below processes from sunrise to sunset.  The python program runs in a bash loop
+    # that restarts itself after downloading a new version of this software
+    # we want to wait to enter that main while loop until sunrise
     cityweather = weather.CityWeather()  # init class and set var based on default of Madison WI
     print(f'It is now {datetime.now()}.  \nSunrise at {cityweather.sunrise} and sunset at {cityweather.sunset}.')
     cityweather.wait_until_midnight()  # if after sunset, wait here until after midnight
