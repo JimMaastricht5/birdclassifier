@@ -57,7 +57,7 @@ def init(args):
     if args.screenwidth != 0:  # use specified height and width or default values if not passed
         camera.resolution = (args.screenheight, args.screenwidth)
     camera.vflip = args.flipcamera
-    # camera.framerate = args.framerate
+    camera.framerate = args.framerate
     time.sleep(2)  # Wait for the automatic gain control to settle
     print(f'shutter speed is {camera.exposure_speed}')
     img = capture_image(camera)  # capture img of type PIL
