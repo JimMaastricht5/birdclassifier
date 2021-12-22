@@ -76,7 +76,7 @@ class DailyChores:
             post_txt = ''  # force to string
             birdstr = ''  # used to force tuple to string
             observed = self.birdpop.get_census_by_count()
-            post_txt = f'top 3 birds for day {str(self.curr_day)}'
+            post_txt = f'top birds for day {str(self.curr_day)}'
             index = 0
             for birdpop in observed:  # bird pop is a multidimensional array with 0th item species name
                 if birdpop[0:2] != '':  # skip the unknown species caregory

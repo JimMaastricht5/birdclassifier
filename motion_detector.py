@@ -41,78 +41,76 @@ except:
     pass
 
 
-# create in-memory stream, close stream when operation is complete
-def capture_image(camera):
-    stream = io.BytesIO()
-    camera.capture(stream, 'jpeg')
-    stream.seek(0)
-    img = Image.open(stream)
-    return img
+class MotionDetector:
+    def __init__(self, args, save_test_img=False):
+        self.min_area = args.minarea
+        self.camera = picamera.PiCamera()
+        if args.screenwidth != 0:  # use specified height and width or default values if not passed
+            self.camera.resolution = (args.screenheight, args.screenwidth)
+        self.camera.vflip = args.flipcamera
+        self.camera.framerate = args.framerate
+        time.sleep(2)  # Wait for the automatic gain control to settle
+        self.shutterspeed = self.camera.exposure_speed
+
+        self.stream = io.BytesIO()
+        self.img = self.capture_image()  # capture img of type PIL
+        self.first_img = self.img.copy()
+        self.gray = image_proc.grayscale(self.img)  # convert image to gray scale for motion detection
+        self.graymotion = image_proc.gaussianblur(self.gray)  # smooth out image for motion detection
+        if save_test_img:
+            self.img.save('testcap_motion.jpg')
+
+    # create in-memory stream, close stream when operation is complete
+    def capture_image(self):
+        self.camera.capture(self.stream, 'jpeg')
+        self.stream.seek(0)
+        img = Image.open(self.stream)
+        return img
+
+    # once first image is captured call motion detector in a loop to find each subsequent image
+    # motion detection, compute the absolute difference between the current frame and first frame
+    def detect(self):
+        img = self.capture_image()
+        grayimg = image_proc.grayscale(img)  # convert image to gray scale
+        grayblur = image_proc.gaussianblur(grayimg)  # smooth out image for motion detection
+        imgdelta = image_proc.compare_images(self.first_img, grayblur)
+        return (self.image_entropy(imgdelta) >= self.min_area), img
+
+    def stop(self):
+        self.camera.close()
+        return
+
+    # determine change between static image and new frame
+    def image_entropy(self, image_delta):
+        histogram = image_delta.histogram()
+        histlength = sum(histogram)
+        probability = [float(h) / histlength for h in histogram]
+        return -sum([p * math.log(p, 2) for p in probability if p != 0])
+
+    def capture_stream(self, frame_rate=30, stream_frames=200, filename='birds.gif'):
+        """
+        function returns a list of images
+
+        :param frame_rate: int value with number of images per second from camera setting
+        :param stream_frames: int value with number of frames to capture
+        :param filename: name of file to save gif under
+        :return frames: images is a list containing a number of PIL jpg image
+        :return gif: animated gif of images in images list
+        """
+        frames = []
+        for image_num in (0, stream_frames):
+            self.camera.capture(self.stream, 'jpeg')
+            self.stream.seek(0)
+            frames.append(Image.open(self.stream))
+            frame_one = frames[0]
+            ml_sec = 1000000 * stream_frames / frame_rate  # frames / rate, 200 /30 = 5 sec * 1,000,000 = ml sec
+            frame_one.save(filename, format="GIF", append_images=frames,
+                           save_all=True, duration=ml_sec, loop=0)  # loop=0 replays gif over and over
+            gif = open(filename, 'rb')  # reload gif
+        return frames, gif
 
 
-# Create the camera object
-# capture first image and gray scale/blur for baseline motion detection
-def init(args):
-    camera = picamera.PiCamera()
-    if args.screenwidth != 0:  # use specified height and width or default values if not passed
-        camera.resolution = (args.screenheight, args.screenwidth)
-    camera.vflip = args.flipcamera
-    camera.framerate = args.framerate
-    time.sleep(2)  # Wait for the automatic gain control to settle
-    print(f'shutter speed is {camera.exposure_speed}')
-    img = capture_image(camera)  # capture img of type PIL
-    print('camera initialized and gray image created... ')
-    # img.save('testcap_motion.jpg')
-    gray = image_proc.grayscale(img)  # convert image to gray scale for motion detection
-    graymotion = image_proc.gaussianblur(gray)  # smooth out image for motion detection
-    return camera, graymotion
-
-
-# once first image is captured call motion detector in a loop to find each subsequent image
-# motion detection, compute the absolute difference between the current frame and first frame
-def detect(camera, first_img, min_area):
-    img = capture_image(camera)
-    grayimg = image_proc.grayscale(img)  # convert image to gray scale
-    grayblur = image_proc.gaussianblur(grayimg)  # smooth out image for motion detection
-    imgdelta = image_proc.compare_images(first_img, grayblur)
-    # print(f'image entropy is{image_entropy(imgdelta)}')
-    return (image_entropy(imgdelta) >= min_area), img
-
-
-# determine change between static image and new frame
-def image_entropy(image):
-    histogram = image.histogram()
-    histlength = sum(histogram)
-    probability = [float(h) / histlength for h in histogram]
-    return -sum([p * math.log(p, 2) for p in probability if p != 0])
-
-
-def capture_stream(camera, frame_rate=30, stream_frames=30):
-    """
-    function returns a list of images
-
-    :param camera: picamera object
-    :param frame_rate: int value with number of images per second from camera setting
-    :param stream_frames: int value with number of frames to capture
-    :return frames: images is a list containing a number of PIL jpg image
-    :return gif: animated gif of images in images list
-    """
-    frames = []
-    stream = io.BytesIO()
-    for image_num in (0, stream_frames):
-        camera.capture(stream, 'jpeg')
-        stream.seek(0)
-        frames.append(Image.open(stream))
-        frame_one = frames[0]
-        ml_sec = 1/1000000 * stream_frames * frame_rate
-        # duration in ml second for 1/30 of a second frame rate with 30 shots; should be 33,333?
-        frame_one.save("birds.gif", format="GIF", append_images=frames,
-                       save_all=True, duration=ml_sec, loop=0)  # duration in ml sec, loop zero loops the image forever
-        gif = open('birds.gif', 'rb')  # reload gih
-    return frames, gif
-
-
-if __name__== '__main__':
+if __name__ == '__main__':
     # construct the argument parser and parse the arguments
     ap = argparse.ArgumentParser()
     # camera settings
@@ -122,5 +120,22 @@ if __name__== '__main__':
     ap.add_argument("-fr", "--framerate", type=int, default=30, help="frame rate for camera")
     arguments = ap.parse_args()
 
-    camera, graymotion = init(arguments)
-    frames, gif = capture_stream(camera)
+    motion_detector = MotionDetector(args=arguments)
+    frames_test, gif_test = motion_detector.capture_stream()
+
+    # Create the camera object
+    # capture first image and gray scale/blur for baseline motion detection
+    # def init(args):
+    #     camera = picamera.PiCamera()
+    #     if args.screenwidth != 0:  # use specified height and width or default values if not passed
+    #         camera.resolution = (args.screenheight, args.screenwidth)
+    #     camera.vflip = args.flipcamera
+    #     camera.framerate = args.framerate
+    #     time.sleep(2)  # Wait for the automatic gain control to settle
+    #     print(f'shutter speed is {camera.exposure_speed}')
+    #     img = capture_image(camera)  # capture img of type PIL
+    #     print('camera initialized and gray image created... ')
+    #     # img.save('testcap_motion.jpg')
+    #     gray = image_proc.grayscale(img)  # convert image to gray scale for motion detection
+    #     graymotion = image_proc.gaussianblur(gray)  # smooth out image for motion detection
+    #     return camera, graymotion

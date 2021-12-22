@@ -55,7 +55,7 @@ def bird_detector(args):
     cityweather.wait_until_sunrise()  # if before sun rise, wait here
 
     # initial video capture, screen size, and grab first image (no motion)
-    camera, first_img = motion_detector.init(args)  # set gray motion mask
+    motion_detect = motion_detector.MotionDetector(args=args)  # init class
     print('done with camera init... setting up classes.')
     bird_tweeter = tweeter.Tweeter_Class()  # init tweeter2 class twitter handler
     chores = dailychores.DailyChores(bird_tweeter, birdpop, cityweather)
@@ -67,12 +67,11 @@ def bird_detector(args):
                                        contrast_chg=args.contrast_chg, sharpness_chg=args.sharpness_chg,
                                        overlap_perc_tolerance=args.overlap_perc_tolerance)
 
-    # camera.start_preview()  # lets see what is going on....
     print('starting while loop until sun set..... ')
     # loop while the sun is up, look for motion, detect birds, determine species
     while cityweather.sunrise.time() < datetime.now().time() < cityweather.sunset.time():
         chores.hourly_and_daily()  # perform chores that take place hourly or daily such as weather reporting
-        motionb, img = motion_detector.detect(camera, first_img, args.minarea)
+        motionb, img = motion_detect.detect()
         if motionb is True:  # motion but no birds
             motioncnt += 1
             print(f'\r motion {motioncnt}', end=' ')  # indicate motion on monitor
@@ -124,8 +123,7 @@ def bird_detector(args):
         #     print(birds.classified_labels, birds.classified_rects)
         # place holder show video w boxes and labels
 
-    # camera.stop_preview()
-    camera.close()
+    motion_detect.stop()
     chores.hourly_and_daily(report_pop=True)
     chores.end_report()  # post a report on run time of the process
 
