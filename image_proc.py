@@ -156,14 +156,16 @@ def overlap_area(rect1, rect2):
 # compare two PIL images for differences
 # returns an array of the differences
 def compare_images(img1, img2):
-    # return ImageChops.difference(img2, img1)
-    im1 = np.array(img1).astype(np.int)  # cast to ints
-    im2 = np.array(img2).astype(np.int)
-    # if you do this with uint8 arrays the negative values will wrap i.e. (0, 2, 2) - (1, 4, 2) => (255, 254, 0)
-    difference = im1 - im2
-    # diff = np.where(np.abs(difference) > 0)[0]  # np.where will return a tuple of 1D arrays
+    if img1.shape != img2.shape:
+        raise Exception(f'images are not the same shape img1:{img1.shape}, img2:{img2.shape}')
+    return ImageChops.difference(img2, img1)
+    # im1 = np.array(img1).astype(np.int)  # cast to ints
+    # im2 = np.array(img2).astype(np.int)
+    # # if you do this with uint8 arrays the negative values will wrap i.e. (0, 2, 2) - (1, 4, 2) => (255, 254, 0)
+    # difference = im1 - im2
+    # # diff = np.where(np.abs(difference) > 0)[0]  # np.where will return a tuple of 1D arrays
     # diff_count = len(diff)  # react if more than N pixel_colours have changed enough
-    return difference
+    # return difference
 
 
 # takes list of frames and saves as a gif
