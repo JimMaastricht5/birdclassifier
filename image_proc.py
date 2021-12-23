@@ -156,8 +156,8 @@ def overlap_area(rect1, rect2):
 # compare two PIL images for differences
 # returns an array of the differences
 def compare_images(img1, img2):
-    if img1.shape != img2.shape:
-        raise Exception(f'images are not the same shape img1:{img1.shape}, img2:{img2.shape}')
+    # if img1.shape != img2.shape:
+    #     raise Exception(f'images are not the same shape img1:{img1.shape}, img2:{img2.shape}')
     return ImageChops.difference(img2, img1)
     # im1 = np.array(img1).astype(np.int)  # cast to ints
     # im2 = np.array(img2).astype(np.int)
