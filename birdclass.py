@@ -144,7 +144,7 @@ if __name__ == "__main__":
     ap.add_argument("-sw", "--screenwidth", type=int, default=640, help="max screen width")
     ap.add_argument("-sh", "--screenheight", type=int, default=480, help="max screen height")
     ap.add_argument("-fr", "--framerate", type=int, default=30, help="frame rate for camera")
-    ap.add_argument("-v", "--verbose", type=bool, default=True, help="Tweet messages")
+    ap.add_argument("-v", "--verbose", type=bool, default=False, help="To tweet or not to tweet")
 
     # motion and image processing settings
     ap.add_argument("-b", "--brightness_chg", type=int, default=1.05, help="brightness boost")  # 1 no chg,< 1 -, > 1 +
