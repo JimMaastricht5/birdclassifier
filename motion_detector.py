@@ -43,8 +43,8 @@ except:
 
 class MotionDetector:
     def __init__(self, args, save_test_img=False):
-        self.min_area = args.minarea
         self.camera = picamera.PiCamera()
+        self.min_area = args.minarea
         if args.screenwidth != 0:  # use specified height and width or default values if not passed
             self.camera.resolution = (args.screenheight, args.screenwidth)
         self.camera.vflip = args.flipcamera
@@ -57,6 +57,7 @@ class MotionDetector:
         self.first_img = self.img.copy()
         self.gray = image_proc.grayscale(self.img)  # convert image to gray scale for motion detection
         self.graymotion = image_proc.gaussianblur(self.gray)  # smooth out image for motion detection
+        self.motion = False
         if save_test_img:
             self.img.save('testcap_motion.jpg')
 
@@ -69,12 +70,15 @@ class MotionDetector:
 
     # once first image is captured call motion detector in a loop to find each subsequent image
     # motion detection, compute the absolute difference between the current frame and first frame
+    # if the difference is more than the tolerance we have something new in the frame aka motion
     def detect(self):
         img = self.capture_image()
         grayimg = image_proc.grayscale(img)  # convert image to gray scale
         grayblur = image_proc.gaussianblur(grayimg)  # smooth out image for motion detection
         imgdelta = image_proc.compare_images(self.first_img, grayblur)
-        return (self.image_entropy(imgdelta) >= self.min_area), img
+        self.img = img
+        self.motion = self.image_entropy(imgdelta) >= self.min_area
+        return self.motion
 
     def stop(self):
         self.camera.close()
@@ -87,27 +91,19 @@ class MotionDetector:
         probability = [float(h) / histlength for h in histogram]
         return -sum([p * math.log(p, 2) for p in probability if p != 0])
 
-    def capture_stream(self, frame_rate=30, stream_frames=200, filename='birds.gif'):
+    def capture_stream(self, stream_frames=200):
         """
         function returns a list of images
 
-        :param frame_rate: int value with number of images per second from camera setting
         :param stream_frames: int value with number of frames to capture
-        :param filename: name of file to save gif under
         :return frames: images is a list containing a number of PIL jpg image
-        :return gif: animated gif of images in images list
         """
         frames = []
         for image_num in (0, stream_frames):
             self.camera.capture(self.stream, 'jpeg')
             self.stream.seek(0)
             frames.append(Image.open(self.stream))
-            frame_one = frames[0]
-            ml_sec = 1000000 * stream_frames / frame_rate  # frames / rate, 200 /30 = 5 sec * 1,000,000 = ml sec
-            frame_one.save(filename, format="GIF", append_images=frames,
-                           save_all=True, duration=ml_sec, loop=0)  # loop=0 replays gif over and over
-            gif = open(filename, 'rb')  # reload gif
-        return frames, gif
+        return frames
 
 
 if __name__ == '__main__':
@@ -120,9 +116,10 @@ if __name__ == '__main__':
     ap.add_argument("-fr", "--framerate", type=int, default=30, help="frame rate for camera")
     arguments = ap.parse_args()
 
-    motion_detector = MotionDetector(args=arguments)
-    frames_test, gif_test = motion_detector.capture_stream()
+    motion_detector = MotionDetector(args=arguments, save_test_img=True)
+    frames_test = motion_detector.capture_stream()
 
+# junk code....
     # Create the camera object
     # capture first image and gray scale/blur for baseline motion detection
     # def init(args):

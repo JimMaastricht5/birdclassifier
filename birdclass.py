@@ -31,7 +31,6 @@
 import image_proc
 import label_image  # code to init tensor flow model and classify bird type, bird object
 import motion_detector  # motion detector helper functions
-import objtracker  # keeps track of detected objects between frames
 import tweeter  # twitter helper functions
 import population  # population census object, tracks species total seen and last time
 import dailychores  # handles tasks that occur once per day or per hour
@@ -42,7 +41,6 @@ from datetime import datetime
 
 def bird_detector(args):
     birdpop = population.Census()  # initialize species population census object
-    birdobj = objtracker.CentroidTracker()
     motioncnt = 0
     curr_day, curr_hr, last_tweet = datetime.now().day, datetime.now().hour, datetime(2021, 1, 1, 0, 0, 0)
 
@@ -71,57 +69,43 @@ def bird_detector(args):
     # loop while the sun is up, look for motion, detect birds, determine species
     while cityweather.sunrise.time() < datetime.now().time() < cityweather.sunset.time():
         chores.hourly_and_daily()  # perform chores that take place hourly or daily such as weather reporting
-        motionb, img = motion_detect.detect()
-        if motionb is True:  # motion but no birds
+        if motion_detect.detect() is True:
             motioncnt += 1
             print(f'\r motion {motioncnt}', end=' ')  # indicate motion on monitor
 
-        if motionb and birds.detect(img):  # daytime with motion and birds
+        if motion_detect.motion and birds.detect(motion_detect.img):  # daytime with motion and birds
             motioncnt = 0  # reset motion count between detected birds
-            print('')  # print new lines between birds detection for motion counter
-            birds.classify()
-            birdobj.update(birds.classified_rects, birds.classified_confidences, birds.classified_labels)
-        else:  # no birds detected in frame or not daytime, update missing from frame count
-            birdobj.update_null()
-            birds.target_object_found = False  # may not have run motion detection if not daylight
+            labeled_frames = []
+            tweet_labels = []
+            frames = motion_detect.capture_stream()  # capture a list of images
+            for frame in frames:
+                birds.classify(img=frame)
+                common_names, tweet_label = label_text(birds.classified_labels, birds.classified_confidences)
+                tweet_labels.append(tweet_label)
+                frame = image_proc.enhance_brightness(img=frame, factor=args.brightness)
+                frame = birds.add_boxes_and_labels(img=frame, label=common_names, rects=birds.classified_rects)
+                labeled_frames.append(frame)
+            gif = image_proc.save_gif(frames=labeled_frames)  # build the labeled gif
+            if (datetime.now() - last_tweet).total_seconds() >= 60 * 5:  # tweet if past wait time
+                birdpop.visitors(birds.classified_labels, datetime.now())  # update census count and last tweeted
+                last_tweet = datetime.now()
+                if bird_tweeter.post_image(tweet_labels[0], gif) is False:
+                    print(f"*** exceeded tweet limit")
 
-        if birds.target_object_found is True:  # saw at least one bird
-            common_names, tweet_label = label_text(birds.classified_labels, birds.classified_confidences)
-            if args.enhanceimg:
-                birds.equalizedimg = birds.add_boxes_and_labels(birds.equalizedimg, common_names,
-                                                                birds.classified_rects)
-                # place holder to show predicted birds.equalizedimg
-            else:
-                birds.img = image_proc.enhance_brightness(birds.img, factor=args.brightness)
-                birds.img = birds.add_boxes_and_labels(birds.img, common_names, birds.classified_rects)
-                # place holder to show predicted birds.img
-
-            # Show image and tweet, confidence
-            if all(conf >= birds.classify_min_confidence for conf in birds.classified_confidences):  # tweet threshold
-                if (datetime.now() - last_tweet).total_seconds() >= 60 * 5:
-                    birdpop.visitors(birds.classified_labels, datetime.now())  # update census count and last tweeted
-                    last_tweet = datetime.now()
-                    if args.enhanceimg:  # decide what to tweet
-                        # place holder to show tweeted birds.equalizedimg
-                        tweetedb = bird_tweeter.post_image(tweet_label, birds.equalizedimg)
-                    else:
-                        # place holder to show tweeted birds.img
-                        tweetedb = bird_tweeter.post_image(tweet_label, birds.img)
-                    if tweetedb is False:
-                        print(f"*** exceeded tweet limit")
-                else:
-                    # print(f" {tweet_label} not tweeted, last tweet {last_tweet.strftime('%I:%M %p')}. wait 5 minutes")
-                    pass
-
-        # motion processed, all birds in image processed if detected, add all known objects to image
-        # try:
-        #    birds.img = birds.add_boxes_and_labels(birds.img, birdobj.objnames, birdobj.rects)
-        # except:
-        #    print('*** error in boxes and labels using image tracker')
-        # if birds.target_object_found:
-        #     print('*** bird detect and classify results')
-        #     print(birds.classified_labels, birds.classified_rects)
-        # place holder show video w boxes and labels
+        # else:  # no birds detected in frame, update missing from frame count
+        #     birds.target_object_found = False  # set by detector, else statement invoked with no motion, set false
+        # if birds.target_object_found is True:  # motion and at least one bird. show gif and tweet confidence
+        #     if all(conf >= birds.classify_min_confidence for conf in birds.classified_confidences):  # tweet threshold
+        #     if (datetime.now() - last_tweet).total_seconds() >= 60 * 5:
+        #         birdpop.visitors(birds.classified_labels, datetime.now())  # update census count and last tweeted
+        #         last_tweet = datetime.now()
+        #         # tweetedb = bird_tweeter.post_image(tweet_label, birds.img)
+        #         tweetedb = bird_tweeter.post_image(tweet_label, gif)
+        #         if tweetedb is False:
+        #             print(f"*** exceeded tweet limit")
+        #     else:
+        #         # print(f" {tweet_label} not tweeted, last tweet {last_tweet.strftime('%I:%M %p')}. wait 5 minutes")
+        #         pass
 
     motion_detect.stop()
     chores.hourly_and_daily(report_pop=True)
@@ -172,3 +156,18 @@ if __name__ == "__main__":
 
     arguments = ap.parse_args()
     bird_detector(arguments)
+
+# junk code
+# import objtracker  # keeps track of detected objects between frames
+# birdobj = objtracker.CentroidTracker()
+# birdobj.update(birds.classified_rects, birds.classified_confidences, birds.classified_labels)
+# birdobj.update_null()
+# motion processed, all birds in image processed if detected, add all known objects to image
+# try:
+#    birds.img = birds.add_boxes_and_labels(birds.img, birdobj.objnames, birdobj.rects)
+# except:
+#    print('*** error in boxes and labels using image tracker')
+# if birds.target_object_found:
+#     print('*** bird detect and classify results')
+#     print(birds.classified_labels, birds.classified_rects)
+# place holder show video w boxes and labels

@@ -52,9 +52,9 @@ def contour(img):
 # func provides both formats for conversion
 # default conversion is to numpy array
 def convert(img, convert_to='np'):
-    if isinstance(img, (Image.Image)) and convert_to == 'np':
+    if isinstance(img, Image.Image) and convert_to == 'np':
         img = np.array(img)
-    elif isinstance(img, (np.ndarray)) and convert_to == 'PIL':
+    elif isinstance(img, np.ndarray) and convert_to == 'PIL':
         img = Image.fromarray(img)
     # else requires no conversion
     return img
@@ -117,6 +117,7 @@ def is_color_low_contrast(colorimg, threshold=.35):
     else:
         return True
 
+
 # adjust contrast of gray image to improve process
 # apply histogram equalization to boost contrast
 def equalize_gray(grayimg):
@@ -156,7 +157,7 @@ def overlap_area(rect1, rect2):
         areaI = x_dist * y_dist
     else:
         areaI = 0
-    return ( (area1 + area2 - areaI) / (area1 + area2))
+    return ((area1 + area2 - areaI) / (area1 + area2))
 
 
 # compare two PIL images for differences
@@ -164,6 +165,15 @@ def overlap_area(rect1, rect2):
 def compare_images(img1, img2):
     return ImageChops.difference(img2, img1)
 
+
+# takes list of frames and saves as a gif
+def save_gif(frames, frame_rate=30, stream_frames=200, filename='birds.gif'):
+    frame_one = frames[0]
+    ml_sec = 1000000 * stream_frames / frame_rate  # frames / rate, 200 /30 = 5 sec * 1,000,000 = ml sec
+    frame_one.save(filename, format="GIF", append_images=frames,
+                   save_all=True, duration=ml_sec, loop=0)  # loop=0 replays gif over and over
+    gif = open(filename, 'rb')  # reload gif
+    return gif
 
 # # compare two gray scale images
 # # https://stackoverflow.com/questions/189943/how-can-i-quantify-difference-between-two-images
@@ -180,8 +190,8 @@ def compare_images(img1, img2):
 
 # testing code
 def main():
-    print(area( (1,1,4,4)) )
-    print(overlap_area((1,1,4,4), (1,1,2,2)))
+    print(area((1, 1, 4, 4)))
+    print(overlap_area((1, 1, 4, 4), (1, 1, 2, 2)))
     # img = Image.open('/home/pi/birdclass/unadjusted20210821.jpg')
     # img.show()
 

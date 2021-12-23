@@ -94,7 +94,6 @@ class DetectClassify:
         self.overlap_perc_tolerance = overlap_perc_tolerance
 
         self.img = np.zeros((screenheight, screenwidth, 3), dtype=np.uint8)
-        self.equalizedimg = np.zeros((screenheight, screenwidth, 3), dtype=np.uint8)
         try:
             self.camera = picamera.PiCamera()
             self.camera.resolution(screenheight, screenwidth)
@@ -122,8 +121,6 @@ class DetectClassify:
     # fill detected_confidences, detected_labels, and detected_rects if in target object list
     def detect(self, img):
         self.img = img.copy()
-        self.equalizedimg = image_proc.enhance(img, brightness=self.brightness_chg, contrast=self.contrast_chg,
-                                               color=self.color_chg, sharpness=self.sharpness_chg)
         self.detected_confidences = []
         self.detected_labels = []  # possible object labels
         self.detected_rects = []
@@ -153,16 +150,18 @@ class DetectClassify:
     # make classifications using img and detect results
     # compare img and equalized images
     # use self.detected_confidences,detected_labels, detected_rects lists
-    def classify(self):
+    def classify(self, img):
         self.classified_rects = []
         self.classified_confidences = []
         self.classified_labels = []
         overlap_perc = 0.0
         for i, det_confidence in enumerate(self.detected_confidences):  # loop thru detected target objects
-            (startX, startY, endX, endY) = self.scale_rect(self.img, self.detected_rects[i])  # set x,y bounding box
+            (startX, startY, endX, endY) = self.scale_rect(img, self.detected_rects[i])  # set x,y bounding box
             rect = (startX, startY, endX, endY)
-            crop_img = self.img.crop((startX, startY, endX, endY))  # extract image for better classification
-            crop_equalizedimg = self.equalizedimg.crop((startX, startY, endX, endY))
+            crop_img = img.crop((startX, startY, endX, endY))  # extract image for better classification
+            equalizedimg = image_proc.enhance(img, brightness=self.brightness_chg, contrast=self.contrast_chg,
+                                              color=self.color_chg, sharpness=self.sharpness_chg)
+            crop_equalizedimg = equalizedimg.crop((startX, startY, endX, endY))
             classify_conf, classify_label = self.classify_obj(crop_img)
             classify_conf_equalized, classify_label_equalized = self.classify_obj(crop_equalizedimg)
             if classify_label != classify_label_equalized:  # predictions should match if pic quality is good
@@ -228,7 +227,7 @@ class DetectClassify:
                         maxcresult = cresult
                         maxlresult = lresult
         if maxcresult != 0:
-            print(f'match returned: confidence {maxcresult}, {maxlresult}')
+            print(f'match returned: confidence {maxcresult}, {maxlresult}\n')
         return maxcresult, maxlresult  # highest confidence with best match
 
     # takes a PIL image type and converts it to np array for tensor
@@ -277,8 +276,8 @@ class DetectClassify:
             draw = PILImageDraw.Draw(img)
             font = draw.getfont()
             draw.text((textX, textY), label, font=font, color=color)
-            draw.line([(startX,startY), (startX, endY), (startX, endY), (endX, endY),
-                       (endX, endY), (endX,startY), (endX, startY), (startX, startY)],
+            draw.line([(startX, startY), (startX, endY), (startX, endY), (endX, endY),
+                       (endX, endY), (endX, startY), (endX, startY), (startX, startY)],
                       fill=color, width=2)
         return img
 
@@ -303,7 +302,7 @@ def main(args):
     print('labels detected', birds.detected_labels)
     print('rectangles', birds.detected_rects)
 
-    birds.classify()  # classify species
+    birds.classify(birds.img)  # classify species
     print(birds.classified_labels)
     label = birds.classified_labels[0]
     if len(label) == 0:
