@@ -85,13 +85,6 @@ def enhance_brightness(img, factor):
     return ImageEnhance.Brightness(img).enhance(factor)
 
 
-# sharpen an image
-# factor of 1 is no change. < 1 blurs,  > 1 sharpens contours
-# recommended values of 1.2 or 0.8
-def enhance_sharpness(img, factor):
-    return ImageEnhance.Sharpness(img).enhance(factor)
-
-
 # increases or decreases contrast
 # factor of 1 is no change. < 1 reduces color,  > 1 increases color
 # recommended values 1.5, 3, 0.8
