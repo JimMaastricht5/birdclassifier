@@ -68,7 +68,9 @@ def bird_detector(args):
     print('starting while loop until sun set..... ')
     # loop while the sun is up, look for motion, detect birds, determine species
     while cityweather.sunrise.time() < datetime.now().time() < cityweather.sunset.time():
-        chores.hourly_and_daily()  # perform chores that take place hourly or daily such as weather reporting
+        if args.verbose:
+            chores.hourly_and_daily()  # perform chores that take place hourly or daily such as weather reporting
+
         if motion_detect.detect() is True:
             motioncnt += 1
             print(f'\r motion {motioncnt}', end=' ')  # indicate motion on monitor
@@ -108,8 +110,9 @@ def bird_detector(args):
         #         pass
 
     motion_detect.stop()
-    chores.hourly_and_daily(report_pop=True)
-    chores.end_report()  # post a report on run time of the process
+    if args.verbose:
+        chores.hourly_and_daily(report_pop=True)
+        chores.end_report()  # post a report on run time of the process
 
 
 # set label for image and tweet, use short species name instead of scientific name
@@ -141,6 +144,7 @@ if __name__ == "__main__":
     ap.add_argument("-sw", "--screenwidth", type=int, default=640, help="max screen width")
     ap.add_argument("-sh", "--screenheight", type=int, default=480, help="max screen height")
     ap.add_argument("-fr", "--framerate", type=int, default=30, help="frame rate for camera")
+    ap.add_argument("-v", "--verbose", type=bool, default=True, help="Tweet messages")
 
     # motion and image processing settings
     ap.add_argument("-b", "--brightness_chg", type=int, default=1.05, help="brightness boost")  # 1 no chg,< 1 -, > 1 +
