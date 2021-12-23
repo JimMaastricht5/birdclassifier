@@ -134,7 +134,7 @@ def predominant_color(pil_img):
 # find area of an image
 def area(rect):
     (startX, startY, endX, endY) = rect
-    return (abs(endX - startX) * abs(endY - startY))
+    return abs(endX - startX) * abs(endY - startY)
 
 
 # find the % area in 2 rectangles that overlap
@@ -150,14 +150,14 @@ def overlap_area(rect1, rect2):
         areaI = x_dist * y_dist
     else:
         areaI = 0
-    return ((area1 + area2 - areaI) / (area1 + area2))
+    return (area1 + area2 - areaI) / (area1 + area2)
 
 
 # compare two PIL images for differences
 # returns an array of the differences
 def compare_images(img1, img2):
-    # if img1.shape != img2.shape:
-    #     raise Exception(f'images are not the same shape img1:{img1.shape}, img2:{img2.shape}')
+    if np.array(img1).shape != np.array(img2).shape:
+        raise Exception(f'images are not the same shape img1:{np.array(img1).shape}, img2:{np.array(img2).shape}')
     return ImageChops.difference(img2, img1)
     # im1 = np.array(img1).astype(np.int)  # cast to ints
     # im2 = np.array(img2).astype(np.int)
