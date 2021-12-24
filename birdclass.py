@@ -75,6 +75,8 @@ def bird_detector(args):
             motioncnt += 1
             print(f'\r motion {motioncnt}', end=' ')  # indicate motion on monitor
 
+        # temp set motion to true
+        motion_detect.motion = True
         if motion_detect.motion and birds.detect(motion_detect.img):  # daytime with motion and birds
             motioncnt = 0  # reset motion count between detected birds
             labeled_frames = []
