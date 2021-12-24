@@ -157,7 +157,7 @@ if __name__ == "__main__":
     ap.add_argument("-ei", "--enhanceimg", type=bool, default=True, help="offset waterproof box blur and enhance img")
     ap.add_argument("-co", "--default_confidence", type=float, default=.95, help="confidence threshold")
     ap.add_argument("-op", "--overlap_perc_tolerance", type=float, default=0.6, help="% box overlap to flag as dup")
-    ap.add_argument("-ma", "--minarea", type=float, default=5.50, help="motion entropy threshold")  # < no motion
+    ap.add_argument("-ma", "--minarea", type=float, default=0.50, help="motion entropy threshold")  # 5.5 reduced to .5
 
     arguments = ap.parse_args()
     bird_detector(arguments)
