@@ -162,9 +162,9 @@ def compare_images(img1, img2):
 
 
 # takes list of frames and saves as a gif
-def save_gif(frames, frame_rate=30, stream_frames=200, filename='birds.gif'):
+def save_gif(frames, frame_rate=30, filename='birds.gif'):
     frame_one = frames[0]
-    ml_sec = 1000000 * stream_frames / frame_rate  # frames / rate, 200 /30 = 5 sec * 1,000,000 = ml sec
+    ml_sec = 1000000 * len(frames) * 1/frame_rate  # frames * rate, 200 * 1/30 = 5 sec * 1,000,000 = ml sec
     print(filename, len(frames), ml_sec)
     frame_one.save(filename, format="GIF", append_images=frames,
                    save_all=True, duration=ml_sec, loop=0)  # loop=0 replays gif over and over

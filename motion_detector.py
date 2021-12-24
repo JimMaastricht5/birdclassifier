@@ -62,9 +62,9 @@ class MotionDetector:
             self.img.save('testcap_motion.jpg')
 
     # grab an image from the open stream
-    def capture_image(self):
+    def capture_image(self, type='jpeg'):
         stream = io.BytesIO()
-        self.camera.capture(stream, 'jpeg')
+        self.camera.capture(stream, type)
         stream.seek(0)
         img = Image.open(stream)
         return img
@@ -105,12 +105,12 @@ class MotionDetector:
         print('in capture stream')
         stream = io.BytesIO()
         frames = []
-        for image_num in (0, stream_frames):
+        for image_num in range(stream_frames):
             print('grabbing a frame')
-            # self.camera.capture(stream, 'jpeg')
+            # self.camera.capture(stream, 'gif')
             # stream.seek(0)
             # frames.append(Image.open(stream).copy())
-            frames.append(self.capture_image())
+            frames.append(self.capture_image(type='gif'))
         return frames
 
 
