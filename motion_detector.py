@@ -102,11 +102,12 @@ class MotionDetector:
         :param stream_frames: int value with number of frames to capture
         :return frames: images is a list containing a number of PIL jpg image
         """
+        print('in capture stream')
         frames = []
         for image_num in (0, stream_frames):
             self.camera.capture(self.stream, 'jpeg')
-            self.stream.seek(0)
-            frames.append(Image.open(self.stream))
+            # self.stream.seek(0)
+            frames.append(Image.open(self.stream).copy())
         return frames
 
 
