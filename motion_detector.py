@@ -66,7 +66,7 @@ class MotionDetector:
         self.camera.capture(self.stream, 'jpeg')
         self.stream.seek(0)
         img = Image.open(self.stream)
-        return img.copy()
+        return img
 
     # once first image is captured call motion detector in a loop to find each subsequent image
     # motion detection, compute the absolute difference between the current frame and first frame
