@@ -81,7 +81,6 @@ class MotionDetector:
         self.first_img.save('first_img.jpg')
         grayblur.save('grayblur.jpg')
         self.motion = (self.image_entropy(imgdelta) >= self.min_area)
-        print(self.motion)
         return self.motion
 
     def stop(self):
