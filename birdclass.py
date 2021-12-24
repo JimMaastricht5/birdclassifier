@@ -78,6 +78,7 @@ def bird_detector(args):
         # temp set motion to true
         motion_detect.motion = True
         if motion_detect.motion and birds.detect(motion_detect.img):  # daytime with motion and birds
+            print('saw a bird!')
             motioncnt = 0  # reset motion count between detected birds
             labeled_frames = []
             tweet_labels = []
