@@ -56,7 +56,7 @@ class MotionDetector:
         self.img = self.capture_image()  # capture img of type PIL
         self.gray = image_proc.grayscale(self.img)  # convert image to gray scale for motion detection
         self.graymotion = image_proc.gaussianblur(self.gray)  # smooth out image for motion detection
-        self.first_img = self.graymotion
+        self.first_img = self.graymotion.copy()
         self.motion = False
         if save_test_img:
             self.img.save('testcap_motion.jpg')

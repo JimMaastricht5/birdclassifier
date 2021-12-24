@@ -53,7 +53,7 @@ def bird_detector(args):
     cityweather.wait_until_sunrise()  # if before sun rise, wait here
 
     # initial video capture, screen size, and grab first image (no motion)
-    motion_detect = motion_detector.MotionDetector(args=args, save_test_img=True)  # init class
+    motion_detect = motion_detector.MotionDetector(args=args, save_test_img=False)  # init class
     print('done with camera init... setting up classes.')
     bird_tweeter = tweeter.Tweeter_Class()  # init tweeter2 class twitter handler
     chores = dailychores.DailyChores(bird_tweeter, birdpop, cityweather)
