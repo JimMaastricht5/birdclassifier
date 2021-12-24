@@ -75,10 +75,7 @@ def bird_detector(args):
             motioncnt += 1
             print(f'\r motion {motioncnt}', end=' ')  # indicate motion on monitor
 
-        # temp set motion to true
-        motion_detect.motion = True
         if motion_detect.motion and birds.detect(motion_detect.img):  # daytime with motion and birds
-            print('saw a bird!')
             motioncnt = 0  # reset motion count between detected birds
             labeled_frames = []
             tweet_labels = []
@@ -87,7 +84,7 @@ def bird_detector(args):
                 birds.classify(img=frame)
                 common_names, tweet_label = label_text(birds.classified_labels, birds.classified_confidences)
                 tweet_labels.append(tweet_label)
-                frame = image_proc.enhance_brightness(img=frame, factor=args.brightness)
+                frame = image_proc.enhance_brightness(img=frame, factor=args.brightness_chg)
                 frame = birds.add_boxes_and_labels(img=frame, label=common_names, rects=birds.classified_rects)
                 labeled_frames.append(frame)
             gif = image_proc.save_gif(frames=labeled_frames)  # build the labeled gif
