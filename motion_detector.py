@@ -66,7 +66,6 @@ class MotionDetector:
         self.camera.capture(self.stream, 'jpeg')
         self.stream.seek(0)
         img = Image.open(self.stream)
-        self.stream.truncate()
         return img
 
     # once first image is captured call motion detector in a loop to find each subsequent image
@@ -104,7 +103,6 @@ class MotionDetector:
             self.camera.capture(self.stream, 'jpeg')
             self.stream.seek(0)
             frames.append(Image.open(self.stream))
-        self.stream.truncate()
         return frames
 
 
