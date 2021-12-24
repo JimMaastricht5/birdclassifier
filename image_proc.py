@@ -162,28 +162,41 @@ def compare_images(img1, img2):
     return ImageChops.difference(img2, img1)
 
 
+def convert_image(img, target='gif'):
+    stream = io.BytesIO()
+    img.save(stream, target)
+    stream.seek(0)
+    new_img = Image.open(stream)
+    return new_img
+
+
 # takes list of frames and saves as a gif
 def save_gif(frames, frame_rate=30, filename='birds.gif'):
-    stream = io.BytesIO()
-    gif_frames = []
-    for frame in frames:
-        frame.save(stream, 'gif')
-        stream.seek(0)
-        gif = Image.open(stream)
-        gif_frames.append(gif)
+    # gif_frames = []
+    gif_frames = [convert_image(frame, target='gif') for frame in frames]
+    # for frame in frames:
+        # stream = io.BytesIO()
+        # frame.save(stream, 'gif')
+        # stream.seek(0)
+        # gif = Image.open(stream)
+        # gif_frames.append(convert_image(frame, target='gif'))
     gif_frame_one = gif_frames[0]
     ml_sec = 1000000 * len(gif_frames) * 1/frame_rate  # frames * rate, 200 * 1/30 = 5 sec * 1,000,000 = ml sec
     gif_frame_one.save(filename, format="GIF", append_images=gif_frames,
-                   save_all=True, duration=ml_sec, loop=0)  # loop=0 replays gif over and over
+                       save_all=True, duration=ml_sec, loop=0)  # loop=0 replays gif over and over
     gif = open(filename, 'rb')  # reload gif
     return gif
 
 
 # testing code
 def main():
-    print(area((1, 1, 4, 4)))
-    print(overlap_area((1, 1, 4, 4), (1, 1, 2, 2)))
-    # img = Image.open('/home/pi/birdclass/unadjusted20210821.jpg')
+    # print(area((1, 1, 4, 4)))
+    # print(overlap_area((1, 1, 4, 4), (1, 1, 2, 2)))
+    img1 = Image.open('/home/pi/birdclass/unadjusted20210821.jpg')
+    gif1 = convert_image(img1,target='gif')
+    img2 = Image.open('/home/pi/birdclass/test2.jpg')
+    gif2 = convert_image(img2, target='gif')
+    save_gif([img1, img2], filename='/home/pi/birdclass/test.gif')
     # img.show()
 
     # img = enhance_brightness(img, 1)
