@@ -53,7 +53,7 @@ def bird_detector(args):
     cityweather.wait_until_sunrise()  # if before sun rise, wait here
 
     # initial video capture, screen size, and grab first image (no motion)
-    motion_detect = motion_detector.MotionDetector(args=args, save_test_img=False)  # init class
+    motion_detect = motion_detector.MotionDetector(args=args, save_test_img=args.save_test_img)  # init class
     print('done with camera init... setting up classes.')
     bird_tweeter = tweeter.Tweeter_Class()  # init tweeter2 class twitter handler
     chores = dailychores.DailyChores(bird_tweeter, birdpop, cityweather)
@@ -157,7 +157,8 @@ if __name__ == "__main__":
     ap.add_argument("-ei", "--enhanceimg", type=bool, default=True, help="offset waterproof box blur and enhance img")
     ap.add_argument("-co", "--default_confidence", type=float, default=.95, help="confidence threshold")
     ap.add_argument("-op", "--overlap_perc_tolerance", type=float, default=0.6, help="% box overlap to flag as dup")
-    ap.add_argument("-ma", "--minarea", type=float, default=0.50, help="motion entropy threshold")  # 5.5 reduced to .5
+    ap.add_argument("-ma", "--minarea", type=float, default=0.50, help="motion entropy threshold")  # lower = > motion
+    ap.add_argument("-st", "--savetest", type=bool, default=False, help="save test images")  # saves sample images
 
     arguments = ap.parse_args()
     bird_detector(arguments)
