@@ -57,7 +57,8 @@ class MotionDetector:
         self.graymotion = image_proc.gaussianblur(self.gray)  # smooth out image for motion detection
         self.first_img = self.graymotion.copy()
         self.motion = False
-        if save_test_img:
+        self.save_test_img = save_test_img
+        if self.save_test_img:
             self.img.save('testcap_motion.jpg')
 
     # grab an image from the open stream
@@ -78,9 +79,9 @@ class MotionDetector:
         grayblur = image_proc.gaussianblur(grayimg)  # smooth out image for motion detection
         imgdelta = image_proc.compare_images(self.first_img, grayblur)
         self.img = img
-        self.img.save('capture.jpg')
-        self.first_img.save('first_img.jpg')
-        grayblur.save('grayblur.jpg')
+        if self.save_test_img:
+            self.img.save('capture.jpg')
+            self.first_img.save('first_img.jpg')
         self.motion = (self.image_entropy(imgdelta) >= self.min_area)
         return self.motion
 
@@ -108,7 +109,6 @@ class MotionDetector:
         for image_num in (0, stream_frames):
             self.camera.capture(stream, 'jpeg')
             frames.append(Image.open(stream).copy())
-        # stream.close()
         return frames
 
 
