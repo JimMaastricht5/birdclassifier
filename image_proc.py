@@ -181,7 +181,7 @@ def save_gif(frames, frame_rate=30, filename='birds.gif'):
         # gif = Image.open(stream)
         # gif_frames.append(convert_image(frame, target='gif'))
     gif_frame_one = gif_frames[0]
-    ml_sec = 1000000 * len(gif_frames) * 1/frame_rate  # frames * rate, 200 * 1/30 = 5 sec * 1,000,000 = ml sec
+    ml_sec = int(1000000 * len(gif_frames) * 1/frame_rate)  # frames * rate, 200 * 1/30 = 5 sec * 1,000,000 = ml sec
     gif_frame_one.save(filename, format="GIF", append_images=gif_frames,
                        save_all=True, duration=ml_sec, loop=0)  # loop=0 replays gif over and over
     gif = open(filename, 'rb')  # reload gif
@@ -196,7 +196,7 @@ def main():
     gif1 = convert_image(img1,target='gif')
     img2 = Image.open('/home/pi/birdclass/test2.jpg')
     gif2 = convert_image(img2, target='gif')
-    save_gif([img1, img2], filename='/home/pi/birdclass/test.gif')
+    save_gif([img1, img2],frame_rate=10, filename='/home/pi/birdclass/test3.gif')
     # img.show()
 
     # img = enhance_brightness(img, 1)
