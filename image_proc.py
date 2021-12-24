@@ -24,6 +24,7 @@
 # required Pillow, scikit-image library in project
 from PIL import ImageEnhance, Image, ImageOps, ImageStat, ImageFilter, ImageChops
 import numpy as np
+import io
 # from skimage.exposure import is_low_contrast
 
 
@@ -163,10 +164,16 @@ def compare_images(img1, img2):
 
 # takes list of frames and saves as a gif
 def save_gif(frames, frame_rate=30, filename='birds.gif'):
-    frame_one = frames[0]
-    ml_sec = 1000000 * len(frames) * 1/frame_rate  # frames * rate, 200 * 1/30 = 5 sec * 1,000,000 = ml sec
-    print(filename, len(frames), ml_sec)
-    frame_one.save(filename, format="GIF", append_images=frames,
+    stream = io.BytesIO()
+    gif_frames = []
+    for frame in frames:
+        frame.save(stream, 'gif')
+        stream.seek(0)
+        gif = Image.open(stream)
+        gif_frames.append(gif)
+    gif_frame_one = gif_frames[0]
+    ml_sec = 1000000 * len(gif_frames) * 1/frame_rate  # frames * rate, 200 * 1/30 = 5 sec * 1,000,000 = ml sec
+    gif_frame_one.save(filename, format="GIF", append_images=gif_frames,
                    save_all=True, duration=ml_sec, loop=0)  # loop=0 replays gif over and over
     gif = open(filename, 'rb')  # reload gif
     return gif

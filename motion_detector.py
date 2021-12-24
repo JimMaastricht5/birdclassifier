@@ -110,7 +110,7 @@ class MotionDetector:
             # self.camera.capture(stream, 'gif')
             # stream.seek(0)
             # frames.append(Image.open(stream).copy())
-            frames.append(self.capture_image(type='gif'))
+            frames.append(self.capture_image())
         return frames
 
 
