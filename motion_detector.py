@@ -52,7 +52,6 @@ class MotionDetector:
         time.sleep(2)  # Wait for the automatic gain control to settle
         self.shutterspeed = self.camera.exposure_speed
 
-        # self.stream = io.BytesIO()
         self.img = self.capture_image()  # capture img of type PIL
         self.gray = image_proc.grayscale(self.img)  # convert image to gray scale for motion detection
         self.graymotion = image_proc.gaussianblur(self.gray)  # smooth out image for motion detection
@@ -67,7 +66,7 @@ class MotionDetector:
         self.camera.capture(stream, 'jpeg')
         stream.seek(0)
         img = Image.open(stream)
-        stream.close()
+        # stream.close()
         return img
 
     # once first image is captured call motion detector in a loop to find each subsequent image
@@ -109,7 +108,7 @@ class MotionDetector:
         for image_num in (0, stream_frames):
             self.camera.capture(stream, 'jpeg')
             frames.append(Image.open(stream).copy())
-        stream.close()
+        # stream.close()
         return frames
 
 
