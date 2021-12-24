@@ -67,7 +67,6 @@ class MotionDetector:
         self.camera.capture(stream, 'jpeg')
         stream.seek(0)
         img = Image.open(stream)
-        # stream.close()
         return img
 
     # once first image is captured call motion detector in a loop to find each subsequent image
