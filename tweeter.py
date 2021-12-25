@@ -71,8 +71,9 @@ class Tweeter_Class:
     # set status and add an image
     def post_image(self, message, img, type='jpg'):
         self.check_hour()
-        img.save("img." + type)
-        tw_img = open('img.' + type, 'rb')  # reload a image for twitter, correct var type
+        # img.save("img." + type)
+        # tw_img = open('img.' + type, 'rb')  # reload a image for twitter, correct var type
+        tw_img = img.copy()
         if self.tweetcnt < self.tweetmax_per_hour:
             try:
                 response = self.twitter.upload_media(media=tw_img)
@@ -80,7 +81,8 @@ class Tweeter_Class:
                 print(message)
                 self.tweetcnt += 1
                 self.tweeted = True
-            except:
+            except Exception as e:
+                print(e)
                 self.tweeted = False
         else:
             self.tweeted = False

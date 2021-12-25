@@ -168,13 +168,13 @@ def convert_image(img, target='gif', save_test_img=False):
     stream.seek(0)
     new_img = Image.open(stream)
     if save_test_img:
-        img.save('/home/pi/birdclass/imgconverter.'+target, target)
+        img.save('/home/pi/birdclass/imgconverter.'+ target, target)
     # new_img = Image.open('/home/pi/birdclass/imgconverter.'+target)
     return new_img
 
 
 # takes list of frames and saves as a gif
-def save_gif(frames, frame_rate=30, filename='birds.gif', save_test_img=False):
+def save_gif(frames, frame_rate=30, filename='/home/pi/birdclass/birds.gif', save_test_img=False):
     gif_frames = [convert_image(frame, target='gif', save_test_img=save_test_img) for frame in frames]
 
     # same code as covert_image function outside list comp
