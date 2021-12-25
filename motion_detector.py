@@ -95,7 +95,7 @@ class MotionDetector:
         probability = [float(h) / histlength for h in histogram]
         return -sum([p * math.log(p, 2) for p in probability if p != 0])
 
-    def capture_stream(self, stream_frames=200):
+    def capture_stream(self, stream_frames=200, save_test_img=False):
         """
         function returns a list of images
 
@@ -110,7 +110,8 @@ class MotionDetector:
             # stream.seek(0)
             # frames.append(Image.open(stream).copy())
             img = self.capture_image().copy()
-            img.save('/home/pi/birdclass/streamcap'+ str(image_num)+ '.jpg')
+            if save_test_img:
+                img.save('/home/pi/birdclass/streamcap'+ str(image_num)+ '.jpg')
             frames.append(img)
         return frames
 
@@ -126,7 +127,7 @@ if __name__ == '__main__':
     arguments = ap.parse_args()
 
     motion_detector = MotionDetector(args=arguments, save_test_img=True)
-    frames_test = motion_detector.capture_stream()
+    frames_test = motion_detector.capture_stream(save_test_img=True)
 
 # junk code....
     # Create the camera object

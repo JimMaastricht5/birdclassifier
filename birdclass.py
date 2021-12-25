@@ -80,7 +80,7 @@ def bird_detector(args):
             motioncnt = 0  # reset motion count between detected birds
             labeled_frames = []
             tweet_labels = []
-            frames = motion_detect.capture_stream()  # capture a list of images
+            frames = motion_detect.capture_stream(save_test_img=args.save_test_img)  # capture a list of images
             for frame in frames:
                 birds.classify(img=frame)
                 common_names, tweet_label = label_text(birds.classified_labels, birds.classified_confidences)
@@ -88,7 +88,7 @@ def bird_detector(args):
                 frame = image_proc.enhance_brightness(img=frame, factor=args.brightness_chg)
                 frame = birds.add_boxes_and_labels(img=frame, label=common_names, rects=birds.classified_rects)
                 labeled_frames.append(frame)
-            gif = image_proc.save_gif(frames=labeled_frames)  # build the labeled gif
+            gif = image_proc.save_gif(frames=labeled_frames, save_test_img=args.save_test_img)  # build the labeled gif
             if (datetime.now() - last_tweet).total_seconds() >= 60 * 5:  # tweet if past wait time
                 birdpop.visitors(birds.classified_labels, datetime.now())  # update census count and last tweeted
                 last_tweet = datetime.now()
