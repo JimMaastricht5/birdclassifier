@@ -163,10 +163,13 @@ def compare_images(img1, img2):
 
 
 def convert_image(img, target='gif'):
-    stream = io.BytesIO()
-    img.save(stream, target)
-    stream.seek(0)
-    new_img = Image.open(stream)
+    # stream = io.BytesIO()
+    # img.save(stream, target)
+    # stream.seek(0)
+    # new_img = Image.open(stream)
+
+    img.save('imgconverter', target)
+    new_img = Image.open('imgconverter')
     return new_img
 
 
