@@ -163,31 +163,32 @@ def compare_images(img1, img2):
 
 
 def convert_image(img, target='gif'):
-    # stream = io.BytesIO()
-    # img.save(stream, target)
-    # stream.seek(0)
-    # new_img = Image.open(stream)
+    stream = io.BytesIO()
+    img.save(stream, target)
+    stream.seek(0)
+    new_img = Image.open(stream)
 
-    img.save('imgconverter.'+target, target)
-    new_img = Image.open('imgconverter.'+target)
+    img.save('/home/pi/birdclass/imgconverter.'+target, target)
+    # new_img = Image.open('/home/pi/birdclass/imgconverter.'+target)
     return new_img
 
 
 # takes list of frames and saves as a gif
 def save_gif(frames, frame_rate=30, filename='birds.gif'):
-    # gif_frames = []
     gif_frames = [convert_image(frame, target='gif') for frame in frames]
+
+    # gif_frames = []
     # for frame in frames:
-    # stream = io.BytesIO()
-    # frame.save(stream, 'gif')
-    # stream.seek(0)
-    # gif = Image.open(stream)
-    # gif_frames.append(convert_image(frame, target='gif'))
+        # stream = io.BytesIO()
+        # frame.save(stream, 'gif')
+        # stream.seek(0)
+        # gif = Image.open(stream)
+        # gif_frames.append(convert_image(frame, target='gif'))
     try:
         gif_frame_one = gif_frames[0]
-        ml_sec = int(1000000 * len(gif_frames) * 1/frame_rate)  # frames * rate, 200 * 1/30 = 5 sec * 1,000,000 = ml sec
+        # ml_sec = int(1000000 * len(gif_frames) * 1/frame_rate)  # frames * rate, 200 * 1/30 = 5 sec * 1,000,000 = ml sec
         gif_frame_one.save(filename, format="GIF", append_images=gif_frames[1:],
-                           save_all=True, optimze=False, duration=40, loop=0)  # loop=0 replays gif over and over
+                           save_all=True, optimze=False, duration=30, loop=0)  # loop=0 replays gif over and over
         gif = open(filename, 'rb')  # reload gif
     except Exception as e:
         print(e)
@@ -203,7 +204,7 @@ def main():
     gif1 = convert_image(img1,target='gif')
     img2 = Image.open('/home/pi/birdclass/test2.jpg')
     gif2 = convert_image(img2, target='gif')
-    save_gif([gif1, gif2], frame_rate=10, filename='/home/pi/birdclass/test3.gif')
+    save_gif([img1, img2], frame_rate=10, filename='/home/pi/birdclass/test4.gif')
     # img.show()
 
     # img = enhance_brightness(img, 1)
