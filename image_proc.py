@@ -168,8 +168,8 @@ def convert_image(img, target='gif'):
     # stream.seek(0)
     # new_img = Image.open(stream)
 
-    img.save('imgconverter', target)
-    new_img = Image.open('imgconverter')
+    img.save('imgconverter.'+target, target)
+    new_img = Image.open('imgconverter.'+target)
     return new_img
 
 
