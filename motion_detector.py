@@ -106,7 +106,6 @@ class MotionDetector:
         stream = io.BytesIO()
         frames = []
         for image_num in range(stream_frames):
-            print('grabbing a frame')
             # self.camera.capture(stream, 'gif')
             # stream.seek(0)
             # frames.append(Image.open(stream).copy())
