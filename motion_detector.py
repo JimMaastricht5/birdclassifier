@@ -95,7 +95,7 @@ class MotionDetector:
         probability = [float(h) / histlength for h in histogram]
         return -sum([p * math.log(p, 2) for p in probability if p != 0])
 
-    def capture_stream(self, stream_frames=200, save_test_img=False):
+    def capture_stream(self, stream_frames=30, save_test_img=False):
         """
         function returns a list of images
 
