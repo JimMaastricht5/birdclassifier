@@ -188,7 +188,7 @@ def save_gif(frames, frame_rate=30, filename='birds.gif'):
         gif = open(filename, 'rb')  # reload gif
     except Exception as e:
         print(e)
-        gif = gif_frames[0]
+        gif = frames[0]
     return gif
 
 
