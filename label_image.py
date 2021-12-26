@@ -227,7 +227,7 @@ class DetectClassify:
                         maxcresult = cresult
                         maxlresult = lresult
         if maxcresult != 0:
-            print(f'match returned: confidence {maxcresult}, {maxlresult}\n')
+            print(f'match returned: confidence {maxcresult}, {maxlresult}')
         return maxcresult, maxlresult  # highest confidence with best match
 
     # takes a PIL image type and converts it to np array for tensor
