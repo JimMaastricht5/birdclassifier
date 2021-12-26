@@ -70,7 +70,7 @@ class Tweeter_Class:
         return
 
     # set status and add an image
-    def post_image(self, message, tw_img, type='jpg'):
+    def post_image(self, message, tw_img):
         self.check_hour()
         # img.save("img." + type)
         # tw_img = open('img.' + type, 'rb')  # reload a image for twitter, correct var type

@@ -80,6 +80,7 @@ def bird_detector(args):
             motioncnt = 0  # reset motion count between detected birds
             labeled_frames = []
             tweet_labels = []
+            img_jpg = birds.img  # keep first shot in case gif tweet fails
             frames = motion_detect.capture_stream(save_test_img=args.save_test_img)  # capture a list of images
             for frame in frames:
                 birds.classify(img=frame)
@@ -92,8 +93,14 @@ def bird_detector(args):
             if (datetime.now() - last_tweet).total_seconds() >= 60 * 5:  # tweet if past wait time
                 birdpop.visitors(birds.classified_labels, datetime.now())  # update census count and last tweeted
                 last_tweet = datetime.now()
-                if bird_tweeter.post_image(tweet_labels[0], gif, type='gif') is False:
-                    print(f"*** exceeded tweet limit")
+                if bird_tweeter.post_image(tweet_labels[0], gif) is False:
+                    print(f"*** failed gif send")
+                    birds.classify(img=img_jpg)
+                    common_names, tweet_label = label_text(birds.classified_labels, birds.classified_confidences)
+                    img_jpg = image_proc.enhance_brightness(img=img_jpg, factor=args.brightness_chg)
+                    img_jpg = birds.add_boxes_and_labels(img=img_jpg, label=common_names, rects=birds.classified_rects)
+                    if bird_tweeter.post_image(tweet_label, img_jpg) is False:
+                        print(f"*** failed jpg send")
 
         # else:  # no birds detected in frame, update missing from frame count
         #     birds.target_object_found = False  # set by detector, else statement invoked with no motion, set false

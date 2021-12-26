@@ -110,8 +110,8 @@ class MotionDetector:
             # stream.seek(0)
             # frames.append(Image.open(stream).copy())
             img = self.capture_image().copy()
-            if save_test_img:
-                img.save('/home/pi/birdclass/streamcap'+ str(image_num)+ '.jpg')
+            # if save_test_img:
+                # img.save('/home/pi/birdclass/streamcap'+ str(image_num)+ '.jpg')
             frames.append(img)
         return frames
 
