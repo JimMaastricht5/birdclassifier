@@ -168,7 +168,7 @@ def convert_image(img, target='gif', save_test_img=False):
     stream.seek(0)
     new_img = Image.open(stream)
     if save_test_img:
-        img.save('/home/pi/birdclass/imgconverter.'+ target, target)
+        img.save('/home/pi/birdclass/imgconverter.' + target, target)
     # new_img = Image.open('/home/pi/birdclass/imgconverter.'+target)
     return new_img
 
@@ -187,9 +187,9 @@ def save_gif(frames, frame_rate=30, filename='/home/pi/birdclass/birds.gif', sav
         # gif_frames.append(convert_image(frame, target='gif'))
     try:
         gif_frame_one = gif_frames[0]
-        ml_sec = int(1000000 * len(gif_frames) * 1/frame_rate)  # frames * rate, 200 * 1/30 = 5 sec * 1,000,000 = ml sec
+        ml_sec = int(1000 * len(gif_frames) * 1/frame_rate)  # frames * rate, 200 * 1/30 = 5 sec * 1,000 = ml sec
         gif_frame_one.save(filename, format="GIF", append_images=gif_frames[1:],
-                           save_all=True, optimze=False, duration=30, loop=0)  # loop=0 replays gif over and over
+                           save_all=True, optimze=True, minimize_size=True, duration=120, loop=50)  # loop=0 inifinite
         gif = open(filename, 'rb')  # reload gif
     except Exception as e:
         print(e)
