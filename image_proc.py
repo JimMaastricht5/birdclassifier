@@ -201,7 +201,7 @@ def save_gif(frames, frame_rate=30, filename='/home/pi/birdclass/birds.gif', sav
 def main():
     # print(area((1, 1, 4, 4)))
     # print(overlap_area((1, 1, 4, 4), (1, 1, 2, 2)))
-    img1 = Image.open('/home/pi/birdclass/unadjusted20210821.jpg')
+    img1 = Image.open('/home/pi/birdclass/test.jpg')
     gif1 = convert_image(img1, target='gif')
     img2 = Image.open('/home/pi/birdclass/test2.jpg')
     gif2 = convert_image(img2, target='gif')

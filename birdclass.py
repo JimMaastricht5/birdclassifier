@@ -80,7 +80,7 @@ def bird_detector(args):
             motioncnt = 0  # reset motion count between detected birds
             labeled_frames = []
             tweet_labels = []
-            img_jpg = birds.img  # keep first shot in case gif tweet fails
+            img_jpg = birds.img.copy()  # keep first shot in case gif tweet fails
             frames = motion_detect.capture_stream(save_test_img=args.save_test_img)  # capture a list of images
             for frame in frames:
                 birds.classify(img=frame)
