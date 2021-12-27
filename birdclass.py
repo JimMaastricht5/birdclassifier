@@ -104,7 +104,10 @@ def bird_detector(args):
             tweet_labels.insert(0, first_tweet_label)  # insert first tweet label
             frames.insert(0, image_proc.convert_image(img=first_img_jpg, target='gif',
                                                       save_test_img=args.save_test_img))  # covert and insert first img
-            gif = image_proc.save_gif(frames=labeled_frames, frame_rate=args.framerate,
+            # gif = image_proc.save_gif(frames=labeled_frames, frame_rate=args.framerate,
+            #                           save_test_img=args.save_test_img)  # build the labeled gif, default file name
+            # try and effective frame rate of 100
+            gif = image_proc.save_gif(frames=labeled_frames, frame_rate=100,
                                       save_test_img=args.save_test_img)  # build the labeled gif, default file name
 
             # tweet handling, if waited long enough and some confidence try gif, if fails tweet jpg from org motion
