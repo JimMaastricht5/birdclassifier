@@ -194,7 +194,11 @@ class DetectClassify:
             self.classified_labels.append(classify_label)
             self.classified_confidences.append(classify_conf)
             self.classified_rects.append(rect)
-        return max(self.classified_confidences)  # returns max confidence from list
+        if len(self.classified_confidences) == 0:
+            max_confidence = 0
+        else:
+            max_confidence = max(self.classified_confidences)
+        return max_confidence
 
     # input image and return best result and label
     # the function will sort the results and compare the confidence to the confidence for that label (species)
