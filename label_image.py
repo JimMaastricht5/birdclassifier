@@ -63,7 +63,7 @@ except Exception as e:
 class DetectClassify:
     def __init__(self, homedir='/home/pi/PycharmProjects/pyface2/', default_confidence=.98, screenheight=640,
                  screenwidth=480, contrast_chg=1.0, color_chg=1.0, brightness_chg=1.0, sharpness_chg=1.0,
-                 framerate=15, mismatch_penalty=0.3, overlap_perc_tolerance=0.7):
+                 mismatch_penalty=0.3, overlap_perc_tolerance=0.7):
         self.detector_file = homedir + 'lite-model_ssd_mobilenet_v1_1_metadata_2.tflite'
         self.detector_labels_file = homedir + 'lite-model_ssd_mobilenet_v1_1_metadata_2_labelmap.txt'
         self.target_objects = ['bird']
@@ -98,14 +98,14 @@ class DetectClassify:
         self.overlap_perc_tolerance = overlap_perc_tolerance
 
         self.img = np.zeros((screenheight, screenwidth, 3), dtype=np.uint8)
-        try:
-            self.camera = picamera.PiCamera()
-            self.camera.resolution(screenheight, screenwidth)
-            self.camera.framerate = framerate
-        except Exception as e_init:
-            print(e_init)
-            print('fails on windows... continue for testing....')
-            pass
+        # try:
+        #     self.camera = picamera.PiCamera()
+        #     self.camera.resolution(screenheight, screenwidth)
+        #     self.camera.framerate = framerate
+        # except Exception as e_init:
+        #     print(e_init)
+        #     print('fails on windows... continue for testing....')
+        #     pass
 
     # initialize tensor flow model
     def init_tf2(self, model_file, label_file_name):

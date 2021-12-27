@@ -155,7 +155,7 @@ if __name__ == "__main__":
     ap.add_argument("-fc", "--flipcamera", type=bool, default=False, help="flip camera image")
     ap.add_argument("-sw", "--screenwidth", type=int, default=640, help="max screen width")
     ap.add_argument("-sh", "--screenheight", type=int, default=480, help="max screen height")
-    ap.add_argument("-fr", "--framerate", type=int, default=30, help="frame rate for camera")
+    ap.add_argument("-fr", "--framerate", type=int, default=60, help="frame rate for camera")
     ap.add_argument("-st", "--save_test_img", type=bool, default=False, help="save test images")  # saves sample images
     ap.add_argument("-v", "--verbose", type=bool, default=True, help="To tweet or not to tweet")
 
