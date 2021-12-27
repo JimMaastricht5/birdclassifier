@@ -35,10 +35,10 @@ import argparse
 
 try:
     import picamera
-    import picamera.array
+    # import picamera.array
 except Exception as e:
     print(e)
-    print('picamera import fails on windows')
+    print('continuing motion detection setup....')
     pass
 
 
