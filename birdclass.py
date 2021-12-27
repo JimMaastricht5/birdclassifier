@@ -76,46 +76,44 @@ def bird_detector(args):
             motioncnt += 1
             print(f'\r motion {motioncnt}', end=' ')  # indicate motion on monitor
 
-        if motion_detect.motion and birds.detect(motion_detect.img):  # daytime with motion and birds
+        if motion_detect.motion and birds.detect(img=motion_detect.img):  # daytime with motion and birds
             motioncnt = 0  # reset motion count between detected birds
+
+            # keep first shot to add to start of animation or as stand along jpg
+            # copy first image, classify, grab labels, enhance the shot, and add boxes
+            first_img_jpg = birds.img.copy()
+            first_img_confidence = birds.classify(img=first_img_jpg)
+            first_common_names, first_tweet_label = label_text(birds.classified_labels, birds.classified_confidences)
+            first_img_jpg = image_proc.enhance_brightness(img=first_img_jpg, factor=args.brightness_chg)
+            first_img_jpg = birds.add_boxes_and_labels(img=first_img_jpg, label=first_common_names,
+                                                       rects=birds.classified_rects)
+
+            # grab a stream of pictures, add first pic from above, and build animated gif
             labeled_frames = []
             tweet_labels = []
-            img_jpg = birds.img.copy()  # keep first shot in case gif tweet fails
             frames = motion_detect.capture_stream(save_test_img=args.save_test_img)  # capture a list of images
             for frame in frames:
-                birds.classify(img=frame)
+                birds.detect(img=frame)  # find bird object in frame and set rectangles containing object
+                birds.classify(img=frame)  # classify object at rectangle location, return value max confidence not used
                 common_names, tweet_label = label_text(birds.classified_labels, birds.classified_confidences)
-                tweet_labels.append(tweet_label)
                 frame = image_proc.enhance_brightness(img=frame, factor=args.brightness_chg)
                 frame = birds.add_boxes_and_labels(img=frame, label=common_names, rects=birds.classified_rects)
+                tweet_labels.append(tweet_label)  # build dictionary of labels
                 labeled_frames.append(frame)
-            gif = image_proc.save_gif(frames=labeled_frames, save_test_img=args.save_test_img)  # build the labeled gif
-            if (datetime.now() - last_tweet).total_seconds() >= 60 * 5:  # tweet if past wait time
+            tweet_labels.insert(0, first_tweet_label)  # insert first tweet label
+            frames.insert(0, image_proc.convert_image(img=first_img_jpg, target='gif',
+                                                      save_test_img=args.save_test_img))  # covert and insert first img
+            gif = image_proc.save_gif(frames=labeled_frames, frame_rate=args.frame_rate,
+                                      save_test_img=args.save_test_img)  # build the labeled gif, default file name
+
+            # tweet handling, if waited long enough and some confidence try gif, if fails tweet jpg from org motion
+            if (datetime.now() - last_tweet).total_seconds() >= 60 * 5 and first_img_confidence > 0:
                 birdpop.visitors(birds.classified_labels, datetime.now())  # update census count and last tweeted
                 last_tweet = datetime.now()
-                if bird_tweeter.post_image(tweet_labels[0], gif) is False:
+                if bird_tweeter.post_image(tweet_labels[0], gif) is False:  # try animated gif
                     print(f"*** failed gif send")
-                    birds.classify(img=img_jpg)
-                    common_names, tweet_label = label_text(birds.classified_labels, birds.classified_confidences)
-                    img_jpg = image_proc.enhance_brightness(img=img_jpg, factor=args.brightness_chg)
-                    img_jpg = birds.add_boxes_and_labels(img=img_jpg, label=common_names, rects=birds.classified_rects)
-                    if bird_tweeter.post_image(tweet_label, img_jpg) is False:
+                    if bird_tweeter.post_image(first_tweet_label, first_img_jpg) is False:  # try org jph
                         print(f"*** failed jpg send")
-
-        # else:  # no birds detected in frame, update missing from frame count
-        #     birds.target_object_found = False  # set by detector, else statement invoked with no motion, set false
-        # if birds.target_object_found is True:  # motion and at least one bird. show gif and tweet confidence
-        #     if all(conf >= birds.classify_min_confidence for conf in birds.classified_confidences):  # tweet threshold
-        #     if (datetime.now() - last_tweet).total_seconds() >= 60 * 5:
-        #         birdpop.visitors(birds.classified_labels, datetime.now())  # update census count and last tweeted
-        #         last_tweet = datetime.now()
-        #         # tweetedb = bird_tweeter.post_image(tweet_label, birds.img)
-        #         tweetedb = bird_tweeter.post_image(tweet_label, gif)
-        #         if tweetedb is False:
-        #             print(f"*** exceeded tweet limit")
-        #     else:
-        #         # print(f" {tweet_label} not tweeted, last tweet {last_tweet.strftime('%I:%M %p')}. wait 5 minutes")
-        #         pass
 
     motion_detect.stop()
     if args.verbose:
@@ -152,6 +150,7 @@ if __name__ == "__main__":
     ap.add_argument("-sw", "--screenwidth", type=int, default=640, help="max screen width")
     ap.add_argument("-sh", "--screenheight", type=int, default=480, help="max screen height")
     ap.add_argument("-fr", "--framerate", type=int, default=30, help="frame rate for camera")
+    ap.add_argument("-st", "--save_test_img", type=bool, default=False, help="save test images")  # saves sample images
     ap.add_argument("-v", "--verbose", type=bool, default=True, help="To tweet or not to tweet")
 
     # motion and image processing settings
@@ -165,7 +164,6 @@ if __name__ == "__main__":
     ap.add_argument("-co", "--default_confidence", type=float, default=.95, help="confidence threshold")
     ap.add_argument("-op", "--overlap_perc_tolerance", type=float, default=0.6, help="% box overlap to flag as dup")
     ap.add_argument("-ma", "--minarea", type=float, default=5.0, help="motion entropy threshold")  # lower = > motion
-    ap.add_argument("-st", "--save_test_img", type=bool, default=False, help="save test images")  # saves sample images
 
     arguments = ap.parse_args()
     bird_detector(arguments)

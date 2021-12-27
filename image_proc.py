@@ -144,14 +144,13 @@ def overlap_area(rect1, rect2):
     area1 = area(rect1)
     (startX2, startY2, endX2, endY2) = rect2
     area2 = area(rect2)
-
     x_dist = min(endX, endX2) - max(startX, startX2)
     y_dist = min(endY, endY2) - max(startY, startY2)
     if x_dist > 0 and y_dist > 0:
-        areaI = x_dist * y_dist
+        area_i = x_dist * y_dist
     else:
-        areaI = 0
-    return (area1 + area2 - areaI) / (area1 + area2)
+        area_i = 0
+    return (area1 + area2 - area_i) / (area1 + area2)
 
 
 # compare two PIL images for differences
@@ -169,27 +168,18 @@ def convert_image(img, target='gif', save_test_img=False):
     new_img = Image.open(stream)
     if save_test_img:
         img.save('/home/pi/birdclass/imgconverter.' + target, target)
-    # new_img = Image.open('/home/pi/birdclass/imgconverter.'+target)
     return new_img
 
 
 # takes list of frames and saves as a gif
 def save_gif(frames, frame_rate=30, filename='/home/pi/birdclass/birds.gif', save_test_img=False):
     gif_frames = [convert_image(frame, target='gif', save_test_img=save_test_img) for frame in frames]
-
-    # same code as covert_image function outside list comp
-    # gif_frames = []
-    # for frame in frames:
-        # stream = io.BytesIO()
-        # frame.save(stream, 'gif')
-        # stream.seek(0)
-        # gif = Image.open(stream)
-        # gif_frames.append(convert_image(frame, target='gif'))
     try:
         gif_frame_one = gif_frames[0]
         ml_sec = int(1000 * len(gif_frames) * 1/frame_rate)  # frames * rate, 200 * 1/30 = 5 sec * 1,000 = ml sec
         gif_frame_one.save(filename, format="GIF", append_images=gif_frames[1:],
-                           save_all=True, optimze=True, minimize_size=True, duration=120, loop=50)  # loop=0 inifinite
+                           save_all=True, optimze=True, minimize_size=True, duration=ml_sec, loop=50)  # loop=0 infinity
+        # save_all = True, optimze = True, minimize_size = True, duration = 120, loop = 50)  # loop=0 inifinite
         gif = open(filename, 'rb')  # reload gif
     except Exception as e:
         print(e)
@@ -202,9 +192,9 @@ def main():
     # print(area((1, 1, 4, 4)))
     # print(overlap_area((1, 1, 4, 4), (1, 1, 2, 2)))
     img1 = Image.open('/home/pi/birdclass/test.jpg')
-    gif1 = convert_image(img1, target='gif')
+    # gif1 = convert_image(img1, target='gif', save_test_img=True)
     img2 = Image.open('/home/pi/birdclass/test2.jpg')
-    gif2 = convert_image(img2, target='gif')
+    # gif2 = convert_image(img2, target='gif', save_test_img=True)
     save_gif([img1, img2], frame_rate=10, filename='/home/pi/birdclass/test4.gif')
     # img.show()
 

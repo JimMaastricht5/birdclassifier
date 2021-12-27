@@ -36,7 +36,8 @@ import argparse
 try:
     import picamera
     import picamera.array
-except:
+except Exception as e:
+    print(e)
     print('picamera import fails on windows')
     pass
 
@@ -62,9 +63,9 @@ class MotionDetector:
             self.img.save('testcap_motion.jpg')
 
     # grab an image from the open stream
-    def capture_image(self, type='jpeg'):
+    def capture_image(self, img_type='jpeg'):
         stream = io.BytesIO()
-        self.camera.capture(stream, type)
+        self.camera.capture(stream, img_type)
         stream.seek(0)
         img = Image.open(stream)
         return img
@@ -100,18 +101,15 @@ class MotionDetector:
         function returns a list of images
 
         :param stream_frames: int value with number of frames to capture
+        :param save_test_img: bool True saves each image captured in the stream.  Slow!  default False
         :return frames: images is a list containing a number of PIL jpg image
         """
         print('in capture stream')
-        stream = io.BytesIO()
         frames = []
         for image_num in range(stream_frames):
-            # self.camera.capture(stream, 'gif')
-            # stream.seek(0)
-            # frames.append(Image.open(stream).copy())
             img = self.capture_image().copy()
-            # if save_test_img:
-                # img.save('/home/pi/birdclass/streamcap'+ str(image_num)+ '.jpg')
+            if save_test_img:
+                img.save('/home/pi/birdclass/streamcap' + str(image_num) + '.jpg')
             frames.append(img)
         return frames
 
@@ -128,21 +126,3 @@ if __name__ == '__main__':
 
     motion_detector = MotionDetector(args=arguments, save_test_img=True)
     frames_test = motion_detector.capture_stream(save_test_img=True)
-
-# junk code....
-    # Create the camera object
-    # capture first image and gray scale/blur for baseline motion detection
-    # def init(args):
-    #     camera = picamera.PiCamera()
-    #     if args.screenwidth != 0:  # use specified height and width or default values if not passed
-    #         camera.resolution = (args.screenheight, args.screenwidth)
-    #     camera.vflip = args.flipcamera
-    #     camera.framerate = args.framerate
-    #     time.sleep(2)  # Wait for the automatic gain control to settle
-    #     print(f'shutter speed is {camera.exposure_speed}')
-    #     img = capture_image(camera)  # capture img of type PIL
-    #     print('camera initialized and gray image created... ')
-    #     # img.save('testcap_motion.jpg')
-    #     gray = image_proc.grayscale(img)  # convert image to gray scale for motion detection
-    #     graymotion = image_proc.gaussianblur(gray)  # smooth out image for motion detection
-    #     return camera, graymotion
