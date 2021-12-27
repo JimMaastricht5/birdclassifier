@@ -107,7 +107,7 @@ def bird_detector(args):
             # gif = image_proc.save_gif(frames=labeled_frames, frame_rate=args.framerate,
             #                           save_test_img=args.save_test_img)  # build the labeled gif, default file name
             # try and effective frame rate of 100
-            gif = image_proc.save_gif(frames=labeled_frames, frame_rate=100,
+            gif = image_proc.save_gif(frames=labeled_frames, frame_rate=60,
                                       save_test_img=args.save_test_img)  # build the labeled gif, default file name
 
             # tweet handling, if waited long enough and some confidence try gif, if fails tweet jpg from org motion
