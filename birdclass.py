@@ -111,8 +111,9 @@ def bird_detector(args):
                                       save_test_img=args.save_test_img)  # build the labeled gif, default file name
 
             # tweet handling, if waited long enough and some confidence try gif, if fails tweet jpg from org motion
-            print('ready to tweet, first confidence:', first_img_confidence)
-            if (datetime.now() - last_tweet).total_seconds() >= 60 * 5:
+            print('ready to tweet, last tweet and first confidence:', last_tweet, first_img_confidence)
+            if (datetime.now() - last_tweet).total_seconds() >= 60 * 5 and \
+                    first_img_confidence > args.default_confidence:
                 birdpop.visitors(birds.classified_labels, datetime.now())  # update census count and last tweeted
                 last_tweet = datetime.now()
                 if bird_tweeter.post_image(tweet_labels[0], gif) is False:  # try animated gif
