@@ -185,11 +185,11 @@ class DetectClassify:
                     classify_conf = 1
 
             # detect overlapping rectangles/same bird and skip it
-            overlap_perc = image_proc.overlap_area(prior_rect, rect)  # compare current rect and prior rect
-            prior_rect = rect  # set prior rect to current rect
-            if overlap_perc > self.overlap_perc_tolerance:  # 0.0 in first loop, if 80% overlap skip bird
-                classify_conf = 0
-                classify_label = ""
+            # overlap_perc = image_proc.overlap_area(prior_rect, rect)  # compare current rect and prior rect
+            # prior_rect = rect  # set prior rect to current rect
+            # if overlap_perc > self.overlap_perc_tolerance:  # 0.0 in first loop, if 80% overlap skip bird
+            #     classify_conf = 0
+            #     classify_label = ""
 
             self.classified_labels.append(classify_label)
             self.classified_confidences.append(classify_conf)
