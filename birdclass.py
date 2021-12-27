@@ -95,7 +95,7 @@ def bird_detector(args):
             frames = motion_detect.capture_stream(save_test_img=args.save_test_img)  # capture a list of images
             for frame in frames:
                 birds.detect(img=frame)  # find bird object in frame and set rectangles containing object
-                birds.classify(img=frame)  # classify object at rectangle location, return value max confidence not used
+                confidence = birds.classify(img=frame)  # classify object at rectangle location
                 common_names, tweet_label = label_text(birds.classified_labels, birds.classified_confidences)
                 frame = image_proc.enhance_brightness(img=frame, factor=args.brightness_chg)
                 frame = birds.add_boxes_and_labels(img=frame, label=common_names, rects=birds.classified_rects)
