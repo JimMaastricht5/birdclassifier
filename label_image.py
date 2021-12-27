@@ -44,7 +44,8 @@ import image_proc
 # attempt to load picamera, fails on windows
 try:
     import picamera
-except:
+except Exception as e:
+    print(e)
     print('picamera import fails on windows')
     pass
 
@@ -52,7 +53,9 @@ except:
 try:
     import tflite_runtime.interpreter as tflite  # for pi4 with install wheel above
     tfliteb = True
-except:
+except Exception as e:
+    print(e)
+    print('load TF2 for testing')
     import tensorflow as tf  # TF2 for desktop testing
     tfliteb = False
 
@@ -85,6 +88,7 @@ class DetectClassify:
         self.classified_labels = []
         self.classified_rects = []
         self.colors = np.random.uniform(0, 255, size=(11, 3)).astype(int)  # random colors for bounding boxes
+        self.color = self.pick_a_color()  # set initial color to use for bounding boxes
 
         # set image adjustment parameters
         self.contrast_chg = contrast_chg
@@ -98,7 +102,9 @@ class DetectClassify:
             self.camera = picamera.PiCamera()
             self.camera.resolution(screenheight, screenwidth)
             self.camera.framerate = framerate
-        except:
+        except Exception as e_init:
+            print(e_init)
+            print('fails on windows... continue for testing....')
             pass
 
     # initialize tensor flow model
@@ -154,6 +160,7 @@ class DetectClassify:
         self.classified_rects = []
         self.classified_confidences = []
         self.classified_labels = []
+        prior_rect = (0, 0, 0, 0)
         overlap_perc = 0.0
         for i, det_confidence in enumerate(self.detected_confidences):  # loop thru detected target objects
             (startX, startY, endX, endY) = self.scale_rect(img, self.detected_rects[i])  # set x,y bounding box
@@ -178,9 +185,8 @@ class DetectClassify:
                     classify_conf = 1
 
             # detect overlapping rectangles/same bird and skip it
-            if i > 0:  # not the first loop
-                overlap_perc = image_proc.overlap_area(prior_rect, rect)  # compare current rect and prior rect
-            prior_rect = rect
+            overlap_perc = image_proc.overlap_area(prior_rect, rect)  # compare current rect and prior rect
+            prior_rect = rect  # set prior rect to current rect
             if overlap_perc > self.overlap_perc_tolerance:  # 0.0 in first loop, if 80% overlap skip bird
                 classify_conf = 0
                 classify_label = ""
@@ -263,23 +269,27 @@ class DetectClassify:
     def add_boxes_and_labels(self, img, label, rects):
         for i, rect in enumerate(rects):
             try:
-                (startX, startY, endX, endY) = rect
-                textX = startX
-                textY = startY
-                startX += -25
-                startY += -25
-                endX += 25
-                endY += 25
+                (start_x, start_y, end_x, end_y) = rect
+                text_x = start_x
+                text_y = start_y
+                start_x += -25
+                start_y += -25
+                end_x += 25
+                end_y += 25
             except TypeError:
                 return
-            color = tuple(self.colors[random.randint(0, (len(self.colors)) - 1)])
+            # color = tuple(self.colors[random.randint(0, (len(self.colors)) - 1)])
             draw = PILImageDraw.Draw(img)
             font = draw.getfont()
-            draw.text((textX, textY), label, font=font, color=color)
-            draw.line([(startX, startY), (startX, endY), (startX, endY), (endX, endY),
-                       (endX, endY), (endX, startY), (endX, startY), (startX, startY)],
-                      fill=color, width=2)
+            draw.text((text_x, text_y), label, font=font, color=self.color)
+            draw.line([(start_x, start_y), (start_x, end_y), (start_x, end_y), (end_x, end_y),
+                       (end_x, end_y), (end_x, start_y), (end_x, start_y), (start_x, start_y)],
+                      fill=self.color, width=2)
         return img
+
+    # pick random color for stream of frames
+    def pick_a_color(self):
+        return tuple(self.colors[random.randint(0, (len(self.colors)) - 1)])
 
     # func checks threshold by each label passed as a nparray with text in col 0 and threshold in col 1
     # species cannot be -1 (not present in geo location), cannot be 0, and must be equal or exceed minimum score

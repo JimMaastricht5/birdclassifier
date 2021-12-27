@@ -85,6 +85,7 @@ def bird_detector(args):
             first_img_confidence = birds.classify(img=first_img_jpg)
             first_common_names, first_tweet_label = label_text(birds.classified_labels, birds.classified_confidences)
             first_img_jpg = image_proc.enhance_brightness(img=first_img_jpg, factor=args.brightness_chg)
+            birds.pick_a_color()  # set new color for this series of bounding boxes
             first_img_jpg = birds.add_boxes_and_labels(img=first_img_jpg, label=first_common_names,
                                                        rects=birds.classified_rects)
 
