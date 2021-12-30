@@ -61,7 +61,7 @@ except Exception as e:
 
 
 class DetectClassify:
-    def __init__(self, homedir='/home/pi/PycharmProjects/pyface2/', default_confidence=.98, screenheight=640,
+    def __init__(self, homedir='/home/pi/PycharmProjects/birdclassifier2/', default_confidence=.98, screenheight=640,
                  screenwidth=480, contrast_chg=1.0, color_chg=1.0, brightness_chg=1.0, sharpness_chg=1.0,
                  mismatch_penalty=0.3, overlap_perc_tolerance=0.7):
         self.detector_file = homedir + 'lite-model_ssd_mobilenet_v1_1_metadata_2.tflite'
