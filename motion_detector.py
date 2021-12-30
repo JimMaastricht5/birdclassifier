@@ -44,15 +44,17 @@ except Exception as e:
 
 class MotionDetector:
     def __init__(self, args, save_test_img=False):
+        print('initializing camera')
         self.camera = picamera.PiCamera()
         self.min_area = args.minarea
         if args.screenwidth != 0:  # use specified height and width or default values if not passed
             self.camera.resolution = (args.screenheight, args.screenwidth)
         self.camera.vflip = args.flipcamera
-        self.camera.framerate = args.framerate
+        # self.camera.framerate = args.framerate
+        print('sleep to let camera settle')
         time.sleep(2)  # Wait for the automatic gain control to settle
-        self.shutterspeed = self.camera.exposure_speed
-
+        # self.shutterspeed = self.camera.exposure_speed
+        print('capturing first image')
         self.img = self.capture_image()  # capture img of type PIL
         self.gray = image_proc.grayscale(self.img)  # convert image to gray scale for motion detection
         self.graymotion = image_proc.gaussianblur(self.gray)  # smooth out image for motion detection
@@ -61,6 +63,7 @@ class MotionDetector:
         self.save_test_img = save_test_img
         if self.save_test_img:
             self.img.save('testcap_motion.jpg')
+        print('camera setup completed')
 
     # grab an image from the open stream
     def capture_image(self, img_type='jpeg'):
