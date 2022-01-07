@@ -117,7 +117,8 @@ def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
         frame = image_proc.enhance_brightness(img=frame, factor=args.brightness_chg)
         frame = birds.add_boxes_and_labels(img=frame)
         labeled_frames.append(frame)
-    frames.insert(0, image_proc.convert_image(img=first_img_jpg, target='gif',
+
+    labeled_frames.insert(0, image_proc.convert_image(img=first_img_jpg, target='gif',
                                               save_test_img=args.save_test_img))  # covert and insert first img
     gif = image_proc.save_gif(frames=labeled_frames, frame_rate=args.framerate,
                               save_test_img=args.save_test_img)  # build the labeled gif, default file name
