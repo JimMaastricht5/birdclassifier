@@ -63,7 +63,7 @@ except Exception as e:
 class DetectClassify:
     def __init__(self, homedir='/home/pi/PycharmProjects/birdclassifier/', default_confidence=.98, screenheight=640,
                  screenwidth=480, contrast_chg=1.0, color_chg=1.0, brightness_chg=1.0, sharpness_chg=1.0,
-                 mismatch_penalty=0.3, overlap_perc_tolerance=0.7, framerate=30):
+                 mismatch_penalty=0.3, overlap_perc_tolerance=0.7):
         self.detector_file = homedir + 'lite-model_ssd_mobilenet_v1_1_metadata_2.tflite'
         self.detector_labels_file = homedir + 'lite-model_ssd_mobilenet_v1_1_metadata_2_labelmap.txt'
         self.target_objects = ['bird']
@@ -270,8 +270,8 @@ class DetectClassify:
         return (x_min, y_min, x_max, y_max)
 
     # add bounding box and label to an image
-    def add_boxes_and_labels(self, img, label, rects):
-        for i, rect in enumerate(rects):
+    def add_boxes_and_labels(self, img):
+        for i, rect in enumerate(self.classified_rects):
             try:
                 (start_x, start_y, end_x, end_y) = rect
                 text_x = start_x
@@ -281,11 +281,12 @@ class DetectClassify:
                 end_x += 25
                 end_y += 25
             except TypeError:
+                print('TypeError in add boxes and labels', rect)
                 return
-            # color = tuple(self.colors[random.randint(0, (len(self.colors)) - 1)])
             draw = PILImageDraw.Draw(img)
             font = draw.getfont()
-            draw.text((text_x, text_y), label, font=font, color=self.color)
+            draw.text((text_x, text_y), self.label_text(self.classified_labels[i], self.classified_confidences[i]),
+                      font=font, color=self.color)
             draw.line([(start_x, start_y), (start_x, end_y), (start_x, end_y), (end_x, end_y),
                        (end_x, end_y), (end_x, start_y), (end_x, start_y), (start_x, start_y)],
                       fill=self.color, width=2)
@@ -306,6 +307,15 @@ class DetectClassify:
         return(int(label_threshold) != -1 and cresult > 0 and
                cresult >= float(label_threshold) / 1000)
 
+    # set label for box in image use short species name instead of scientific name
+    def label_text(self, label, confidence):
+        sname = str(label)  # make sure label is considered a string
+        start = sname.find('(') + 1  # find start of common name, move one character to drop (
+        end = sname.find(')')
+        cname = sname[start:end] if start >= 0 and end >= 0 else sname
+        common_name = f'{cname} {confidence * 100:.1f}%'
+        return common_name
+
 
 def main(args):
     img = PILImage.open(args.image)  # load image
@@ -322,7 +332,7 @@ def main(args):
     if len(label) == 0:
         label = "no classification text"
     print(label)
-    img = birds.add_boxes_and_labels(img, label, birds.classified_rects)
+    img = birds.add_boxes_and_labels(img)
     img.save('imgtest.jpg')
     img.show()
 

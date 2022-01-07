@@ -61,7 +61,7 @@ def bird_detector(args):
     birds = label_image.DetectClassify(default_confidence=args.default_confidence,
                                        mismatch_penalty=args.mismatch_penalty,
                                        screenheight=args.screenheight, screenwidth=args.screenwidth,
-                                       framerate=args.framerate, color_chg=args.color_chg,
+                                       color_chg=args.color_chg,
                                        contrast_chg=args.contrast_chg, sharpness_chg=args.sharpness_chg,
                                        overlap_perc_tolerance=args.overlap_perc_tolerance)
 
@@ -83,26 +83,22 @@ def bird_detector(args):
             # copy first image, classify, grab labels, enhance the shot, and add boxes
             first_img_jpg = birds.img.copy()
             first_img_confidence = birds.classify(img=first_img_jpg)
-            first_common_names, first_tweet_label = label_text(birds.classified_labels, birds.classified_confidences)
+            first_tweet_label = tweet_text(birds.classified_labels, birds.classified_confidences)
             first_img_jpg = image_proc.enhance_brightness(img=first_img_jpg, factor=args.brightness_chg)
             birds.pick_a_color()  # set new color for this series of bounding boxes
-            first_img_jpg = birds.add_boxes_and_labels(img=first_img_jpg, label=first_common_names,
-                                                       rects=birds.classified_rects)
+            first_img_jpg = birds.add_boxes_and_labels(img=first_img_jpg)
+            birdpop.visitors(birds.classified_labels, datetime.now())  # update census count and time last seen
             # if found a bird that we're confident in, grab a stream of pics, add first pic, and build animated gif
             if first_img_confidence >= args.default_confidence:
-                # potential error in tweet labels, consider all birds in all frames?
-                gif, tweet_labels, stream_confidences = build_bird_animated_gif(args, motion_detect, birds,
-                                                            first_tweet_label, first_img_jpg)
+                gif = build_bird_animated_gif(args, motion_detect, birds, first_img_jpg)
                 # what to do if bird flies off at first img grab?
-                # potential error in bird pop, labels from last frame only?  use first pic?
                 print('ready to tweet, wait five minutes since last tweet.  last tweet was at:', last_tweet)
                 if (datetime.now() - last_tweet).total_seconds() >= 60 * 5:
-                    birdpop.visitors(birds.classified_labels, datetime.now())  # update census count and last tweeted
                     last_tweet = datetime.now()
-                    if bird_tweeter.post_image(tweet_labels[0], gif) is False:  # try animated gif
-                        print(f"*** failed gif send")
-                        if bird_tweeter.post_image(first_tweet_label, first_img_jpg) is False:  # try org jph
-                            print(f"*** failed jpg send")
+                    if bird_tweeter.post_image(first_tweet_label, gif) is False:  # try animated gif
+                        print(f"*** failed gif tweet")
+                        if bird_tweeter.post_image(first_tweet_label, first_img_jpg) is False:  # try org jpg
+                            print(f"*** failed jpg tweet")
 
     motion_detect.stop()
     if args.verbose:
@@ -110,46 +106,30 @@ def bird_detector(args):
         chores.end_report()  # post a report on run time of the process
 
 
-def build_bird_animated_gif(args, motion_detect, birds, first_tweet_label, first_img_jpg):
+def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
     # grab a stream of pictures, add first pic from above, and build animated gif
     labeled_frames = []
-    tweet_labels = []
-    stream_confidences = []
+    max_confidences_per_frame = []
     frames = motion_detect.capture_stream(save_test_img=args.save_test_img)  # capture a list of images
     for frame in frames:
         birds.detect(img=frame)  # find bird object in frame and set rectangles containing object
-        stream_confidences.append(birds.classify(img=frame))  # classify object at rectangle location
-        common_names, tweet_label = label_text(birds.classified_labels, birds.classified_confidences)
+        max_confidences_per_frame.append(birds.classify(img=frame))  # classify object at rectangle location
         frame = image_proc.enhance_brightness(img=frame, factor=args.brightness_chg)
-        frame = birds.add_boxes_and_labels(img=frame, label=common_names, rects=birds.classified_rects)
-        tweet_labels.append(tweet_label)  # build dictionary of labels
+        frame = birds.add_boxes_and_labels(img=frame)
         labeled_frames.append(frame)
-    tweet_labels.insert(0, first_tweet_label)  # insert first tweet label
     frames.insert(0, image_proc.convert_image(img=first_img_jpg, target='gif',
                                               save_test_img=args.save_test_img))  # covert and insert first img
     gif = image_proc.save_gif(frames=labeled_frames, frame_rate=args.framerate,
                               save_test_img=args.save_test_img)  # build the labeled gif, default file name
-    return gif, tweet_labels, stream_confidences
+    return gif
 
 
-# set label for image and tweet, use short species name instead of scientific name
-def label_text(species_names, species_confs):
-    common_names, tweet_label, cname, sname = '', '', '', ''
-    for i, sname in enumerate(species_names):
-        if i > 0:
-            common_names += ', '
-            tweet_label += ', '
-
-        sname = str(sname)  # make sure species is considered a string
-        start = sname.find('(') + 1  # find start of common name, move one character to drop (
-        end = sname.find(')')
-        if start >= 0 and end >= 0:
-            cname = sname[start:end]
-        else:
-            cname = sname
-        common_names += f'{cname} {species_confs[i] * 100:.1f}%'
-        tweet_label += f'{sname} {species_confs[i] * 100:.1f}%'
-    return common_names, tweet_label
+def tweet_text(classified_labels, classified_confidences):
+    tweet_label, sname = '', ''
+    for i, sname in enumerate(classified_labels):
+        sname = str(sname)  # make sure label is considered a string
+        tweet_label += f'{sname} {classified_confidences[i] * 100:.1f}% '
+    return tweet_label
 
 
 if __name__ == "__main__":
