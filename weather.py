@@ -100,7 +100,7 @@ class CityWeather:
         if datetime.now().time() > self.sunset.time():
             waittime = (datetime.combine(datetime.now().date() + timedelta(days=1),
                                          datetime.strptime("0000", "%H%M").time()) - datetime.now()).total_seconds()
-            waittime += 1 # add a second
+            waittime = waittime + 1 if waittime >= 0 else 1  # add a second and check for negative numbers
             print(f'taking a {waittime} second nap until after midnight')
             time.sleep(waittime + 60)  # wait until after midnight with a small pad just to be sure
         return
@@ -109,7 +109,7 @@ class CityWeather:
     def wait_until_sunrise(self):
         if datetime.now().time() < self.sunrise.time():
             waittime = (self.sunrise - datetime.now()).total_seconds()
-            waittime += 1  # add a second
+            waittime = waittime + 1 if waittime >= 0 else 1  # add a second and check for negative numbers
             print(f'taking a {waittime} second nap to wait for sun rise')
             time.sleep(waittime)  # wait until the sun comes up
         return

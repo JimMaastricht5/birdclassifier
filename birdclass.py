@@ -33,7 +33,7 @@ import label_image  # code to init tensor flow model and classify bird type, bir
 import motion_detector  # motion detector helper functions
 import tweeter  # twitter helper functions
 import population  # population census object, tracks species total seen and last time
-import dailychores  # handles tasks that occur once per day or per hour
+import dailychores  # handle tasks that occur once per day or per hour
 import weather
 import argparse  # argument parser
 from datetime import datetime
@@ -88,43 +88,48 @@ def bird_detector(args):
             birds.pick_a_color()  # set new color for this series of bounding boxes
             first_img_jpg = birds.add_boxes_and_labels(img=first_img_jpg, label=first_common_names,
                                                        rects=birds.classified_rects)
-
-            # grab a stream of pictures, add first pic from above, and build animated gif
-            labeled_frames = []
-            tweet_labels = []
-            frames = motion_detect.capture_stream(save_test_img=args.save_test_img)  # capture a list of images
-            for frame in frames:
-                birds.detect(img=frame)  # find bird object in frame and set rectangles containing object
-                confidence = birds.classify(img=frame)  # classify object at rectangle location, confidence not used
-                common_names, tweet_label = label_text(birds.classified_labels, birds.classified_confidences)
-                frame = image_proc.enhance_brightness(img=frame, factor=args.brightness_chg)
-                frame = birds.add_boxes_and_labels(img=frame, label=common_names, rects=birds.classified_rects)
-                tweet_labels.append(tweet_label)  # build dictionary of labels
-                labeled_frames.append(frame)
-            tweet_labels.insert(0, first_tweet_label)  # insert first tweet label
-            frames.insert(0, image_proc.convert_image(img=first_img_jpg, target='gif',
-                                                      save_test_img=args.save_test_img))  # covert and insert first img
-            # gif = image_proc.save_gif(frames=labeled_frames, frame_rate=args.framerate,
-            #                           save_test_img=args.save_test_img)  # build the labeled gif, default file name
-            # try and effective frame rate of 100
-            gif = image_proc.save_gif(frames=labeled_frames, frame_rate=60,
-                                      save_test_img=args.save_test_img)  # build the labeled gif, default file name
-
-            # tweet handling, if waited long enough and some confidence try gif, if fails tweet jpg from org motion
-            print('ready to tweet, last tweet and first confidence:', last_tweet, first_img_confidence)
-            if (datetime.now() - last_tweet).total_seconds() >= 60 * 5 and \
-                    first_img_confidence > args.default_confidence:
-                birdpop.visitors(birds.classified_labels, datetime.now())  # update census count and last tweeted
-                last_tweet = datetime.now()
-                if bird_tweeter.post_image(tweet_labels[0], gif) is False:  # try animated gif
-                    print(f"*** failed gif send")
-                    if bird_tweeter.post_image(first_tweet_label, first_img_jpg) is False:  # try org jph
-                        print(f"*** failed jpg send")
+            # if found a bird that we're confident in, grab a stream of pics, add first pic, and build animated gif
+            if first_img_confidence >= args.default_confidence:
+                # potential error in tweet labels, consider all birds in all frames?
+                gif, tweet_labels, stream_confidences = build_bird_animated_gif(args, motion_detect, birds,
+                                                            first_tweet_label, first_img_jpg)
+                # what to do if bird flies off at first img grab?
+                # potential error in bird pop, labels from last frame only?  use first pic?
+                print('ready to tweet, wait five minutes since last tweet.  last tweet was at:', last_tweet)
+                if (datetime.now() - last_tweet).total_seconds() >= 60 * 5:
+                    birdpop.visitors(birds.classified_labels, datetime.now())  # update census count and last tweeted
+                    last_tweet = datetime.now()
+                    if bird_tweeter.post_image(tweet_labels[0], gif) is False:  # try animated gif
+                        print(f"*** failed gif send")
+                        if bird_tweeter.post_image(first_tweet_label, first_img_jpg) is False:  # try org jph
+                            print(f"*** failed jpg send")
 
     motion_detect.stop()
     if args.verbose:
         chores.hourly_and_daily(report_pop=True)
         chores.end_report()  # post a report on run time of the process
+
+
+def build_bird_animated_gif(args, motion_detect, birds, first_tweet_label, first_img_jpg):
+    # grab a stream of pictures, add first pic from above, and build animated gif
+    labeled_frames = []
+    tweet_labels = []
+    stream_confidences = []
+    frames = motion_detect.capture_stream(save_test_img=args.save_test_img)  # capture a list of images
+    for frame in frames:
+        birds.detect(img=frame)  # find bird object in frame and set rectangles containing object
+        stream_confidences.append(birds.classify(img=frame))  # classify object at rectangle location
+        common_names, tweet_label = label_text(birds.classified_labels, birds.classified_confidences)
+        frame = image_proc.enhance_brightness(img=frame, factor=args.brightness_chg)
+        frame = birds.add_boxes_and_labels(img=frame, label=common_names, rects=birds.classified_rects)
+        tweet_labels.append(tweet_label)  # build dictionary of labels
+        labeled_frames.append(frame)
+    tweet_labels.insert(0, first_tweet_label)  # insert first tweet label
+    frames.insert(0, image_proc.convert_image(img=first_img_jpg, target='gif',
+                                              save_test_img=args.save_test_img))  # covert and insert first img
+    gif = image_proc.save_gif(frames=labeled_frames, frame_rate=args.framerate,
+                              save_test_img=args.save_test_img)  # build the labeled gif, default file name
+    return gif, tweet_labels, stream_confidences
 
 
 # set label for image and tweet, use short species name instead of scientific name
@@ -187,4 +192,4 @@ if __name__ == "__main__":
 # if birds.target_object_found:
 #     print('*** bird detect and classify results')
 #     print(birds.classified_labels, birds.classified_rects)
-# place holder show video w boxes and labels
+# placeholder show video w boxes and labels
