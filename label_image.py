@@ -87,6 +87,9 @@ class DetectClassify:
         self.classified_confidences = []
         self.classified_labels = []
         self.classified_rects = []
+        self.last_known_classified_confidences = []
+        self.last_known_classified_labels = []
+        self.last_known_classified_rects = []
         self.colors = np.random.uniform(0, 255, size=(11, 3)).astype(int)  # random colors for bounding boxes
         self.color = self.pick_a_color()  # set initial color to use for bounding boxes
 
@@ -156,6 +159,7 @@ class DetectClassify:
     # make classifications using img and detect results
     # compare img and equalized images
     # use self.detected_confidences,detected_labels, detected_rects lists
+    # stash prior classification for later processing if current frame does not find a bird
     def classify(self, img):
         self.classified_rects = []
         self.classified_confidences = []
@@ -198,6 +202,9 @@ class DetectClassify:
             max_confidence = 0
         else:
             max_confidence = max(self.classified_confidences)
+            self.last_known_classified_rects = self.classified_rects
+            self.last_known_classified_labels = self.classified_labels
+            self.last_known_classified_confidences = self.classified_confidences
         return max_confidence
 
     # input image and return best result and label
@@ -270,8 +277,18 @@ class DetectClassify:
         return (x_min, y_min, x_max, y_max)
 
     # add bounding box and label to an image
-    def add_boxes_and_labels(self, img):
-        for i, rect in enumerate(self.classified_rects):
+    # we may have a rect with no species and a zero confidence, in that case use the last known label and confidence
+    def add_boxes_and_labels(self, img, use_last_known=False):
+        if use_last_known and max(self.classified_confidences) == 0:
+            classified_rects = self.last_known_classified_rects
+            classified_labels = self.last_known_classified_labels
+            classified_confidences = self.last_known_classified_confidences
+        else:
+            classified_rects = self.classified_rects
+            classified_labels = self.classified_labels
+            classified_confidences = self.classified_confidences
+
+        for i, rect in enumerate(classified_rects):
             try:
                 (start_x, start_y, end_x, end_y) = rect
                 text_x = start_x
@@ -285,7 +302,7 @@ class DetectClassify:
                 return
             draw = PILImageDraw.Draw(img)
             font = draw.getfont()
-            draw.text((text_x, text_y), self.label_text(self.classified_labels[i], self.classified_confidences[i]),
+            draw.text((text_x, text_y), self.label_text(classified_labels[i], classified_confidences[i]),
                       font=font, color=self.color)
             draw.line([(start_x, start_y), (start_x, end_y), (start_x, end_y), (end_x, end_y),
                        (end_x, end_y), (end_x, start_y), (end_x, start_y), (start_x, start_y)],
