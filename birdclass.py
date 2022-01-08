@@ -121,7 +121,7 @@ def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
 
     labeled_frames.insert(0, image_proc.convert_image(img=first_img_jpg,
                                                       target='gif', save_test_img=args.save_test_img))  # isrt 1st img
-    if last_good_frame > 0:  # if bird is in more than one frame
+    if last_good_frame >= (args.minanimatedframes - 1):  # if bird is in more than the min number of frames
         gif = image_proc.save_gif(frames=labeled_frames[0:last_good_frame], frame_rate=args.framerate,
                                   save_test_img=args.save_test_img)  # build the labeled gif, default file name
     else:
@@ -146,6 +146,7 @@ if __name__ == "__main__":
     ap.add_argument("-sw", "--screenwidth", type=int, default=640, help="max screen width")
     ap.add_argument("-sh", "--screenheight", type=int, default=480, help="max screen height")
     ap.add_argument("-fr", "--framerate", type=int, default=30, help="frame rate for camera")
+    ap.add_argument("-gf", "--minanimatedframes", type=int, default=5, help="minimum number of frames for an animation")
     ap.add_argument("-st", "--save_test_img", type=bool, default=False, help="save test images")  # saves sample images
     ap.add_argument("-v", "--verbose", type=bool, default=True, help="To tweet or not to tweet")
 
