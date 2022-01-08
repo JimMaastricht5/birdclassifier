@@ -121,8 +121,11 @@ def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
 
     labeled_frames.insert(0, image_proc.convert_image(img=first_img_jpg,
                                                       target='gif', save_test_img=args.save_test_img))  # isrt 1st img
-    gif = image_proc.save_gif(frames=labeled_frames[0:last_good_frame], frame_rate=args.framerate,
-                              save_test_img=args.save_test_img)  # build the labeled gif, default file name
+    if last_good_frame > 0:  # if bird is in more than one frame
+        gif = image_proc.save_gif(frames=labeled_frames[0:last_good_frame], frame_rate=args.framerate,
+                                  save_test_img=args.save_test_img)  # build the labeled gif, default file name
+    else:
+        gif = image_proc.convert_image(img=first_img_jpg, target='gif', save_test_img=args.save_test_img)
     return gif
 
 
