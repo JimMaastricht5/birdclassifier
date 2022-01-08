@@ -82,16 +82,15 @@ def bird_detector(args):
             # keep first shot to add to start of animation or as stand along jpg
             # copy first image, classify, grab labels, enhance the shot, and add boxes
             first_img_jpg = birds.img.copy()
-            first_img_confidence = birds.classify(img=first_img_jpg)
-            first_tweet_label = tweet_text(birds.classified_labels, birds.classified_confidences)
-            first_img_jpg = image_proc.enhance_brightness(img=first_img_jpg, factor=args.brightness_chg)
-            birds.pick_a_color()  # set new color for this series of bounding boxes
-            first_img_jpg = birds.add_boxes_and_labels(img=first_img_jpg)
-            birdpop.visitors(birds.classified_labels, datetime.now())  # update census count and time last seen
-            # if found a bird that we're confident in, grab a stream of pics, add first pic, and build animated gif
-            if first_img_confidence >= args.default_confidence:
+            if birds.classify(img=first_img_jpg) >= args.default_confidence:  # found a bird we can classify
+                first_tweet_label = tweet_text(birds.classified_labels, birds.classified_confidences)
+                first_img_jpg = image_proc.enhance_brightness(img=first_img_jpg, factor=args.brightness_chg)
+                birds.pick_a_color()  # set new color for this series of bounding boxes
+                first_img_jpg = birds.add_boxes_and_labels(img=first_img_jpg)
+                birdpop.visitors(birds.classified_labels, datetime.now())  # update census count and time last seen
+
+                # grab a stream of pics, add first pic, and build animated gif
                 gif = build_bird_animated_gif(args, motion_detect, birds, first_img_jpg)
-                # what to do if bird flies off at first img grab?
                 print('ready to tweet, wait five minutes since last tweet.  last tweet was at:', last_tweet)
                 if (datetime.now() - last_tweet).total_seconds() >= 60 * 5:
                     last_tweet = datetime.now()
@@ -109,18 +108,19 @@ def bird_detector(args):
 def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
     # grab a stream of pictures, add first pic from above, and build animated gif
     labeled_frames = []
-    max_confidences_per_frame = []
+    last_good_frame = 0  # find last frame that has a bird, index zero is good based on first image
     frames = motion_detect.capture_stream(save_test_img=args.save_test_img)  # capture a list of images
-    for frame in frames:
-        birds.detect(img=frame)  # find bird object in frame and set rectangles containing object
-        max_confidences_per_frame.append(birds.classify(img=frame))  # classify object at rectangle location
+    for i, frame in enumerate(frames):
         frame = image_proc.enhance_brightness(img=frame, factor=args.brightness_chg)
-        frame = birds.add_boxes_and_labels(img=frame)
-        labeled_frames.append(frame)
+        if birds.detect(img=frame):  # find bird object in frame and set rectangles containing object
+            last_good_frame = i + 1  # found a bird, add one to last good frame to account for insert of 1st image below
+        confidence = birds.classify(img=frame)   # classify object at rectangle location
+        # ?? figure out how to carry over prior box and label if we don't get one here
+        labeled_frames.append(birds.add_boxes_and_labels(img=frame))  # enhanced, classified, and labeled frame -> list
 
-    labeled_frames.insert(0, image_proc.convert_image(img=first_img_jpg, target='gif',
-                                              save_test_img=args.save_test_img))  # covert and insert first img
-    gif = image_proc.save_gif(frames=labeled_frames, frame_rate=args.framerate,
+    labeled_frames.insert(0, image_proc.convert_image(img=first_img_jpg,
+                                                      target='gif', save_test_img=args.save_test_img))  # isrt 1st img
+    gif = image_proc.save_gif(frames=labeled_frames[0:last_good_frame], frame_rate=args.framerate,
                               save_test_img=args.save_test_img)  # build the labeled gif, default file name
     return gif
 
