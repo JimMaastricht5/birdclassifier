@@ -91,9 +91,10 @@ def bird_detector(args):
 
                 # grab a stream of pics, add first pic, and build animated gif
                 gif = build_bird_animated_gif(args, motion_detect, birds, first_img_jpg)
-                print('ready to tweet, wait five minutes since last tweet.  last tweet was at:', last_tweet)
+                print('ready to tweet.  last tweet was at:', last_tweet)
                 if (datetime.now() - last_tweet).total_seconds() >= 60 * 5:
                     last_tweet = datetime.now()
+                    print('attempting gif and/or jpg tweet at:', last_tweet)
                     if bird_tweeter.post_image(first_tweet_label, gif) is False:  # try animated gif
                         print(f"*** failed gif tweet")
                         if bird_tweeter.post_image(first_tweet_label, first_img_jpg) is False:  # try org jpg
