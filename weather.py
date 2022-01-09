@@ -97,7 +97,7 @@ class CityWeather:
 
     # wait here until after midnight and then wait for sunrise
     def wait_until_midnight(self):
-        if datetime.now().time() > self.sunset.time():
+        if datetime.now() > self.sunset:
             waittime = (datetime.combine(datetime.now().date() + timedelta(days=1),
                                          datetime.strptime("0000", "%H%M").time()) - datetime.now()).total_seconds()
             waittime = waittime + 1 if waittime >= 0 else 1  # add a second and check for negative numbers
@@ -107,7 +107,7 @@ class CityWeather:
 
     # wait here until the sun is up before initialize the camera
     def wait_until_sunrise(self):
-        if datetime.now().time() < self.sunrise.time():
+        if datetime.now() < self.sunrise:
             waittime = (self.sunrise - datetime.now()).total_seconds()
             waittime = waittime + 1 if waittime >= 0 else 1  # add a second and check for negative numbers
             print(f'taking a {waittime} second nap to wait for sun rise')
@@ -119,6 +119,8 @@ def main():
     spweather = CityWeather()
     spweather.update_conditions()
     print(spweather.isclear)
+    print(datetime.now())
+    print(spweather.sunrise)
     print(spweather.sunrise.strftime('%H:%M:%S'))
     print(spweather.sunset.strftime('%H:%M:%S'))
     print(spweather.temp)
@@ -128,6 +130,8 @@ def main():
     print(spweather.humidity)
     print(spweather.visibility)
     print(spweather.is_daytime())
+    waittime = (spweather.sunrise - datetime.now()).total_seconds()
+    print('waittime:', waittime)
     spweather.wait_until_midnight()
     spweather.wait_until_sunrise()
 
