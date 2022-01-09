@@ -76,10 +76,10 @@ class DailyChores:
             post_txt = ''  # force to string
             birdstr = ''  # used to force tuple to string
             observed = self.birdpop.get_census_by_count()
-            post_txt = f'top birds for day {str(self.curr_day)}'
+            post_txt = f'top birds for day {str(self.curr_day)}: '
             index = 0
             for birdpop in observed:  # bird pop is a multidimensional array with 0th item species name
-                if birdpop[0:2] != '':  # skip the unknown species caregory
+                if birdpop[0:2] != '' and birdpop[0:2] != 'undetermined':  # skip the unknown species category
                     birdstr = str(birdpop[0])
                     start = birdstr.find('(') + 1  # find start of common name, move one character to drop (
                     end = birdstr.find(')')
@@ -90,20 +90,7 @@ class DailyChores:
                     birdstr = str(f', #{str(index + 1)} {cname} {observed[index][1]} ')  # top bird count & species name
                     post_txt = post_txt + birdstr  # aggregate text for post
                 index += 1
-            # old code block rewritten to avoid premature end of list
-            # while index <= 2:  # top 3 skipping unknown species
-            #     if observed[index][0:2] != '':  # skip the unknown species category
-            #         birdstr = str(observed[index][0])  # grab top species name
-            #         start = birdstr.find('(') + 1  # find start of common name, move one character to drop (
-            #         end = birdstr.find(')')
-            #         if start >= 0 and end >= 0:
-            #             cname = birdstr[start:end]
-            #         else:
-            #             cname = birdstr
-            #         birdstr = str(f', #{str(index + 1)} {cname} {observed[index][1]} ')  # top bird count & species name
-            #         post_txt = post_txt + birdstr  # aggregate text for post
-            #     index += 1
-            self.tweeter.post_status(post_txt[0:150])  # grab full text up to 150 characters
+            self.tweeter.post_status(post_txt[0:279])  # grab full text up to 280 characters
         except:
             pass  # just keep going....
         return
