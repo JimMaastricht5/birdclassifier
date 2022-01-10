@@ -99,16 +99,8 @@ class DetectClassify:
         self.color_chg = color_chg
         self.sharpness_chg = sharpness_chg
         self.overlap_perc_tolerance = overlap_perc_tolerance
-
         self.img = np.zeros((screenheight, screenwidth, 3), dtype=np.uint8)
-        # try:
-        #     self.camera = picamera.PiCamera()
-        #     self.camera.resolution(screenheight, screenwidth)
-        #     self.camera.framerate = framerate
-        # except Exception as e_init:
-        #     print(e_init)
-        #     print('fails on windows... continue for testing....')
-        #     pass
+
 
     # initialize tensor flow model
     def init_tf2(self, model_file, label_file_name):
@@ -176,17 +168,17 @@ class DetectClassify:
             classify_conf, classify_label = self.classify_obj(crop_img)
             classify_conf_equalized, classify_label_equalized = self.classify_obj(crop_equalizedimg)
             if classify_label != classify_label_equalized:  # predictions should match if pic quality is good
-                # pick the result with highest confidence and reduce the confidence of the highest
-                if classify_conf >= classify_conf_equalized:
-                    pass
-                else:
+                if classify_conf < classify_conf_equalized:
                     classify_conf = classify_conf_equalized
                     classify_label = classify_label_equalized
                 classify_conf -= self.classify_mismatch_reduction  # reduce confidence on mismatch
             else:  # increase confidence on match
-                classify_conf += classify_conf_equalized
-                if classify_conf > 1:
-                    classify_conf = 1
+                classify_conf = \
+                    classify_conf + classify_conf_equalized if classify_conf + classify_conf_equalized <= 1 else 1
+
+                # classify_conf += classify_conf_equalized
+                # if classify_conf > 1:
+                #     classify_conf = 1
 
             # detect overlapping rectangles/same bird and skip it
             # overlap_perc = image_proc.overlap_area(prior_rect, rect)  # compare current rect and prior rect
@@ -196,9 +188,12 @@ class DetectClassify:
             #     classify_label = ""
 
             self.classified_labels.append(classify_label)
+            classify_conf = classify_conf if classify_conf > 0 else 0  # check for negative conf
             self.classified_confidences.append(classify_conf)
             self.classified_rects.append(rect)
-        if len(self.classified_confidences) == 0:
+        if len(self.classified_confidences) == 0:  # check for an empty list
+            max_confidence = 0
+        elif max(self.classified_confidences) == 0:  # if not empty check for zero, don't combine with above or error
             max_confidence = 0
         else:
             max_confidence = max(self.classified_confidences)

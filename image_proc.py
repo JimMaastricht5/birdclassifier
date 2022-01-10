@@ -179,7 +179,6 @@ def save_gif(frames, frame_rate=30, filename='/home/pi/birdclass/birds.gif', sav
         ml_sec = int(1000 * len(gif_frames) * 1/frame_rate)  # frames * rate, 200 * 1/30 = 5 sec * 1,000 = ml sec
         gif_frame_one.save(filename, format="GIF", append_images=gif_frames[1:],
                            save_all=True, optimze=True, minimize_size=True, duration=ml_sec, loop=50)  # loop=0 infinity
-        # save_all = True, optimze = True, minimize_size = True, duration = 120, loop = 50)  # loop=0 inifinite
         gif = open(filename, 'rb')  # reload gif
     except Exception as e:
         print(e)
