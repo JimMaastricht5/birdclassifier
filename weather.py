@@ -96,6 +96,7 @@ class CityWeather:
         return
 
     # wait here until after midnight and then wait for sunrise
+    # once midnight is reached + 1 second reset sunrise and sunset with correct date for new day
     def wait_until_midnight(self):
         if datetime.now() > self.sunset:
             waittime = (datetime.combine(datetime.now().date() + timedelta(days=1),
@@ -103,6 +104,7 @@ class CityWeather:
             waittime = waittime + 1 if waittime >= 0 else 1  # add a second and check for negative numbers
             print(f'taking a {waittime} second nap until after midnight')
             time.sleep(waittime + 60)  # wait until after midnight with a small pad just to be sure
+            self.local_weather()  # reset dates and times for sunrise and sunset for a new day
         return
 
     # wait here until the sun is up before initialize the camera
