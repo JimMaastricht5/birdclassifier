@@ -92,7 +92,7 @@ def bird_detector(args):
                 # grab a stream of pics, add first pic, and build animated gif
                 gif = build_bird_animated_gif(args, motion_detect, birds, first_img_jpg)
                 print('ready to tweet.  last tweet was at:', last_tweet)
-                if (datetime.now() - last_tweet).total_seconds() >= 60 * 5:
+                if (datetime.now() - last_tweet).total_seconds() >= args.tweetdelay:
                     last_tweet = datetime.now()
                     print('attempting gif and/or jpg tweet at:', last_tweet)
                     if bird_tweeter.post_image(first_tweet_label, gif) is False:  # try animated gif
@@ -149,6 +149,8 @@ if __name__ == "__main__":
     ap.add_argument("-gf", "--minanimatedframes", type=int, default=10, help="minimum number of frames for an animation")
     ap.add_argument("-st", "--save_test_img", type=bool, default=False, help="save test images")  # saves sample images
     ap.add_argument("-v", "--verbose", type=bool, default=True, help="To tweet or not to tweet")
+    ap.add_argument("-td", "--tweetdelay", type=int, default=300,
+                    help="Time to wait between tweets in seconds, default 300 seconds or 5 min")
 
     # motion and image processing settings
     ap.add_argument("-b", "--brightness_chg", type=int, default=1.05, help="brightness boost")  # 1 no chg,< 1 -, > 1 +
