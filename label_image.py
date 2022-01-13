@@ -101,7 +101,6 @@ class DetectClassify:
         self.overlap_perc_tolerance = overlap_perc_tolerance
         self.img = np.zeros((screenheight, screenwidth, 3), dtype=np.uint8)
 
-
     # initialize tensor flow model
     def init_tf2(self, model_file, label_file_name):
         possible_labels = np.asarray(self.load_labels(label_file_name))  # load label file and convert to list

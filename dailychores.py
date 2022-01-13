@@ -54,8 +54,9 @@ class DailyChores:
             if int(cpu.temperature) >= 86:  # limit is 85 C
                 self.tweeter.post_status(f'***shut down. temp: {cpu.temperature}')
                 call("sudo shutdown -poweroff")
-        except:
-            pass
+        except Exception as e:
+            print('Error in temp shutdown protection:', e)
+            pass  # uncharted territory....
         return
 
     # post weather conditions
@@ -73,26 +74,21 @@ class DailyChores:
     # position 0 in tuple is bird name, 1 is count, 2 is last seen
     def top_pop_report(self):
         try:
-            post_txt = ''  # force to string
-            birdstr = ''  # used to force tuple to string
             observed = self.birdpop.get_census_by_count()
             post_txt = f'top birds for day {str(self.curr_day)}. '
-            index = 0
-            for birdpop in observed:  # bird pop is a multidimensional array with 0th item species name
-                if birdpop[0:2] != '' and birdpop[0:2] != 'undetermined':  # skip the unknown species category
-                    birdstr = str(birdpop[0])
-                    start = birdstr.find('(') + 1  # find start of common name, move one character to drop (
-                    end = birdstr.find(')')
-                    if start >= 0 and end >= 0:
-                        cname = birdstr[start:end]
-                    else:
-                        cname = birdstr
-                    birdstr = str(f'#{str(index + 1)}: {observed[index][1]} {cname}, ')  # top bird count & species name
-                    post_txt = post_txt + birdstr  # aggregate text for post
-                index += 1
+            for index, birdpop in enumerate(observed):  # bird pop is list of tuples with 0th item species name
+                start = birdpop[0].find('(') + 1
+                end = birdpop[0].find(')')
+                if start >= 0 and end >= 0:
+                    cname = birdpop[0][start:end]
+                else:
+                    cname = birdpop[0]
+                birdstr = str(f'#{str(index + 1)}: {observed[index][1]} {cname}, ')  # top bird count & species name
+                post_txt = post_txt + birdstr  # aggregate text for post
             self.tweeter.post_status(post_txt[0:279])  # grab full text up to 280 characters
-        except:
-            pass  # just keep going....
+        except Exception as e:
+            print('Error in daily population report:', e)
+            pass  # just keep going...
         return
 
     # housekeeping for day and hour
