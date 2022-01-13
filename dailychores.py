@@ -87,7 +87,7 @@ class DailyChores:
                         cname = birdstr[start:end]
                     else:
                         cname = birdstr
-                    birdstr = str(f', #{str(index + 1)}: {observed[index][1]} {cname},  ')  # top bird count & species name
+                    birdstr = str(f'#{str(index + 1)}: {observed[index][1]} {cname}, ')  # top bird count & species name
                     post_txt = post_txt + birdstr  # aggregate text for post
                 index += 1
             self.tweeter.post_status(post_txt[0:279])  # grab full text up to 280 characters

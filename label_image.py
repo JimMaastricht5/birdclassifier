@@ -172,13 +172,9 @@ class DetectClassify:
                     classify_conf = classify_conf_equalized
                     classify_label = classify_label_equalized
                 classify_conf -= self.classify_mismatch_reduction  # reduce confidence on mismatch
-            else:  # increase confidence on match
+            else:  # increase confidence on match, use classify_label already set above
                 classify_conf = \
                     classify_conf + classify_conf_equalized if classify_conf + classify_conf_equalized <= 1 else 1
-
-                # classify_conf += classify_conf_equalized
-                # if classify_conf > 1:
-                #     classify_conf = 1
 
             # detect overlapping rectangles/same bird and skip it
             # overlap_perc = image_proc.overlap_area(prior_rect, rect)  # compare current rect and prior rect
