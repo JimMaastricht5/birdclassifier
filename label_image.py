@@ -166,7 +166,7 @@ class DetectClassify:
             crop_equalizedimg = equalizedimg.crop((startX, startY, endX, endY))
             classify_conf, classify_label = self.classify_obj(crop_img)
             classify_conf_equalized, classify_label_equalized = self.classify_obj(crop_equalizedimg)
-            if classify_label != classify_label_equalized:  # predictions should match if pic quality is good
+            if round(classify_label, 3) != round(classify_label_equalized, 3):  # should match if pic quality is good
                 if classify_conf < classify_conf_equalized:
                     classify_conf = classify_conf_equalized
                     classify_label = classify_label_equalized
@@ -188,7 +188,7 @@ class DetectClassify:
             self.classified_rects.append(rect)
         if len(self.classified_confidences) == 0:  # check for an empty list
             max_confidence = 0
-        elif max(self.classified_confidences) == 0:  # if not empty check for zero, don't combine with above or error
+        elif round(max(self.classified_confidences), 3) == 0:  # if not empty check zero, don't combine with above if
             max_confidence = 0
         else:
             max_confidence = max(self.classified_confidences)
