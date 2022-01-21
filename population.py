@@ -23,60 +23,82 @@
 # population census
 #
 from datetime import datetime
-from operator import itemgetter
+from collections import defaultdict
+
+
+# default dictionary returns a tuple of zero count and the current date and time as last seen
+def default_value():
+    return 0, datetime.now()
 
 
 class Census:
     def __init__(self):
-        self.clear()
-        self.census = []
+        # self.census = []
+        self.census_dict = defaultdict(default_value)
 
     def clear(self):
-        self.census = []
+        # self.census = []
+        self.census_dict = []  # clear it and re-establish
+        self.census_dict = defaultdict(default_value)
 
     # find index for visitor by name
-    def find_visitor(self, visitor_name):
-        loc = -1
-        for i in range(len(self.census)):
-            if self.census[i][0] == visitor_name:
-                loc = i
-                break
-        return loc
+    # def find_visitor(self, visitor_name):
+    #     loc = -1
+    #     for i in range(len(self.census)):
+    #         if self.census[i][0] == visitor_name:
+    #             loc = i
+    #             break
+    #     return loc
 
     # find visitor by census name, increment count, and update time
-    def visitors(self, visitor_names, time_of_visit):
-        for i, visitor_name in enumerate(visitor_names):
+    def visitors(self, visitor_names, time_of_visit=datetime.now()):
+        visitor_name_list = []
+        if type(visitor_names) != list:
+            visitor_name_list.append(visitor_names)
+        else:
+            visitor_name_list = visitor_names
+
+        for i, visitor_name in enumerate(visitor_name_list):
             if visitor_name == '' or visitor_name == ' ':
                 visitor_name = 'undetermined'
-            vindex = self.find_visitor(visitor_name)
-            if vindex >= 0:
-                self.census[vindex][1] += 1
-                self.census[vindex][2] = time_of_visit
-            else:  # add
-                self.census.append([visitor_name, 1, time_of_visit])
+            # vindex = self.find_visitor(visitor_name)
+            # if vindex >= 0:
+            #     self.census[vindex][1] += 1
+            #     self.census[vindex][2] = time_of_visit
+            # else:  # add
+            #     self.census.append([visitor_name, 1, time_of_visit])
+
+            self.census_dict[visitor_name] = (self.census_dict[visitor_name][0] + 1, time_of_visit)
         return
 
     # return count of visitors by name along with last seen date time
     def report_census(self, visitor_names):
-        last_seen = datetime(2021, 1, 1, 0, 0, 0)
-        visitors_count = []
-        visitors_last_seen = []
-        for i, visitor_name in enumerate(visitor_names):
-            vindex = self.find_visitor(visitor_name)
-            if vindex >= 0:
-                visitor_count = self.census[vindex][1]
-                last_seen = self.census[vindex][2]
-            else:
-                visitor_count = 0  # haven't seen this visitor by name
+        # last_seen = datetime(2021, 1, 1, 0, 0, 0)
+        # visitors_count = []
+        # visitors_last_seen = []
+        visitor_name_list = []
+        if type(visitor_names) != list:
+            visitor_name_list.append(visitor_names)
+        else:
+            visitor_name_list = visitor_names
+        # for i, visitor_name in enumerate(visitor_name_list):
+            # vindex = self.find_visitor(visitor_name)
+            # if vindex >= 0:
+            #     visitor_count = self.census[vindex][1]
+            #     last_seen = self.census[vindex][2]
+            # else:
+            #     visitor_count = 0  # haven't seen this visitor by name
 
-            visitors_count.append(visitor_count)
-            visitors_last_seen.append(last_seen)
-        return visitors_count, visitors_last_seen
+            # visitors_count.append(visitor_count)
+            # visitors_last_seen.append(last_seen)
+        census_subset = {key: self.census_dict[key] for key in visitor_name_list}
+        return census_subset
 
     # sort census by count
     def get_census_by_count(self):
-        self.census.sort(key=itemgetter(1), reverse=True)
-        return self.census
+        # self.census.sort(key=itemgetter(1), reverse=True)
+        # self.census_dict = dict(sorted(self.census_dict.items(), key=lambda k_v: k_v[1][0], reverse=True))
+        return dict(sorted(self.census_dict.items(), key=lambda k_v: k_v[1][0], reverse=True))
 
 
 def main():
@@ -91,12 +113,23 @@ def main():
     popdogcats.visitors('cat', observed_time)
     print('should be one dog', popdogcats.report_census('dog'))
     print('should be two cats', popdogcats.report_census('cat'))
-    print(popdogcats.get_census_by_count())
+    popdogcats.visitors(['dog', 'cat', 'bird'], datetime.now())
+
+    print('should be two dogs, three cats, and a bird')
     observed = popdogcats.get_census_by_count()  # print count from prior day
-    try:
-        print(f'top 3 birds yesterday #1 {observed[0][0:2]}, #2 {observed[1][0:2]}')
-    except IndexError:
-        print('unable to post observations')
+    print(observed)
+
+    # mirror daily chorses reporting for tesitng
+    def short_name(birdname):
+        start = birdname.find('(')
+        end = birdname.find(')')
+        return birdname[start + 1:end] if start >= 0 and end >= 0 else birdname
+
+    post_txt = ''
+    for index, birdkey in enumerate(observed):  # bird pop is list of tuples with 0th item species name
+        birdstr = str(f'#{str(index + 1)}: {observed[birdkey][0]} {short_name(birdkey)}, ')  # top count & species name
+        post_txt = post_txt + birdstr  # aggregate text for post
+    print(post_txt)
 
     popdogcats.clear()  # clear count for new day
     return

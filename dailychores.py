@@ -29,6 +29,13 @@ from gpiozero import CPUTemperature
 from subprocess import call
 
 
+# find common / short name in species label
+def short_name(birdname):
+    start = birdname.find('(')
+    end = birdname.find(')')
+    return birdname[start + 1:end] if start >= 0 and end >= 0 else birdname
+
+
 class DailyChores:
 
     def __init__(self, tweeter_obj, birdpop, city_weather):
@@ -76,15 +83,9 @@ class DailyChores:
         try:
             observed = self.birdpop.get_census_by_count()
             post_txt = f'top birds for day {str(self.curr_day)}. '
-            for index, birdpop in enumerate(observed):  # bird pop is list of tuples with 0th item species name
-                start = birdpop[0].find('(') + 1
-                end = birdpop[0].find(')')
-                if start >= 0 and end >= 0:
-                    cname = birdpop[0][start:end]
-                else:
-                    cname = birdpop[0]
-                birdstr = str(f'#{str(index + 1)}: {observed[index][1]} {cname}, ')  # top bird count & species name
-                post_txt = post_txt + birdstr  # aggregate text for post
+            for index, birdkey in enumerate(observed):  # bird pop is list of tuples with 0th item species name
+                post_txt = post_txt + \
+                           str(f'#{str(index + 1)}: {observed[birdkey][0]} {short_name(birdkey)}, ')  # count& name
             self.tweeter.post_status(post_txt[0:279])  # grab full text up to 280 characters
         except Exception as e:
             print('Error in daily population report:', e)
