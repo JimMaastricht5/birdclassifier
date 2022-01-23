@@ -92,6 +92,7 @@ class DetectClassify:
         self.last_known_classified_rects = []
         self.colors = np.random.uniform(0, 255, size=(11, 3)).astype(int)  # random colors for bounding boxes
         self.color = self.pick_a_color()  # set initial color to use for bounding boxes
+        self.text_color = self.pick_a_color()  # set initial color to use for text
 
         # set image adjustment parameters
         self.contrast_chg = contrast_chg
@@ -291,7 +292,7 @@ class DetectClassify:
             draw = PILImageDraw.Draw(img)
             font = draw.getfont()
             draw.text((text_x, text_y), self.label_text(classified_labels[i], classified_confidences[i]),
-                      font=font, fill=self.color)
+                      font=font, fill=self.text_color)
             draw.line([(start_x, start_y), (start_x, end_y), (start_x, end_y), (end_x, end_y),
                        (end_x, end_y), (end_x, start_y), (end_x, start_y), (start_x, start_y)],
                       fill=self.color, width=2)
@@ -300,6 +301,11 @@ class DetectClassify:
     # pick random color for stream of frames
     def pick_a_color(self):
         return tuple(self.colors[random.randint(0, (len(self.colors)) - 1)])
+
+    def set_colors(self):
+        self.color = self.pick_a_color()
+        self.text_color = self.pick_a_color()
+        return
 
     # func checks threshold by each label passed as a nparray with text in col 0 and threshold in col 1
     # species cannot be -1 (not present in geo location), cannot be 0, and must be equal or exceed minimum score

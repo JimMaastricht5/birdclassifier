@@ -55,7 +55,7 @@ class MotionDetector:
         time.sleep(2)  # Wait for the automatic gain control to settle
         # self.shutterspeed = self.camera.exposure_speed
         print('capturing first image')
-        self.img = self.capture_image()  # capture img of type PIL
+        self.img = self.capture_image()  # capture img
         self.gray = image_proc.grayscale(self.img)  # convert image to gray scale for motion detection
         self.graymotion = image_proc.gaussianblur(self.gray)  # smooth out image for motion detection
         self.first_img = self.graymotion.copy()
