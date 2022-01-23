@@ -21,6 +21,7 @@
 # SOFTWARE.
 # auth.py must be located in project; protect this file as it contains keys
 # code by JimMaastricht5@gmail.com
+from PIL import Image
 from twython import Twython
 import numpy as np
 from datetime import datetime
@@ -76,7 +77,7 @@ class Tweeter_Class:
             try:
                 if save_img:
                     tw_img.save('img_to_tweet.jpg')
-                    # tw_img = Image.open('img_to_tweet.jpg')
+                    tw_img = Image.open('img_to_tweet.jpg')
                 response = self.twitter.upload_media(media=tw_img)
                 self.twitter.update_status(status=message, media_ids=[response['media_id']])
                 print(message)
