@@ -88,6 +88,9 @@ def bird_detector(args):
                 birds.pick_a_color()  # set new color for this series of bounding boxes
                 first_img_jpg = birds.add_boxes_and_labels(img=first_img_jpg)
                 birdpop.visitors(birds.classified_labels, datetime.now())  # update census count and time last seen
+                if birdpop.first_time_seen:
+                    bird_tweeter.post_image('First time today:' + first_tweet_label, first_img_jpg)
+                    print(f'first time seeing a {first_tweet_label} today.  Tweet still shot')
 
                 # grab a stream of pics, add first pic, and build animated gif
                 gif = build_bird_animated_gif(args, motion_detect, birds, first_img_jpg)
@@ -132,6 +135,8 @@ def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
 def tweet_text(classified_labels, classified_confidences):
     tweet_label, sname = '', ''
     for i, sname in enumerate(classified_labels):
+        sname = str(sname)  # make sure the label is a string
+        sname = sname[sname.find(' ') + 1:] if sname.find(' ') >= 0 else sname
         sname = str(sname)  # make sure label is considered a string
         tweet_label += f'{sname} {classified_confidences[i] * 100:.1f}% '
     return tweet_label
