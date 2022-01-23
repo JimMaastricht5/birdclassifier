@@ -292,7 +292,7 @@ class DetectClassify:
             draw = PILImageDraw.Draw(img)
             font = draw.getfont()
             draw.text((text_x, text_y), self.label_text(classified_labels[i], classified_confidences[i]),
-                      font=font, fill=self.text_color)
+                      font=font)  # , fill=self.text_color)
             draw.line([(start_x, start_y), (start_x, end_y), (start_x, end_y), (end_x, end_y),
                        (end_x, end_y), (end_x, start_y), (end_x, start_y), (start_x, start_y)],
                       fill=self.color, width=2)

@@ -89,9 +89,10 @@ def bird_detector(args):
                 first_img_jpg = birds.add_boxes_and_labels(img=first_img_jpg)
                 birdpop.visitors(birds.classified_labels, datetime.now())  # update census count and time last seen
                 if birdpop.first_time_seen:
+                    print(f'first time seeing a {first_tweet_label} today.  Tweet still shot')
                     bird_tweeter.post_image('First time today:' + first_tweet_label,
                                             image_proc.convert_image(first_img_jpg))
-                    print(f'first time seeing a {first_tweet_label} today.  Tweet still shot')
+
 
                 # grab a stream of pics, add first pic, and build animated gif
                 gif = build_bird_animated_gif(args, motion_detect, birds, first_img_jpg)
