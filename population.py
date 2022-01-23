@@ -33,71 +33,40 @@ def default_value():
 
 class Census:
     def __init__(self):
-        # self.census = []
         self.census_dict = defaultdict(default_value)
+        self.first_time_seen = False
 
     def clear(self):
-        # self.census = []
         self.census_dict = []  # clear it and re-establish
         self.census_dict = defaultdict(default_value)
-
-    # find index for visitor by name
-    # def find_visitor(self, visitor_name):
-    #     loc = -1
-    #     for i in range(len(self.census)):
-    #         if self.census[i][0] == visitor_name:
-    #             loc = i
-    #             break
-    #     return loc
 
     # find visitor by census name, increment count, and update time
     def visitors(self, visitor_names, time_of_visit=datetime.now()):
         visitor_name_list = []
+        self.first_time_seen = False
         if type(visitor_names) != list:
             visitor_name_list.append(visitor_names)
         else:
             visitor_name_list = visitor_names
-
         for i, visitor_name in enumerate(visitor_name_list):
-            if visitor_name == '' or visitor_name == ' ':
-                visitor_name = 'undetermined'
-            # vindex = self.find_visitor(visitor_name)
-            # if vindex >= 0:
-            #     self.census[vindex][1] += 1
-            #     self.census[vindex][2] = time_of_visit
-            # else:  # add
-            #     self.census.append([visitor_name, 1, time_of_visit])
-
+            visitor_name = visitor_name if visitor_name != '' and visitor_name != ' ' else 'undetermined'
+            if self.census_dict[visitor_name][0] == 0:
+                self.first_time_seen = True
             self.census_dict[visitor_name] = (self.census_dict[visitor_name][0] + 1, time_of_visit)
         return
 
     # return count of visitors by name along with last seen date time
     def report_census(self, visitor_names):
-        # last_seen = datetime(2021, 1, 1, 0, 0, 0)
-        # visitors_count = []
-        # visitors_last_seen = []
         visitor_name_list = []
         if type(visitor_names) != list:
             visitor_name_list.append(visitor_names)
         else:
             visitor_name_list = visitor_names
-        # for i, visitor_name in enumerate(visitor_name_list):
-            # vindex = self.find_visitor(visitor_name)
-            # if vindex >= 0:
-            #     visitor_count = self.census[vindex][1]
-            #     last_seen = self.census[vindex][2]
-            # else:
-            #     visitor_count = 0  # haven't seen this visitor by name
-
-            # visitors_count.append(visitor_count)
-            # visitors_last_seen.append(last_seen)
         census_subset = {key: self.census_dict[key] for key in visitor_name_list}
         return census_subset
 
     # sort census by count
     def get_census_by_count(self):
-        # self.census.sort(key=itemgetter(1), reverse=True)
-        # self.census_dict = dict(sorted(self.census_dict.items(), key=lambda k_v: k_v[1][0], reverse=True))
         return dict(sorted(self.census_dict.items(), key=lambda k_v: k_v[1][0], reverse=True))
 
 

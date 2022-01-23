@@ -285,13 +285,13 @@ class DetectClassify:
                 start_y += -25
                 end_x += 25
                 end_y += 25
-            except TypeError:
+            except TypeError:  # was getting a type error here?  still an issue?
                 print('TypeError in add boxes and labels', rect)
                 return
             draw = PILImageDraw.Draw(img)
             font = draw.getfont()
             draw.text((text_x, text_y), self.label_text(classified_labels[i], classified_confidences[i]),
-                      font=font, color=self.color)
+                      font=font, fill=self.color)
             draw.line([(start_x, start_y), (start_x, end_y), (start_x, end_y), (end_x, end_y),
                        (end_x, end_y), (end_x, start_y), (end_x, start_y), (start_x, start_y)],
                       fill=self.color, width=2)
