@@ -137,8 +137,7 @@ def tweet_text(classified_labels, classified_confidences):
     tweet_label, sname = '', ''
     for i, sname in enumerate(classified_labels):
         sname = str(sname)  # make sure the label is a string
-        sname = sname[sname.find(' ') + 1:] if sname.find(' ') >= 0 else sname
-        sname = str(sname)  # make sure label is considered a string
+        # sname = sname[sname.find(' ') + 1:] if sname.find(' ') >= 0 else sname
         tweet_label += f'{sname} {classified_confidences[i] * 100:.1f}% '
     return tweet_label
 
