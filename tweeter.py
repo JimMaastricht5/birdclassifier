@@ -71,14 +71,14 @@ class Tweeter_Class:
         return
 
     # set status and add an image
-    def post_image(self, message, tw_img, save_img=False):
+    def post_image(self, message, tw_img, save_img=True):
         self.check_hour()
         if self.tweetcnt < self.tweetmax_per_hour:
             try:
                 if save_img:
                     tw_img.save('img_to_tweet.jpg')
                     tw_img = Image.open('img_to_tweet.jpg')
-                print(f'ready to tweet {message}')
+                print(f'Tweeting image with message: {message}')
                 response = self.twitter.upload_media(media=tw_img)
                 self.twitter.update_status(status=message, media_ids=[response['media_id']])
                 print(message)
@@ -115,15 +115,15 @@ def main_test():
     # tweeter_obj.destroy_direct_messages(direct_messages)
 
     # test code to tweet a message
-    message = 'Python status'
-    tweeter_obj.post_status(message)
-    print('tweeted: %s' % message)
+    # message = 'Python status'
+    # tweeter_obj.post_status(message)
+    # print('tweeted: %s' % message)
 
     # test code to tweet a picture
-    # message = 'Python image test'
-    # twtimage = open('cardinal.jpg', 'rb')
-    # tweeter_obj.post_image(message, twtimage)
-    # print('tweeted: %s' % message)
+    message = 'Python image test'
+    twtimage = open('cardinal.jpg', 'rb')
+    tweeter_obj.post_image(message, twtimage)
+    print('tweeted: %s' % message)
 
 
 if __name__ == "__main__":
