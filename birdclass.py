@@ -92,7 +92,6 @@ def bird_detector(args):
                     print(f'first time seeing a {first_tweet_label} today.  Tweet still shot')
                     bird_tweeter.post_image('First time today:' + first_tweet_label, first_img_jpg, save_img=True)
 
-
                 # grab a stream of pics, add first pic, and build animated gif
                 gif = build_bird_animated_gif(args, motion_detect, birds, first_img_jpg)
                 print('preparing tweet.  last tweet was at:', last_tweet)
@@ -101,8 +100,10 @@ def bird_detector(args):
                     print('attempting gif and/or jpg tweet at:', last_tweet)
                     if bird_tweeter.post_image(first_tweet_label, gif, save_img=True) is False:  # try animated gif
                         print(f"*** failed gif tweet")
-                        if bird_tweeter.post_image(first_tweet_label, first_img_jpg, save_img=True) is False:  # try org jpg
+                        if bird_tweeter.post_image(first_tweet_label, first_img_jpg, save_img=True) is False:  # try jpg
                             print(f"*** failed jpg tweet")
+                            if bird_tweeter.post_image('', first_img_jpg, save_img=False) is False:
+                                print('*** failed send only image test')
 
     motion_detect.stop()
     if args.verbose:

@@ -71,17 +71,16 @@ class Tweeter_Class:
         return
 
     # set status and add an image
-    def post_image(self, message, tw_img, save_img=True):
+    def post_image(self, message, tw_img, save_img=False):
         self.check_hour()
         if self.tweetcnt < self.tweetmax_per_hour:
             try:
                 if save_img:
                     tw_img.save('img_to_tweet.jpg')
-                    tw_img = Image.open('img_to_tweet.jpg')
-                print(f'Tweeting image with message: {message}')
                 response = self.twitter.upload_media(media=tw_img)
+                print('upload_media response:', response)
+                print('updating status with message:', message)
                 self.twitter.update_status(status=message, media_ids=[response['media_id']])
-                print(message)
                 self.tweetcnt += 1
                 self.tweeted = True
             except Exception as e:
