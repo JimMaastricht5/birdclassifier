@@ -49,7 +49,7 @@ class Census:
         else:
             visitor_name_list = visitor_names
         for i, visitor_name in enumerate(visitor_name_list):
-            visitor_name = visitor_name if visitor_name != '' and visitor_name != ' ' else 'undetermined'
+            visitor_name = visitor_name if visitor_name.rstrip() != '' else 'undetermined'
             if self.census_dict[visitor_name][0] == 0:
                 self.first_time_seen = True
             self.census_dict[visitor_name] = (self.census_dict[visitor_name][0] + 1, time_of_visit)
