@@ -85,7 +85,7 @@ def bird_detector(args):
             if birds.classify(img=first_img_jpg) >= args.default_confidence:  # found a bird we can classify
                 first_tweet_label = tweet_text(birds.classified_labels, birds.classified_confidences)
                 first_img_jpg = image_proc.enhance_brightness(img=first_img_jpg, factor=args.brightness_chg)
-                # birds.set_colors()  # set new colors for this series of bounding boxes
+                birds.set_colors()  # set new colors for this series of bounding boxes
                 first_img_jpg = birds.add_boxes_and_labels(img=first_img_jpg)
                 birdpop.visitors(birds.classified_labels, datetime.now())  # update census count and time last seen
                 if birdpop.first_time_seen:
