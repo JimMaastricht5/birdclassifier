@@ -154,7 +154,7 @@ if __name__ == "__main__":
     ap.add_argument("-fr", "--framerate", type=int, default=45, help="frame rate for camera")
     ap.add_argument("-gf", "--minanimatedframes", type=int, default=10, help="minimum number of frames for animation")
     ap.add_argument("-st", "--save_test_img", type=bool, default=False, help="save test images")  # saves sample images
-    ap.add_argument("-v", "--verbose", type=bool, default=True, help="To tweet or not to tweet")
+    ap.add_argument("-v", "--verbose", type=bool, default=False, help="To tweet extra stuff or not")
     ap.add_argument("-td", "--tweetdelay", type=int, default=300,
                     help="Time to wait between tweets in seconds, default 300 seconds or 5 min")
 
