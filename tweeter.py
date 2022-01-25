@@ -75,8 +75,8 @@ class Tweeter_Class:
         self.check_hour()
         if self.tweetcnt < self.tweetmax_per_hour:
             try:
-                if save_img:
-                    tw_img.save('img_to_tweet.jpg')
+                # if save_img:
+                #     tw_img.save('img_to_tweet.jpg')
                 response = self.twitter.upload_media(media=tw_img)
                 print('upload_media response:', response)
                 print('updating status with message:', message)
