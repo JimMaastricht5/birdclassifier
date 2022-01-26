@@ -221,8 +221,6 @@ class DetectClassify:
             lresult = str(self.classifier_possible_labels[lindex])  # grab label,push to string instead of tuple
             cresult = float(output[lindex])  # grab predicted confidence score
             if cresult != 0:
-                # print(f'     {check_threshold(cresult, lindex, label_thresholds)} match, confidence:{str(cresult)}' +
-                #         f', threshold:{label_thresholds[lindex][1]}, {str(labels[lindex])}.')
                 if cresult > 1:  # still don't have scaling working 100% if the result is more than 100% adjust
                     if tfliteb:
                         cresult -= math.floor(cresult)

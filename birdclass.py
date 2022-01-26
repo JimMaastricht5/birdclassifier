@@ -89,8 +89,10 @@ def bird_detector(args):
                 first_img_jpg = birds.add_boxes_and_labels(img=first_img_jpg)
                 birdpop.visitors(birds.classified_labels, datetime.now())  # update census count and time last seen
                 if birdpop.first_time_seen:
-                    print(f'first time seeing a {first_tweet_label} today.  Tweet still shot')
-                    bird_tweeter.post_image('First time today:' + first_tweet_label, first_img_jpg, save_img=True)
+                    print(f'first time seeing a {first_tweet_label} today.  Tweeting still shot')
+                    bird_tweeter.post_image(message=f'First time today: {first_tweet_label}',
+                                            img=image_proc.convert_image(img=first_img_jpg, target='gif'),
+                                            save_img=True)
 
                 # grab a stream of pics, add first pic, and build animated gif
                 gif = build_bird_animated_gif(args, motion_detect, birds, first_img_jpg)
@@ -98,12 +100,10 @@ def bird_detector(args):
                 if (datetime.now() - last_tweet).total_seconds() >= args.tweetdelay:
                     last_tweet = datetime.now()
                     print('attempting gif and/or jpg tweet at:', last_tweet)
-                    if bird_tweeter.post_image(first_tweet_label, gif, save_img=True) is False:  # try animated gif
-                        print(f"*** failed gif tweet")
-                        if bird_tweeter.post_image(first_tweet_label, first_img_jpg, save_img=True) is False:  # try jpg
-                            print(f"*** failed jpg tweet")
-                            if bird_tweeter.post_image('', first_img_jpg, save_img=False) is False:
-                                print('*** failed send only image test')
+                    if bird_tweeter.post_image(first_tweet_label, gif) is False:  # try animated gif
+                        print(f"*** failed animated gif tweet")
+                        if bird_tweeter.post_image(first_tweet_label, img=image_proc.convert_image(img=first_img_jpg, target='gif')) is False:  # try still image
+                            print(f"*** failed still image tweet")
 
     motion_detect.stop()
     if args.verbose:
@@ -154,7 +154,7 @@ if __name__ == "__main__":
     ap.add_argument("-fr", "--framerate", type=int, default=45, help="frame rate for camera")
     ap.add_argument("-gf", "--minanimatedframes", type=int, default=10, help="minimum number of frames for animation")
     ap.add_argument("-st", "--save_test_img", type=bool, default=False, help="save test images")  # saves sample images
-    ap.add_argument("-v", "--verbose", type=bool, default=False, help="To tweet extra stuff or not")
+    ap.add_argument("-v", "--verbose", type=bool, default=True, help="To tweet extra stuff or not")
     ap.add_argument("-td", "--tweetdelay", type=int, default=300,
                     help="Time to wait between tweets in seconds, default 300 seconds or 5 min")
 
