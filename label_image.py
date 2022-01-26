@@ -307,7 +307,7 @@ class DetectClassify:
         return
 
     def get_next_color(self, from_index=0):
-        return self.colors[(self.color_index + from_index) % (len(self.colors) - 1)]
+        return tuple(self.colors[(self.color_index + from_index) % (len(self.colors) - 1)])
 
     # func checks threshold by each label passed as a nparray with text in col 0 and threshold in col 1
     # species cannot be -1 (not present in geo location), cannot be 0, and must be equal or exceed minimum score
