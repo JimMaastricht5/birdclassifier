@@ -53,7 +53,7 @@ def bird_detector(args):
     cityweather.wait_until_sunrise()  # if before sun rise, wait here
 
     # initial video capture, screen size, and grab first image (no motion)
-    motion_detect = motion_detector.MotionDetector(args=args, save_test_img=args.save_test_img)  # init class
+    motion_detect = motion_detector.MotionDetector(args=args, save_img=args.save_img)  # init class
     print('done with camera init... setting up classes.')
     bird_tweeter = tweeter.Tweeter_Class()  # init tweeter2 class twitter handler
     chores = dailychores.DailyChores(bird_tweeter, birdpop, cityweather)
@@ -96,14 +96,14 @@ def bird_detector(args):
 
                 # grab a stream of pics, add first pic, and build animated gif
                 gif = build_bird_animated_gif(args, motion_detect, birds, first_img_jpg)
-                print('preparing tweet.  last tweet was at:', last_tweet)
+                print('Last tweet was at:', last_tweet)
                 if (datetime.now() - last_tweet).total_seconds() >= args.tweetdelay:
-                    last_tweet = datetime.now()
-                    print('attempting gif and/or jpg tweet at:', last_tweet)
+                    print('attempting gif and/or jpg tweet at:', datetime.now())
                     if bird_tweeter.post_image(first_tweet_label, gif) is False:  # try animated gif
-                        print(f"*** failed animated gif tweet")
-                        if bird_tweeter.post_image(first_tweet_label, img=image_proc.convert_image(img=first_img_jpg)) is False:  # try still image
-                            print(f"*** failed still image tweet")
+                        print(f"*** failed animated gif tweet")  # failure, don't update last tweet time
+                    else:
+                        last_tweet = datetime.now()  # update last tweet time if successful
+
 
     motion_detect.stop()
     if args.verbose:
@@ -115,7 +115,7 @@ def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
     # grab a stream of pictures, add first pic from above, and build animated gif
     labeled_frames = []
     last_good_frame = 0  # find last frame that has a bird, index zero is good based on first image
-    frames = motion_detect.capture_stream(save_test_img=args.save_test_img)  # capture a list of images
+    frames = motion_detect.capture_stream(save_img=args.save_img)  # capture a list of images
     for i, frame in enumerate(frames):
         frame = image_proc.enhance_brightness(img=frame, factor=args.brightness_chg)
 
@@ -125,12 +125,12 @@ def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
         labeled_frames.append(birds.add_boxes_and_labels(img=frame, use_last_known=True))
 
     labeled_frames.insert(0, image_proc.convert_image(img=first_img_jpg,
-                                                      target='gif', save_test_img=args.save_test_img))  # isrt 1st img
+                                                      target='gif', save_img=args.save_img))  # isrt 1st img
     if last_good_frame >= (args.minanimatedframes - 1):  # if bird is in more than the min number of frames
         gif = image_proc.save_gif(frames=labeled_frames[0:last_good_frame], frame_rate=args.framerate,
-                                  save_test_img=args.save_test_img)  # build the labeled gif, default file name
+                                  save_img=args.save_img)  # build the labeled gif, default file name
     else:
-        gif = image_proc.convert_image(img=first_img_jpg, target='gif', save_test_img=args.save_test_img)
+        gif = image_proc.convert_image(img=first_img_jpg, target='gif', save_img=args.save_img)
     return gif
 
 
@@ -153,8 +153,8 @@ if __name__ == "__main__":
     ap.add_argument("-sh", "--screenheight", type=int, default=480, help="max screen height")
     ap.add_argument("-fr", "--framerate", type=int, default=45, help="frame rate for camera")
     ap.add_argument("-gf", "--minanimatedframes", type=int, default=10, help="minimum number of frames for animation")
-    ap.add_argument("-st", "--save_test_img", type=bool, default=False, help="save test images")  # saves sample images
-    ap.add_argument("-v", "--verbose", type=bool, default=False, help="To tweet extra stuff or not")
+    ap.add_argument("-st", "--save_img", type=bool, default=False, help="save images")  # saves sample images
+    ap.add_argument("-v", "--verbose", type=bool, default=True, help="To tweet extra stuff or not")
     ap.add_argument("-td", "--tweetdelay", type=int, default=300,
                     help="Time to wait between tweets in seconds, default 300 seconds or 5 min")
 
