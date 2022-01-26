@@ -102,7 +102,7 @@ def bird_detector(args):
                     print('attempting gif and/or jpg tweet at:', last_tweet)
                     if bird_tweeter.post_image(first_tweet_label, gif) is False:  # try animated gif
                         print(f"*** failed animated gif tweet")
-                        if bird_tweeter.post_image(first_tweet_label, img=image_proc.convert_image(img=first_img_jpg, target='gif')) is False:  # try still image
+                        if bird_tweeter.post_image(first_tweet_label, img=image_proc.convert_image(img=first_img_jpg)) is False:  # try still image
                             print(f"*** failed still image tweet")
 
     motion_detect.stop()

@@ -162,12 +162,14 @@ def compare_images(img1, img2):
 
 
 def convert_image(img, target='gif', save_test_img=False):
+    filename = '/home/pi/birdclass/imgconverter.' + target
     stream = io.BytesIO()
     img.save(stream, target)
     stream.seek(0)
     new_img = Image.open(stream)
     if save_test_img:
-        img.save('/home/pi/birdclass/imgconverter.' + target, target)
+        img.save(filename, target)
+        new_img = open(filename, 'rb')  # reload gif
     return new_img
 
 
@@ -175,7 +177,7 @@ def convert_image(img, target='gif', save_test_img=False):
 def save_gif(frames, frame_rate=30, filename='/home/pi/birdclass/birds.gif', save_test_img=False):
     gif_frames = [convert_image(frame, target='gif', save_test_img=save_test_img) for frame in frames]
     try:
-        gif_frame_one = gif_frames[0]
+        gif_frame_one = gif_frames[0]  # grab a frame to save full image with
         ml_sec = int(1000 * len(gif_frames) * 1/frame_rate)  # frames * rate, 200 * 1/30 = 5 sec * 1,000 = ml sec
         gif_frame_one.save(filename, format="GIF", append_images=gif_frames[1:],
                            save_all=True, optimze=True, minimize_size=True, duration=ml_sec, loop=50)  # loop=0 infinity
@@ -190,9 +192,12 @@ def save_gif(frames, frame_rate=30, filename='/home/pi/birdclass/birds.gif', sav
 def main():
     # print(area((1, 1, 4, 4)))
     # print(overlap_area((1, 1, 4, 4), (1, 1, 2, 2)))
-    img1 = Image.open('/home/pi/birdclass/test.jpg')
+    img1 = Image.open('/home/pi/birdclass/test.gif')
     # gif1 = convert_image(img1, target='gif', save_test_img=True)
     img2 = Image.open('/home/pi/birdclass/test2.jpg')
+    img2_gif = convert_image(img=img2, target='gif', save_test_img=True)
+    img3_gif = convert_image(img=img2, target='gif', save_test_img=False)
+    img3_gif.save('/home/pi/birdclass/test stream.gif', 'gif')
     # gif2 = convert_image(img2, target='gif', save_test_img=True)
     save_gif([img1, img2], frame_rate=10, filename='/home/pi/birdclass/test4.gif')
     # img.show()
