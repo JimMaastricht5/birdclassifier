@@ -163,13 +163,13 @@ def compare_images(img1, img2):
 
 def convert_image(img, target='gif', save_img=False):
     filename = '/home/pi/birdclass/imgconverter.' + target
-    stream = io.BytesIO()
-    img.save(stream, target)
-    stream.seek(0)
-    new_img = Image.open(stream)
-    if save_img:
+    with io.BytesIO() as stream:
+        # stream = io.BytesIO()
+        img.save(stream, target)
+        stream.seek(0)
+        new_img = Image.open(stream)
+    if save_img:  # physically save image if requested
         img.save(filename, target)
-        new_img = open(filename, 'rb')  # reload gif
     return new_img
 
 

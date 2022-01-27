@@ -61,7 +61,7 @@ class MotionDetector:
         self.graymotion = image_proc.gaussianblur(self.gray)  # smooth out image for motion detection
         self.first_img = self.graymotion.copy()
         self.motion = False
-        self.save_img = save_img
+        self.save_img = save_img  # physically save images to disk
         if self.save_img:
             self.img.save('testcap_motion.jpg')
         print('camera setup completed')
@@ -95,7 +95,6 @@ class MotionDetector:
         self.img = img
         if self.save_img:
             self.img.save('capture.jpg')
-            self.first_img.save('first_img.jpg')
         self.motion = (self.image_entropy(imgdelta) >= self.min_area)
         return self.motion
 
@@ -118,7 +117,6 @@ class MotionDetector:
         :param save_img: bool True saves each image captured in the stream.  Slow!  default False
         :return frames: images is a list containing a number of PIL jpg image
         """
-        print('in capture stream')
         frames = []
         for image_num in range(stream_frames):
             img = self.capture_image().copy()

@@ -92,7 +92,7 @@ def bird_detector(args):
                     print(f'first time seeing a {first_tweet_label} today.  Tweeting still shot')
                     bird_tweeter.post_image(message=f'First time today: {first_tweet_label}',
                                             img=image_proc.convert_image(img=first_img_jpg, target='gif'),
-                                            save_img=True)
+                                            save_img=True)  # force save image for debugging!!!
 
                 # grab a stream of pics, add first pic, and build animated gif
                 gif = build_bird_animated_gif(args, motion_detect, birds, first_img_jpg)
