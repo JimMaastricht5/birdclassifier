@@ -68,16 +68,17 @@ class MotionDetector:
 
     # grab an image from the open stream
     def capture_image(self, img_type='jpeg'):
-        stream = io.BytesIO()
-        self.camera.capture(stream, img_type)
-        stream.seek(0)
-        img = Image.open(stream)
+        with io.BytesIO() as stream:
+            self.camera.capture(stream, img_type)
+            stream.seek(0)
+            img = Image.open(stream)
         return img
 
-    # grab an image using NP array
+    # grab an image using NP array: doesn't work!!!!
     def capture_image_np(self, img_type='jpeg'):
         height, width = self.camera.resolution
         img = np.empty((height, width, 3), dtype=np.uint8)
+        print(height, width)
         self.camera.capture(img, img_type)
         img_pil = image_proc.convert(img=img, convert_to='PIL')
         img_pil.save('alt_camera_img.jpg')
