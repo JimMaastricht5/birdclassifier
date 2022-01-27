@@ -67,7 +67,7 @@ class MotionDetector:
         print('camera setup completed')
 
     # grab an image from the open stream
-    def capture_image_stream(self, img_type='jpeg'):
+    def capture_image(self, img_type='jpeg'):
         stream = io.BytesIO()
         self.camera.capture(stream, img_type)
         stream.seek(0)
@@ -75,7 +75,7 @@ class MotionDetector:
         return img
 
     # grab an image using NP array
-    def capture_image(self, img_type='jpeg'):
+    def capture_image_np(self, img_type='jpeg'):
         height, width = self.camera.resolution
         img = np.empty((height, width, 3), dtype=np.uint8)
         self.camera.capture(img, img_type)
