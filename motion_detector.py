@@ -30,6 +30,7 @@ import io
 import time
 import math
 from PIL import Image
+import numpy as np
 import image_proc
 import argparse
 
@@ -66,12 +67,21 @@ class MotionDetector:
         print('camera setup completed')
 
     # grab an image from the open stream
-    def capture_image(self, img_type='jpeg'):
+    def capture_image_stream(self, img_type='jpeg'):
         stream = io.BytesIO()
         self.camera.capture(stream, img_type)
         stream.seek(0)
         img = Image.open(stream)
         return img
+
+    # grab an image using NP array
+    def capture_image(self, img_type='jpeg'):
+        height, width = self.camera.resolution
+        img = np.empty((height * width * 3,), dtype=np.uint8)
+        self.camera.capture(img, img_type)
+        img_pil = image_proc.convert(img=img, convert_to='PIL')
+        img_pil.save('alt_camera_img.jpg')
+        return img_pil
 
     # once first image is captured call motion detector in a loop to find each subsequent image
     # motion detection, compute the absolute difference between the current frame and first frame

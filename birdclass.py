@@ -104,7 +104,6 @@ def bird_detector(args):
                     else:
                         last_tweet = datetime.now()  # update last tweet time if successful
 
-
     motion_detect.stop()
     if args.verbose:
         chores.hourly_and_daily(report_pop=True)
