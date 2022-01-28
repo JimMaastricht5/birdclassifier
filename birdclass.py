@@ -70,9 +70,7 @@ def bird_detector(args):
         if args.verbose:
             chores.hourly_and_daily()  # perform chores that take place hourly or daily such as weather reporting
 
-        bird_tweeter.post_image(message=f'Check seed.... ',
-                                img=image_proc.convert_image(img=birds.img, target='gif'),
-                                save_img=args.save_img)  # force save image for debugging!!!
+        bird_tweeter.post_image(message=f'Check seed.... ', img=image_proc.convert_image(img=birds.img, target='gif'))
         motion_detect.detect()
         if motion_detect.motion:
             motioncnt += 1
@@ -92,8 +90,7 @@ def bird_detector(args):
                 if birdpop.first_time_seen:
                     print(f'first time seeing a {first_tweet_label} today.  Tweeting still shot')
                     bird_tweeter.post_image(message=f'First time today: {first_tweet_label}',
-                                            img=image_proc.convert_image(img=first_img_jpg, target='gif'),
-                                            save_img=args.save_img)  # force save image for debugging!!!
+                                            img=image_proc.convert_image(img=first_img_jpg, target='gif'))
                 # grab a stream of pics, add first pic, and build animated gif
                 gif = build_bird_animated_gif(args, motion_detect, birds, first_img_jpg)
                 print('Last tweet was at:', last_tweet)
@@ -120,13 +117,11 @@ def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
             last_good_frame = i + 1  # found a bird, add one to last good frame to account for insert of 1st image below
         confidence = birds.classify(img=frame)   # classify object at rectangle location
         labeled_frames.append(birds.add_boxes_and_labels(img=frame, use_last_known=True))
-    labeled_frames.insert(0, image_proc.convert_image(img=first_img_jpg,
-                                                      target='gif', save_img=args.save_img))  # isrt 1st img
+    labeled_frames.insert(0, image_proc.convert_image(img=first_img_jpg, target='gif'))  # isrt 1st img
     if last_good_frame >= (args.minanimatedframes - 1):  # if bird is in more than the min number of frames
-        gif = image_proc.save_gif(frames=labeled_frames[0:last_good_frame], frame_rate=args.framerate,
-                                  save_img=args.save_img)  # build the labeled gif, default file name
+        gif = image_proc.save_gif(frames=labeled_frames[0:last_good_frame], frame_rate=args.framerate)  # build gif
     else:
-        gif = image_proc.convert_image(img=first_img_jpg, target='gif', save_img=args.save_img)
+        gif = image_proc.convert_image(img=first_img_jpg, target='gif')
     return gif
 
 

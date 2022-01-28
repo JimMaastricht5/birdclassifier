@@ -161,7 +161,7 @@ def compare_images(img1, img2):
     return ImageChops.difference(img2, img1)
 
 
-def convert_image(img, target='gif', save_img=False):
+def convert_image(img, target='gif'):
     filename = '/home/pi/birdclass/imgconverter.' + target
     with io.BytesIO() as stream:
         # stream = io.BytesIO()
