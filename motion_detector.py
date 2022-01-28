@@ -74,7 +74,7 @@ class MotionDetector:
         self.camera.capture(stream, img_type)
         stream.seek(0)
         img = Image.open(stream)
-        if len(stream) == 0:
+        if img.size == 0:
             print('zero byte img!!!!')
         return img
     # going back to using a file...
