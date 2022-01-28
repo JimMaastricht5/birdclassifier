@@ -73,7 +73,7 @@ class Tweeter_Class:
     def post_image(self, message, img, target='gif', save_img=False):
         self.check_hour()
         if self.tweetcnt < self.tweetmax_per_hour:
-            if save_img:
+            if save_img and target!='gif':
                 img.save(f'/home/pi/birdclass/tweeting.{target}', target)
             try:
                 response = self.twitter.upload_media(media=img)  # possible that wi-fi strength is too poor to reach
