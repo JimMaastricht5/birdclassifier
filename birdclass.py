@@ -78,7 +78,7 @@ def bird_detector(args):
             motioncnt = 0  # reset motion count between detected birds
             # keep first shot to add to start of animation or as stand along jpg
             # copy first image, classify, grab labels, enhance the shot, and add boxes
-            first_img_jpg = birds.img.copy()
+            first_img_jpg = birds.img
             if birds.classify(img=first_img_jpg) >= args.default_confidence:  # found a bird we can classify
                 first_tweet_label = tweet_text(birds.classified_labels, birds.classified_confidences)
                 first_img_jpg = image_proc.enhance_brightness(img=first_img_jpg, factor=args.brightness_chg)
