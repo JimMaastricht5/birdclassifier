@@ -55,7 +55,7 @@ def bird_detector(args):
     # initial video capture, screen size, and grab first image (no motion)
     motion_detect = motion_detector.MotionDetector(args=args, save_img=args.save_img)  # init class
     print('done with camera init... setting up classes.')
-    bird_tweeter = tweeter.Tweeter_Class()  # init tweeter2 class twitter handler
+    bird_tweeter = tweeter.TweeterClass()  # init tweeter2 class twitter handler
     chores = dailychores.DailyChores(bird_tweeter, birdpop, cityweather)
     # init detection and classifier object
     birds = label_image.DetectClassify(default_confidence=args.default_confidence,

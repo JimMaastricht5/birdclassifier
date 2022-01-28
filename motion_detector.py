@@ -30,7 +30,7 @@ import io
 import time
 import math
 from PIL import Image
-import copy
+# import copy
 import numpy as np
 import image_proc
 import argparse
