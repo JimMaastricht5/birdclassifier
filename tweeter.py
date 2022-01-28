@@ -21,8 +21,9 @@
 # SOFTWARE.
 # auth.py must be located in project; protect this file as it contains keys
 # code by JimMaastricht5@gmail.com
-from PIL import Image
-from twython import Twython
+# from PIL import Image
+# from twython import Twython
+import tweepy
 import numpy as np
 from datetime import datetime
 from auth import (
@@ -33,7 +34,7 @@ from auth import (
 )
 
 
-class Tweeter_Class:
+class TweeterClass:
 
     def __init__(self):
         self.twitter = self.init(api_key, api_secret_key, access_token, access_token_secret)
@@ -44,8 +45,12 @@ class Tweeter_Class:
         self.tweeted = False
 
     # initialize twitter connection and login
-    def init(self, api_key, api_secret_key, access_token, access_token_secret):
-        return Twython(api_key, api_secret_key, access_token, access_token_secret)
+    def init(self, consumer_key, consumer_secret, access_token, access_token_secret):
+        # return Twython(api_key, api_secret_key, access_token, access_token_secret)
+        auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+        auth.set_access_token(access_token, access_token_secret)
+        api = tweepy.API(auth)
+        return api
 
     # reset hourly tweet count if new hour
     def check_hour(self):
@@ -74,11 +79,11 @@ class Tweeter_Class:
     def post_image_from_file(self, message, file_name):
         self.check_hour()
         if self.tweetcnt < self.tweetmax_per_hour:
-            print('posting from file')
-            img = Image.open(file_name)
+            # print('posting from file')
+            # img = Image.open(file_name)
             try:
-
-                response = self.twitter.upload_media(media=img)  # possible that wi-fi strength is too poor to reach
+                # response = self.twitter.upload_media(media=img)  # possible that wi-fi strength is too poor to reach
+                response = self.twitter.media_upload(file_name)
                 print('upload_media response:', response)
                 if response['media_id'] == '':
                     print('problem!!!!!! insert problem handling code here')
@@ -97,7 +102,8 @@ class Tweeter_Class:
         self.check_hour()
         if self.tweetcnt < self.tweetmax_per_hour:
             try:
-                response = self.twitter.upload_media(media=img)  # possible that wi-fi strength is too poor to reach
+                # response = self.twitter.upload_media(media=img)  # possible that wi-fi strength is too poor to reach
+                response = self.twitter.media_upload(file=img)  # possible that wi-fi strength is too poor to reach
                 print('upload_media response:', response)
                 if response['media_id'] == '':
                     print('problem!!!!!! insert problem handling code here')
@@ -120,15 +126,15 @@ class Tweeter_Class:
         return np.array(dm_array)
 
     # destroy all direct messages, takes numpy array with id and text
-    def destroy_direct_messages(self, direct_messages):
-        for dmid, dmtext in direct_messages:
-            self.twitter.destroy_direct_message(id=dmid)
-        return
+    # def destroy_direct_messages(self, direct_messages):
+    #     for dmid, dmtext in direct_messages:
+    #         self.twitter.destroy_direct_message(id=dmid)
+    #     return
 
 
 # test code
 def main_test():
-    tweeter_obj = Tweeter_Class()
+    tweeter_obj = TweeterClass()
     # direct_messages = tweeter_obj.get_direct_messages()
     # print(direct_messages)
     # print(direct_messages.shape)

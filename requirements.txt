@@ -10,3 +10,4 @@ picamera
 matplotlib
 scipy~=1.7.0
 tflite-runtime~=2.7.0
+tweepy~=4.5.0
