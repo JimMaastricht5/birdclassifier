@@ -85,8 +85,6 @@ class TweeterClass:
                 # response = self.twitter.upload_media(media=img)  # possible that wi-fi strength is too poor to reach
                 response = self.twitter.media_upload(file_name)
                 print('upload_media response:', response)
-                if response['media_id'] == '':
-                    print('problem!!!!!! insert problem handling code here')
                 self.twitter.update_status(status=message, media_ids=[response['media_id']])
                 self.tweetcnt += 1
                 self.tweeted = True
@@ -105,8 +103,6 @@ class TweeterClass:
                 # response = self.twitter.upload_media(media=img)  # possible that wi-fi strength is too poor to reach
                 response = self.twitter.media_upload(file=img)  # possible that wi-fi strength is too poor to reach
                 print('upload_media response:', response)
-                if response['media_id'] == '':
-                    print('problem!!!!!! insert problem handling code here')
                 self.twitter.update_status(status=message, media_ids=[response['media_id']])
                 self.tweetcnt += 1
                 self.tweeted = True
