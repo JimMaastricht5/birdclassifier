@@ -64,13 +64,12 @@ def bird_detector(args):
                                        color_chg=args.color_chg,
                                        contrast_chg=args.contrast_chg, sharpness_chg=args.sharpness_chg,
                                        overlap_perc_tolerance=args.overlap_perc_tolerance)
+    bird_tweeter.post_image(message=f'Check seed.... ', img=motion_detect.img)
     print('starting while loop until sun set..... ')
     # loop while the sun is up, look for motion, detect birds, determine species
     while cityweather.sunrise.time() < datetime.now().time() < cityweather.sunset.time():
         if args.verbose:
             chores.hourly_and_daily()  # perform chores that take place hourly or daily such as weather reporting
-
-        bird_tweeter.post_image(message=f'Check seed.... ', img=birds.img)
         motion_detect.detect()
         if motion_detect.motion:
             motioncnt += 1
