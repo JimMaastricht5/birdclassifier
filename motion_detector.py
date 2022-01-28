@@ -47,6 +47,7 @@ class MotionDetector:
     def __init__(self, args, save_img=False):
         print('initializing camera')
         self.camera = picamera.PiCamera()
+        self.stream = io.BytesIO()
         self.min_area = args.minarea
         if args.screenwidth != 0:  # use specified height and width or default values if not passed
             self.camera.resolution = (args.screenheight, args.screenwidth)
@@ -61,17 +62,24 @@ class MotionDetector:
         self.graymotion = image_proc.gaussianblur(self.gray)  # smooth out image for motion detection
         self.first_img = self.graymotion.copy()
         self.motion = False
-        self.save_img = save_img  # physically save images to disk
+        self.save_img = save_img  # boolean to set physically save images to disk behavior
         if self.save_img:
             self.img.save('testcap_motion.jpg')
         print('camera setup completed')
 
     # org code
+    # def capture_image(self, img_type='jpeg'):
+    #     stream = io.BytesIO()
+    #     self.camera.capture(stream, img_type)
+    #     stream.seek(0)
+    #     img = Image.open(stream)
+    #     return img
+
+    # revised to carry stream as at class creation until end of process
     def capture_image(self, img_type='jpeg'):
-        stream = io.BytesIO()
-        self.camera.capture(stream, img_type)
-        stream.seek(0)
-        img = Image.open(stream)
+        self.camera.capture(self.stream, img_type)
+        self.stream.seek(0)
+        img = Image.open(self.stream)
         return img
     # grab an image from the open stream
     # def capture_image(self, img_type='jpeg'):
