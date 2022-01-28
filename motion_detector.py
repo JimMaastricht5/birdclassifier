@@ -68,19 +68,19 @@ class MotionDetector:
         print('camera setup completed')
 
     # org code
-    # def capture_image(self, img_type='jpeg'):
-    #     stream = io.BytesIO()
-    #     self.camera.capture(stream, img_type)
-    #     stream.seek(0)
-    #     img = Image.open(stream)
-    #     return img
-
-    # revised to carry stream as at class creation until end of process
     def capture_image(self, img_type='jpeg'):
-        self.camera.capture(self.stream, img_type)
-        self.stream.seek(0)
-        img = Image.open(self.stream)
+        stream = io.BytesIO()
+        self.camera.capture(stream, img_type)
+        stream.seek(0)
+        img = Image.open(stream)
         return img
+
+    # # revised to carry stream as at class creation until end of process
+    # def capture_image(self, img_type='jpeg'):
+    #     self.camera.capture(self.stream, img_type)
+    #     self.stream.seek(0)
+    #     img = Image.open(self.stream)
+    #     return img
     # grab an image from the open stream
     # def capture_image(self, img_type='jpeg'):
     #     # with io.BytesIO() as stream:
