@@ -70,7 +70,7 @@ def bird_detector(args):
         if args.verbose:
             chores.hourly_and_daily()  # perform chores that take place hourly or daily such as weather reporting
 
-        bird_tweeter.post_image(message=f'Check seed.... ', img=image_proc.convert_image(img=birds.img, target='gif'))
+        bird_tweeter.post_image(message=f'Check seed.... ', img=birds.img)
         motion_detect.detect()
         if motion_detect.motion:
             motioncnt += 1
