@@ -168,8 +168,6 @@ def convert_image(img, target='gif', save_img=False):
         img.save(stream, target)
         stream.seek(0)
         new_img = Image.open(stream)
-    if save_img:  # physically save image if requested
-        img.save(filename, target)
     return new_img
 
 
