@@ -21,6 +21,7 @@
 # SOFTWARE.
 # auth.py must be located in project; protect this file as it contains keys
 # code by JimMaastricht5@gmail.com
+from PIL import Image
 from twython import Twython
 import numpy as np
 from datetime import datetime
@@ -68,6 +69,26 @@ class Tweeter_Class:
         else:
             self.tweeted = False
         return
+
+    # set status and add an image
+    def post_image_from_file(self, message, file_name):
+        self.check_hour()
+        if self.tweetcnt < self.tweetmax_per_hour:
+            try:
+                img = Image.open(file_name)
+                response = self.twitter.upload_media(media=img)  # possible that wi-fi strength is too poor to reach
+                print('upload_media response:', response)
+                if response['media_id'] == '':
+                    print('problem!!!!!! insert problem handling code here')
+                self.twitter.update_status(status=message, media_ids=[response['media_id']])
+                self.tweetcnt += 1
+                self.tweeted = True
+            except Exception as e:
+                print(e)
+                self.tweeted = False
+        else:
+            self.tweeted = False
+        return self.tweeted
 
     # set status and add an image
     def post_image(self, message, img):
