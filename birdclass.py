@@ -64,13 +64,11 @@ def bird_detector(args):
                                        color_chg=args.color_chg,
                                        contrast_chg=args.contrast_chg, sharpness_chg=args.sharpness_chg,
                                        overlap_perc_tolerance=args.overlap_perc_tolerance)
-
     print('starting while loop until sun set..... ')
     # loop while the sun is up, look for motion, detect birds, determine species
     while cityweather.sunrise.time() < datetime.now().time() < cityweather.sunset.time():
         if args.verbose:
             chores.hourly_and_daily()  # perform chores that take place hourly or daily such as weather reporting
-
         motion_detect.detect()
         if motion_detect.motion:
             motioncnt += 1
@@ -78,7 +76,6 @@ def bird_detector(args):
 
         if motion_detect.motion and birds.detect(img=motion_detect.img):  # daytime with motion and birds
             motioncnt = 0  # reset motion count between detected birds
-
             # keep first shot to add to start of animation or as stand along jpg
             # copy first image, classify, grab labels, enhance the shot, and add boxes
             first_img_jpg = birds.img.copy()
@@ -93,7 +90,6 @@ def bird_detector(args):
                     bird_tweeter.post_image(message=f'First time today: {first_tweet_label}',
                                             img=image_proc.convert_image(img=first_img_jpg, target='gif'),
                                             save_img=True)  # force save image for debugging!!!
-
                 # grab a stream of pics, add first pic, and build animated gif
                 gif = build_bird_animated_gif(args, motion_detect, birds, first_img_jpg)
                 print('Last tweet was at:', last_tweet)
@@ -103,7 +99,6 @@ def bird_detector(args):
                         print(f"*** failed animated gif tweet")  # failure, don't update last tweet time
                     else:
                         last_tweet = datetime.now()  # update last tweet time if successful
-
     motion_detect.stop()
     if args.verbose:
         chores.hourly_and_daily(report_pop=True)
@@ -117,12 +112,10 @@ def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
     frames = motion_detect.capture_stream(save_img=args.save_img)  # capture a list of images
     for i, frame in enumerate(frames):
         frame = image_proc.enhance_brightness(img=frame, factor=args.brightness_chg)
-
         if birds.detect(img=frame):  # find bird object in frame and set rectangles containing object
             last_good_frame = i + 1  # found a bird, add one to last good frame to account for insert of 1st image below
         confidence = birds.classify(img=frame)   # classify object at rectangle location
         labeled_frames.append(birds.add_boxes_and_labels(img=frame, use_last_known=True))
-
     labeled_frames.insert(0, image_proc.convert_image(img=first_img_jpg,
                                                       target='gif', save_img=args.save_img))  # isrt 1st img
     if last_good_frame >= (args.minanimatedframes - 1):  # if bird is in more than the min number of frames
