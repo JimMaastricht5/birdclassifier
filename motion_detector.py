@@ -30,6 +30,7 @@ import io
 import time
 import math
 from PIL import Image
+import copy
 import numpy as np
 import image_proc
 import argparse
@@ -72,8 +73,8 @@ class MotionDetector:
         stream = io.BytesIO()
         self.camera.capture(stream, img_type)
         stream.seek(0)
-        img = Image.open(stream)
-        img.save(stream, img_type)
+        img = copy.deepcopy(Image.open(stream))
+        stream.close()
         return img
 
     # # revised to carry stream as at class creation until end of process
