@@ -49,8 +49,8 @@ def bird_detector(args):
     # we want to wait to enter that main while loop until sunrise
     cityweather = weather.CityWeather()  # init class and set var based on default of Madison WI
     print(f'It is now {datetime.now()}.  \nSunrise at {cityweather.sunrise} and sunset at {cityweather.sunset}.')
-    cityweather.wait_until_midnight()  # if after sunset, wait here until after midnight
-    cityweather.wait_until_sunrise()  # if before sun rise, wait here
+    # cityweather.wait_until_midnight()  # if after sunset, wait here until after midnight
+    # cityweather.wait_until_sunrise()  # if before sun rise, wait here
 
     # initial video capture, screen size, and grab first image (no motion)
     motion_detect = motion_detector.MotionDetector(args=args, save_img=args.save_img)  # init class
