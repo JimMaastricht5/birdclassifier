@@ -70,7 +70,7 @@ class Tweeter_Class:
         return
 
     # set status and add an image
-    def post_image(self, message, img, target='gif'):
+    def post_image(self, message, img):
         self.check_hour()
         if self.tweetcnt < self.tweetmax_per_hour:
             try:
