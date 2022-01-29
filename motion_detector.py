@@ -132,9 +132,7 @@ class MotionDetector:
         """
         frames = []
         for image_num in range(stream_frames):
-            self.capture_image_stream()
-            # img = Image.open(self.img_filename)
-            img = Image.open(self.stream)
+            img = self.capture_image_stream()
             frames.append(img)
         return frames
 
