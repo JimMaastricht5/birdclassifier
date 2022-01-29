@@ -86,7 +86,7 @@ class MotionDetector:
     def capture_image_stream(self, img_type='jpeg'):
         stream = io.BytesIO()
         self.camera.capture(stream, img_type)
-        self.stream.seek(0)
+        stream.seek(0)
         img = Image.open(stream)
         return img
 
