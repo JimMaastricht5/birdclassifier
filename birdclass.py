@@ -124,6 +124,7 @@ def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
         gif, gif_filename = image_proc.save_gif(frames=labeled_frames[0:last_good_frame], frame_rate=args.framerate)
     else:  # use the jpg as a still gif
         gif = image_proc.convert_image(img=first_img_jpg, target='gif')
+        gif_filename = 'first_img.jpg'
     return gif, gif_filename
 
 
