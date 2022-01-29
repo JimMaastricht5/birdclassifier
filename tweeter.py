@@ -95,12 +95,12 @@ class TweeterClass:
         return self.tweeted
 
     # set status and add an image
-    def post_image(self, message, img):
+    def post_image(self, message, img, filename):
         self.check_hour()
         if self.tweetcnt < self.tweetmax_per_hour:
             try:
                 # response = self.twitter.upload_media(media=img)  # possible that wi-fi strength is too poor to reach
-                media = self.twitter.media_upload(filename='', file=img)
+                media = self.twitter.media_upload(filename=filename, file=img)
                 self.twitter.update_status(status=message, media_ids=[media.media_id])
                 self.tweetcnt += 1
                 self.tweeted = True
