@@ -100,7 +100,7 @@ class TweeterClass:
         if self.tweetcnt < self.tweetmax_per_hour:
             try:
                 # response = self.twitter.upload_media(media=img)  # possible that wi-fi strength is too poor to reach
-                media = self.twitter.media_upload(file=img)
+                media = self.twitter.media_upload(filename='', file=img)
                 self.twitter.update_status(status=message, media_ids=[media.media_id])
                 self.tweetcnt += 1
                 self.tweeted = True
