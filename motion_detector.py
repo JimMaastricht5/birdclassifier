@@ -63,8 +63,8 @@ class MotionDetector:
         self.first_img = self.graymotion.copy()
         self.motion = False
         self.save_img = save_img  # boolean to set physically save images to disk behavior
-        if self.save_img:
-            self.img.save('testcap_motion.jpg')
+        # if self.save_img:
+        self.img.save('testcap_motion_init.jpg')
         print('camera setup completed')
 
     # org code
