@@ -30,7 +30,6 @@ import io
 import time
 import math
 from PIL import Image
-# import copy
 import numpy as np
 import image_proc
 import argparse
@@ -75,26 +74,14 @@ class MotionDetector:
         stream.seek(0)
         img = Image.open(stream)
         return img
-    # going back to using a file...
-    # def capture_image(self, img_type='jpeg'):
-    #     self.camera.capture('cap.jpg', img_type)
-    #     img = Image.open('cap.jpg')
-    #     return img
+
     # # revised to carry stream as at class creation until end of process
     # def capture_image(self, img_type='jpeg'):
     #     self.camera.capture(self.stream, img_type)
     #     self.stream.seek(0)
     #     img = Image.open(self.stream)
     #     return img
-    # grab an image from the open stream
-    # def capture_image(self, img_type='jpeg'):
-    #     # with io.BytesIO() as stream:
-    #     stream = io.BytesIO
-    #     self.camera.capture(stream, img_type)
-    #     stream.seek(0)
-    #     img = Image.open(stream)
-    #     img_copy = img.copy()
-    #     return img_copy
+
 
     # grab an image using NP array: doesn't work!!!!
     def capture_image_np(self, img_type='jpeg'):

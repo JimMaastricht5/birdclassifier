@@ -49,8 +49,8 @@ def bird_detector(args):
     # we want to wait to enter that main while loop until sunrise
     cityweather = weather.CityWeather()  # init class and set var based on default of Madison WI
     print(f'It is now {datetime.now()}.  \nSunrise at {cityweather.sunrise} and sunset at {cityweather.sunset}.')
-    # cityweather.wait_until_midnight()  # if after sunset, wait here until after midnight
-    # cityweather.wait_until_sunrise()  # if before sun rise, wait here
+    cityweather.wait_until_midnight()  # if after sunset, wait here until after midnight
+    cityweather.wait_until_sunrise()  # if before sun rise, wait here
 
     # initial video capture, screen size, and grab first image (no motion)
     motion_detect = motion_detector.MotionDetector(args=args, save_img=args.save_img)  # init class
@@ -64,8 +64,7 @@ def bird_detector(args):
                                        color_chg=args.color_chg,
                                        contrast_chg=args.contrast_chg, sharpness_chg=args.sharpness_chg,
                                        overlap_perc_tolerance=args.overlap_perc_tolerance)
-    motion_detect.img.save('seedcheck.jpg')
-    bird_tweeter.post_image_from_file(message=f'Check seed.... ', file_name='seedcheck.jpg')
+    bird_tweeter.post_image(message=f'Check seed.... ', img=motion_detect.img)
     print('starting while loop until sun set..... ')
     # loop while the sun is up, look for motion, detect birds, determine species
     while cityweather.sunrise.time() < datetime.now().time() < cityweather.sunset.time():
@@ -79,7 +78,7 @@ def bird_detector(args):
         if motion_detect.motion and birds.detect(img=motion_detect.img):  # daytime with motion and birds
             motioncnt = 0  # reset motion count between detected birds
             # keep first shot to add to start of animation or as stand along jpg
-            # copy first image, classify, grab labels, enhance the shot, and add boxes
+            # classify, grab labels, enhance the shot, and add boxes
             first_img_jpg = birds.img
             if birds.classify(img=first_img_jpg) >= args.default_confidence:  # found a bird we can classify
                 first_tweet_label = tweet_text(birds.classified_labels, birds.classified_confidences)
@@ -90,8 +89,7 @@ def bird_detector(args):
                 if birdpop.first_time_seen:
                     print(f'first time seeing a {first_tweet_label} today.  Tweeting still shot')
                     bird_tweeter.post_image(message=f'First time today: {first_tweet_label}', img=first_img_jpg)
-                # grab a stream of pics, add first pic, and build animated gif
-                gif = build_bird_animated_gif(args, motion_detect, birds, first_img_jpg)
+                gif = build_bird_animated_gif(args, motion_detect, birds, first_img_jpg)  # grab stream+1st & animate
                 print('Last tweet was at:', last_tweet)
                 if (datetime.now() - last_tweet).total_seconds() >= args.tweetdelay:
                     print('attempting gif and/or jpg tweet at:', datetime.now())
