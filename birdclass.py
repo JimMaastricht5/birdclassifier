@@ -65,7 +65,8 @@ def bird_detector(args):
                                        color_chg=args.color_chg,
                                        contrast_chg=args.contrast_chg, sharpness_chg=args.sharpness_chg,
                                        overlap_perc_tolerance=args.overlap_perc_tolerance)
-    bird_tweeter.post_image_from_file(message=f'Morning seed and camera position check. ', file_name=motion_detect.img_filename)
+    bird_tweeter.post_image_from_file(message=f'Morning seed and camera position check. ',
+                                      file_name=motion_detect.img_filename)
     print('starting while loop until sun set..... ')
     # loop while the sun is up, look for motion, detect birds, determine species
     while cityweather.sunrise.time() < datetime.now().time() < cityweather.sunset.time():
@@ -93,14 +94,14 @@ def bird_detector(args):
                     print(f'first time seeing a {first_tweet_label} today.  Tweeting still shot')
                     bird_tweeter.post_image_from_file(message=f'First time today: {first_tweet_label}',
                                                       file_name='first_img.jpg')
-                gif = build_bird_animated_gif(args, motion_detect, birds, first_img_jpg)  # grab stream+1st & animate
+                gif, gif_filename = build_bird_animated_gif(args, motion_detect, birds, first_img_jpg)
                 print('Last tweet was at:', last_tweet)
                 if (datetime.now() - last_tweet).total_seconds() >= args.tweetdelay:
                     print('attempting gif and/or jpg tweet at:', datetime.now())
-                    # if bird_tweeter.post_image(first_tweet_label, gif) is False:  # try animated gif
-                    #     print(f"*** failed animated gif tweet")  # failure, don't update last tweet time
-                    # else:
-                    #     last_tweet = datetime.now()  # update last tweet time if successful
+                    if bird_tweeter.post_image_from_file(first_tweet_label, gif_filename) is False:  # try animated gif
+                        print(f"*** failed animated gif tweet")  # failure, don't update last tweet time
+                    else:
+                        last_tweet = datetime.now()  # update last tweet time if successful
     motion_detect.stop()
     if args.verbose:
         chores.hourly_and_daily(report_pop=True)
@@ -119,11 +120,11 @@ def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
         confidence = birds.classify(img=frame)   # classify object at rectangle location
         labeled_frames.append(birds.add_boxes_and_labels(img=frame, use_last_known=True))
     labeled_frames.insert(0, image_proc.convert_image(img=first_img_jpg, target='gif'))  # isrt 1st img
-    if last_good_frame >= (args.minanimatedframes - 1):  # if bird is in more than the min number of frames
-        gif = image_proc.save_gif(frames=labeled_frames[0:last_good_frame], frame_rate=args.framerate)  # build gif
-    else:
-        gif = image_proc.convert_image(img=first_img_jpg, target='gif')
-    return gif
+    if last_good_frame >= (args.minanimatedframes - 1):  # if bird is in more than the min number of frames build gif
+        gif, gif_filename = image_proc.save_gif(frames=labeled_frames[0:last_good_frame], frame_rate=args.framerate)
+    else:  # use the jpg as a still gif
+        gif, gif_filename = image_proc.convert_image(img=first_img_jpg, target='gif')
+    return gif, gif_filename
 
 
 def tweet_text(classified_labels, classified_confidences):

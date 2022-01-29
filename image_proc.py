@@ -181,7 +181,7 @@ def save_gif(frames, frame_rate=30, filename='/home/pi/birdclass/birds.gif'):
     except Exception as e:
         print(e)
         gif = frames[0]
-    return gif
+    return gif, filename
 
 
 # testing code
