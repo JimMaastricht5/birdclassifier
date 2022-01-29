@@ -111,7 +111,7 @@ def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
     # grab a stream of pictures, add first pic from above, and build animated gif
     labeled_frames = []
     last_good_frame = 0  # find last frame that has a bird, index zero is good based on first image
-    frames = motion_detect.capture_stream(save_img=args.save_img)  # capture a list of images
+    frames = motion_detect.capture_stream()  # capture a list of images
     for i, frame in enumerate(frames):
         frame = image_proc.enhance_brightness(img=frame, factor=args.brightness_chg)
         if birds.detect(img=frame):  # find bird object in frame and set rectangles containing object
