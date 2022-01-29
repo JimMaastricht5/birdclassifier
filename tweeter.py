@@ -83,9 +83,8 @@ class TweeterClass:
             # img = Image.open(file_name)
             try:
                 # response = self.twitter.upload_media(media=img)  # possible that wi-fi strength is too poor to reach
-                response = self.twitter.media_upload(file_name)
-                print('upload_media response:', response)
-                self.twitter.update_status(status=message, media_ids=[response['media_id']])
+                media = self.twitter.media_upload(file_name)
+                self.twitter.update_status(status=message, media_ids=[media.media_id])
                 self.tweetcnt += 1
                 self.tweeted = True
             except Exception as e:
@@ -101,9 +100,8 @@ class TweeterClass:
         if self.tweetcnt < self.tweetmax_per_hour:
             try:
                 # response = self.twitter.upload_media(media=img)  # possible that wi-fi strength is too poor to reach
-                response = self.twitter.media_upload(file=img)  # possible that wi-fi strength is too poor to reach
-                print('upload_media response:', response)
-                self.twitter.update_status(status=message, media_ids=[response['media_id']])
+                media = self.twitter.media_upload(file=img)
+                self.twitter.update_status(status=message, media_ids=[media.media_id])
                 self.tweetcnt += 1
                 self.tweeted = True
             except Exception as e:
