@@ -97,13 +97,13 @@ class MotionDetector:
     # motion detection, compute the absolute difference between the current frame and first frame
     # if the difference is more than the tolerance we have something new in the frame aka motion
     def detect(self):
-        img = self.capture_image()
-        grayimg = image_proc.grayscale(img)  # convert image to gray scale
+        self.img = self.capture_image()
+        grayimg = image_proc.grayscale(self.img)  # convert image to gray scale
         grayblur = image_proc.gaussianblur(grayimg)  # smooth out image for motion detection
         imgdelta = image_proc.compare_images(self.first_img, grayblur)
-        self.img = img
-        if self.save_img:
-            self.img.save('capture.jpg')
+        # self.img = img
+        # if self.save_img:
+        self.img.save('detect.jpg')
         self.motion = (self.image_entropy(imgdelta) >= self.min_area)
         return self.motion
 
@@ -128,7 +128,7 @@ class MotionDetector:
         """
         frames = []
         for image_num in range(stream_frames):
-            img = self.capture_image().copy()
+            img = self.capture_image()
             if save_img:
                 img.save('/home/pi/birdclass/streamcap' + str(image_num) + '.jpg')
             frames.append(img)
