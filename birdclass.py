@@ -37,6 +37,7 @@ import dailychores  # handle tasks that occur once per day or per hour
 import weather
 import argparse  # argument parser
 from datetime import datetime
+from PIL import Image
 
 
 def bird_detector(args):
@@ -79,7 +80,9 @@ def bird_detector(args):
             motioncnt = 0  # reset motion count between detected birds
             # keep first shot to add to start of animation or as stand along jpg
             # classify, grab labels, enhance the shot, and add boxes
-            first_img_jpg = birds.img
+            # first_img_jpg = birds.img
+            first_img_jpg = Image.open(motion_detect.img_filename)
+            first_img_jpg.save('first_img.jpg')
             if birds.classify(img=first_img_jpg) >= args.default_confidence:  # found a bird we can classify
                 first_tweet_label = tweet_text(birds.classified_labels, birds.classified_confidences)
                 first_img_jpg = image_proc.enhance_brightness(img=first_img_jpg, factor=args.brightness_chg)
@@ -88,15 +91,16 @@ def bird_detector(args):
                 birdpop.visitors(birds.classified_labels, datetime.now())  # update census count and time last seen
                 if birdpop.first_time_seen:
                     print(f'first time seeing a {first_tweet_label} today.  Tweeting still shot')
-                    bird_tweeter.post_image(message=f'First time today: {first_tweet_label}', img=first_img_jpg)
+                    bird_tweeter.post_image(message=f'First time today: {first_tweet_label}', img=first_img_jpg,
+                                            filename='first_img.jpg')
                 gif = build_bird_animated_gif(args, motion_detect, birds, first_img_jpg)  # grab stream+1st & animate
                 print('Last tweet was at:', last_tweet)
                 if (datetime.now() - last_tweet).total_seconds() >= args.tweetdelay:
                     print('attempting gif and/or jpg tweet at:', datetime.now())
-                    if bird_tweeter.post_image(first_tweet_label, gif) is False:  # try animated gif
-                        print(f"*** failed animated gif tweet")  # failure, don't update last tweet time
-                    else:
-                        last_tweet = datetime.now()  # update last tweet time if successful
+                    # if bird_tweeter.post_image(first_tweet_label, gif) is False:  # try animated gif
+                    #     print(f"*** failed animated gif tweet")  # failure, don't update last tweet time
+                    # else:
+                    #     last_tweet = datetime.now()  # update last tweet time if successful
     motion_detect.stop()
     if args.verbose:
         chores.hourly_and_daily(report_pop=True)
