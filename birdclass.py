@@ -65,8 +65,8 @@ def bird_detector(args):
                                        color_chg=args.color_chg,
                                        contrast_chg=args.contrast_chg, sharpness_chg=args.sharpness_chg,
                                        overlap_perc_tolerance=args.overlap_perc_tolerance)
-    bird_tweeter.post_image_from_file(message=f'Morning seed and camera position check. ',
-                                      file_name=motion_detect.img_filename)
+    # bird_tweeter.post_image_from_file(message=f'Morning seed and camera position check. ',
+    #                                   file_name=motion_detect.img_filename)
     print('starting while loop until sun set..... ')
     # loop while the sun is up, look for motion, detect birds, determine species
     while cityweather.sunrise.time() < datetime.now().time() < cityweather.sunset.time():
@@ -123,7 +123,7 @@ def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
     if last_good_frame >= (args.minanimatedframes - 1):  # if bird is in more than the min number of frames build gif
         gif, gif_filename = image_proc.save_gif(frames=labeled_frames[0:last_good_frame], frame_rate=args.framerate)
     else:  # use the jpg as a still gif
-        gif, gif_filename = image_proc.convert_image(img=first_img_jpg, target='gif')
+        gif = image_proc.convert_image(img=first_img_jpg, target='gif')
     return gif, gif_filename
 
 
@@ -147,7 +147,7 @@ if __name__ == "__main__":
     ap.add_argument("-fr", "--framerate", type=int, default=45, help="frame rate for camera")
     ap.add_argument("-gf", "--minanimatedframes", type=int, default=10, help="minimum number of frames for animation")
     ap.add_argument("-st", "--save_img", type=bool, default=False, help="write images to disk")
-    ap.add_argument("-v", "--verbose", type=bool, default=True, help="To tweet extra stuff or not")
+    ap.add_argument("-v", "--verbose", type=bool, default=False, help="To tweet extra stuff or not")
     ap.add_argument("-td", "--tweetdelay", type=int, default=300,
                     help="Time to wait between tweets in seconds, default 300 seconds or 5 min")
 
