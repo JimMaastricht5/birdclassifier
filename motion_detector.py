@@ -44,7 +44,7 @@ except Exception as e:
 
 
 class MotionDetector:
-    def __init__(self, args, save_img=False):
+    def __init__(self, args):
         print('initializing camera')
         self.camera = picamera.PiCamera()
         self.stream = io.BytesIO()
@@ -57,23 +57,31 @@ class MotionDetector:
         time.sleep(2)  # Wait for the automatic gain control to settle
         # self.shutterspeed = self.camera.exposure_speed
         print('capturing first image')
-        self.img = self.capture_image()  # capture img
+        self.img_filename = 'capture.jpg'
+        self.capture_image_with_file(filename=self.img_filename)  # capture img
+        self.img = Image.open(self.img_filename)
         self.gray = image_proc.grayscale(self.img)  # convert image to gray scale for motion detection
         self.graymotion = image_proc.gaussianblur(self.gray)  # smooth out image for motion detection
         self.first_img = self.graymotion.copy()
         self.motion = False
-        self.save_img = save_img  # boolean to set physically save images to disk behavior
-        # if self.save_img:
-        self.img.save('testcap_motion_init.jpg')
         print('camera setup completed')
 
     # org code
-    def capture_image(self, img_type='jpeg'):
+    # def capture_image(self, img_type='jpeg'):
+    #     stream = io.BytesIO()
+    #     self.camera.capture(stream, img_type)
+    #     stream.seek(0)
+    #     img = Image.open(stream)
+    #     return img
+
+        # org code
+    def capture_image_with_file(self, img_type='jpeg', filename='capture_image.jpg'):
         stream = io.BytesIO()
         self.camera.capture(stream, img_type)
         stream.seek(0)
         img = Image.open(stream)
-        return img
+        img.save(filename)
+        return
 
     # # revised to carry stream as at class creation until end of process
     # def capture_image(self, img_type='jpeg'):
@@ -81,7 +89,6 @@ class MotionDetector:
     #     self.stream.seek(0)
     #     img = Image.open(self.stream)
     #     return img
-
 
     # grab an image using NP array: doesn't work!!!!
     def capture_image_np(self, img_type='jpeg'):
@@ -97,13 +104,11 @@ class MotionDetector:
     # motion detection, compute the absolute difference between the current frame and first frame
     # if the difference is more than the tolerance we have something new in the frame aka motion
     def detect(self):
-        self.img = self.capture_image()
+        self.capture_image_with_file(filename=self.img_filename)
+        self.img = Image.open(self.img_filename)
         grayimg = image_proc.grayscale(self.img)  # convert image to gray scale
         grayblur = image_proc.gaussianblur(grayimg)  # smooth out image for motion detection
         imgdelta = image_proc.compare_images(self.first_img, grayblur)
-        # self.img = img
-        # if self.save_img:
-        self.img.save('detect.jpg')
         self.motion = (self.image_entropy(imgdelta) >= self.min_area)
         return self.motion
 
@@ -118,19 +123,17 @@ class MotionDetector:
         probability = [float(h) / histlength for h in histogram]
         return -sum([p * math.log(p, 2) for p in probability if p != 0])
 
-    def capture_stream(self, stream_frames=15, save_img=False):
+    def capture_stream(self, stream_frames=15):
         """
         function returns a list of images
 
         :param stream_frames: int value with number of frames to capture
-        :param save_img: bool True saves each image captured in the stream.  Slow!  default False
         :return frames: images is a list containing a number of PIL jpg image
         """
         frames = []
         for image_num in range(stream_frames):
-            img = self.capture_image()
-            if save_img:
-                img.save('/home/pi/birdclass/streamcap' + str(image_num) + '.jpg')
+            self.capture_image_with_file(filename=self.img_filename)
+            img = Image.open(self.img_filename)
             frames.append(img)
         return frames
 
@@ -145,5 +148,5 @@ if __name__ == '__main__':
     ap.add_argument("-fr", "--framerate", type=int, default=30, help="frame rate for camera")
     arguments = ap.parse_args()
 
-    motion_detector = MotionDetector(args=arguments, save_img=True)
-    frames_test = motion_detector.capture_stream(save_img=True)
+    motion_detector = MotionDetector(args=arguments)
+    frames_test = motion_detector.capture_stream()

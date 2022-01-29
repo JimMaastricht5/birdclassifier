@@ -32,12 +32,9 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import argparse
 import numpy as np
 import math
 import random
-from PIL import Image as PILImage
-# from PIL import ImageFont as PILImageFont
 from PIL import ImageDraw as PILImageDraw
 import image_proc
 
@@ -243,7 +240,7 @@ class DetectClassify:
         height = input_details[0]['shape'][1]
         width = input_details[0]['shape'][2]
 
-        reshape_image = pil_img.resize((width, height), PILImageDraw.Image.LANCZOS)
+        reshape_image = pil_img.resize((width, height))
         image_np = image_proc.convert(reshape_image, 'np')
         image_np_expanded = np.expand_dims(image_np, axis=0)
 
@@ -261,7 +258,7 @@ class DetectClassify:
         x_min = int(max(1, (box[1] * img_width)))
         y_max = int(min(img_height, (box[2] * img_height)))
         x_max = int(min(img_width, (box[3] * img_width)))
-        return (x_min, y_min, x_max, y_max)
+        return x_min, y_min, x_max, y_max
 
     # add bounding box and label to an image
     # we may have a rect with no species and a zero confidence, in that case use the last known label and confidence
@@ -330,32 +327,32 @@ class DetectClassify:
         return common_name
 
 
-def main(args):
-    img = PILImage.open(args.image)  # load image
-    birds = DetectClassify(args.homedir, default_confidence=.9)  # setup obj
-    birds.detect(img)  # run object detection
-
-    print('objects detected', birds.detected_confidences)
-    print('labels detected', birds.detected_labels)
-    print('rectangles', birds.detected_rects)
-
-    birds.classify(birds.img)  # classify species
-    print(birds.classified_labels)
-    label = birds.classified_labels[0]
-    if len(label) == 0:
-        label = "no classification text"
-    print(label)
-    img = birds.add_boxes_and_labels(img)
-    img.save('imgtest.jpg')
-    img.show()
+# def main(args):
+#     img = PILImage.open(args.image)  # load image
+#     birds = DetectClassify(args.homedir, default_confidence=.9)  # setup obj
+#     birds.detect(img)  # run object detection
+#
+#     print('objects detected', birds.detected_confidences)
+#     print('labels detected', birds.detected_labels)
+#     print('rectangles', birds.detected_rects)
+#
+#     birds.classify(birds.img)  # classify species
+#     print(birds.classified_labels)
+#     label = birds.classified_labels[0]
+#     if len(label) == 0:
+#         label = "no classification text"
+#     print(label)
+#     img = birds.add_boxes_and_labels(img)
+#     img.save('imgtest.jpg')
+#     img.show()
 
 
 # test function
-if __name__ == '__main__':
-    ap = argparse.ArgumentParser()
-    ap.add_argument('-i', '--image', default='/home/pi/birdclass/test2.jpg', help='cardinal')
-    ap.add_argument('-dir', '--homedir', default='c:/Users/jimma/PycharmProjects/birdclassifier/', help='loc files')
-
-    arguments = ap.parse_args()
-
-    main(arguments)
+# if __name__ == '__main__':
+#     ap = argparse.ArgumentParser()
+#     ap.add_argument('-i', '--image', default='/home/pi/birdclass/test2.jpg', help='cardinal')
+#     ap.add_argument('-dir', '--homedir', default='c:/Users/jimma/PycharmProjects/birdclassifier/', help='loc files')
+#
+#     arguments = ap.parse_args()
+#
+#     main(arguments)
