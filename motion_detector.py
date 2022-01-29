@@ -47,7 +47,6 @@ class MotionDetector:
     def __init__(self, args):
         print('initializing camera')
         self.camera = picamera.PiCamera()
-        self.stream = io.BytesIO()
         self.min_area = args.minarea
         if args.screenwidth != 0:  # use specified height and width or default values if not passed
             self.camera.resolution = (args.screenheight, args.screenwidth)
@@ -85,9 +84,10 @@ class MotionDetector:
 
     # revised to carry stream as at class creation until end of process
     def capture_image_stream(self, img_type='jpeg'):
-        self.camera.capture(self.stream, img_type)
+        stream = io.BytesIO()
+        self.camera.capture(stream, img_type)
         self.stream.seek(0)
-        img = Image.open(self.stream)
+        img = Image.open(stream)
         return img
 
     # grab an image using NP array: doesn't work!!!!
