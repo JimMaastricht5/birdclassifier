@@ -95,12 +95,12 @@ class TweeterClass:
         return self.tweeted
 
     # set status and add an image
-    def post_image(self, message, img, filename):
+    def post_image(self, message, img, file_name):
         self.check_hour()
         if self.tweetcnt < self.tweetmax_per_hour:
             try:
                 # response = self.twitter.upload_media(media=img)  # possible that wi-fi strength is too poor to reach
-                media = self.twitter.media_upload(filename=filename, file=img)
+                media = self.twitter.media_upload(filename=file_name, file=img)
                 self.twitter.update_status(status=message, media_ids=[media.media_id])
                 self.tweetcnt += 1
                 self.tweeted = True
@@ -127,8 +127,8 @@ class TweeterClass:
 
 
 # test code
-def main_test():
-    tweeter_obj = TweeterClass()
+# def main_test():
+#     tweeter_obj = TweeterClass()
     # direct_messages = tweeter_obj.get_direct_messages()
     # print(direct_messages)
     # print(direct_messages.shape)
@@ -140,11 +140,11 @@ def main_test():
     # print('tweeted: %s' % message)
 
     # test code to tweet a picture
-    message = 'Python image test'
-    twtimage = open('cardinal.jpg', 'rb')
-    tweeter_obj.post_image(message, twtimage)
-    print('tweeted: %s' % message)
+    # message = 'Python image test'
+    # twtimage = open('cardinal.jpg', 'rb')
+    # tweeter_obj.post_image(message, twtimage)
+    # print('tweeted: %s' % message)
 
 
-if __name__ == "__main__":
-    main_test()
+# if __name__ == "__main__":
+#     main_test()

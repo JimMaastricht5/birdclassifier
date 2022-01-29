@@ -65,7 +65,7 @@ def bird_detector(args):
                                        color_chg=args.color_chg,
                                        contrast_chg=args.contrast_chg, sharpness_chg=args.sharpness_chg,
                                        overlap_perc_tolerance=args.overlap_perc_tolerance)
-    bird_tweeter.post_image(message=f'Check seed.... ', img=motion_detect.img, filename=motion_detect.img_filename)
+    bird_tweeter.post_image_from_file(message=f'Check seed.... ', file_name=motion_detect.img_filename)
     print('starting while loop until sun set..... ')
     # loop while the sun is up, look for motion, detect birds, determine species
     while cityweather.sunrise.time() < datetime.now().time() < cityweather.sunset.time():
@@ -91,8 +91,8 @@ def bird_detector(args):
                 birdpop.visitors(birds.classified_labels, datetime.now())  # update census count and time last seen
                 if birdpop.first_time_seen:
                     print(f'first time seeing a {first_tweet_label} today.  Tweeting still shot')
-                    bird_tweeter.post_image(message=f'First time today: {first_tweet_label}', img=first_img_jpg,
-                                            filename='first_img.jpg')
+                    bird_tweeter.post_image_from_file(message=f'First time today: {first_tweet_label}',
+                                                      file_name='first_img.jpg')
                 gif = build_bird_animated_gif(args, motion_detect, birds, first_img_jpg)  # grab stream+1st & animate
                 print('Last tweet was at:', last_tweet)
                 if (datetime.now() - last_tweet).total_seconds() >= args.tweetdelay:
