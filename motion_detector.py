@@ -83,12 +83,12 @@ class MotionDetector:
         img.save(filename)
         return
 
-    # # revised to carry stream as at class creation until end of process
-    # def capture_image(self, img_type='jpeg'):
-    #     self.camera.capture(self.stream, img_type)
-    #     self.stream.seek(0)
-    #     img = Image.open(self.stream)
-    #     return img
+    # revised to carry stream as at class creation until end of process
+    def capture_image_stream(self, img_type='jpeg'):
+        self.camera.capture(self.stream, img_type)
+        self.stream.seek(0)
+        img = Image.open(self.stream)
+        return img
 
     # grab an image using NP array: doesn't work!!!!
     def capture_image_np(self, img_type='jpeg'):
@@ -132,8 +132,9 @@ class MotionDetector:
         """
         frames = []
         for image_num in range(stream_frames):
-            self.capture_image_with_file(filename=self.img_filename)
-            img = Image.open(self.img_filename)
+            self.capture_image_stream()
+            # img = Image.open(self.img_filename)
+            img = Image.open(self.stream)
             frames.append(img)
         return frames
 
