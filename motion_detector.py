@@ -65,15 +65,6 @@ class MotionDetector:
         self.motion = False
         print('camera setup completed')
 
-    # org code
-    # def capture_image(self, img_type='jpeg'):
-    #     stream = io.BytesIO()
-    #     self.camera.capture(stream, img_type)
-    #     stream.seek(0)
-    #     img = Image.open(stream)
-    #     return img
-
-        # org code
     def capture_image_with_file(self, img_type='jpeg', filename='capture_image.jpg'):
         stream = io.BytesIO()
         self.camera.capture(stream, img_type)
@@ -82,7 +73,7 @@ class MotionDetector:
         img.save(filename)
         return
 
-    # revised to carry stream as at class creation until end of process
+    # grab and image and store in mem
     def capture_image_stream(self, img_type='jpeg'):
         stream = io.BytesIO()
         self.camera.capture(stream, img_type)
@@ -104,8 +95,9 @@ class MotionDetector:
     # motion detection, compute the absolute difference between the current frame and first frame
     # if the difference is more than the tolerance we have something new in the frame aka motion
     def detect(self):
-        self.capture_image_with_file(filename=self.img_filename)
-        self.img = Image.open(self.img_filename)
+        # self.capture_image_with_file(filename=self.img_filename)
+        # self.img = Image.open(self.img_filename)
+        self.img = self.capture_image_stream()
         grayimg = image_proc.grayscale(self.img)  # convert image to gray scale
         grayblur = image_proc.gaussianblur(grayimg)  # smooth out image for motion detection
         imgdelta = image_proc.compare_images(self.first_img, grayblur)

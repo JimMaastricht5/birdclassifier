@@ -79,11 +79,8 @@ class TweeterClass:
     def post_image_from_file(self, message, file_name):
         self.check_hour()
         if self.tweetcnt < self.tweetmax_per_hour:
-            # print('posting from file')
-            # img = Image.open(file_name)
             try:
-                # response = self.twitter.upload_media(media=img)  # possible that wi-fi strength is too poor to reach
-                media = self.twitter.media_upload(file_name)
+                media = self.twitter.media_upload(filename=file_name)
                 self.twitter.update_status(status=message, media_ids=[media.media_id])
                 self.tweetcnt += 1
                 self.tweeted = True
@@ -99,8 +96,10 @@ class TweeterClass:
         self.check_hour()
         if self.tweetcnt < self.tweetmax_per_hour:
             try:
-                # response = self.twitter.upload_media(media=img)  # possible that wi-fi strength is too poor to reach
-                media = self.twitter.media_upload(filename=file_name, file=img)
+                img.save(file_name)
+                # response = self.twitter.upload_media(media=img)  # doesn't work!
+                # media = self.twitter.media_upload(filename=file_name, file=img)  # doesn't work
+                media = self.twitter.media_upload(filename=file_name)
                 self.twitter.update_status(status=message, media_ids=[media.media_id])
                 self.tweetcnt += 1
                 self.tweeted = True
