@@ -88,7 +88,7 @@ def bird_detector(args):
                 birds.set_colors()  # set new colors for this series of bounding boxes
                 first_img_jpg = birds.add_boxes_and_labels(img=first_img_jpg)
                 birdpop.visitors(birds.classified_labels, datetime.now())  # update census count and time last seen
-                if birdpop.first_time_seen:
+                if birdpop.first_time_seen:  # note this doesn't change last_tweet time, intended as a one off.
                     print(f'first time seeing a {first_tweet_label} today.  Tweeting still shot')
                     first_img_jpg.save('first_img.jpg')
                     bird_tweeter.post_image_from_file(message=f'First time today: {first_tweet_label}',
