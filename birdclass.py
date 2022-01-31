@@ -94,7 +94,7 @@ def bird_detector(args):
                     bird_tweeter.post_image_from_file(message=f'First time today: {first_tweet_label}',
                                                       file_name='first_img.jpg')
                 gif, gif_filename, animated = build_bird_animated_gif(args, motion_detect, birds, first_img_jpg)
-                print('Skipping Tweet Last tweet was at:', last_tweet)
+                print('Prepared to tweet.  Last tweet was at:', last_tweet)
                 if (datetime.now() - last_tweet).total_seconds() >= args.tweetdelay and animated:
                     print('***Tweet animated gif at:', datetime.now())
                     if bird_tweeter.post_image_from_file(first_tweet_label, gif_filename) is False:  # animated gif
