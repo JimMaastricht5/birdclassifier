@@ -65,13 +65,11 @@ def bird_detector(args):
                                        color_chg=args.color_chg,
                                        contrast_chg=args.contrast_chg, sharpness_chg=args.sharpness_chg,
                                        overlap_perc_tolerance=args.overlap_perc_tolerance)
-    # bird_tweeter.post_image_from_file(message=f'Morning seed and camera position check. ',
-    #                                   file_name=motion_detect.img_filename)
     print('starting while loop until sun set..... ')
     # loop while the sun is up, look for motion, detect birds, determine species
     while cityweather.sunrise.time() < datetime.now().time() < cityweather.sunset.time():
         if args.verbose:
-            chores.hourly_and_daily()  # perform chores that take place hourly or daily such as weather reporting
+            chores.hourly_and_daily(filename='')  # perform chores that take on a schedule such as weather reporting
         motion_detect.detect()
         if motion_detect.motion:
             motioncnt += 1
@@ -151,7 +149,7 @@ if __name__ == "__main__":
     ap.add_argument("-fr", "--framerate", type=int, default=45, help="frame rate for camera")
     ap.add_argument("-gf", "--minanimatedframes", type=int, default=10, help="minimum number of frames for animation")
     ap.add_argument("-st", "--save_img", type=bool, default=False, help="write images to disk")
-    ap.add_argument("-v", "--verbose", type=bool, default=False, help="To tweet extra stuff or not")
+    ap.add_argument("-v", "--verbose", type=bool, default=True, help="To tweet extra stuff or not")
     ap.add_argument("-td", "--tweetdelay", type=int, default=300,
                     help="Time to wait between tweets in seconds, default 300 seconds or 5 min")
 

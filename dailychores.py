@@ -94,11 +94,15 @@ class DailyChores:
 
     # housekeeping for day and hour
     # takes a pointer to the population tracking object
-    def hourly_and_daily(self, report_pop=False):
+    def hourly_and_daily(self, filename='', report_pop=False):
         # post the weather once per day at 6am
         if self.weather_reported is False and self.cityweather.is_daytime() and \
-                datetime.now().hour > 6 and datetime.now().minute >= 0:
+                datetime.now().hour > 6 and datetime.now().minute >= 0 and \
+                datetime.now().hour < 7:
             self.weather_report()
+            if filename != '':  # if an img file name was passed post it
+                self.tweeter.post_image_from_file(message=f'Morning seed and camera position check. ',
+                                                  file_name=filename)
             self.weather_reported = True
 
         if report_pop:  # process is ending report populations observations
