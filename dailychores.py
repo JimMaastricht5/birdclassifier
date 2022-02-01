@@ -98,7 +98,7 @@ class DailyChores:
         # post the weather once per day at 6am
         if self.weather_reported is False and self.cityweather.is_daytime() and \
                 datetime.now().hour > 6 and datetime.now().minute >= 0 and \
-                datetime.now().hour < 7:
+                datetime.now().hour < 8:
             self.weather_report()
             if filename != '':  # if an img file name was passed post it
                 self.tweeter.post_image_from_file(message=f'Morning seed and camera position check. ',
