@@ -85,7 +85,7 @@ def bird_detector(args):
                 birds.set_colors()  # set new colors for this series of bounding boxes
                 first_img_jpg = birds.add_boxes_and_labels(img=first_img_jpg)
                 birdpop.visitors(birds.classified_labels, datetime.now())  # update census count and time last seen
-                if birdpop.first_time_seen:  # note this doesn't change last_tweet time, intended as a one off.
+                if birdpop.first_time_seen:  # note this doesn't change last_tweet time & overrides time between tweets
                     print(f'first time seeing a {first_tweet_label} today.  Tweeting still shot')
                     first_img_jpg.save('first_img.jpg')
                     bird_tweeter.post_image_from_file(message=f'First time today: {first_tweet_label}',
@@ -113,7 +113,7 @@ def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
         frame = image_proc.enhance_brightness(img=frame, factor=args.brightness_chg)
         if birds.detect(img=frame):  # find bird object in frame and set rectangles containing object
             last_good_frame = i + 1  # found a bird, add one to last good frame to account for insert of 1st image below
-        confidence = birds.classify(img=frame)   # classify object at rectangle location
+        _confidence = birds.classify(img=frame)   # classify object at rectangle location
         labeled_frames.append(birds.add_boxes_and_labels(img=frame, use_last_known=True))
     labeled_frames.insert(0, image_proc.convert_image(img=first_img_jpg, target='gif'))  # isrt 1st img
     if last_good_frame >= (args.minanimatedframes - 1):  # if bird is in more than the min number of frames build gif
@@ -148,8 +148,8 @@ if __name__ == "__main__":
     ap.add_argument("-gf", "--minanimatedframes", type=int, default=10, help="minimum number of frames for animation")
     ap.add_argument("-st", "--save_img", type=bool, default=False, help="write images to disk")
     ap.add_argument("-v", "--verbose", type=bool, default=True, help="To tweet extra stuff or not")
-    ap.add_argument("-td", "--tweetdelay", type=int, default=300,
-                    help="Time to wait between tweets in seconds, default 300 seconds or 5 min")
+    ap.add_argument("-td", "--tweetdelay", type=int, default=600,
+                    help="Time to wait between tweets in seconds, default 600 seconds or 10 min")
 
     # motion and image processing settings
     ap.add_argument("-b", "--brightness_chg", type=int, default=1.05, help="brightness boost")  # 1 no chg,< 1 -, > 1 +

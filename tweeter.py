@@ -34,12 +34,12 @@ from auth import (
 
 class TweeterClass:
 
-    def __init__(self):
+    def __init__(self, tweetmax_per_hour=15):
         self.twitter = self.init(api_key, api_secret_key, access_token, access_token_secret)
         self.curr_day = datetime.now().day
         self.curr_hr = datetime.now().hour
         self.tweetcnt = 0
-        self.tweetmax_per_hour = 15
+        self.tweetmax_per_hour = tweetmax_per_hour
         self.tweeted = False
 
     # initialize twitter connection and login
