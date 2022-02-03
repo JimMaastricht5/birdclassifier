@@ -37,7 +37,6 @@ import dailychores  # handle tasks that occur once per day or per hour
 import weather
 import argparse  # argument parser
 from datetime import datetime
-# from PIL import Image
 
 
 def bird_detector(args):
@@ -80,8 +79,6 @@ def bird_detector(args):
             # keep first shot to add to start of animation or as stand along jpg
             # classify, grab labels, enhance the shot, and add boxes
             first_img_jpg = birds.img
-            # first_img_jpg = Image.open(motion_detect.img_filename)
-            # first_img_jpg.save('first_img.jpg')
             if birds.classify(img=first_img_jpg) >= args.default_confidence:  # found a bird we can classify
                 first_tweet_label = tweet_text(birds.classified_labels, birds.classified_confidences)
                 first_img_jpg = image_proc.enhance_brightness(img=first_img_jpg, factor=args.brightness_chg)
@@ -134,7 +131,8 @@ def tweet_text(classified_labels, classified_confidences):
     for i, sname in enumerate(classified_labels):
         sname = str(sname)  # make sure the label is a string
         sname = sname[sname.find(' ') + 1:] if sname.find(' ') >= 0 else sname  # remove index number
-        tweet_label += f'{sname} {classified_confidences[i] * 100:.1f}% '
+        if sname != '' and classified_confidences * 100 > 1.0:  # skip blank names and 0% confidence, keep good stuff
+            tweet_label += f'{sname} {classified_confidences[i] * 100:.1f}% '
     return tweet_label
 
 

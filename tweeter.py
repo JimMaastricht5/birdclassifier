@@ -21,8 +21,6 @@
 # SOFTWARE.
 # auth.py must be located in project; protect this file as it contains keys
 # code by JimMaastricht5@gmail.com
-# from PIL import Image
-# from twython import Twython
 import tweepy
 import numpy as np
 from datetime import datetime
@@ -46,7 +44,6 @@ class TweeterClass:
 
     # initialize twitter connection and login
     def init(self, consumer_key, consumer_secret, access_token, access_token_secret):
-        # return Twython(api_key, api_secret_key, access_token, access_token_secret)
         auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
         auth.set_access_token(access_token, access_token_secret)
         api = tweepy.API(auth)

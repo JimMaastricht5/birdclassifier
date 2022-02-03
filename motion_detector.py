@@ -95,7 +95,7 @@ class MotionDetector:
     # motion detection, compute the absolute difference between the current frame and first frame
     # if the difference is more than the tolerance we have something new in the frame aka motion
     def detect(self):
-        # self.capture_image_with_file(filename=self.img_filename)
+        # self.capture_image_with_file(filename=self.img_filename)  # alternative method to image_stream
         # self.img = Image.open(self.img_filename)
         self.img = self.capture_image_stream()
         grayimg = image_proc.grayscale(self.img)  # convert image to gray scale

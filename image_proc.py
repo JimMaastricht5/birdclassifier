@@ -25,7 +25,6 @@
 from PIL import ImageEnhance, Image, ImageOps, ImageStat, ImageFilter, ImageChops
 import numpy as np
 import io
-# from skimage.exposure import is_low_contrast
 
 
 # Pillow img to flip
@@ -191,7 +190,7 @@ def main():
     img1 = Image.open('/home/pi/birdclass/test.gif')
     # gif1 = convert_image(img1, target='gif', save_test_img=True)
     img2 = Image.open('/home/pi/birdclass/test2.jpg')
-    img2_gif = convert_image(img=img2, target='gif')
+    # img2_gif = convert_image(img=img2, target='gif')
     img3_gif = convert_image(img=img2, target='gif')
     img3_gif.save('/home/pi/birdclass/test stream.gif', 'gif')
     # gif2 = convert_image(img2, target='gif', save_test_img=True)
