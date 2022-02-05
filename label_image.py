@@ -159,18 +159,18 @@ class DetectClassify:
             (startX, startY, endX, endY) = self.scale_rect(img, self.detected_rects[i])  # set x,y bounding box
             rect = (startX, startY, endX, endY)
             crop_img = img.crop((startX, startY, endX, endY))  # extract image for better classification
-            # equalizedimg = image_proc.enhance(img, brightness=self.brightness_chg, contrast=self.contrast_chg,
-            #                                   color=self.color_chg, sharpness=self.sharpness_chg)
-            # # crop_equalizedimg = equalizedimg.crop((startX, startY, endX, endY))
+            equalizedimg = image_proc.enhance(img, brightness=self.brightness_chg, contrast=self.contrast_chg,
+                                              color=self.color_chg, sharpness=self.sharpness_chg)
+            crop_equalizedimg = equalizedimg.crop((startX, startY, endX, endY))
             classify_conf, classify_label = self.classify_obj(crop_img)
-            # classify_conf_equalized, classify_label_equalized = self.classify_obj(crop_equalizedimg)
-            # if classify_label != classify_label_equalized:  # labels should match if pic quality is good
-            #     if classify_conf < classify_conf_equalized:
-            #         classify_conf = classify_conf_equalized
-            #         classify_label = classify_label_equalized
-            #     classify_conf -= self.classify_mismatch_reduction  # reduce confidence on confusion between images
-            # else:  # increase confidence on match, use classify_label already set above
-            #     classify_conf = \
+            classify_conf_equalized, classify_label_equalized = self.classify_obj(crop_equalizedimg)
+            if classify_label != classify_label_equalized:  # labels should match if pic quality is good
+                if classify_conf < classify_conf_equalized:
+                    classify_conf = classify_conf_equalized
+                    classify_label = classify_label_equalized
+                classify_conf -= self.classify_mismatch_reduction  # reduce confidence on confusion between images
+            else:  # increase confidence on match, use classify_label already set above
+                classify_conf += self.classify_mismatch_reduction
             #         classify_conf + classify_conf_equalized if classify_conf + classify_conf_equalized <= 1 else 1
 
             # detect overlapping rectangles/same bird and skip it
