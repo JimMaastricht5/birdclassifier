@@ -167,11 +167,11 @@ class DetectClassify:
             if classify_label != classify_label_equalized:  # labels should match if pic quality is good
                 if classify_conf < classify_conf_equalized:
                     classify_conf = classify_conf_equalized
-                    classify_label = classify_label_equalized
+                    classify_label = classify_label_equalized \
+                        if len(classify_label_equalized.strip()) > 0 else classify_label
                 classify_conf -= self.classify_mismatch_reduction  # reduce confidence on confusion between images
             else:  # increase confidence on match, use classify_label already set above
                 classify_conf += self.classify_mismatch_reduction
-            #         classify_conf + classify_conf_equalized if classify_conf + classify_conf_equalized <= 1 else 1
             classify_conf = classify_conf if classify_conf <= 1 else 1
             # detect overlapping rectangles/same bird and skip it
             # overlap_perc = image_proc.overlap_area(prior_rect, rect)  # compare current rect and prior rect
