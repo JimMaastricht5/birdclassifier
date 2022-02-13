@@ -80,19 +80,24 @@ def bird_detector(args):
             # classify, grab labels, enhance the shot, and add boxes
             first_img_jpg = birds.img
             if birds.classify(img=first_img_jpg) >= args.default_confidence:  # found a bird we can classify
+                first_labels = birds.classified_labels # grab unedited labels
                 first_tweet_label = tweet_text(birds.classified_labels, birds.classified_confidences)
                 first_img_jpg = image_proc.enhance_brightness(img=first_img_jpg, factor=args.brightness_chg)
                 birds.set_colors()  # set new colors for this series of bounding boxes
                 first_img_jpg = birds.add_boxes_and_labels(img=first_img_jpg)
                 birdpop.visitors(birds.classified_labels, datetime.now())  # update census count and time last seen
-                if birdpop.first_time_seen:  # note this doesn't change last_tweet time & overrides time between tweets
+                bird_first_time_seen = birdpop.first_time_seen
+                if bird_first_time_seen:  # note this doesn't change last_tweet time & overrides time between tweets
                     print(f'first time seeing a {first_tweet_label} today.  Tweeting still shot')
                     first_img_jpg.save('first_img.jpg')
                     bird_tweeter.post_image_from_file(message=f'First time today: {first_tweet_label}',
                                                       file_name='first_img.jpg')
                 gif, gif_filename, animated = build_bird_animated_gif(args, motion_detect, birds, first_img_jpg)
                 print(f'Prepared to tweet.  Animated GIF is {animated}.  Last tweet was at: {last_tweet}')
-                if (datetime.now() - last_tweet).total_seconds() >= args.tweetdelay and animated:
+                waittime = birdpop.report_single_census_count(first_labels[0]) * args.tweetdelay
+                print('suggested waittime is...',waittime)
+                if animated and \
+                        ((datetime.now() - last_tweet).total_seconds() >= args.tweetdelay or bird_first_time_seen):
                     print('***Tweet animated gif at:', datetime.now())
                     if bird_tweeter.post_image_from_file(first_tweet_label, gif_filename) is False:  # animated gif
                         print(f"*** Failed gif tweet")  # failure, don't update last tweet time

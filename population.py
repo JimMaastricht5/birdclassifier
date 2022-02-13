@@ -65,6 +65,10 @@ class Census:
         census_subset = {key: self.census_dict[key] for key in visitor_name_list}
         return census_subset
 
+    # return count of visitors by name along with last seen date time
+    def report_single_census_count(self, visitor_name):
+        return self.census_dict[visitor_name][0]
+
     # sort census by count
     def get_census_by_count(self):
         return dict(sorted(self.census_dict.items(), key=lambda k_v: k_v[1][0], reverse=True))
@@ -82,6 +86,7 @@ def main():
     popdogcats.visitors('cat', observed_time)
     print('should be one dog', popdogcats.report_census('dog'))
     print('should be two cats', popdogcats.report_census('cat'))
+    print(popdogcats.report_single_census_count('cat'))
     popdogcats.visitors(['dog', 'cat', 'bird'], datetime.now())
 
     print('should be two dogs, three cats, and a bird')
