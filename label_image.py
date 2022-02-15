@@ -263,27 +263,27 @@ class DetectClassify:
     # add bounding box and label to an image
     # we may have a rect with no species and a zero confidence, in that case use the last known label and confidence
     def add_boxes_and_labels(self, img, use_last_known=False):
-        if use_last_known and round(max(self.classified_confidences, default=0), 2) == 0:  # poor result use last known
+        if use_last_known and round(max(self.classified_confidences, default=0), 2) == 0:  # < 10% conf, use last known
             classified_rects = self.last_known_classified_rects
             classified_labels = self.last_known_classified_labels
             classified_confidences = self.last_known_classified_confidences
         else:
             classified_rects = self.classified_rects
-            classified_labels = self.classified_labels
+            classified_labels = self.classified_labels  # assigned but not used below in line 289??
             classified_confidences = self.classified_confidences
 
         for i, rect in enumerate(classified_rects):
-            try:
-                (start_x, start_y, end_x, end_y) = rect
-                text_x = start_x
-                text_y = start_y
-                start_x += -25
-                start_y += -25
-                end_x += 25
-                end_y += 25
-            except TypeError:  # was getting a type error here?  still an issue?
-                print('TypeError in add boxes and labels', rect)
-                return
+            # try:
+            (start_x, start_y, end_x, end_y) = rect
+            text_x = start_x
+            text_y = start_y
+            start_x += -25
+            start_y += -25
+            end_x += 25
+            end_y += 25
+            # except TypeError:  # was getting a type error here?  still an issue?
+            #    print('TypeError in add boxes and labels', rect)
+            #     return
             draw = PILImageDraw.Draw(img)
             font = draw.getfont()
             draw.text((text_x, text_y), self.label_text(classified_labels[i], classified_confidences[i]),

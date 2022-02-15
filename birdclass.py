@@ -80,7 +80,7 @@ def bird_detector(args):
             # classify, grab labels, enhance the shot, and add boxes
             first_img_jpg = birds.img
             if birds.classify(img=first_img_jpg) >= args.default_confidence:  # found a bird we can classify
-                first_labels = birds.classified_labels # grab unedited labels
+                first_labels = birds.classified_labels  # grab unedited labels
                 first_tweet_label = tweet_text(birds.classified_labels, birds.classified_confidences)
                 first_img_jpg = image_proc.enhance_brightness(img=first_img_jpg, factor=args.brightness_chg)
                 birds.set_colors()  # set new colors for this series of bounding boxes
@@ -94,10 +94,11 @@ def bird_detector(args):
                                                       file_name='first_img.jpg')
                 gif, gif_filename, animated = build_bird_animated_gif(args, motion_detect, birds, first_img_jpg)
                 print(f'Prepared to tweet.  Animated GIF is {animated}.  Last tweet was at: {last_tweet}')
-                waittime = birdpop.report_single_census_count(first_labels[0]) * args.tweetdelay
-                print('suggested waittime is...',waittime)
-                if animated and \
-                        ((datetime.now() - last_tweet).total_seconds() >= args.tweetdelay or bird_first_time_seen):
+                waittime = birdpop.report_single_census_count(first_labels[0]) * 300  # wait 5 minutes per reported N
+                waittime = args.tweetdelay if waittime >= args.tweetdelay else waittime
+                print('suggested waittime is...', waittime)
+                if animated and ((datetime.now() - last_tweet).total_seconds() >= waittime or bird_first_time_seen):
+                    # ((datetime.now() - last_tweet).total_seconds() >= args.tweetdelay or bird_first_time_seen):
                     print('***Tweet animated gif at:', datetime.now())
                     if bird_tweeter.post_image_from_file(first_tweet_label, gif_filename) is False:  # animated gif
                         print(f"*** Failed gif tweet")  # failure, don't update last tweet time
@@ -153,8 +154,8 @@ if __name__ == "__main__":
     ap.add_argument("-gf", "--minanimatedframes", type=int, default=10, help="minimum number of frames for animation")
     ap.add_argument("-st", "--save_img", type=bool, default=False, help="write images to disk")
     ap.add_argument("-v", "--verbose", type=bool, default=True, help="To tweet extra stuff or not")
-    ap.add_argument("-td", "--tweetdelay", type=int, default=600,
-                    help="Time to wait between tweets in seconds, default 600 seconds or 10 min")
+    ap.add_argument("-td", "--tweetdelay", type=int, default=3600,
+                    help="Wait time between tweets is N species seen * 300 with not to exceed max of tweet delay")
 
     # motion and image processing settings
     ap.add_argument("-b", "--brightness_chg", type=int, default=1.05, help="brightness boost")  # 1 no chg,< 1 -, > 1 +
