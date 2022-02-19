@@ -263,6 +263,7 @@ class DetectClassify:
     # we may have a rect with no species and a zero confidence, in that case use the last known label and confidence
     def add_boxes_and_labels(self, img, use_last_known=False):
         if use_last_known and round(max(self.classified_confidences, default=0), 2) == 0:  # < 10% conf, use last known
+            print('using last known', self.last_known_classified_confidences, self.last_known_classified_labels)
             classified_rects = self.last_known_classified_rects
             classified_labels = self.last_known_classified_labels
             classified_confidences = self.last_known_classified_confidences
