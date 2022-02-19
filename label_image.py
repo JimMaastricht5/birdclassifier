@@ -33,7 +33,6 @@ from __future__ import division
 from __future__ import print_function
 
 import numpy as np
-import math
 import random
 from PIL import ImageDraw as PILImageDraw
 import image_proc
@@ -153,8 +152,7 @@ class DetectClassify:
         self.classified_rects = []
         self.classified_confidences = []
         self.classified_labels = []
-        # prior_rect = (0, 0, 0, 0)
-        # overlap_perc = 0.0
+        prior_rect = (0, 0, 0, 0)
         for i, det_confidence in enumerate(self.detected_confidences):  # loop thru detected target objects
             (startX, startY, endX, endY) = self.scale_rect(img, self.detected_rects[i])  # set x,y bounding box
             rect = (startX, startY, endX, endY)
@@ -164,26 +162,25 @@ class DetectClassify:
             crop_equalizedimg = equalizedimg.crop((startX, startY, endX, endY))
             classify_conf, classify_label = self.classify_obj(crop_img)
             classify_conf_equalized, classify_label_equalized = self.classify_obj(crop_equalizedimg)
-            if classify_label != classify_label_equalized:  # labels should match if pic quality is good
-                if classify_conf < classify_conf_equalized:
-                    classify_conf = classify_conf_equalized
-                    classify_label = classify_label_equalized \
-                        if len(classify_label_equalized.strip()) > 0 else classify_label
-                classify_conf -= self.classify_mismatch_reduction  # reduce confidence on confusion between images
-            else:  # increase confidence on match, use classify_label already set above
-                classify_conf += self.classify_mismatch_reduction
-            classify_conf = classify_conf if classify_conf <= 1 else 1
-            # detect overlapping rectangles/same bird and skip it
-            # overlap_perc = image_proc.overlap_area(prior_rect, rect)  # compare current rect and prior rect
-            # prior_rect = rect  # set prior rect to current rect
-            # if overlap_perc > self.overlap_perc_tolerance:  # 0.0 in first loop, if 80% overlap skip bird
-            #     classify_conf = 0
-            #     classify_label = ""
+            # take the best result between img and enhanced img
+            classify_label = classify_label if classify_conf >= classify_conf_equalized else classify_label_equalized
+            classify_conf = classify_conf if classify_conf >= classify_conf_equalized else classify_conf_equalized
+            # classify_conf -= self.classify_mismatch_reduction  # reduce confidence on confusion between images
+            # else:  # increase confidence on match, use classify_label already set above
+            #     classify_conf += self.classify_mismatch_reduction
 
-            self.classified_labels.append(classify_label)
-            classify_conf = classify_conf if classify_conf > 0 else 0  # check for negative conf
-            self.classified_confidences.append(classify_conf)
-            self.classified_rects.append(rect)
+            # detect overlapping rectangles/same bird and skip it
+            overlap_perc = image_proc.overlap_area(prior_rect, rect)  # compare current rect and prior rect
+            prior_rect = rect  # set prior rect to current rect
+            if overlap_perc > self.overlap_perc_tolerance:  # 0.0 in first loop, if XX% overlap skip bird
+                classify_conf = 0
+                classify_label = ""
+            # record bird classification and location if there is a label
+            if len(classify_label.strip()) > 0:
+                self.classified_labels.append(classify_label)
+                self.classified_confidences.append(classify_conf)
+                self.classified_rects.append(rect)
+
         if round(max(self.classified_confidences, default=0), 2) == 0:  # if empty list zero or round and check
             max_confidence = 0
         else:
@@ -209,24 +206,26 @@ class DetectClassify:
         if output_details['dtype'] == np.uint8:
             scale, zero_point = output_details['quantization']
             output = scale * (output - zero_point) * 10  # added * 10 scale factor to try and get numbers right
-
         cindex = np.argpartition(output, -10)[-10:]
         # loop thru top N results to find best match; highest score align with matching species threshold
         maxcresult = float(0)
         maxlresult = ''
         for lindex in cindex:
-            lresult = str(self.classifier_possible_labels[lindex])  # grab label,push to string instead of tuple
-            cresult = float(output[lindex])  # grab predicted confidence score
-            if cresult != 0:
-                if cresult > 1:  # still don't have scaling working 100% if the result is more than 100% adjust
-                    if tfliteb:
-                        cresult -= math.floor(cresult)
-                    else:
-                        cresult = cresult / 10
-                if self.check_threshold(cresult, lindex):  # comp confidence>=threshold by label
-                    if cresult > maxcresult:  # if this above threshold and is a better confidence result store it
-                        maxcresult = cresult
-                        maxlresult = lresult
+            lresult = str(self.classifier_possible_labels[lindex]).strip()  # grab label,push to string instead of tuple
+            cresult = float(output[lindex]) if float(output[lindex]) > 0 else 0  # grab predicted confidence score > 0
+            cresult = cresult if cresult <= 1 else 1
+            # if cresult != 0:
+            #     cresult = cresult - match.floor(cresult) if cresult > 1 else cresult
+            #     # if cresult > 1:  # still don't have scaling working 100% if the result is more than 100% adjust
+                #     if tfliteb:
+                #         cresult -= math.floor(cresult)
+                #     else:
+                #         cresult = cresult / 10
+            if self.check_threshold(cresult, lindex):  # comp confidence>=threshold by label
+                if cresult > maxcresult:  # if this above threshold and is a better confidence result store it
+                    maxcresult = cresult
+                    maxlresult = lresult
+        # check bounds on confidence level
         if maxcresult != 0:
             print(f'match returned: confidence {maxcresult}, {maxlresult}')
         return maxcresult, maxlresult  # highest confidence with best match
@@ -310,9 +309,9 @@ class DetectClassify:
     # species cannot be -1 (not present in geo location), cannot be 0, and must be equal or exceed minimum score
     # cresult is a decimal % 0 - 1; lindex is % * 10 (no decimals) must div by 1000 to get same scale
     def check_threshold(self, cresult, lindex):
-        if self.classifier_thresholds[int(lindex)][1] == 0:
+        if self.classifier_thresholds[int(lindex)][1] == 0:  # species does not have its own threshold
             label_threshold = self.classify_default_confidence * 1000
-        else:
+        else:  # use species specific threshold
             label_threshold = self.classifier_thresholds[int(lindex)][1]
         return(int(label_threshold) != -1 and cresult > 0 and
                cresult >= float(label_threshold) / 1000)

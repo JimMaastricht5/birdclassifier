@@ -120,7 +120,7 @@ def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
         if birds.detect(img=frame):  # find bird object in frame and set rectangles containing object
             last_good_frame = i + 1  # found a bird, add one to last good frame to account for insert of 1st image below
         _confidence = birds.classify(img=frame)   # classify object at rectangle location
-        labeled_frames.append(birds.add_boxes_and_labels(img=frame, use_last_known=True))
+        labeled_frames.append(birds.add_boxes_and_labels(img=frame, use_last_known=True))  # <- error in here????
     labeled_frames.insert(0, image_proc.convert_image(img=first_img_jpg, target='gif'))  # isrt 1st img
     if last_good_frame >= (args.minanimatedframes - 1):  # if bird is in more than the min number of frames build gif
         gif, gif_filename = image_proc.save_gif(frames=labeled_frames[0:last_good_frame], frame_rate=args.framerate)
@@ -166,7 +166,7 @@ if __name__ == "__main__":
                     help="confidence penalty if predictions from img and enhance img dont match ")
     ap.add_argument("-ei", "--enhanceimg", type=bool, default=True, help="offset waterproof box blur and enhance img")
     ap.add_argument("-co", "--default_confidence", type=float, default=.95, help="confidence threshold")
-    ap.add_argument("-op", "--overlap_perc_tolerance", type=float, default=0.6, help="% box overlap to flag as dup")
+    ap.add_argument("-op", "--overlap_perc_tolerance", type=float, default=0.8, help="% box overlap to flag as dup")
     ap.add_argument("-ma", "--minarea", type=float, default=5.0, help="motion entropy threshold")  # lower = > motion
 
     arguments = ap.parse_args()
