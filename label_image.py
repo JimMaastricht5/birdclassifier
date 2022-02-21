@@ -36,6 +36,7 @@ import numpy as np
 import random
 from PIL import ImageDraw as PILImageDraw
 import image_proc
+import math
 
 # attempt to load picamera, fails on windows
 try:
@@ -196,7 +197,6 @@ class DetectClassify:
     # return that best result
     def classify_obj(self, img):
         input_details = self.classifier.get_input_details()
-        # output_details = self.classifier.get_output_details()
         floating_model, input_data = self.convert_img_to_tf(img, input_details)
         self.classifier.set_tensor(input_details[0]['index'], input_data)
         self.classifier.invoke()  # invoke classification
@@ -205,27 +205,23 @@ class DetectClassify:
         # If the model is quantized (tflite uint8 data), then dequantize the results
         if output_details['dtype'] == np.uint8:
             scale, zero_point = output_details['quantization']
-            output = scale * (output - zero_point) * 10  # added * 10 scale factor to try and get numbers right
+            output = scale * (output - zero_point) * 10  # scale factor to adjust results
         cindex = np.argpartition(output, -10)[-10:]
+
         # loop thru top N results to find best match; highest score align with matching species threshold
         maxcresult = float(0)
         maxlresult = ''
         for lindex in cindex:
             lresult = str(self.classifier_possible_labels[lindex]).strip()  # grab label,push to string instead of tuple
-            cresult = float(output[lindex]) if float(output[lindex]) > 0 else 0  # grab predicted confidence score > 0
-            cresult = cresult if cresult <= 1 else 1
-            # if cresult != 0:
-            #     cresult = cresult - match.floor(cresult) if cresult > 1 else cresult
-            #     # if cresult > 1:  # still don't have scaling working 100% if the result is more than 100% adjust
-                #     if tfliteb:
-                #         cresult -= math.floor(cresult)
-                #     else:
-                #         cresult = cresult / 10
+            # cresult = float(output[lindex])
+            cresult = float(output[lindex]) if float(output[lindex]) > 0 else 0
+            cresult = cresult - math.floor(cresult) if cresult > 1 else cresult  # ignore whole numbers, keep decimals
+            # cresult = cresult if cresult > 0 else 0  # ignore cresults < 0
             if self.check_threshold(cresult, lindex):  # comp confidence>=threshold by label
                 if cresult > maxcresult:  # if this above threshold and is a better confidence result store it
                     maxcresult = cresult
                     maxlresult = lresult
-        # check bounds on confidence level
+
         if maxcresult != 0:
             print(f'match returned: confidence {maxcresult}, {maxlresult}')
         return maxcresult, maxlresult  # highest confidence with best match
