@@ -184,9 +184,8 @@ class DetectClassify:
                 self.classified_confidences.append(classify_conf)
                 self.classified_rects.append(rect)
         print('max confidence rounded', max(self.classified_confidences, default=0))
-        if round(max(self.classified_confidences, default=0), 2) == 0:  # if empty list zero or round and check
-            # max_confidence = 0
-            pass
+        if max(self.classified_confidences, default=0) == 0:  # if empty list zero or round and check
+            max_confidence = 0
         else:
             max_confidence = max(self.classified_confidences)
             self.last_known_classified_rects = self.classified_rects

@@ -25,6 +25,7 @@
 from PIL import ImageEnhance, Image, ImageOps, ImageStat, ImageFilter, ImageChops
 import numpy as np
 import io
+import math
 
 
 # Pillow img to flip
@@ -139,17 +140,23 @@ def area(rect):
 
 # find the % area in 2 rectangles that overlap
 def overlap_area(rect1, rect2):
-    (startX, startY, endX, endY) = rect1
-    area1 = area(rect1)
-    (startX2, startY2, endX2, endY2) = rect2
-    area2 = area(rect2)
-    x_dist = min(endX, endX2) - max(startX, startX2)
-    y_dist = min(endY, endY2) - max(startY, startY2)
-    if x_dist > 0 and y_dist > 0:
-        area_i = x_dist * y_dist
-    else:
-        area_i = 0
-    return (area1 + area2 - area_i) / (area1 + area2)
+    (XA1, YA1, XA2, YA2) = rect1
+    (XB1, YB1, XB2, YB2) = rect2
+    sa = area(rect1)
+    sb = area(rect2)
+    si = max(0, min(XA2, XB2) - max(XA1, XB1)) * max(0, min(YA2, YB2) - max(YA1, YB1))
+    su = sa + sb - si
+    return si/su
+
+# SI = Max(0, Min(XA2, XB2) - Max(XA1, XB1)) * Max(0, Min(YA2, YB2) - Max(YA1, YB1))
+#
+# The rest as usual. Union:
+#
+# SU = SA + SB - SI
+#
+# and ratio:
+#
+# SI/SU
 
 
 # compare two PIL images for differences
@@ -185,16 +192,16 @@ def save_gif(frames, frame_rate=30, filename='/home/pi/birdclass/birds.gif'):
 
 # testing code
 def main():
-    # print(area((1, 1, 4, 4)))
-    # print(overlap_area((1, 1, 4, 4), (1, 1, 2, 2)))
-    img1 = Image.open('/home/pi/birdclass/test.gif')
+
+    print(overlap_area((1, 1, 10, 10), (1, 1, 2, 2)))
+    # img1 = Image.open('/home/pi/birdclass/test.gif')
     # gif1 = convert_image(img1, target='gif', save_test_img=True)
-    img2 = Image.open('/home/pi/birdclass/test2.jpg')
+    # img2 = Image.open('/home/pi/birdclass/test2.jpg')
     # img2_gif = convert_image(img=img2, target='gif')
-    img3_gif = convert_image(img=img2, target='gif')
-    img3_gif.save('/home/pi/birdclass/test stream.gif', 'gif')
+    # img3_gif = convert_image(img=img2, target='gif')
+    # img3_gif.save('/home/pi/birdclass/test stream.gif', 'gif')
     # gif2 = convert_image(img2, target='gif', save_test_img=True)
-    save_gif([img1, img2], frame_rate=10, filename='/home/pi/birdclass/test4.gif')
+    # save_gif([img1, img2], frame_rate=10, filename='/home/pi/birdclass/test4.gif')
     # img.show()
 
     # img = enhance_brightness(img, 1)
