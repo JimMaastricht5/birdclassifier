@@ -183,7 +183,6 @@ class DetectClassify:
                 self.classified_labels.append(classify_label)
                 self.classified_confidences.append(classify_conf)
                 self.classified_rects.append(rect)
-        print('max confidence rounded', max(self.classified_confidences, default=0))
         if max(self.classified_confidences, default=0) == 0:  # if empty list zero or round and check
             max_confidence = 0
         else:
@@ -280,9 +279,6 @@ class DetectClassify:
             start_y += -25
             end_x += 25
             end_y += 25
-            # except TypeError:  # was getting a type error here?  still an issue?
-            #    print('TypeError in add boxes and labels', rect)
-            #     return
             draw = PILImageDraw.Draw(img)
             font = draw.getfont()
             draw.text((text_x, text_y), self.label_text(classified_labels[i], classified_confidences[i]),
