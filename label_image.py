@@ -183,7 +183,7 @@ class DetectClassify:
                 self.classified_labels.append(classify_label)
                 self.classified_confidences.append(classify_conf)
                 self.classified_rects.append(rect)
-        if max(self.classified_confidences, default=0) == 0:  # if empty list zero or round and check
+        if max(self.classified_confidences, default=0) == 0:  # if empty list or zero
             max_confidence = 0
         else:
             max_confidence = max(self.classified_confidences)

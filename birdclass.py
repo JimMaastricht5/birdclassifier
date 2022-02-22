@@ -120,7 +120,7 @@ def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
         if birds.detect(img=frame):  # find bird object in frame and set rectangles containing object
             last_good_frame = i + 1  # found a bird, add one to last good frame to account for insert of 1st image below
         _confidence = birds.classify(img=frame)   # classify object at rectangle location
-        labeled_frames.append(birds.add_boxes_and_labels(img=frame, use_last_known=True))  # <- error in here????
+        labeled_frames.append(birds.add_boxes_and_labels(img=frame, use_last_known=True))
     labeled_frames.insert(0, image_proc.convert_image(img=first_img_jpg, target='gif'))  # isrt 1st img
     if last_good_frame >= (args.minanimatedframes - 1):  # if bird is in more than the min number of frames build gif
         gif, gif_filename = image_proc.save_gif(frames=labeled_frames[0:last_good_frame], frame_rate=args.framerate)
@@ -133,12 +133,17 @@ def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
 
 
 def tweet_text(classified_labels, classified_confidences):
-    tweet_label, sname = '', ''
+    # sample url https://www.allaboutbirds.org/guide/Northern_Rough-winged_Swallow/overview
+    tweet_label, sname, cname, hypername = '', '', '', ''
     for i, sname in enumerate(classified_labels):
         sname = str(sname)  # make sure the label is a string
         sname = sname[sname.find(' ') + 1:] if sname.find(' ') >= 0 else sname  # remove index number
-        if sname != '' and classified_confidences[i] * 100 > 1.0:  # skip blank names and 0% confidence, keep good stuff
-            tweet_label += f'{sname} {classified_confidences[i] * 100:.1f}% '
+        cname = sname[sname.find('(') + 1: -1] if sname.find('(') >= 0 else sname  # retrieve common name
+        if cname != '' and classified_confidences[i] * 100 > 1.0:  # skip blank names and 0% confidence, keep good stuff
+            # tweet_label += f'{sname} {classified_confidences[i] * 100:.1f}% '
+            hypername = cname.replace(' ', '_')
+            hyperlink = f'https://www.allaboutbirds.org/guide/{hypername}/overview'
+            tweet_label += f'{cname} {classified_confidences[i] * 100:.1f}% {hyperlink}'
     return tweet_label
 
 
