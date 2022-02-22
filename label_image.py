@@ -154,6 +154,7 @@ class DetectClassify:
         self.classified_confidences = []
         self.classified_labels = []
         prior_rect = (0, 0, 0, 0)
+        max_confidence = 0
         for i, det_confidence in enumerate(self.detected_confidences):  # loop thru detected target objects
             (startX, startY, endX, endY) = self.scale_rect(img, self.detected_rects[i])  # set x,y bounding box
             rect = (startX, startY, endX, endY)
