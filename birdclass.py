@@ -40,9 +40,9 @@ from datetime import datetime
 from collections import defaultdict
 
 
-# default dictionary returns a tuple of zero count and the current date and time as last seen
+# default dictionary returns a tuple of zero confidence and zero bird count
 def default_value():
-    return 0
+    return 0, 0
 
 
 def bird_detector(args):
@@ -86,13 +86,14 @@ def bird_detector(args):
             # classify, grab labels, enhance the shot, and add boxes
             first_img_jpg = birds.img
             if birds.classify(img=first_img_jpg) >= args.default_confidence:  # found a bird we can classify
-                first_labels = birds.classified_labels  # grab unedited labels
-                first_tweet_label = tweet_text(birds.classified_labels, birds.classified_confidences)
+                # first_labels = birds.classified_labels  # grab unedited labels
+                # first_tweet_label = tweet_text(birds.classified_labels, birds.classified_confidences)
                 first_img_jpg = image_proc.enhance_brightness(img=first_img_jpg, factor=args.brightness_chg)
                 birds.set_colors()  # set new colors for this series of bounding boxes
                 first_img_jpg = birds.add_boxes_and_labels(img=first_img_jpg)
                 gif, gif_filename, animated, best_label = build_bird_animated_gif(args, motion_detect, birds,
                                                                                   first_img_jpg)
+
                 birdpop.visitors(best_label, datetime.now())  # update census count and time last seen
                 bird_first_time_seen = birdpop.first_time_seen
                 if bird_first_time_seen:  # note this doesn't change last_tweet time or override time between tweets
@@ -104,7 +105,7 @@ def bird_detector(args):
                 waittime = args.tweetdelay if waittime >= args.tweetdelay else waittime
                 if animated and ((datetime.now() - last_tweet).total_seconds() >= waittime or bird_first_time_seen):
                     print('***Tweet animated gif at:', datetime.now())
-                    if bird_tweeter.post_image_from_file(first_tweet_label, gif_filename) is False:  # animated gif
+                    if bird_tweeter.post_image_from_file(best_label, gif_filename) is False:  # animated gif
                         print(f"*** Failed gif tweet")  # failure, don't update last tweet time
                     else:
                         last_tweet = datetime.now()  # update last tweet time if successful
@@ -120,7 +121,7 @@ def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
     labeled_frames = []
     last_good_frame = 0  # find last frame that has a bird, index zero is good based on first image
     census_dict = defaultdict(default_value)  # track all results and pick best confidence
-    census_dict[birds.classified_labels[0]] = birds.classified_confidences[0]  # first image must have label and conf
+    census_dict[birds.classified_labels[0]] = (birds.classified_confidences[0], 1)  # first image has label and conf
     frames = motion_detect.capture_stream()  # capture a list of images
     for i, frame in enumerate(frames):
         frame = image_proc.enhance_brightness(img=frame, factor=args.brightness_chg)
@@ -128,7 +129,9 @@ def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
             last_good_frame = i + 1  # found a bird, add one to last good frame to account for insert of 1st image below
         confidence = birds.classify(img=frame)   # classify object at rectangle location
         if len(birds.classified_labels) > 0:
-            census_dict[birds.classified_labels[0]] += confidence
+            # census_dict[birds.classified_labels[0]] += confidence
+            species_confidence, species_count = census_dict[birds.classified_labels[0]]
+            census_dict[birds.classified_labels[0]] = (species_confidence + confidence, species_count + 1)
         labeled_frames.append(birds.add_boxes_and_labels(img=frame, use_last_known=True))
     labeled_frames.insert(0, image_proc.convert_image(img=first_img_jpg, target='gif'))  # isrt 1st img
     if last_good_frame >= (args.minanimatedframes - 1):  # if bird is in more than the min number of frames build gif
@@ -138,22 +141,33 @@ def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
         gif = image_proc.convert_image(img=first_img_jpg, target='gif')
         gif_filename = 'first_img.jpg'
         animated = False
-    return gif, gif_filename, animated, max(census_dict)
+    best_label = tweet_text(max(census_dict), 0)
+    return gif, gif_filename, animated, best_label
 
 
-def tweet_text(classified_labels, classified_confidences):
+def tweet_text(label, confidence):
     # sample url https://www.allaboutbirds.org/guide/Northern_Rough-winged_Swallow/overview
-    tweet_label, sname, cname, hypername = '', '', '', ''
-    for i, sname in enumerate(classified_labels):
-        sname = str(sname)  # make sure the label is a string
-        sname = sname[sname.find(' ') + 1:] if sname.find(' ') >= 0 else sname  # remove index number
-        cname = sname[sname.find('(') + 1: -1] if sname.find('(') >= 0 else sname  # retrieve common name
-        if cname != '' and classified_confidences[i] * 100 > 1.0:  # skip blank names and 0% confidence, keep good stuff
-            # tweet_label += f'{sname} {classified_confidences[i] * 100:.1f}% '
-            hypername = cname.replace(' ', '_')
-            hyperlink = f'https://www.allaboutbirds.org/guide/{hypername}/overview'
-            tweet_label += f'{cname} {classified_confidences[i] * 100:.1f}% {hyperlink}'
+    sname = str(label)  # make sure the label is a string
+    sname = sname[sname.find(' ') + 1:] if sname.find(' ') >= 0 else sname  # remove index number
+    cname = sname[sname.find('(') + 1: -1] if sname.find('(') >= 0 else sname  # retrieve common name
+    hypername = cname.replace(' ', '_')
+    hyperlink = f'https://www.allaboutbirds.org/guide/{hypername}/overview'
+    tweet_label = f'{cname} {confidence * 100:.1f}% {hyperlink}'
     return tweet_label
+
+# def tweet_text(classified_labels, classified_confidences):
+#     # sample url https://www.allaboutbirds.org/guide/Northern_Rough-winged_Swallow/overview
+#     tweet_label, sname, cname, hypername = '', '', '', ''
+#     for i, sname in enumerate(classified_labels):
+#         sname = str(sname)  # make sure the label is a string
+#         sname = sname[sname.find(' ') + 1:] if sname.find(' ') >= 0 else sname  # remove index number
+#         cname = sname[sname.find('(') + 1: -1] if sname.find('(') >= 0 else sname  # retrieve common name
+#         if cname != '' and classified_confidences[i] * 100 > 1.0:  # skip blank names and 0% confidence, keep good
+#             # tweet_label += f'{sname} {classified_confidences[i] * 100:.1f}% '
+#             hypername = cname.replace(' ', '_')
+#             hyperlink = f'https://www.allaboutbirds.org/guide/{hypername}/overview'
+#             tweet_label += f'{cname} {classified_confidences[i] * 100:.1f}% {hyperlink}'
+#     return tweet_label
 
 
 if __name__ == "__main__":
