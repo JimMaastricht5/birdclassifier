@@ -141,7 +141,8 @@ def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
         gif = image_proc.convert_image(img=first_img_jpg, target='gif')
         gif_filename = 'first_img.jpg'
         animated = False
-    best_label = tweet_text(max(census_dict), 0)
+    best_confidence = census_dict[max(census_dict)][0] / census_dict[max(census_dict)][1]  # total confidence / bird cnt
+    best_label = tweet_text(max(census_dict), best_confidence)
     return gif, gif_filename, animated, best_label
 
 
