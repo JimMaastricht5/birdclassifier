@@ -42,7 +42,7 @@ from collections import defaultdict
 
 # default dictionary returns a tuple of zero confidence and zero bird count
 def default_value():
-    return 0, 0
+    return 0
 
 
 def bird_detector(args):
@@ -121,7 +121,9 @@ def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
     labeled_frames = []
     last_good_frame = 0  # find last frame that has a bird, index zero is good based on first image
     census_dict = defaultdict(default_value)  # track all results and pick best confidence
-    census_dict[birds.classified_labels[0]] = (birds.classified_confidences[0], 1)  # first image has label and conf
+    confidence_dict = defaultdict(default_value)  # track all results and pick best confidence
+    census_dict[birds.classified_labels[0]] = 1  # first image has label and conf
+    confidence_dict[birds.classified_labels[0]] = birds.classified_confidences[0]
     frames = motion_detect.capture_stream()  # capture a list of images
     for i, frame in enumerate(frames):
         frame = image_proc.enhance_brightness(img=frame, factor=args.brightness_chg)
@@ -129,9 +131,8 @@ def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
             last_good_frame = i + 1  # found a bird, add one to last good frame to account for insert of 1st image below
         confidence = birds.classify(img=frame)   # classify object at rectangle location
         if len(birds.classified_labels) > 0:
-            # census_dict[birds.classified_labels[0]] += confidence
-            species_confidence, species_count = census_dict[birds.classified_labels[0]]
-            census_dict[birds.classified_labels[0]] = (species_confidence + confidence, species_count + 1)
+            census_dict[birds.classified_labels[0]] += 1
+            confidence_dict[birds.classified_labels[0]] += confidence
         labeled_frames.append(birds.add_boxes_and_labels(img=frame, use_last_known=True))
     labeled_frames.insert(0, image_proc.convert_image(img=first_img_jpg, target='gif'))  # isrt 1st img
     if last_good_frame >= (args.minanimatedframes - 1):  # if bird is in more than the min number of frames build gif
@@ -141,9 +142,8 @@ def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
         gif = image_proc.convert_image(img=first_img_jpg, target='gif')
         gif_filename = 'first_img.jpg'
         animated = False
-    best_confidence = census_dict[max(census_dict)][0] / census_dict[max(census_dict)][1]  # total confidence / bird cnt
-    # best_label = tweet_text(max(census_dict), best_confidence)
-    best_label = max(census_dict)
+    best_confidence = confidence_dict[max(confidence_dict)] / census_dict[max(confidence_dict)]  # total conf / bird cnt
+    best_label = max(confidence_dict)
     return gif, gif_filename, animated, best_label, best_confidence
 
 
