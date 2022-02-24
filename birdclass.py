@@ -129,10 +129,14 @@ def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
         frame = image_proc.enhance_brightness(img=frame, factor=args.brightness_chg)
         if birds.detect(img=frame):  # find bird object in frame and set rectangles containing object
             last_good_frame = i + 1  # found a bird, add one to last good frame to account for insert of 1st image below
-        confidence = birds.classify(img=frame)   # classify object at rectangle location
-        if len(birds.classified_labels) > 0:
-            census_dict[birds.classified_labels[0]] += 1
-            confidence_dict[birds.classified_labels[0]] += confidence
+            _confidence = birds.classify(img=frame)   # classify object at rectangle location
+            if len(birds.classified_labels) > 0 and len(birds.classified_confidences) > 0:
+                maxvalue = max(birds.classified_confidences)
+                maxindex = birds.classified_confidences.index(maxvalue)
+                maxbird = birds.classified_labels[maxindex]
+                print(maxbird, maxindex, maxvalue)
+                census_dict[maxbird] += 1
+                confidence_dict[maxbird] += maxvalue
         labeled_frames.append(birds.add_boxes_and_labels(img=frame, use_last_known=True))
     labeled_frames.insert(0, image_proc.convert_image(img=first_img_jpg, target='gif'))  # isrt 1st img
     if last_good_frame >= (args.minanimatedframes - 1):  # if bird is in more than the min number of frames build gif
