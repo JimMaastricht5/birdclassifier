@@ -134,7 +134,7 @@ def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
                 maxvalue = max(birds.classified_confidences)
                 maxindex = birds.classified_confidences.index(maxvalue)
                 maxbird = birds.classified_labels[maxindex]
-                print(maxbird, maxindex, maxvalue)
+                print('building best tweet label', maxbird, maxindex, maxvalue)
                 census_dict[maxbird] += 1
                 confidence_dict[maxbird] += maxvalue
         labeled_frames.append(birds.add_boxes_and_labels(img=frame, use_last_known=True))
