@@ -152,6 +152,7 @@ def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
         animated = False
     best_confidence = confidence_dict[max(confidence_dict)] / census_dict[max(confidence_dict)]  # total conf / bird cnt
     best_label = max(confidence_dict)
+    print('best label and confidence', best_label, best_confidence)
     return gif, gif_filename, animated, best_label, best_confidence
 
 
