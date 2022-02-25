@@ -91,13 +91,14 @@ def bird_detector(args):
                 first_img_jpg = image_proc.enhance_brightness(img=first_img_jpg, factor=args.brightness_chg)
                 birds.set_colors()  # set new colors for this series of bounding boxes
                 first_img_jpg = birds.add_boxes_and_labels(img=first_img_jpg)
+                print('*** build animated gif')
                 gif, gif_filename, animated, best_label, best_confidence = build_bird_animated_gif(args, motion_detect,
                                                                                                    birds, first_img_jpg)
                 birdpop.visitors(best_label, datetime.now())  # update census count and time last seen
                 bird_first_time_seen = birdpop.first_time_seen
                 tweet_label = tweet_text(best_label, best_confidence)
                 if bird_first_time_seen:  # note this doesn't change last_tweet time or override time between tweets
-                    print(f'first time seeing a {best_label} today.  Tweeting still shot')
+                    # print(f'first time seeing a {best_label} today.  Tweeting still shot')
                     first_img_jpg.save('first_img.jpg')
                     bird_tweeter.post_image_from_file(message=f'First time today: {tweet_label}',
                                                       file_name='first_img.jpg')
@@ -122,12 +123,12 @@ def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
     last_good_frame = 0  # find last frame that has a bird, index zero is good based on first image
     census_dict = defaultdict(default_value)  # track all results and pick best confidence
     confidence_dict = defaultdict(default_value)  # track all results and pick best confidence
-    maxvalue = max(birds.classified_confidences)
-    maxindex = birds.classified_confidences.index(maxvalue)
-    maxbird = birds.classified_labels[maxindex]
-    print('first frame building best tweet label', maxbird, maxindex, maxvalue)
-    census_dict[maxbird] += 1
-    confidence_dict[maxbird] += maxvalue
+    first_maxvalue = max(birds.classified_confidences)
+    first_maxindex = birds.classified_confidences.index(first_maxvalue)
+    first_maxbird = birds.classified_labels[first_maxindex]
+    print('first frame building best tweet label', first_maxbird, first_maxindex, first_maxvalue)
+    census_dict[first_maxbird] += 1
+    confidence_dict[first_maxbird] += first_maxvalue
     frames = motion_detect.capture_stream()  # capture a list of images
     for i, frame in enumerate(frames):
         frame = image_proc.enhance_brightness(img=frame, factor=args.brightness_chg)
@@ -141,6 +142,10 @@ def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
                 print('building best tweet label', maxbird, maxindex, maxvalue)
                 census_dict[maxbird] += 1
                 confidence_dict[maxbird] += maxvalue
+            else:
+                print('using first tweet info', first_maxbird, first_maxindex, first_maxvalue)
+                census_dict[first_maxbird] += 1
+                confidence_dict[first_maxbird] += first_maxvalue
         labeled_frames.append(birds.add_boxes_and_labels(img=frame, use_last_known=True))
     labeled_frames.insert(0, image_proc.convert_image(img=first_img_jpg, target='gif'))  # isrt 1st img
     if last_good_frame >= (args.minanimatedframes - 1):  # if bird is in more than the min number of frames build gif
