@@ -152,6 +152,8 @@ def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
     if last_good_frame >= (args.minanimatedframes - 1):  # if bird is in more than the min number of frames build gif
         gif, gif_filename = image_proc.save_gif(frames=labeled_frames[0:last_good_frame], frame_rate=args.framerate)
         animated = True
+        print('*** using multiframe value', max(confidence_dict))
+        print('*** dict:', confidence_dict, census_dict)
         best_confidence = confidence_dict[max(confidence_dict)] / census_dict[max(confidence_dict)]  # sum conf/bird cnt
         best_label = max(confidence_dict)
     else:  # use the jpg as a still gif
@@ -160,8 +162,8 @@ def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
         animated = False
         best_confidence = first_maxvalue
         best_label = first_maxbird
-    best_confidence = confidence_dict[max(confidence_dict)] / census_dict[max(confidence_dict)]  # total conf / bird cnt
-    best_label = max(confidence_dict)
+    # best_confidence = confidence_dict[max(confidence_dict)] / census_dict[max(confidence_dict)]  # total conf / bird cnt
+    # best_label = max(confidence_dict)
     print('***best label and confidence', best_label, best_confidence)
     return gif, gif_filename, animated, best_label, best_confidence
 
