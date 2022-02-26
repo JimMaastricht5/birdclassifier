@@ -61,7 +61,7 @@
 60 Anas bahamensis (White-cheeked Pintail),0
 61 Egretta novaehollandiae (White-faced Heron),0
 62 Anas crecca carolinensis (American Green-winged Teal),0
-63 Alectoris chukar (Chukar),0
+63 Alectoris chukar (Chukar),-1
 64 Tachybaptus dominicus (Least Grebe),0
 65 Artemisiospiza belli (Bell's Sparrow),0
 66 Gallus gallus (Red Junglefowl),0
@@ -450,7 +450,7 @@
 449 Larus glaucoides (Iceland Gull),0
 450 Larus delawarensis (Ring-billed Gull),985
 451 Trogon collaris (Collared Trogon),0
-452 Zenaida asiatica (White-winged Dove),0
+452 Zenaida asiatica (White-winged Dove),-1
 453 Larus fuscus (Lesser Black-backed Gull),0
 454 Larus californicus (California Gull),-1
 455 Prosthemadera novaeseelandiae (Tui),0

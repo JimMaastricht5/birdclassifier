@@ -122,6 +122,7 @@ def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
     # return gif, filename, animated boolean, and best label as the max of all confidences
     labeled_frames = []
     last_good_frame = 0  # find last frame that has a bird, index zero is good based on first image
+    frames_with_birds = 1  # count of frames with birds, set to 1 for first img
     census_dict = defaultdict(default_value)  # track all results and pick best confidence
     confidence_dict = defaultdict(default_value)  # track all results and pick best confidence
     first_maxvalue = max(birds.classified_confidences)
@@ -134,22 +135,28 @@ def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
     for i, frame in enumerate(frames):
         frame = image_proc.enhance_brightness(img=frame, factor=args.brightness_chg)
         if birds.detect(img=frame):  # find bird object in frame and set rectangles containing object
+            frames_with_birds += 1
             last_good_frame = i + 1  # found a bird, add one to last good frame to account for insert of 1st image below
             _confidence = birds.classify(img=frame)   # classify object at rectangle location
-            if len(birds.classified_labels) > 0 and len(birds.classified_confidences) > 0:
-                maxvalue = max(birds.classified_confidences)
-                maxindex = birds.classified_confidences.index(maxvalue)
-                maxbird = birds.classified_labels[maxindex]
-                print('---building best tweet label', maxbird, maxindex, maxvalue)
-                census_dict[maxbird] += 1
-                confidence_dict[maxbird] += maxvalue
-            else:
+            for ii, label_bird in enumerate(birds.classified_labels):
+                census_dict[label_bird] += 1
+                confidence_dict[label_bird] += birds.classified_confidences[ii]
+                print('---building best tweet label', label_bird, birds.classified_confidences[ii])
+
+            if len(birds.classified_labels) == 0:
+                # maxvalue = max(birds.classified_confidences)
+                # maxindex = birds.classified_confidences.index(maxvalue)
+                # maxbird = birds.classified_labels[maxindex]
+                # print('---building best tweet label', maxbird, maxindex, maxvalue)
+                # census_dict[maxbird] += 1
+                # confidence_dict[maxbird] += maxvalue
+                # else:
                 print('---using first tweet info', first_maxbird, first_maxindex, first_maxvalue)
                 census_dict[first_maxbird] += 1
                 confidence_dict[first_maxbird] += first_maxvalue
         labeled_frames.append(birds.add_boxes_and_labels(img=frame, use_last_known=True))
     labeled_frames.insert(0, image_proc.convert_image(img=first_img_jpg, target='gif'))  # isrt 1st img
-    if last_good_frame >= (args.minanimatedframes - 1):  # if bird is in more than the min number of frames build gif
+    if frames_with_birds >= (args.minanimatedframes - 1):  # if bird is in more than the min number of frames build gif
         gif, gif_filename = image_proc.save_gif(frames=labeled_frames[0:last_good_frame], frame_rate=args.framerate)
         animated = True
         print('*** using multiframe value', max(confidence_dict))
@@ -162,8 +169,6 @@ def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
         animated = False
         best_confidence = first_maxvalue
         best_label = first_maxbird
-    # best_confidence = confidence_dict[max(confidence_dict)] / census_dict[max(confidence_dict)]  # total conf / bird cnt
-    # best_label = max(confidence_dict)
     print('***best label and confidence', best_label, best_confidence)
     return gif, gif_filename, animated, best_label, best_confidence
 
@@ -202,7 +207,7 @@ if __name__ == "__main__":
     ap.add_argument("-sw", "--screenwidth", type=int, default=640, help="max screen width")
     ap.add_argument("-sh", "--screenheight", type=int, default=480, help="max screen height")
     ap.add_argument("-fr", "--framerate", type=int, default=45, help="frame rate for camera")
-    ap.add_argument("-gf", "--minanimatedframes", type=int, default=10, help="minimum number of frames for animation")
+    ap.add_argument("-gf", "--minanimatedframes", type=int, default=5, help="minimum number of frames with a bird")
     ap.add_argument("-st", "--save_img", type=bool, default=False, help="write images to disk")
     ap.add_argument("-v", "--verbose", type=bool, default=True, help="To tweet extra stuff or not")
     ap.add_argument("-td", "--tweetdelay", type=int, default=3600,
