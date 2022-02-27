@@ -146,7 +146,7 @@ def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
     frames_with_birds = 1  # count of frames with birds, set to 1 for first img
     census_dict = defaultdict(default_value)  # track all results and pick best confidence
     confidence_dict = defaultdict(default_value)  # track all results and pick best confidence
-    census_dict, confidence_dict = build_dict(census_dict, birds.classifier, confidence_dict,
+    census_dict, confidence_dict = build_dict(census_dict, birds.classified_labels, confidence_dict,
                                               birds.classified_confidences)
     # first_maxvalue = max(birds.classified_confidences)
     # first_maxindex = birds.classified_confidences.index(first_maxvalue)
