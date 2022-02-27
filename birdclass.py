@@ -248,7 +248,7 @@ if __name__ == "__main__":
     ap.add_argument("-mp", "--mismatch_penalty", type=float, default=.3,
                     help="confidence penalty if predictions from img and enhance img dont match ")
     ap.add_argument("-ei", "--enhanceimg", type=bool, default=True, help="offset waterproof box blur and enhance img")
-    ap.add_argument("-co", "--default_confidence", type=float, default=.95, help="confidence threshold")
+    ap.add_argument("-co", "--default_confidence", type=float, default=.98, help="confidence threshold")
     ap.add_argument("-op", "--overlap_perc_tolerance", type=float, default=0.8, help="% box overlap to flag as dup")
     ap.add_argument("-ma", "--minarea", type=float, default=5.0, help="motion entropy threshold")  # lower = > motion
 
