@@ -118,7 +118,19 @@ def bird_detector(args):
 
 
 # should be passing default dictionary
-def build_dict(label_dict, labels_list, conf_dict, confidences_list):
+def build_dict(label_dict, input_labels_list, conf_dict, input_confidences_list):
+    labels_list = []
+    confidences_list = []
+    if type(input_labels_list) != list:
+        labels_list.append(str(input_labels_list))
+    else:
+        labels_list = input_labels_list
+
+    if type(input_confidences_list) != list:
+        confidences_list.append(str(input_confidences_list))
+    else:
+        confidences_list = input_confidences_list
+
     for ii, label in enumerate(labels_list):
         label_dict[label] += 1
         conf_dict[label] += confidences_list[ii]
