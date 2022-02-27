@@ -461,7 +461,7 @@
 460 Himantopus leucocephalus (Pied Stilt),0
 461 Cepphus grylle (Black Guillemot),0
 462 Anthornis melanura (New Zealand Bellbird),0
-463 Leptoptilos crumenifer (Marabou Stork),0
+463 Leptoptilos crumenifer (Marabou Stork),-1
 464 Threskiornis moluccus (Australian Ibis),0
 465 Thraupis episcopus (Blue-gray Tanager),-1
 466 Geranoaetus albicaudatus (White-tailed Hawk),0
@@ -891,7 +891,7 @@
 890 Mimus polyglottos (Northern Mockingbird),0
 891 Gymnorhina tibicen (Australian Magpie),0
 892 Alcedo atthis (Common Kingfisher),0
-893 Streptopelia chinensis (Spotted Dove),0
+893 Streptopelia chinensis (Spotted Dove),-1
 894 Bombycilla cedrorum (Cedar Waxwing),0
 895 Bombycilla garrulus (Bohemian Waxwing),0
 896 Tadorna tadorna (Common Shelduck),0
