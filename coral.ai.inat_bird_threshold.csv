@@ -168,7 +168,7 @@
 167 Junco hyemalis hyemalis (Slate-colored Junco),0
 168 Eupsittula canicularis (Orange-fronted Parakeet),0
 169 Microcarbo melanoleucos (Little Pied Cormorant),0
-170 Piranga rubra (Summer Tanager),0
+170 Piranga rubra (Summer Tanager),-1
 171 Piranga olivacea (Scarlet Tanager),0
 172 Piranga flava (Hepatic Tanager),-1
 173 Amphispiza bilineata (Black-throated Sparrow),0
@@ -339,7 +339,7 @@
 338 Columbina passerina (Common Ground-Dove),0
 339 Eupsittula nana (Olive-throated Parakeet),0
 340 Nestor notabilis (Kea),0
-341 Columbina talpacoti (Ruddy Ground-Dove),0
+341 Columbina talpacoti (Ruddy Ground-Dove),-1
 342 Geopelia striata (Zebra Dove),0
 343 Athene noctua (Little Owl),0
 344 Crotophaga ani (Smooth-billed Ani),0
@@ -626,7 +626,7 @@
 625 Thalasseus bergii (Great Crested Tern),0
 626 Elanus leucurus (White-tailed Kite),0
 627 Alopochen aegyptiaca (Egyptian Goose),0
-628 Streptopelia senegalensis (Laughing Dove),0
+628 Streptopelia senegalensis (Laughing Dove),-1
 629 Gerygone igata (Gray Gerygone),0
 630 Haliaeetus leucocephalus (Bald Eagle),0
 631 Cistothorus platensis (Sedge Wren),0
@@ -681,8 +681,8 @@
 680 Melanitta americana (Black Scoter),0
 681 Spizella pallida (Clay-colored Sparrow),0
 682 Amazilia rutila (Cinnamon Hummingbird),0
-683 Zenaida aurita (Zenaida Dove),0
-684 Prunella modularis (Dunnock),0
+683 Zenaida aurita (Zenaida Dove),-1
+684 Prunella modularis (Dunnock),-1
 685 Falco tinnunculus (Rock Kestrel),-1
 686 Ixoreus naevius (Varied Thrush),0
 687 Archilochus colubris (Ruby-throated Hummingbird),0
