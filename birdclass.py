@@ -114,12 +114,12 @@ def bird_detector(args):
         chores.end_report()  # post a report on run time of the process
 
 
-def convert_to_list(input):
+def convert_to_list(input_str_list):
     output_list = []
-    if type(input) != list:
-        output_list.append(input)
+    if type(input_str_list) != list:
+        output_list.append(input_str_list)
     else:
-        output_list = input
+        output_list = input_str_list
     return output_list
 
 
@@ -160,7 +160,7 @@ def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
         gif, gif_filename = image_proc.save_gif(frames=labeled_frames[0:last_good_frame], frame_rate=args.framerate)
         animated = True
         best_confidence = confidence_dict[max(confidence_dict, key=confidence_dict.get)] / \
-                          census_dict[max(confidence_dict, key=confidence_dict.get)]  # sum conf/bird cnt
+            census_dict[max(confidence_dict, key=confidence_dict.get)]  # sum conf/bird cnt
         best_label = max(confidence_dict, key=confidence_dict.get)
         print('--- Best label and confidence', best_label, best_confidence)
     return gif, gif_filename, animated, best_label, best_confidence

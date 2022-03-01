@@ -40,12 +40,12 @@ class Census:
         self.census_dict = []  # clear it and re-establish
         self.census_dict = defaultdict(default_value)
 
-    def convert_to_list(self, input):
+    def convert_to_list(self, input_str_list):
         output_list = []
-        if type(input) != list:
-            output_list.append(input)
+        if type(input_str_list) != list:
+            output_list.append(input_str_list)
         else:
-            output_list = input
+            output_list = input_str_list
         return output_list
 
     # find visitor by census name, increment count, and update time
