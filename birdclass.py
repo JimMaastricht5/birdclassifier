@@ -86,8 +86,6 @@ def bird_detector(args):
             # classify, grab labels, enhance the shot, and add boxes
             first_img_jpg = birds.img
             if birds.classify(img=first_img_jpg) >= args.default_confidence:  # found a bird we can classify
-                # first_labels = birds.classified_labels  # grab unedited labels
-                # first_tweet_label = tweet_text(birds.classified_labels, birds.classified_confidences)
                 first_img_jpg = image_proc.enhance_brightness(img=first_img_jpg, factor=args.brightness_chg)
                 birds.set_colors()  # set new colors for this series of bounding boxes
                 first_img_jpg = birds.add_boxes_and_labels(img=first_img_jpg)
@@ -117,86 +115,73 @@ def bird_detector(args):
         chores.end_report()  # post a report on run time of the process
 
 
+def convert_to_list(input):
+    output_list = []
+    if type(input) != list:
+        output_list.append(input)
+    else:
+        output_list = input
+    return output_list
+
+
 # should be passing default dictionary
 def build_dict(label_dict, input_labels_list, conf_dict, input_confidences_list):
-    labels_list = []
-    confidences_list = []
-    if type(input_labels_list) != list:
-        labels_list.append(str(input_labels_list))
-    else:
-        labels_list = input_labels_list
-
-    if type(input_confidences_list) != list:
-        confidences_list.append(str(input_confidences_list))
-    else:
-        confidences_list = input_confidences_list
-
+    # labels_list = []
+    # confidences_list = []
+    labels_list = convert_to_list(input_labels_list)
+    confidences_list = convert_to_list(input_confidences_list)
+    # if type(input_labels_list) != list:
+    #     labels_list.append(str(input_labels_list))
+    # else:
+    #     labels_list = input_labels_list
+    #
+    # if type(input_confidences_list) != list:
+    #     confidences_list.append(str(input_confidences_list))
+    # else:
+    #     confidences_list = input_confidences_list
     for ii, label in enumerate(labels_list):
         label_dict[label] += 1
         conf_dict[label] += confidences_list[ii]
-        print('---building best tweet label', label, confidences_list[ii])
     return label_dict, conf_dict
 
 
 def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
     # grab a stream of pictures, add first pic from above, and build animated gif
     # return gif, filename, animated boolean, and best label as the max of all confidences
-    labeled_frames = []
+    gif_filename, best_label, best_confidence, labeled_frames = '', '', 0, []
+    animated = False  # set to true if min # of frames captured with birds
+    gif = first_img_jpg  # set a default, doesn't get used.
     last_good_frame = 0  # find last frame that has a bird, index zero is good based on first image
     frames_with_birds = 1  # count of frames with birds, set to 1 for first img
     census_dict = defaultdict(default_value)  # track all results and pick best confidence
     confidence_dict = defaultdict(default_value)  # track all results and pick best confidence
     census_dict, confidence_dict = build_dict(census_dict, birds.classified_labels, confidence_dict,
                                               birds.classified_confidences)
-    # first_maxvalue = max(birds.classified_confidences)
-    # first_maxindex = birds.classified_confidences.index(first_maxvalue)
-    # first_maxbird = birds.classified_labels[first_maxindex]
-    # print('---first frame building best tweet label', first_maxbird, first_maxindex, first_maxvalue)
-    # census_dict[first_maxbird] += 1
-    # confidence_dict[first_maxbird] += first_maxvalue
     frames = motion_detect.capture_stream()  # capture a list of images
+    labeled_frames.insert(0, image_proc.convert_image(img=first_img_jpg, target='gif'))  # isrt 1st img
     for i, frame in enumerate(frames):
         frame = image_proc.enhance_brightness(img=frame, factor=args.brightness_chg)
         if birds.detect(img=frame):  # find bird object in frame and set rectangles containing object
             frames_with_birds += 1
             last_good_frame = i + 1  # found a bird, add one to last good frame to account for insert of 1st image below
             _confidence = birds.classify(img=frame)   # classify object at rectangle location
-            for ii, label_bird in enumerate(birds.classified_labels):
-                census_dict[label_bird] += 1
-                confidence_dict[label_bird] += birds.classified_confidences[ii]
-                print('---building best tweet label', label_bird, birds.classified_confidences[ii])
-
-            # if len(birds.classified_labels) == 0:
-            #     # maxvalue = max(birds.classified_confidences)
-            #     # maxindex = birds.classified_confidences.index(maxvalue)
-            #     # maxbird = birds.classified_labels[maxindex]
-            #     # print('---building best tweet label', maxbird, maxindex, maxvalue)
-            #     # census_dict[maxbird] += 1
-            #     # confidence_dict[maxbird] += maxvalue
-            #     # else:
-            #     print('---using first tweet info', first_maxbird, first_maxindex, first_maxvalue)
-            #     census_dict[first_maxbird] += 1
-            #     confidence_dict[first_maxbird] += first_maxvalue
+            census_dict, confidence_dict = build_dict(census_dict, birds.classified_labels, confidence_dict,
+                                                      birds.classified_confidences)
         labeled_frames.append(birds.add_boxes_and_labels(img=frame, use_last_known=True))
-    labeled_frames.insert(0, image_proc.convert_image(img=first_img_jpg, target='gif'))  # isrt 1st img
+    # labeled_frames.insert(0, image_proc.convert_image(img=first_img_jpg, target='gif'))  # isrt 1st img
     if frames_with_birds >= (args.minanimatedframes - 1):  # if bird is in more than the min number of frames build gif
         gif, gif_filename = image_proc.save_gif(frames=labeled_frames[0:last_good_frame], frame_rate=args.framerate)
         animated = True
-        # best_confidence = confidence_dict[max(confidence_dict, key=confidence_dict.get)] / \
-        #                   census_dict[max(confidence_dict, key=confidence_dict.get)]  # sum conf/bird cnt
-        # best_label = max(confidence_dict, key=confidence_dict.get)
-    else:  # use the jpg as a still gif
-        gif = image_proc.convert_image(img=first_img_jpg, target='gif')
-        gif_filename = 'first_img.jpg'
-        animated = False
-        # best_confidence = first_maxvalue
-        # best_label = first_maxbird
-    print('*** using label and confidence:', max(confidence_dict, key=confidence_dict.get))
-    print('*** dicts:', confidence_dict, census_dict)
-    best_confidence = confidence_dict[max(confidence_dict, key=confidence_dict.get)] / \
-        census_dict[max(confidence_dict, key=confidence_dict.get)]  # sum conf/bird cnt
-    best_label = max(confidence_dict, key=confidence_dict.get)
-    print('*** best label and confidence', best_label, best_confidence)
+        best_confidence = confidence_dict[max(confidence_dict, key=confidence_dict.get)] / \
+                          census_dict[max(confidence_dict, key=confidence_dict.get)]  # sum conf/bird cnt
+        best_label = max(confidence_dict, key=confidence_dict.get)
+        print('*** best label and confidence', best_label, best_confidence)
+    # else:  # use the jpg as a still gif, convert and set filename
+    #     # gif = image_proc.convert_image(img=first_img_jpg, target='gif')  # uses stream
+    #     # gif_filename = 'first_img.jpg'
+    #     animated = False
+    #     # best_confidence = first_maxvalue
+    #     # best_label = first_maxbird
     return gif, gif_filename, animated, best_label, best_confidence
 
 

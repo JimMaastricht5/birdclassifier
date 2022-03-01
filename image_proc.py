@@ -25,7 +25,6 @@
 from PIL import ImageEnhance, Image, ImageOps, ImageStat, ImageFilter, ImageChops
 import numpy as np
 import io
-import math
 
 
 # Pillow img to flip
@@ -147,16 +146,6 @@ def overlap_area(rect1, rect2):
     si = max(0, min(XA2, XB2) - max(XA1, XB1)) * max(0, min(YA2, YB2) - max(YA1, YB1))
     su = sa + sb - si
     return si/su
-
-# SI = Max(0, Min(XA2, XB2) - Max(XA1, XB1)) * Max(0, Min(YA2, YB2) - Max(YA1, YB1))
-#
-# The rest as usual. Union:
-#
-# SU = SA + SB - SI
-#
-# and ratio:
-#
-# SI/SU
 
 
 # compare two PIL images for differences
