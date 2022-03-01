@@ -154,7 +154,6 @@ class DetectClassify:
         self.classified_confidences = []
         self.classified_labels = []
         prior_rect = (0, 0, 0, 0)
-        max_confidence = 0
         for i, det_confidence in enumerate(self.detected_confidences):  # loop thru detected target objects
             (startX, startY, endX, endY) = self.scale_rect(img, self.detected_rects[i])  # set x,y bounding box
             rect = (startX, startY, endX, endY)
@@ -167,12 +166,7 @@ class DetectClassify:
             # take the best result between img and enhanced img
             classify_label = classify_label if classify_conf >= classify_conf_equalized else classify_label_equalized
             classify_conf = classify_conf if classify_conf >= classify_conf_equalized else classify_conf_equalized
-            # classify_conf -= self.classify_mismatch_reduction  # reduce confidence on confusion between images
-            # else:  # increase confidence on match, use classify_label already set above
-            #     classify_conf += self.classify_mismatch_reduction
-
-            # detect overlapping rectangles/same bird and skip it
-            overlap_perc = image_proc.overlap_area(prior_rect, rect)  # compare current rect and prior rect
+            _overlap_perc = image_proc.overlap_area(prior_rect, rect)  # compare current rect and prior rect
             prior_rect = rect  # set prior rect to current rect
             # print('overlap percent', overlap_perc)
             # if overlap_perc > self.overlap_perc_tolerance:  # 0.0 in first loop, if XX% overlap skip bird
@@ -208,21 +202,17 @@ class DetectClassify:
             scale, zero_point = output_details['quantization']
             output = scale * (output - zero_point) * 10  # scale factor to adjust results
         cindex = np.argpartition(output, -10)[-10:]
-
         # loop thru top N results to find best match; highest score align with matching species threshold
         maxcresult = float(0)
         maxlresult = ''
         for lindex in cindex:
             lresult = str(self.classifier_possible_labels[lindex]).strip()  # grab label,push to string instead of tuple
-            # cresult = float(output[lindex])
             cresult = float(output[lindex]) if float(output[lindex]) > 0 else 0
             cresult = cresult - math.floor(cresult) if cresult > 1 else cresult  # ignore whole numbers, keep decimals
-            # cresult = cresult if cresult > 0 else 0  # ignore cresults < 0
             if self.check_threshold(cresult, lindex):  # comp confidence>=threshold by label
                 if cresult > maxcresult:  # if this above threshold and is a better confidence result store it
                     maxcresult = cresult
                     maxlresult = lresult
-
         if maxcresult != 0:
             print(f'match returned: confidence {maxcresult}, {maxlresult}')
         return maxcresult, maxlresult  # highest confidence with best match
@@ -265,7 +255,6 @@ class DetectClassify:
             classified_labels = self.last_known_classified_labels
             classified_confidences = self.last_known_classified_confidences
         else:
-            # print('using latest', self.classified_confidences, self.classified_labels)
             classified_rects = self.classified_rects
             classified_labels = self.classified_labels  # assigned but not used below in line 289??
             classified_confidences = self.classified_confidences

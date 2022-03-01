@@ -50,13 +50,8 @@ class Census:
 
     # find visitor by census name, increment count, and update time
     def visitors(self, visitor_names, time_of_visit=datetime.now()):
-        # visitor_name_list = []
         self.first_time_seen = False
         visitor_name_list = self.convert_to_list(visitor_names)
-        # if type(visitor_names) != list:
-        #     visitor_name_list.append(visitor_names)
-        # else:
-        #     visitor_name_list = visitor_names
         for i, visitor_name in enumerate(visitor_name_list):
             visitor_name = visitor_name if visitor_name.rstrip() != '' else 'undetermined'
             if self.census_dict[visitor_name][0] == 0:
@@ -67,11 +62,6 @@ class Census:
     # return count of visitors by name along with last seen date time
     def report_census(self, visitor_names):
         visitor_name_list = self.convert_to_list(visitor_names)
-        # visitor_name_list = []
-        # if type(visitor_names) != list:
-        #     visitor_name_list.append(visitor_names)
-        # else:
-        #     visitor_name_list = visitor_names
         census_subset = {key: self.census_dict[key] for key in visitor_name_list}
         return census_subset
 
