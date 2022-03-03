@@ -95,7 +95,7 @@ def bird_detector(args):
                 birdpop.visitors(best_label, datetime.now())  # update census count and time last seen
                 bird_first_time_seen = birdpop.first_time_seen
                 tweet_label = tweet_text(best_label, best_confidence)
-                if bird_first_time_seen:  # note this doesn't change last_tweet time or override time between tweets
+                if animated and bird_first_time_seen:  # note this doesn't change last_tweet time or override time between tweets
                     print(f'--- First time seeing a {best_label} today.  Tweeting still shot')
                     first_img_jpg.save('first_img.jpg')
                     bird_tweeter.post_image_from_file(message=f'First time today: {tweet_label}',
