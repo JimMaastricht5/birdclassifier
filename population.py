@@ -53,10 +53,11 @@ class Census:
         self.first_time_seen = False
         visitor_name_list = self.convert_to_list(visitor_names)
         for i, visitor_name in enumerate(visitor_name_list):
-            visitor_name = visitor_name if visitor_name.rstrip() != '' else 'undetermined'
-            if self.census_dict[visitor_name][0] == 0:
-                self.first_time_seen = True
-            self.census_dict[visitor_name] = (self.census_dict[visitor_name][0] + 1, time_of_visit)
+            if visitor_name.rstrip() != '':
+                # visitor_name = visitor_name if visitor_name.rstrip() != '' else 'undetermined'
+                if self.census_dict[visitor_name][0] == 0:
+                    self.first_time_seen = True
+                self.census_dict[visitor_name] = (self.census_dict[visitor_name][0] + 1, time_of_visit)
         return
 
     # return count of visitors by name along with last seen date time
