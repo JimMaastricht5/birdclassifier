@@ -95,7 +95,7 @@ def bird_detector(args):
                 birdpop.visitors(best_label, datetime.now())  # update census count and time last seen
                 bird_first_time_seen = birdpop.first_time_seen
                 tweet_label = tweet_text(best_label, best_confidence)
-                if animated and bird_first_time_seen:  # note this doesn't change last_tweet time or override time between tweets
+                if animated and bird_first_time_seen:  # doesn't change last_tweet time or override time between tweets
                     print(f'--- First time seeing a {best_label} today.  Tweeting still shot')
                     first_img_jpg.save('first_img.jpg')
                     bird_tweeter.post_image_from_file(message=f'First time today: {tweet_label}',
@@ -138,7 +138,7 @@ def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
     # return gif, filename, animated boolean, and best label as the max of all confidences
     gif_filename, best_label, best_confidence, labeled_frames = '', '', 0, []
     animated = False  # set to true if min # of frames captured with birds
-    gif = first_img_jpg  # set a default, doesn't get used.
+    gif = first_img_jpg  # set a default if animated = False
     last_good_frame = 0  # find last frame that has a bird, index zero is good based on first image
     frames_with_birds = 1  # count of frames with birds, set to 1 for first img
     census_dict = defaultdict(default_value)  # track all results and pick best confidence
@@ -150,12 +150,12 @@ def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
     for i, frame in enumerate(frames):
         frame = image_proc.enhance_brightness(img=frame, factor=args.brightness_chg)
         if birds.detect(img=frame):  # find bird object in frame and set rectangles containing object
-            frames_with_birds += 1
-            last_good_frame = i + 1  # found a bird, add one to last good frame to account for insert of 1st image below
-            _confidence = birds.classify(img=frame)   # classify object at rectangle location
+            if birds.classify(img=frame) > 0:   # classify object at rectangle location, check returned confidence
+                frames_with_birds += 1
+                last_good_frame = i + 1  # found a bird, add one to last good frame to account for insert of 1st image
             census_dict, confidence_dict = build_dict(census_dict, birds.classified_labels, confidence_dict,
                                                       birds.classified_confidences)
-        labeled_frames.append(birds.add_boxes_and_labels(img=frame, use_last_known=True))
+        labeled_frames.append(birds.add_boxes_and_labels(img=frame, use_last_known=True))  # append image regardless
     if frames_with_birds >= (args.minanimatedframes - 1):  # if bird is in more than the min number of frames build gif
         gif, gif_filename = image_proc.save_gif(frames=labeled_frames[0:last_good_frame], frame_rate=args.framerate)
         animated = True
