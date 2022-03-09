@@ -156,7 +156,7 @@ def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
             census_dict, confidence_dict = build_dict(census_dict, birds.classified_labels, confidence_dict,
                                                       birds.classified_confidences)
         labeled_frames.append(birds.add_boxes_and_labels(img=frame, use_last_known=True))  # append image regardless
-    if frames_with_birds >= (args.minanimatedframes - 1):  # if bird is in more than the min number of frames build gif
+    if frames_with_birds >= (args.minanimatedframes - 1):  # if bird is in min number of frames build gif
         gif, gif_filename = image_proc.save_gif(frames=labeled_frames[0:last_good_frame], frame_rate=args.framerate)
         animated = True
         best_confidence = confidence_dict[max(confidence_dict, key=confidence_dict.get)] / \
