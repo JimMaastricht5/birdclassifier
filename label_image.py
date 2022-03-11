@@ -58,7 +58,7 @@ except Exception as e:
 
 
 class DetectClassify:
-    def __init__(self, homedir='/home/pi/PycharmProjects/birdclassifier/', labels='coral.ai.inat_bird_labels.txt' ,
+    def __init__(self, homedir='/home/pi/PycharmProjects/birdclassifier/', labels='coral.ai.inat_bird_labels.txt',
                  default_confidence=.98, screenheight=640,
                  screenwidth=480, contrast_chg=1.0, color_chg=1.0, brightness_chg=1.0, sharpness_chg=1.0,
                  mismatch_penalty=0.3, overlap_perc_tolerance=0.7):
@@ -151,7 +151,7 @@ class DetectClassify:
     # compare img and equalized images
     # use self.detected_confidences,detected_labels, detected_rects lists
     # stash prior classification for later processing if current frame does not find a bird
-    def classify(self, img):
+    def classify(self, img, use_confidence_threshold=True):
         self.classified_rects = []
         self.classified_confidences = []
         self.classified_labels = []
@@ -163,8 +163,9 @@ class DetectClassify:
             equalizedimg = image_proc.enhance(img, brightness=self.brightness_chg, contrast=self.contrast_chg,
                                               color=self.color_chg, sharpness=self.sharpness_chg)
             crop_equalizedimg = equalizedimg.crop((startX, startY, endX, endY))
-            classify_conf, classify_label = self.classify_obj(crop_img)
-            classify_conf_equalized, classify_label_equalized = self.classify_obj(crop_equalizedimg)
+            classify_conf, classify_label = self.classify_obj(crop_img, use_confidence_threshold)
+            classify_conf_equalized, classify_label_equalized = self.classify_obj(crop_equalizedimg,
+                                                                                  use_confidence_threshold)
             # take the best result between img and enhanced img
             classify_label = classify_label if classify_conf >= classify_conf_equalized else classify_label_equalized
             classify_conf = classify_conf if classify_conf >= classify_conf_equalized else classify_conf_equalized
@@ -192,7 +193,7 @@ class DetectClassify:
     # the function will sort the results and compare the confidence to the confidence for that label (species)
     # if the ML models confidence is higer than the treshold for that lable (species) it will stop searching and
     # return that best result
-    def classify_obj(self, img):
+    def classify_obj(self, img, use_confidence_threshold=True):
         input_details = self.classifier.get_input_details()
         floating_model, input_data = self.convert_img_to_tf(img, input_details)
         self.classifier.set_tensor(input_details[0]['index'], input_data)
@@ -211,7 +212,7 @@ class DetectClassify:
             lresult = str(self.classifier_possible_labels[lindex]).strip()  # grab label,push to string instead of tuple
             cresult = float(output[lindex]) if float(output[lindex]) > 0 else 0
             cresult = cresult - math.floor(cresult) if cresult > 1 else cresult  # ignore whole numbers, keep decimals
-            if self.check_threshold(cresult, lindex):  # comp confidence>=threshold by label
+            if self.check_threshold(cresult, lindex) or use_confidence_threshold is False:  # confidence>=threshold
                 if cresult > maxcresult:  # if this above threshold and is a better confidence result store it
                     maxcresult = cresult
                     maxlresult = lresult

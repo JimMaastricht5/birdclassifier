@@ -150,7 +150,7 @@ def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
     for i, frame in enumerate(frames):
         frame = image_proc.enhance_brightness(img=frame, factor=args.brightness_chg)
         if birds.detect(img=frame):  # find bird object in frame and set rectangles containing object
-            if birds.classify(img=frame) > 0:   # classify object at rectangle location, check returned confidence
+            if birds.classify(img=frame, use_confidence_threshold=False) > 0:   # classify at rectangle & chk confidence
                 frames_with_birds += 1
                 last_good_frame = i + 1  # found a bird, add one to last good frame to account for insert of 1st image
             census_dict, confidence_dict = build_dict(census_dict, birds.classified_labels, confidence_dict,
