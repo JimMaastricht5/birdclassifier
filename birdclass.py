@@ -209,6 +209,9 @@ if __name__ == "__main__":
                     help="home directory for files")
     ap.add_argument("-la", "--labels", type=str, default='coral.ai.inat_bird_labels.txt',
                     help="name of file to use for species labels and thresholds")
+    ap.add_argument("-tr", "--thresholds", type=str, default='coral.ai.inat_bird_threshold.csv',
+                    help="name of file to use for species labels and thresholds")
+
     arguments = ap.parse_args()
     bird_detector(arguments)
 

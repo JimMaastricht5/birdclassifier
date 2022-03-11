@@ -90,7 +90,7 @@
 89 Zonotrichia querula (Harris's Sparrow),0
 90 Vireo huttoni (Hutton's Vireo),0
 91 Zonotrichia albicollis (White-throated Sparrow),0
-92 Zonotrichia atricapilla (Golden-crowned Sparrow),0
+92 Zonotrichia atricapilla (Golden-crowned Sparrow),-1
 93 Emberiza citrinella (Yellowhammer),0
 94 Bucephala islandica (Barrow's Goldeneye),0
 95 Emberiza schoeniclus (Reed Bunting),-1
@@ -111,7 +111,7 @@
 110 Anas superciliosa \xd7 platyrhynchos (Pacific Black Duck \xd7 Mallard hybrid),0
 111 Icterus pustulatus (Streak-backed Oriole),-1
 112 Icterus gularis (Altamira Oriole),0
-113 Carduelis cannabina (Eurasian Linnet),0
+113 Carduelis cannabina (Eurasian Linnet),-1
 114 Catharus minimus (Gray-cheeked Thrush),0
 115 Amaurornis phoenicurus (White-breasted Waterhen),0
 116 Pavo cristatus (Indian Peafowl),-1
@@ -145,7 +145,7 @@
 144 Cinclus cinclus (White-throated Dipper),0
 145 Chen rossii (Ross's Goose),0
 146 Callipepla californica (California Quail),-1
-147 Cardinalis cardinalis (Northern Cardinal2),0
+147 Cardinalis cardinalis (Northern Cardinal),0
 148 Quiscalus mexicanus (Great-tailed Grackle),-1
 149 Callipepla squamata (Scaled Quail),0
 150 Dryocopus pileatus (Pileated Woodpecker),0
