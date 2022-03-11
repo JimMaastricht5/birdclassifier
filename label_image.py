@@ -212,7 +212,7 @@ class DetectClassify:
             lresult = str(self.classifier_possible_labels[lindex]).strip()  # grab label,push to string instead of tuple
             cresult = float(output[lindex]) if float(output[lindex]) > 0 else 0
             cresult = cresult - math.floor(cresult) if cresult > 1 else cresult  # ignore whole numbers, keep decimals
-            if self.check_threshold(cresult, lindex) or use_confidence_threshold is False:  # confidence>=threshold
+            if self.check_threshold(cresult, lindex, use_confidence_threshold):  # confidence>=threshold
                 if cresult > maxcresult:  # if this above threshold and is a better confidence result store it
                     maxcresult = cresult
                     maxlresult = lresult
@@ -296,11 +296,14 @@ class DetectClassify:
     # func checks threshold by each label passed as a nparray with text in col 0 and threshold in col 1
     # species cannot be -1 (not present in geo location), cannot be 0, and must be equal or exceed minimum score
     # cresult is a decimal % 0 - 1; lindex is % * 10 (no decimals) must div by 1000 to get same scale
-    def check_threshold(self, cresult, lindex):
-        if self.classifier_thresholds[int(lindex)][1] == 0:  # species does not have its own threshold
-            label_threshold = self.classify_default_confidence * 1000
-        else:  # use species specific threshold
-            label_threshold = self.classifier_thresholds[int(lindex)][1]
+    def check_threshold(self, cresult, lindex, use_confidence_threshold):
+        label_threshold = self.classify_default_confidence * 1000 if self.classifier_thresholds[int(lindex)][1] == 0 \
+            else self.classifier_thresholds[int(lindex)][1]
+        # if self.classifier_thresholds[int(lindex)][1] == 0:  # species does not have its own threshold
+        #     label_threshold = self.classify_default_confidence * 1000
+        # else:  # use species specific threshold
+        #     label_threshold = self.classifier_thresholds[int(lindex)][1]
+        label_threshold = label_threshold if use_confidence_threshold else 0  # pass all test if use threshold is false
         return(int(label_threshold) != -1 and cresult > 0 and
                cresult >= float(label_threshold) / 1000)
 
