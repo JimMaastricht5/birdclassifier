@@ -64,7 +64,7 @@ def bird_detector(args):
     bird_tweeter = tweeter.TweeterClass()  # init tweeter2 class twitter handler
     chores = dailychores.DailyChores(bird_tweeter, birdpop, cityweather)
     # init detection and classifier object
-    birds = label_image.DetectClassify(homedir=args.homedir, labels=args.labels, threshold=args.thresholds,
+    birds = label_image.DetectClassify(homedir=args.homedir, labels=args.labels, thresholds=args.thresholds,
                                        default_confidence=args.default_confidence,
                                        mismatch_penalty=args.mismatch_penalty,
                                        screenheight=args.screenheight, screenwidth=args.screenwidth,
