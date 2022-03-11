@@ -135,6 +135,18 @@ def build_dict(label_dict, input_labels_list, conf_dict, input_confidences_list)
     return label_dict, conf_dict
 
 
+def remove_single_observations(label_dict, conf_dict):
+    key_list =[]
+    # for key in label_dict:  # loop thru keys
+    #     if label_dict[key] <= 1:  # remove entries with one or zero observations
+    #         key_list.append(key)
+    [key_list.append(key) if label_dict[key] <=1 else '' for key in label_dict]
+    print(key_list)
+    [label_dict.pop(key) for key in key_list]
+    [conf_dict.pop(key) for key in key_list]
+    return label_dict, conf_dict
+
+
 def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
     # grab a stream of pictures, add first pic from above, and build animated gif
     # return gif, filename, animated boolean, and best label as the max of all confidences
