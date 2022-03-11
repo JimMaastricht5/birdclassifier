@@ -305,7 +305,8 @@ class DetectClassify:
         #     label_threshold = self.classify_default_confidence * 1000
         # else:  # use species specific threshold
         #     label_threshold = self.classifier_thresholds[int(lindex)][1]
-        label_threshold = label_threshold if use_confidence_threshold else 0  # pass all test if use threshold is false
+        # use current threshold if boolean (first shot) or if -1 (discard), else override it to zero, force return True
+        label_threshold = label_threshold if (use_confidence_threshold or label_threshold == -1) else 0
         return(int(label_threshold) != -1 and cresult > 0 and
                cresult >= float(label_threshold) / 1000)
 
