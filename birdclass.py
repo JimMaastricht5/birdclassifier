@@ -172,7 +172,7 @@ def tweet_text(label, confidence):
     # sample url https://www.allaboutbirds.org/guide/Northern_Rough-winged_Swallow/overview
     sname = str(label)  # make sure the label is a string
     sname = sname[sname.find(' ') + 1:] if sname.find(' ') >= 0 else sname  # remove index number
-    cname = sname[sname.find('(') + 1: -1] if sname.find('(') >= 0 else sname  # retrieve common name
+    cname = sname[sname.find('(') + 1: sname.find(')')] if sname.find('(') >= 0 else sname  # retrieve common name
     hypername = cname.replace(' ', '_')
     hyperlink = f'https://www.allaboutbirds.org/guide/{hypername}/overview'
     tweet_label = f'{cname} {confidence * 100:.1f}% {hyperlink}'
