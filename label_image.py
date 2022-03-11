@@ -67,6 +67,7 @@ class DetectClassify:
         self.target_objects = ['bird']
         self.target_object_found = False
         self.classifier_file = homedir + 'coral.ai.mobilenet_v2_1.0_224_inat_bird_quant.tflite'
+        print('Using label file:', labels)
         self.classifier_labels_file = homedir + labels
         self.classifier_thresholds_file = homedir + 'coral.ai.inat_bird_threshold.csv'
         self.classifier_thresholds = np.genfromtxt(self.classifier_thresholds_file, delimiter=',')
