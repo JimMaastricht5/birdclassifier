@@ -136,11 +136,11 @@ def build_dict(label_dict, input_labels_list, conf_dict, input_confidences_list)
 
 
 def remove_single_observations(label_dict, conf_dict):
-    key_list =[]
+    key_list = []
     # for key in label_dict:  # loop thru keys
     #     if label_dict[key] <= 1:  # remove entries with one or zero observations
     #         key_list.append(key)
-    [key_list.append(key) if label_dict[key] <=1 else '' for key in label_dict]
+    [key_list.append(key) if label_dict[key] <= 1 else '' for key in label_dict]
     print(key_list)
     [label_dict.pop(key) for key in key_list]
     [conf_dict.pop(key) for key in key_list]
@@ -173,6 +173,7 @@ def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
     if frames_with_birds >= (args.minanimatedframes - 1):  # if bird is in min number of frames build gif
         gif, gif_filename = image_proc.save_gif(frames=labeled_frames[0:last_good_frame], frame_rate=args.framerate)
         animated = True
+        # census_dict, confidence_dict = remove_single_observations(census_dict, confidence_dict)  # use multishots results
         best_confidence = confidence_dict[max(confidence_dict, key=confidence_dict.get)] / \
             census_dict[max(confidence_dict, key=confidence_dict.get)]  # sum conf/bird cnt
         best_label = max(confidence_dict, key=confidence_dict.get)
