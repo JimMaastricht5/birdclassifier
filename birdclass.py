@@ -64,11 +64,13 @@ def bird_detector(args):
     bird_tweeter = tweeter.TweeterClass()  # init tweeter2 class twitter handler
     chores = dailychores.DailyChores(bird_tweeter, birdpop, cityweather)
     # init detection and classifier object
-    birds = label_image.DetectClassify(default_confidence=args.default_confidence,
+    birds = label_image.DetectClassify(homedir=args.homedir, labels=args.labels,
+                                       default_confidence=args.default_confidence,
                                        mismatch_penalty=args.mismatch_penalty,
                                        screenheight=args.screenheight, screenwidth=args.screenwidth,
                                        color_chg=args.color_chg,
                                        contrast_chg=args.contrast_chg, sharpness_chg=args.sharpness_chg,
+                                       brightness_chg=args.brightness_chg,
                                        overlap_perc_tolerance=args.overlap_perc_tolerance)
     print('Starting while loop until sun set..... ')
     # loop while the sun is up, look for motion, detect birds, determine species
@@ -203,9 +205,10 @@ if __name__ == "__main__":
     ap.add_argument("-co", "--default_confidence", type=float, default=.98, help="confidence threshold")
     ap.add_argument("-op", "--overlap_perc_tolerance", type=float, default=0.8, help="% box overlap to flag as dup")
     ap.add_argument("-ma", "--minarea", type=float, default=5.0, help="motion entropy threshold")  # lower = > motion
+    ap.add_argument("-hd", "--homedir", type=str, default='/home/pi/PycharmProjects/birdclassifier/',
+                    help="home directory for files")
     ap.add_argument("-la", "--labels", type=str, default='coral.ai.inat_bird_labels.txt',
-                    help="name of file to use for species labels and thresholds")  # lower = > motion
-
+                    help="name of file to use for species labels and thresholds")
     arguments = ap.parse_args()
     bird_detector(arguments)
 
