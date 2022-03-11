@@ -58,7 +58,8 @@ except Exception as e:
 
 
 class DetectClassify:
-    def __init__(self, homedir='/home/pi/PycharmProjects/birdclassifier/', default_confidence=.98, screenheight=640,
+    def __init__(self, homedir='/home/pi/PycharmProjects/birdclassifier/', labels='coral.ai.inat_bird_labels.txt' ,
+                 default_confidence=.98, screenheight=640,
                  screenwidth=480, contrast_chg=1.0, color_chg=1.0, brightness_chg=1.0, sharpness_chg=1.0,
                  mismatch_penalty=0.3, overlap_perc_tolerance=0.7):
         self.detector_file = homedir + 'lite-model_ssd_mobilenet_v1_1_metadata_2.tflite'
@@ -66,7 +67,7 @@ class DetectClassify:
         self.target_objects = ['bird']
         self.target_object_found = False
         self.classifier_file = homedir + 'coral.ai.mobilenet_v2_1.0_224_inat_bird_quant.tflite'
-        self.classifier_labels_file = homedir + 'coral.ai.inat_bird_labels.txt'
+        self.classifier_labels_file = homedir + labels
         self.classifier_thresholds_file = homedir + 'coral.ai.inat_bird_threshold.csv'
         self.classifier_thresholds = np.genfromtxt(self.classifier_thresholds_file, delimiter=',')
         self.detector, self.obj_detector_possible_labels = self.init_tf2(self.detector_file, self.detector_labels_file)

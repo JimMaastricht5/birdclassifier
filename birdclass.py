@@ -176,20 +176,6 @@ def tweet_text(label, confidence):
     tweet_label = f'{cname} {confidence * 100:.1f}% {hyperlink}'
     return tweet_label
 
-# def tweet_text(classified_labels, classified_confidences):
-#     # sample url https://www.allaboutbirds.org/guide/Northern_Rough-winged_Swallow/overview
-#     tweet_label, sname, cname, hypername = '', '', '', ''
-#     for i, sname in enumerate(classified_labels):
-#         sname = str(sname)  # make sure the label is a string
-#         sname = sname[sname.find(' ') + 1:] if sname.find(' ') >= 0 else sname  # remove index number
-#         cname = sname[sname.find('(') + 1: -1] if sname.find('(') >= 0 else sname  # retrieve common name
-#         if cname != '' and classified_confidences[i] * 100 > 1.0:  # skip blank names and 0% confidence, keep good
-#             # tweet_label += f'{sname} {classified_confidences[i] * 100:.1f}% '
-#             hypername = cname.replace(' ', '_')
-#             hyperlink = f'https://www.allaboutbirds.org/guide/{hypername}/overview'
-#             tweet_label += f'{cname} {classified_confidences[i] * 100:.1f}% {hyperlink}'
-#     return tweet_label
-
 
 if __name__ == "__main__":
     # construct the argument parser and parse the arguments
@@ -217,6 +203,8 @@ if __name__ == "__main__":
     ap.add_argument("-co", "--default_confidence", type=float, default=.98, help="confidence threshold")
     ap.add_argument("-op", "--overlap_perc_tolerance", type=float, default=0.8, help="% box overlap to flag as dup")
     ap.add_argument("-ma", "--minarea", type=float, default=5.0, help="motion entropy threshold")  # lower = > motion
+    ap.add_argument("-la", "--labels", type=str, default='coral.ai.inat_bird_labels.txt',
+                    help="name of file to use for species labels and thresholds")  # lower = > motion
 
     arguments = ap.parse_args()
     bird_detector(arguments)
