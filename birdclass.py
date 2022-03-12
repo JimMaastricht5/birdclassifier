@@ -102,7 +102,7 @@ def bird_detector(args):
                     first_img_jpg.save('first_img.jpg')
                     bird_tweeter.post_image_from_file(message=f'First time today: {tweet_label}',
                                                       file_name='first_img.jpg')
-                waittime = birdpop.report_single_census_count(best_label) * 300  # wait 5 minutes per reported N
+                waittime = birdpop.report_single_census_count(best_label) * args.tweetdelay / 10  # wait X min * N bird
                 waittime = args.tweetdelay if waittime >= args.tweetdelay else waittime
                 if animated and ((datetime.now() - last_tweet).total_seconds() >= waittime or bird_first_time_seen):
                     print('--- Tweet animated gif at:', datetime.now())
@@ -205,7 +205,7 @@ if __name__ == "__main__":
     ap.add_argument("-st", "--save_img", type=bool, default=False, help="write images to disk")
     ap.add_argument("-v", "--verbose", type=bool, default=True, help="To tweet extra stuff or not")
     ap.add_argument("-td", "--tweetdelay", type=int, default=3600,
-                    help="Wait time between tweets is N species seen * 300 with not to exceed max of tweet delay")
+                    help="Wait time between tweets is N species seen delay/10 with not to exceed max of tweet delay")
 
     # motion and image processing settings
     ap.add_argument("-b", "--brightness_chg", type=int, default=1.05, help="brightness boost")  # 1 no chg,< 1 -, > 1 +
