@@ -145,7 +145,7 @@
 144 Cinclus cinclus (White-throated Dipper),0
 145 Chen rossii (Ross's Goose),0
 146 Callipepla californica (California Quail),-1
-147 Cardinalis cardinalis (Northern Cardinal),0
+147 Quiscalus quiscula (Common Grackle),0
 148 Quiscalus mexicanus (Great-tailed Grackle),-1
 149 Callipepla squamata (Scaled Quail),0
 150 Dryocopus pileatus (Pileated Woodpecker),0
@@ -644,7 +644,7 @@
 643 Haliastur indus (Brahminy Kite),0
 644 Gyps africanus (White-backed Vulture),0
 645 Ictinia mississippiensis (Mississippi Kite),0
-646 Dives dives (Melodious Blackbird),0
+646 Dives dives (Melodious Blackbird),-1
 647 Baeolophus atricristatus (Black-crested Titmouse),-1
 648 Baeolophus bicolor (Tufted Titmouse),0
 649 Baeolophus inornatus (Oak Titmouse),-1
