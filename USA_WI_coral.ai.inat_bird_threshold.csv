@@ -116,7 +116,7 @@
 115 Amaurornis phoenicurus (White-breasted Waterhen),0
 116 Pavo cristatus (Indian Peafowl),-1
 117 Rallus crepitans (Clapper Rail),0
-118 Nestor meridionalis septentrionalis (North Island Kaka),0
+118 Nestor meridionalis septentrionalis (North Island Kaka),-1
 119 Pipilo chlorurus (Green-tailed Towhee),0
 120 Pipilo maculatus (Spotted Towhee),0
 121 Pipilo erythrophthalmus (Eastern Towhee),0
@@ -390,15 +390,15 @@
 389 Numenius arquata (Eurasian Curlew),0
 390 Numenius phaeopus (Whimbrel),0
 391 Phalacrocorax carbo novaehollandiae (Australasian Great Cormorant),0
-392 Petroica macrocephala macrocephala (South Island Tomtit),0
+392 Petroica macrocephala macrocephala (South Island Tomtit),-1
 393 Petroica australis longipes (North Island Robin),-1
 394 Prosthemadera novaeseelandiae novaeseelandiae (Mainland Tui),0
 395 Asio flammeus (Short-eared Owl),0
-396 Rhipidura fuliginosa fuliginosa (South Island Fantail),0
+396 Rhipidura fuliginosa fuliginosa (South Island Fantail),-1
 397 Scolopax minor (American Woodcock),0
 398 Arenaria interpres (Ruddy Turnstone),0
 399 Arenaria melanocephala (Black Turnstone),0
-400 Rhipidura fuliginosa placabilis (North Island Fantail),0
+400 Rhipidura fuliginosa placabilis (North Island Fantail),-1
 401 Limosa limosa (Black-tailed Godwit),0
 402 Limosa haemastica (Hudsonian Godwit),0
 403 Limosa fedoa (Marbled Godwit),0
@@ -435,7 +435,7 @@
 434 Charadrius montanus (Mountain Plover),0
 435 Phalacrocorax auritus (Double-crested Cormorant),0
 436 Phalacrocorax carbo (Great Cormorant),0
-437 Phalacrocorax penicillatus (Brandt's Cormorant),0
+437 Phalacrocorax penicillatus (Brandt's Cormorant),-1
 438 Aechmophorus clarkii (Clark's Grebe),0
 439 Pelecanus onocrotalus (Great White Pelican),0
 440 Pelecanus erythrorhynchos (American White Pelican),0
@@ -759,7 +759,7 @@
 758 Larus glaucescens \xd7 occidentalis (Olympic Gull),0
 759 Aphelocoma woodhouseii (Woodhouse's Scrub-Jay),0
 760 Florisuga mellivora (White-necked Jacobin),0
-761 Haematopus finschi (South Island Oystercatcher),0
+761 Haematopus finschi (South Island Oystercatcher),-1
 762 Falcipennis canadensis (Spruce Grouse),0
 763 Archilochus alexandri (Black-chinned Hummingbird),0
 764 Circus cyaneus (Northern Harrier),0
@@ -796,7 +796,7 @@
 795 Icterus spurius (Orchard Oriole),0
 796 Calidris minutilla (Least Sandpiper),0
 797 Dumetella carolinensis (Gray Catbird),0
-798 Porphyrio hochstetteri (South Island Takahe),0
+798 Porphyrio hochstetteri (South Island Takahe),-1
 799 Calidris fuscicollis (White-rumped Sandpiper),0
 800 Phalaropus tricolor (Wilson's Phalarope),-1
 801 Colaptes auratus auratus (Yellow-shafted Flicker),0
@@ -895,7 +895,7 @@
 894 Bombycilla cedrorum (Cedar Waxwing),0
 895 Bombycilla garrulus (Bohemian Waxwing),0
 896 Tadorna tadorna (Common Shelduck),0
-897 Petroica australis australis (South Island Robin),0
+897 Petroica australis australis (South Island Robin),-1
 898 Amazona autumnalis (Red-lored Parrot),0
 899 Dendragapus obscurus (Dusky Grouse),0
 900 Catherpes mexicanus (Canyon Wren),0
