@@ -625,7 +625,7 @@
 624 Thalasseus maximus (Royal Tern),0
 625 Thalasseus bergii (Great Crested Tern),0
 626 Elanus leucurus (White-tailed Kite),0
-627 Alopochen aegyptiaca (Egyptian Goose),0
+627 Alopochen aegyptiaca (Egyptian Goose),-1
 628 Streptopelia senegalensis (Laughing Dove),-1
 629 Gerygone igata (Gray Gerygone),0
 630 Haliaeetus leucocephalus (Bald Eagle),0
@@ -676,7 +676,7 @@
 675 Dicrurus adsimilis (Fork-tailed Drongo),0
 676 Amazilia violiceps (Violet-crowned Hummingbird),0
 677 Lonchura punctulata (Scaly-breasted Munia),0
-678 Tigrisoma mexicanum (Bare-throated Tiger-Heron),0
+678 Tigrisoma mexicanum (Bare-throated Tiger-Heron),-1
 679 Porphyrio melanotus melanotus (Pukeko),0
 680 Melanitta americana (Black Scoter),0
 681 Spizella pallida (Clay-colored Sparrow),0
@@ -815,7 +815,7 @@
 814 Cygnus buccinator (Trumpeter Swan),0
 815 Cygnus cygnus (Whooper Swan),0
 816 Cygnus columbianus (Tundra Swan),0
-817 Cygnus olor (Mute Swan),0
+817 Cygnus olor (Mute Swan),-1
 818 Icterus galbula (Baltimore Oriole),0
 819 Anas platyrhynchos (Mallard),0
 820 Anas acuta (Northern Pintail),0
