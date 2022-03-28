@@ -557,26 +557,26 @@
 556 Erithacus rubecula (European Robin),0
 557 Melanerpes aurifrons (Golden-fronted Woodpecker),0
 558 Charadrius hiaticula (Common Ringed Plover),0
-559 Egretta gularis (Western Reef-Heron),0
-560 Egretta caerulea (Little Blue Heron),0
-561 Egretta tricolor (Tricolored Heron),0
+559 Egretta gularis (Western Reef-Heron),-1
+560 Egretta caerulea (Little Blue Heron),-1
+561 Egretta tricolor (Tricolored Heron),-1
 562 Egretta thula (Snowy Egret),0
 563 Egretta garzetta (Little Egret),0
-564 Egretta sacra (Pacific Reef-Heron),0
+564 Egretta sacra (Pacific Reef-Heron),-1
 565 Monticola solitarius (Blue Rock-Thrush),0
-566 Ardea cocoi (Cocoi Heron),0
-567 Ardea cinerea (Grey Heron),0
+566 Ardea cocoi (Cocoi Heron),-1
+567 Ardea cinerea (Grey Heron),-1
 568 Ardea herodias (Great Blue Heron),-1
-569 Nycticorax nycticorax (Black-crowned Night-Heron),0
+569 Nycticorax nycticorax (Black-crowned Night-Heron),-1
 570 Turdus rufopalliatus (Rufous-backed Robin),0
-571 Ardeola ralloides (Squacco Heron),0
+571 Ardeola ralloides (Squacco Heron),-1
 572 Nyctanassa violacea (Yellow-crowned Night-Heron),-1
 573 Aramides cajaneus (Gray-necked Wood-Rail),0
 574 Bubulcus ibis (Cattle Egret),0
-575 Butorides virescens (Green Heron),0
+575 Butorides virescens (Green Heron),-1
 576 Porphyrio martinicus (Purple Gallinule),0
 577 Botaurus lentiginosus (American Bittern),0
-578 Cochlearius cochlearius (Boat-billed Heron),0
+578 Cochlearius cochlearius (Boat-billed Heron),-1
 579 Anhinga novaehollandiae (Australasian Darter),0
 580 Anhinga rufa (African Darter),0
 581 Melozone fusca (Canyon Towhee),0
@@ -590,7 +590,7 @@
 589 Bucephala clangula (Common Goldeneye),0
 590 Anous stolidus (Brown Noddy),0
 591 Actitis macularius (Spotted Sandpiper),0
-592 Ardea purpurea (Purple Heron),0
+592 Ardea purpurea (Purple Heron),-1
 593 Todiramphus chloris (Collared Kingfisher),0
 594 Grus americana (Whooping Crane),0
 595 Himantopus himantopus (Black-winged Stilt),0
@@ -599,7 +599,7 @@
 598 Circus aeruginosus (Western Marsh-Harrier),0
 599 Phalacrocorax sulcirostris (Little Black Cormorant),0
 600 Buteo albonotatus (Zone-tailed Hawk),0
-601 Butorides striata (Striated Heron),0
+601 Butorides striata (Striated Heron),-1
 602 Platalea ajaja (Roseate Spoonbill),-1
 603 Buteo brachyurus (Short-tailed Hawk),0
 604 Ardea alba (Great Egret),0

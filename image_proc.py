@@ -131,6 +131,12 @@ def predominant_color(pil_img):
     return dominant_color
 
 
+# find the ratio of width/height
+def ratio(rect):
+    (startX, startY, endX, endY) = rect
+    return round((endX - startX) / (endY - startY), 3)
+
+
 # find area of an image
 def area(rect):
     (startX, startY, endX, endY) = rect

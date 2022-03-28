@@ -265,7 +265,6 @@ class DetectClassify:
             classified_confidences = self.classified_confidences
 
         for i, rect in enumerate(classified_rects):
-            # try:
             (start_x, start_y, end_x, end_y) = rect
             text_x = start_x
             text_y = start_y
@@ -275,7 +274,7 @@ class DetectClassify:
             end_y += 25
             draw = PILImageDraw.Draw(img)
             font = draw.getfont()
-            draw.text((text_x, text_y), self.label_text(classified_labels[i], classified_confidences[i]),
+            draw.text((text_x, text_y), self.label_text(classified_labels[i], classified_confidences[i], rect),
                       font=font)  # font = font, fill = self.text_color)
             draw.line([(start_x, start_y), (start_x, end_y), (start_x, end_y), (end_x, end_y),
                        (end_x, end_y), (end_x, start_y), (end_x, start_y), (start_x, start_y)],
@@ -301,22 +300,18 @@ class DetectClassify:
     def check_threshold(self, cresult, lindex, use_confidence_threshold):
         label_threshold = self.classify_default_confidence * 1000 if self.classifier_thresholds[int(lindex)][1] == 0 \
             else self.classifier_thresholds[int(lindex)][1]
-        # if self.classifier_thresholds[int(lindex)][1] == 0:  # species does not have its own threshold
-        #     label_threshold = self.classify_default_confidence * 1000
-        # else:  # use species specific threshold
-        #     label_threshold = self.classifier_thresholds[int(lindex)][1]
-        # use current threshold if boolean (first shot) or if -1 (discard), else override it to zero, force return True
+        # push to zero if use threshold boolean is false
         label_threshold = label_threshold if (use_confidence_threshold or label_threshold == -1) else 0
         return(int(label_threshold) != -1 and cresult > 0 and
                cresult >= float(label_threshold) / 1000)
 
     # set label for box in image use short species name instead of scientific name
-    def label_text(self, label, confidence):
+    def label_text(self, label, confidence, rect):
         sname = str(label)  # make sure label is considered a string
         start = sname.find('(') + 1  # find start of common name, move one character to drop (
         end = sname.find(')')
         cname = sname[start:end] if start >= 0 and end >= 0 else sname
-        common_name = f'{cname} {confidence * 100:.1f}%'
+        common_name = f'{cname} {confidence * 100:.1f}% area:{image_proc.area(rect)}, ratio:{image_proc.ratio(rect)}'
         return common_name
 
 
