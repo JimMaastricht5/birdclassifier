@@ -165,8 +165,8 @@ class DetectClassify:
             equalizedimg = image_proc.enhance(img, brightness=self.brightness_chg, contrast=self.contrast_chg,
                                               color=self.color_chg, sharpness=self.sharpness_chg)
             crop_equalizedimg = equalizedimg.crop((startX, startY, endX, endY))
-            classify_conf, classify_label = self.classify_obj(crop_img, use_confidence_threshold)
-            classify_conf_equalized, classify_label_equalized = self.classify_obj(crop_equalizedimg,
+            classify_conf, classify_label = self.classify_obj(crop_img, rect, use_confidence_threshold)
+            classify_conf_equalized, classify_label_equalized = self.classify_obj(crop_equalizedimg, rect,
                                                                                   use_confidence_threshold)
             # take the best result between img and enhanced img
             classify_label = classify_label if classify_conf >= classify_conf_equalized else classify_label_equalized
@@ -195,7 +195,7 @@ class DetectClassify:
     # the function will sort the results and compare the confidence to the confidence for that label (species)
     # if the ML models confidence is higer than the treshold for that lable (species) it will stop searching and
     # return that best result
-    def classify_obj(self, img, use_confidence_threshold=True):
+    def classify_obj(self, img, rect, use_confidence_threshold=True):
         input_details = self.classifier.get_input_details()
         floating_model, input_data = self.convert_img_to_tf(img, input_details)
         self.classifier.set_tensor(input_details[0]['index'], input_data)
@@ -214,7 +214,7 @@ class DetectClassify:
             lresult = str(self.classifier_possible_labels[lindex]).strip()  # grab label,push to string instead of tuple
             cresult = float(output[lindex]) if float(output[lindex]) > 0 else 0
             cresult = cresult - math.floor(cresult) if cresult > 1 else cresult  # ignore whole numbers, keep decimals
-            if self.check_threshold(cresult, lindex, use_confidence_threshold):  # confidence>=threshold
+            if self.check_threshold(cresult, lindex, rect, use_confidence_threshold):  # confidence>=threshold
                 if cresult > maxcresult:  # if this above threshold and is a better confidence result store it
                     maxcresult = cresult
                     maxlresult = lresult
@@ -297,11 +297,11 @@ class DetectClassify:
     # func checks threshold by each label passed as a nparray with text in col 0 and threshold in col 1
     # species cannot be -1 (not present in geo location), cannot be 0, and must be equal or exceed minimum score
     # cresult is a decimal % 0 - 1; lindex is % * 10 (no decimals) must div by 1000 to get same scale
-    def check_threshold(self, cresult, lindex, use_confidence_threshold):
+    def check_threshold(self, cresult, lindex, rect, use_confidence_threshold):
         label_threshold = self.classify_default_confidence * 1000 if self.classifier_thresholds[int(lindex)][1] == 0 \
             else self.classifier_thresholds[int(lindex)][1]
         # push to zero if use threshold boolean is false
-        label_threshold = label_threshold if (use_confidence_threshold or label_threshold == -1) else 0
+        label_threshold = label_threshold if (use_confidence_threshold or label_threshold == -1) and image_proc.area(rect) >= 20000 else 0
         return(int(label_threshold) != -1 and cresult > 0 and
                cresult >= float(label_threshold) / 1000)
 
@@ -311,8 +311,7 @@ class DetectClassify:
         start = sname.find('(') + 1  # find start of common name, move one character to drop (
         end = sname.find(')')
         cname = sname[start:end] if start >= 0 and end >= 0 else sname
-        common_name = f'{cname} {confidence * 100:.1f}% area:{image_proc.area(rect)}, ' \
-                      f'ratio:{image_proc.ratio(rect):.3f}'
+        common_name = f'{cname} {confidence * 100:.1f}% area:{image_proc.area(rect)/1000:.0f}k '
         return common_name
 
 
