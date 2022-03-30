@@ -295,15 +295,16 @@ class DetectClassify:
         return tuple(self.colors[(self.color_index + from_index) % (len(self.colors) - 1)])
 
     # func checks threshold by each label passed as a nparray with text in col 0 and threshold in col 1
-    # species cannot be -1 (not present in geo location), cannot be 0, and must be equal or exceed minimum score
+    # species cannot be -1 (not present in geo location), confidence cannot be 0,must be equal or exceed minimum score
     # cresult is a decimal % 0 - 1; lindex is % * 10 (no decimals) must div by 1000 to get same scale
+    # result needs to also have a minimum area to get a good result.
     def check_threshold(self, cresult, lindex, rect, use_confidence_threshold):
         label_threshold = self.classify_default_confidence * 1000 if self.classifier_thresholds[int(lindex)][1] == 0 \
             else self.classifier_thresholds[int(lindex)][1]
-        # push to zero if use threshold boolean is false
-        label_threshold = label_threshold if (use_confidence_threshold or label_threshold == -1) and image_proc.area(rect) >= 20000 else 0
-        return(int(label_threshold) != -1 and cresult > 0 and
-               cresult >= float(label_threshold) / 1000)
+        # push to zero if use threshold boolean is false, this automatically puts any confidence over the threshold
+        label_threshold = label_threshold if (use_confidence_threshold or label_threshold == -1) else 0
+        return(int(label_threshold) != -1 and image_proc.area(rect) >= 20000 and
+               cresult > 0 and cresult >= float(label_threshold) / 1000)
 
     # set label for box in image use short species name instead of scientific name
     def label_text(self, label, confidence, rect):
