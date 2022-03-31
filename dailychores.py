@@ -84,8 +84,8 @@ class DailyChores:
             observed = self.birdpop.get_census_by_count()
             post_txt = f'top birds for day {str(self.curr_day)}. '
             for index, birdkey in enumerate(observed):  # bird pop is list of tuples with 0th item species name
-                if observed[birdkey][0] > 0: # post observed bird if count > 0 else blank
-                    post_txt = post_txt + str(f'#{str(index + 1)}: {observed[birdkey][0]} {short_name(birdkey)}, ')
+                post_txt = post_txt + str(f'#{str(index + 1)}: {observed[birdkey][0]} {short_name(birdkey)}, ') \
+                    if observed[birdkey][0] > 0 else post_txt  # post observed bird if count > 0 else keep prior txt
             self.tweeter.post_status(post_txt[0:279])  # grab full text up to 280 characters
         except Exception as e:
             print('Error in daily population report:', e)
