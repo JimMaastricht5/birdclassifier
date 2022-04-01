@@ -62,7 +62,7 @@ class DetectClassify:
                  thresholds='coral.ai.inat_bird_threshold.csv',
                  default_confidence=.98, screenheight=640,
                  screenwidth=480, contrast_chg=1.0, color_chg=1.0, brightness_chg=1.0, sharpness_chg=1.0,
-                 mismatch_penalty=0.3, overlap_perc_tolerance=0.7):
+                 mismatch_penalty=0.3, overlap_perc_tolerance=0.7, min_area=28000):
         self.detector_file = homedir + 'lite-model_ssd_mobilenet_v1_1_metadata_2.tflite'
         self.detector_labels_file = homedir + 'lite-model_ssd_mobilenet_v1_1_metadata_2_labelmap.txt'
         self.target_objects = ['bird']
@@ -82,6 +82,7 @@ class DetectClassify:
         self.classify_min_confidence = .7
         self.classify_default_confidence = default_confidence
         self.classify_mismatch_reduction = mismatch_penalty
+        self.min_area = min_area
         self.detected_confidences = []
         self.detected_labels = []
         self.detected_rects = []
@@ -303,7 +304,7 @@ class DetectClassify:
             else self.classifier_thresholds[int(lindex)][1]
         # push to zero if use threshold boolean is false, this automatically puts any confidence over the threshold
         label_threshold = label_threshold if (use_confidence_threshold or label_threshold == -1) else 0
-        return(int(label_threshold) != -1 and image_proc.area(rect) >= 20000 and
+        return(int(label_threshold) != -1 and image_proc.area(rect) >= self.min_area and
                cresult > 0 and cresult >= float(label_threshold) / 1000)
 
     # set label for box in image use short species name instead of scientific name
