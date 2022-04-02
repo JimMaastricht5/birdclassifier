@@ -135,16 +135,28 @@ def build_dict(label_dict, input_labels_list, conf_dict, input_confidences_list)
     return label_dict, conf_dict
 
 
-def remove_single_observations(label_dict, conf_dict):
+# loop thru keys and remove census entries with 1 or zero observations
+def remove_single_observations(census_dict, conf_dict):
     key_list = []
-    # for key in label_dict:  # loop thru keys
-    #     if label_dict[key] <= 1:  # remove entries with one or zero observations
-    #         key_list.append(key)
-    [key_list.append(key) if label_dict[key] <= 1 else '' for key in label_dict]
-    print(key_list)
-    [label_dict.pop(key) for key in key_list]
+    [key_list.append(key) if census_dict[key] <= 1 else '' for key in census_dict]
+    [census_dict.pop(key) for key in key_list]
     [conf_dict.pop(key) for key in key_list]
-    return label_dict, conf_dict
+    return census_dict, conf_dict
+
+
+def best_confidence_and_label(census_dict, confidence_dict):
+    best_confidence, best_confidence_label, best_census, best_census_label = 0, '', 0, ''
+    try:
+        census_dict, confidence_dict = remove_single_observations(census_dict, confidence_dict)  # multishots results
+        best_confidence = confidence_dict[max(confidence_dict, key=confidence_dict.get)] / \
+            census_dict[max(confidence_dict, key=confidence_dict.get)]  # sum conf/bird cnt
+        best_confidence_label = max(confidence_dict, key=confidence_dict.get)
+        best_census = census_dict[max(census_dict, key=census_dict.get)]
+        best_census_label = max(census_dict, key=census_dict.get)
+    except Exception as e:
+        print(e)
+    print(best_confidence, best_confidence_label, best_census, best_census_label)
+    return best_confidence, best_confidence_label, best_census, best_census_label
 
 
 def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
@@ -173,7 +185,7 @@ def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
     if frames_with_birds >= (args.minanimatedframes - 1):  # if bird is in min number of frames build gif
         gif, gif_filename = image_proc.save_gif(frames=labeled_frames[0:last_good_frame], frame_rate=args.framerate)
         animated = True
-        # census_dict, confidence_dict = remove_single_observations(census_dict, confidence_dict)  # use multishots results
+        _, _, _, _ = best_confidence_and_label(census_dict, confidence_dict)
         best_confidence = confidence_dict[max(confidence_dict, key=confidence_dict.get)] / \
             census_dict[max(confidence_dict, key=confidence_dict.get)]  # sum conf/bird cnt
         best_label = max(confidence_dict, key=confidence_dict.get)
