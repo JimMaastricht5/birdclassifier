@@ -52,12 +52,12 @@
 51 Larus marinus (Great Black-backed Gull),-1
 52 Pitangus sulphuratus (Great Kiskadee),0
 53 Anas rubripes (American Black Duck),0
-54 Anthus novaeseelandiae novaeseelandiae (New Zealand Pipit),0
+54 Anthus novaeseelandiae novaeseelandiae (New Zealand Pipit),-1
 55 Sayornis phoebe (Eastern Phoebe),0
 56 Sayornis nigricans (Black Phoebe),-1
 57 Tityra semifasciata (Masked Tityra),0
 58 Dryocopus lineatus (Lineated Woodpecker),0
-59 Porphyrio melanotus (Australasian Swamphen),0
+59 Porphyrio melanotus (Australasian Swamphen),-1
 60 Anas bahamensis (White-cheeked Pintail),0
 61 Egretta novaehollandiae (White-faced Heron),0
 62 Anas crecca carolinensis (American Green-winged Teal),0
@@ -107,7 +107,7 @@
 106 Phalacrocorax pelagicus (Pelagic Cormorant),0
 107 Icterus cucullatus (Hooded Oriole),0
 108 Icterus graduacauda (Audubon's Oriole),0
-109 Motacilla aguimp (African Pied Wagtail),0
+109 Motacilla aguimp (African Pied Wagtail),-1
 110 Anas superciliosa \xd7 platyrhynchos (Pacific Black Duck \xd7 Mallard hybrid),0
 111 Icterus pustulatus (Streak-backed Oriole),-1
 112 Icterus gularis (Altamira Oriole),0
@@ -139,7 +139,7 @@
 138 Sturnella magna (Eastern Meadowlark),0
 139 Melopsittacus undulatus (Budgerigar),0
 140 Aythya affinis (Lesser Scaup),0
-141 Aythya novaeseelandiae (New Zealand Scaup),0
+141 Aythya novaeseelandiae (New Zealand Scaup),-1
 142 Cyrtonyx montezumae (Montezuma Quail),0
 143 Pelecanus occidentalis (Brown Pelican),0
 144 Cinclus cinclus (White-throated Dipper),0
@@ -208,7 +208,7 @@
 207 Geococcyx velox (Lesser Roadrunner),-1
 208 Coereba flaveola (Bananaquit),0
 209 Passerina ciris (Painted Bunting),-1
-210 Alectura lathami (Australian Brushturkey),0
+210 Alectura lathami (Australian Brushturkey),-1
 211 Passerina leclancherii (Orange-breasted Bunting),0
 212 Passerina amoena (Lazuli Bunting),0
 213 Icteria virens (Yellow-breasted Chat),0
@@ -261,7 +261,7 @@
 260 Regulus regulus (Goldcrest),0
 261 Regulus satrapa (Golden-crowned Kinglet),0
 262 Tyrannus melancholicus (Tropical Kingbird),0
-263 Pelecanus conspicillatus (Australian Pelican),0
+263 Pelecanus conspicillatus (Australian Pelican),-1
 264 Aulacorhynchus prasinus (Emerald Toucanet),0
 265 Todiramphus sanctus (Sacred Kingfisher),0
 266 Icterus bullockii (Bullock's Oriole),0
@@ -278,9 +278,9 @@
 277 Protonotaria citrea (Prothonotary Warbler),0
 278 Megaceryle torquata (Ringed Kingfisher),0
 279 Nestor meridionalis (New Zealand Kaka),-1
-280 Amazona viridigenalis (Red-crowned Parrot),0
-281 Amazona albifrons (White-fronted Parrot),0
-282 Amazona oratrix (Yellow-headed Parrot),0
+280 Amazona viridigenalis (Red-crowned Parrot),-1
+281 Amazona albifrons (White-fronted Parrot),-1
+282 Amazona oratrix (Yellow-headed Parrot),-1
 283 Saxicola rubetra (Whinchat),0
 284 Ara militaris (Military Macaw),0
 285 Spizelloides arborea (American Tree Sparrow),0
@@ -291,7 +291,7 @@
 290 Toxostoma curvirostre (Curve-billed Thrasher),0
 291 Megaceryle alcyon (Belted Kingfisher),0
 292 Eremophila alpestris (Horned Lark),0
-293 Alisterus scapularis (Australian King-Parrot),0
+293 Alisterus scapularis (Australian King-Parrot),-1
 294 Cinnyris jugularis (Olive-backed Sunbird),0
 295 Xiphorhynchus flavigaster (Ivory-billed Woodcreeper),0
 296 Jacana jacana (Wattled Jacana),0
@@ -344,7 +344,7 @@
 343 Athene noctua (Little Owl),0
 344 Crotophaga ani (Smooth-billed Ani),0
 345 Sialia sialis (Eastern Bluebird),0
-346 Platalea alba (African Spoonbill),0
+346 Platalea alba (African Spoonbill),-1
 347 Bubo virginianus (Great Horned Owl),0
 348 Petrochelidon fulva (Cave Swallow),0
 349 Progne subis (Purple Martin),0
@@ -365,9 +365,9 @@
 364 Sula dactylatra (Masked Booby),0
 365 Sula sula (Red-footed Booby),0
 366 Sula leucogaster (Brown Booby),0
-367 Morus serrator (Australasian Gannet),0
-368 Eudyptula minor (Little Penguin),0
-369 Megadyptes antipodes (Yellow-eyed Penguin),0
+367 Morus serrator (Australasian Gannet),-1
+368 Eudyptula minor (Little Penguin),-1
+369 Megadyptes antipodes (Yellow-eyed Penguin),-1
 370 Scopus umbretta (Hamerkop),0
 371 Troglodytes troglodytes (Eurasian Wren),0
 372 Calidris canutus (Red Knot),0
@@ -382,14 +382,14 @@
 381 Limnodromus griseus (Short-billed Dowitcher),0
 382 Malurus cyaneus (Superb Fairywren),0
 383 Tringa nebularia (Common Greenshank),0
-384 Todiramphus sanctus vagans (New Zealand Kingfisher),0
+384 Todiramphus sanctus vagans (New Zealand Kingfisher),-1
 385 Tringa ochropus (Green Sandpiper),0
 386 Tringa glareola (Wood Sandpiper),0
 387 Tringa melanoleuca (Greater Yellowlegs),0
 388 Tringa flavipes (Lesser Yellowlegs),0
 389 Numenius arquata (Eurasian Curlew),0
 390 Numenius phaeopus (Whimbrel),0
-391 Phalacrocorax carbo novaehollandiae (Australasian Great Cormorant),0
+391 Phalacrocorax carbo novaehollandiae (Australasian Great Cormorant),-1
 392 Petroica macrocephala macrocephala (South Island Tomtit),-1
 393 Petroica australis longipes (North Island Robin),-1
 394 Prosthemadera novaeseelandiae novaeseelandiae (Mainland Tui),0
@@ -460,9 +460,9 @@
 459 Cepphus columba (Pigeon Guillemot),0
 460 Himantopus leucocephalus (Pied Stilt),0
 461 Cepphus grylle (Black Guillemot),0
-462 Anthornis melanura (New Zealand Bellbird),0
+462 Anthornis melanura (New Zealand Bellbird),-1
 463 Leptoptilos crumenifer (Marabou Stork),-1
-464 Threskiornis moluccus (Australian Ibis),0
+464 Threskiornis moluccus (Australian Ibis),-1
 465 Thraupis episcopus (Blue-gray Tanager),-1
 466 Geranoaetus albicaudatus (White-tailed Hawk),0
 467 Sterna paradisaea (Arctic Tern),0
@@ -510,7 +510,7 @@
 509 Gallinula chloropus (Eurasian Moorhen),0
 510 Cardellina pusilla (Wilson's Warbler),0
 511 Catharus ustulatus (Swainson's Thrush),0
-512 Falco novaeseelandiae (New Zealand Falcon),0
+512 Falco novaeseelandiae (New Zealand Falcon),-1
 513 Catharus guttatus (Hermit Thrush),0
 514 Catharus fuscescens (Veery),0
 515 Caracara cheriway (Crested Caracara),0
@@ -528,7 +528,7 @@
 527 Sarcoramphus papa (King Vulture),0
 528 Coragyps atratus (Black Vulture),0
 529 Strix nebulosa (Great Gray Owl),0
-530 Anastomus lamelligerus (African Openbill),0
+530 Anastomus lamelligerus (African Openbill),-1
 531 Pluvialis squatarola (Black-bellied Plover),0
 532 Gymnogyps californianus (California Condor),0
 533 Muscicapa striata (Spotted Flycatcher),0
@@ -577,8 +577,8 @@
 576 Porphyrio martinicus (Purple Gallinule),0
 577 Botaurus lentiginosus (American Bittern),0
 578 Cochlearius cochlearius (Boat-billed Heron),-1
-579 Anhinga novaehollandiae (Australasian Darter),0
-580 Anhinga rufa (African Darter),0
+579 Anhinga novaehollandiae (Australasian Darter),-1
+580 Anhinga rufa (African Darter),-1
 581 Melozone fusca (Canyon Towhee),0
 582 Aquila chrysaetos (Golden Eagle),0
 583 Hylocichla mustelina (Wood Thrush),0
@@ -630,7 +630,7 @@
 629 Gerygone igata (Gray Gerygone),0
 630 Haliaeetus leucocephalus (Bald Eagle),0
 631 Cistothorus platensis (Sedge Wren),0
-632 Haliaeetus vocifer (African Fish-Eagle),0
+632 Haliaeetus vocifer (African Fish-Eagle),-1
 633 Bubo scandiacus (Snowy Owl),-1
 634 Ciccaba virgata (Mottled Owl),0
 635 Bonasa umbellus (Ruffed Grouse),0
@@ -642,7 +642,7 @@
 641 Momotus coeruliceps (Blue-crowned Motmot),0
 642 Charadrius semipalmatus (Semipalmated Plover),0
 643 Haliastur indus (Brahminy Kite),0
-644 Gyps africanus (White-backed Vulture),0
+644 Gyps africanus (White-backed Vulture),-1
 645 Ictinia mississippiensis (Mississippi Kite),0
 646 Dives dives (Melodious Blackbird),-1
 647 Baeolophus atricristatus (Black-crested Titmouse),-1
@@ -729,7 +729,7 @@
 728 Spinus psaltria (Lesser Goldfinch),0
 729 Spinus lawrencei (Lawrence's Goldfinch),0
 730 Spinus tristis (American Goldfinch),0
-731 Threskiornis aethiopicus (African Sacred Ibis),0
+731 Threskiornis aethiopicus (African Sacred Ibis),-1
 732 Gygis alba (White Tern),0
 733 Tachycineta bicolor (Tree Swallow),0
 734 Larus dominicanus dominicanus (Southern Black-backed Gull),-1
@@ -741,7 +741,7 @@
 740 Selasphorus platycercus (Broad-tailed Hummingbird),0
 741 Chroicocephalus scopulinus (Red-billed Gull),0
 742 Aechmophorus occidentalis (Western Grebe),0
-743 Hemiphaga novaeseelandiae (New Zealand Pigeon),0
+743 Hemiphaga novaeseelandiae (New Zealand Pigeon),-1
 744 Xema sabini (Sabine's Gull),0
 745 Ramphastos sulfuratus (Keel-billed Toucan),0
 746 Dacelo novaeguineae (Laughing Kookaburra),0
@@ -774,7 +774,7 @@
 773 Anhinga anhinga (Anhinga),0
 774 Acridotheres tristis (Common Myna),0
 775 Sitta pygmaea (Pygmy Nuthatch),-1
-776 Actophilornis africanus (African Jacana),0
+776 Actophilornis africanus (African Jacana),-1
 777 Sitta canadensis (Red-breasted Nuthatch),0
 778 Sitta europaea (Eurasian Nuthatch),0
 779 Sitta pusilla (Brown-headed Nuthatch),0
@@ -867,7 +867,7 @@
 866 Asio otus (Long-eared Owl),0
 867 Corvus brachyrhynchos (American Crow),0
 868 Clangula hyemalis (Long-tailed Duck),0
-869 Chenonetta jubata (Australian Wood Duck),0
+869 Chenonetta jubata (Australian Wood Duck),-1
 870 Thalasseus sandvicensis (Sandwich Tern),0
 871 Eolophus roseicapilla (Galah),0
 872 Colaptes rubiginosus (Golden-olive Woodpecker),0
@@ -889,20 +889,20 @@
 888 Helmitheros vermivorum (Worm-eating Warbler),0
 889 Hylocharis leucotis (White-eared Hummingbird),0
 890 Mimus polyglottos (Northern Mockingbird),0
-891 Gymnorhina tibicen (Australian Magpie),0
+891 Gymnorhina tibicen (Australian Magpie),-1
 892 Alcedo atthis (Common Kingfisher),0
 893 Streptopelia chinensis (Spotted Dove),-1
 894 Bombycilla cedrorum (Cedar Waxwing),0
 895 Bombycilla garrulus (Bohemian Waxwing),0
 896 Tadorna tadorna (Common Shelduck),0
 897 Petroica australis australis (South Island Robin),-1
-898 Amazona autumnalis (Red-lored Parrot),0
+898 Amazona autumnalis (Red-lored Parrot),-1
 899 Dendragapus obscurus (Dusky Grouse),0
 900 Catherpes mexicanus (Canyon Wren),0
 901 Tadorna ferruginea (Ruddy Shelduck),0
 902 Campylorhynchus brunneicapillus (Cactus Wren),0
 903 Campylorhynchus rufinucha (Rufous-naped Wren),0
-904 Rhipidura fuliginosa (New Zealand Fantail),0
+904 Rhipidura fuliginosa (New Zealand Fantail),-1
 905 Polioptila melanura (Black-tailed Gnatcatcher),0
 906 Pelecanus occidentalis carolinensis (Eastern Brown Pelican),0
 907 Melozone aberti (Abert's Towhee),0
@@ -916,7 +916,7 @@
 915 Thryomanes bewickii (Bewick's Wren),-1
 916 Tadorna variegata (Paradise Shelduck),0
 917 Myioborus miniatus (Slate-throated Redstart),0
-918 Phalacrocorax varius varius (New Zealand Pied Shag),0
+918 Phalacrocorax varius varius (New Zealand Pied Shag),-1
 919 Myioborus pictus (Painted Redstart),0
 920 Larus argentatus smithsonianus (American Herring Gull),0
 921 Parkesia motacilla (Louisiana Waterthrush),0
@@ -951,7 +951,7 @@
 950 Trogon caligatus (Gartered Trogon),0
 951 Corvus monedula (Eurasian Jackdaw),-1
 952 Corvus ossifragus (Fish Crow),0
-953 Spheniscus demersus (African Penguin),0
+953 Spheniscus demersus (African Penguin),-1
 954 Corvus frugilegus (Rook),0
 955 Corvus splendens (House Crow),-1
 956 Branta bernicla (Brant),0
