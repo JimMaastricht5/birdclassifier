@@ -155,7 +155,8 @@ def best_confidence_and_label(census_dict, confidence_dict):
         best_census_label = max(census_dict, key=census_dict.get)
     except Exception as e:
         print(e)
-    print(best_confidence, best_confidence_label, best_census, best_census_label)
+    print('best confidence:', best_confidence, best_confidence_label)
+    print('best census:', best_census, best_census_label)
     return best_confidence, best_confidence_label, best_census, best_census_label
 
 
