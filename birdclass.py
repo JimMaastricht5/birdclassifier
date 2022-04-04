@@ -84,7 +84,7 @@ def bird_detector(args):
 
         if motion_detect.motion and birds.detect(img=motion_detect.img):  # daytime with motion and birds
             motioncnt = 0  # reset motion count between detected birds
-            print('--- Saw a bird')
+            print(f'\r Saw a bird {datetime.now().strftime("%I:%M:%S %P")}', end=' ')  # indicate motion on monitor
             # keep first shot to add to start of animation or as stand along jpg
             # classify, grab labels, enhance the shot, and add boxes
             first_img_jpg = birds.img
