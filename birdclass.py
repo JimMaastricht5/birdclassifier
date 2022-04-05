@@ -157,6 +157,8 @@ def best_confidence_and_label(census_dict, confidence_dict):
         print(e)
     print('best confidence:', best_confidence, best_confidence_label)
     print('best census:', best_census, best_census_label)
+    # if best_confidence_label != best_census_label:
+    #  what to do here?  Which one is better?  High count or high confidence?
     return best_confidence, best_confidence_label, best_census, best_census_label
 
 
