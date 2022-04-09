@@ -104,7 +104,7 @@
 103 Agelaius tricolor (Tricolored Blackbird),0
 104 Momotus lessonii (Lesson's Motmot),0
 105 Zosterops japonicus (Japanese White-eye),0
-106 Phalacrocorax pelagicus (Pelagic Cormorant),0
+106 Phalacrocorax pelagicus (Pelagic Cormorant),-1
 107 Icterus cucullatus (Hooded Oriole),0
 108 Icterus graduacauda (Audubon's Oriole),0
 109 Motacilla aguimp (African Pied Wagtail),-1
@@ -120,7 +120,7 @@
 119 Pipilo chlorurus (Green-tailed Towhee),0
 120 Pipilo maculatus (Spotted Towhee),0
 121 Pipilo erythrophthalmus (Eastern Towhee),0
-122 Cairina moschata domestica (Domestic Muscovy Duck),0
+122 Cairina moschata domestica (Domestic Muscovy Duck),-1
 123 Phalacrocorax varius (Pied Cormorant),0
 124 Picoides dorsalis (American Three-toed Woodpecker),0
 125 Picoides nuttallii (Nuttall's Woodpecker),0
@@ -355,11 +355,11 @@
 354 Calidris pugnax (Ruff),0
 355 Platalea regia (Royal Spoonbill),0
 356 Tachycineta thalassina (Violet-green Swallow),0
-357 Bostrychia hagedash (Hadada Ibis),0
+357 Bostrychia hagedash (Hadada Ibis),-1
 358 Riparia riparia (Bank Swallow),0
-359 Eudocimus albus (White Ibis),0
-360 Plegadis falcinellus (Glossy Ibis),0
-361 Plegadis chihi (White-faced Ibis),0
+359 Eudocimus albus (White Ibis),-1
+360 Plegadis falcinellus (Glossy Ibis),-1
+361 Plegadis chihi (White-faced Ibis),-1
 362 Corvus corax (Common Raven),0
 363 Stelgidopteryx serripennis (Northern Rough-winged Swallow),0
 364 Sula dactylatra (Masked Booby),0
@@ -840,7 +840,7 @@
 839 Milvus migrans (Black Kite),0
 840 Gelochelidon nilotica (Gull-billed Tern),0
 841 Ninox novaeseelandiae novaeseelandiae (Morepork),0
-842 Melanitta perspicillata (Surf Scoter),0
+842 Melanitta perspicillata (Surf Scoter),-1
 843 Aythya collaris (Ring-necked Duck),0
 844 Aythya ferina (Common Pochard),0
 845 Aythya fuligula (Tufted Duck),0
@@ -875,7 +875,7 @@
 874 Ptiliogonys cinereus (Gray Silky-flycatcher),0
 875 Elanoides forficatus (Swallow-tailed Kite),0
 876 Carduelis carduelis (European Goldfinch),0
-877 Cassiculus melanicterus (Yellow-winged Cacique),0
+877 Cassiculus melanicterus (Yellow-winged Cacique),-1
 878 Dendragapus fuliginosus (Sooty Grouse),-1
 879 Psaltriparus minimus (Bushtit),-1
 880 Aegithalos caudatus (Long-tailed Tit),0
