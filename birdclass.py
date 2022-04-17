@@ -110,6 +110,7 @@ def bird_detector(args):
                         print(f"*** Failed gif tweet")  # failure, don't update last tweet time
                     else:
                         last_tweet = datetime.now()  # update last tweet time if successful
+    print('')  # ending process for evening, print blank line and begin shut down
     motion_detect.stop()
     if args.verbose:
         chores.hourly_and_daily(report_pop=True)
