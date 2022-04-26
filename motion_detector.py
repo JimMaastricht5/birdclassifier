@@ -67,7 +67,7 @@ class MotionDetector:
 
     def capture_image_with_file(self, img_type='jpeg', filename='capture_image.jpg'):
         stream = io.BytesIO()
-        self.camera.capture(stream, img_type)
+        self.camera.capture(stream, img_type, use_video_port=True)
         stream.seek(0)
         img = Image.open(stream)
         img.save(filename)
@@ -76,10 +76,23 @@ class MotionDetector:
     # grab and image and store in mem
     def capture_image_stream(self, img_type='jpeg'):
         stream = io.BytesIO()
-        self.camera.capture(stream, img_type)
+        self.camera.capture(stream, img_type, use_video_port=True)
         stream.seek(0)
         img = Image.open(stream)
         return img
+
+    def capture_stream(self, stream_frames=15):
+        """
+        function returns a list of images
+
+        :param stream_frames: int value with number of frames to capture
+        :return frames: images is a list containing a number of PIL jpg image
+        """
+        frames = []
+        for image_num in range(stream_frames):
+            img = self.capture_image_stream()
+            frames.append(img)
+        return frames
 
     # grab an image using NP array: doesn't work!!!!
     def capture_image_np(self, img_type='jpeg'):
@@ -114,19 +127,6 @@ class MotionDetector:
         histlength = sum(histogram)
         probability = [float(h) / histlength for h in histogram]
         return -sum([p * math.log(p, 2) for p in probability if p != 0])
-
-    def capture_stream(self, stream_frames=15):
-        """
-        function returns a list of images
-
-        :param stream_frames: int value with number of frames to capture
-        :return frames: images is a list containing a number of PIL jpg image
-        """
-        frames = []
-        for image_num in range(stream_frames):
-            img = self.capture_image_stream()
-            frames.append(img)
-        return frames
 
 
 if __name__ == '__main__':
