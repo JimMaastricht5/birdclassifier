@@ -32,7 +32,7 @@
 31 Psilorhinus morio (Brown Jay),-1
 32 Megarynchus pitangua (Boat-billed Flycatcher),-1
 33 Gallinula tenebrosa (Dusky Moorhen),-1
-34 Gallus gallus domesticus (Domestic Chicken),0
+34 Gallus gallus domesticus (Domestic Chicken),99
 35 Numida meleagris (Helmeted Guineafowl),-1
 36 Junco hyemalis caniceps (Gray-headed Junco),0
 37 Tyrannus vociferans (Cassin's Kingbird),-1
@@ -108,7 +108,7 @@
 107 Icterus cucullatus (Hooded Oriole),0
 108 Icterus graduacauda (Audubon's Oriole),0
 109 Motacilla aguimp (African Pied Wagtail),-1
-110 Anas superciliosa \xd7 platyrhynchos (Pacific Black Duck \xd7 Mallard hybrid),0
+110 Anas superciliosa \xd7 platyrhynchos (Pacific Black Duck \xd7 Mallard hybrid),-1
 111 Icterus pustulatus (Streak-backed Oriole),-1
 112 Icterus gularis (Altamira Oriole),0
 113 Carduelis cannabina (Eurasian Linnet),-1
@@ -231,7 +231,7 @@
 230 Thraupis palmarum (Palm Tanager),0
 231 Momotus mexicanus (Russet-crowned Motmot),0
 232 Euphagus cyanocephalus (Brewer's Blackbird),0
-233 Cacatua galerita (Sulphur-crested Cockatoo),0
+233 Cacatua galerita (Sulphur-crested Cockatoo),-1
 234 Junco hyemalis oreganus (Oregon Junco),0
 235 Pluvialis fulva (Pacific Golden-Plover),0
 236 Molothrus aeneus (Bronzed Cowbird),0
@@ -524,9 +524,9 @@
 523 Ephippiorhynchus senegalensis (Saddle-billed Stork),0
 524 Cathartes aura (Turkey Vulture),-1
 525 Myadestes townsendi (Townsend's Solitaire),-1
-526 Cathartes burrovianus (Lesser Yellow-headed Vulture),0
-527 Sarcoramphus papa (King Vulture),0
-528 Coragyps atratus (Black Vulture),0
+526 Cathartes burrovianus (Lesser Yellow-headed Vulture),-1
+527 Sarcoramphus papa (King Vulture),-1
+528 Coragyps atratus (Black Vulture),-1
 529 Strix nebulosa (Great Gray Owl),0
 530 Anastomus lamelligerus (African Openbill),-1
 531 Pluvialis squatarola (Black-bellied Plover),0
@@ -574,7 +574,7 @@
 573 Aramides cajaneus (Gray-necked Wood-Rail),0
 574 Bubulcus ibis (Cattle Egret),0
 575 Butorides virescens (Green Heron),-1
-576 Porphyrio martinicus (Purple Gallinule),0
+576 Porphyrio martinicus (Purple Gallinule),-1
 577 Botaurus lentiginosus (American Bittern),0
 578 Cochlearius cochlearius (Boat-billed Heron),-1
 579 Anhinga novaehollandiae (Australasian Darter),-1
@@ -817,7 +817,7 @@
 816 Cygnus columbianus (Tundra Swan),0
 817 Cygnus olor (Mute Swan),-1
 818 Icterus galbula (Baltimore Oriole),0
-819 Anas platyrhynchos (Mallard),0
+819 Anas platyrhynchos (Mallard),99
 820 Anas acuta (Northern Pintail),0
 821 Anas crecca (Green-winged Teal),0
 822 Anas cyanoptera (Cinnamon Teal),-1

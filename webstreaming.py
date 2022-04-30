@@ -1,95 +1,144 @@
-# https://picamera.readthedocs.io/en/latest/recipes2.html#rapid-capture-and-processing
-# Once the script is running, visit http://your-pi-address:8000/ with your web-browser to view the video stream.
-
-import io
-import picamera
-import logging
-import socketserver
-from threading import Condition
-from http import server
+#!/usr/bin/env python3
+from http.server import BaseHTTPRequestHandler, HTTPServer
+import socket
+import multiprocessing
+import datetime
+import time
 
 PAGE = """\
-<html>
-<head>
-<title>picamera MJPEG streaming demo</title>
-</head>
-<body>
-<h1>PiCamera MJPEG Streaming Demo</h1>
-<img src="stream.mjpg" width="640" height="480" />
-</body>
-</html>
-"""
+    <html>
+    <head>
+    <title>picamera MJPEG streaming demo</title>
+    </head>
+    <body>
+    <h1>PiCamera MJPEG Streaming Demo</h1>
+    <img src="stream.mjpg" width="640" height="480" />
+    </body>
+    </html>
+    """
 
 
-class StreamingOutput(object):
-    def __init__(self):
-        self.frame = None
-        self.buffer = io.BytesIO()
-        self.condition = Condition()
-
-    def write(self, buf):
-        if buf.startswith(b'\xff\xd8'):
-            # New frame, copy the existing buffer's content and notify all
-            # clients it's available
-            self.buffer.truncate()
-            with self.condition:
-                self.frame = self.buffer.getvalue()
-                self.condition.notify_all()
-            self.buffer.seek(0)
-        return self.buffer.write(buf)
-
-
-class StreamingHandler(server.BaseHTTPRequestHandler):
+class handler(BaseHTTPRequestHandler):
     def do_GET(self):
-        if self.path == '/':
-            self.send_response(301)
-            self.send_header('Location', '/index.html')
-            self.end_headers()
-        elif self.path == '/index.html':
-            content = PAGE.encode('utf-8')
-            self.send_response(200)
-            self.send_header('Content-Type', 'text/html')
-            self.send_header('Content-Length', len(content))
-            self.end_headers()
-            self.wfile.write(content)
-        elif self.path == '/stream.mjpg':
-            self.send_response(200)
-            self.send_header('Age', 0)
-            self.send_header('Cache-Control', 'no-cache, private')
-            self.send_header('Pragma', 'no-cache')
-            self.send_header('Content-Type', 'multipart/x-mixed-replace; boundary=FRAME')
-            self.end_headers()
-            try:
-                while True:
-                    with output.condition:
-                        output.condition.wait()
-                        frame = output.frame
-                    self.wfile.write(b'--FRAME\r\n')
-                    self.send_header('Content-Type', 'image/jpeg')
-                    self.send_header('Content-Length', len(frame))
-                    self.end_headers()
-                    self.wfile.write(frame)
-                    self.wfile.write(b'\r\n')
-            except Exception as e:
-                logging.warning(
-                    'Removed streaming client %s: %s',
-                    self.client_address, str(e))
-        else:
-            self.send_error(404)
-            self.end_headers()
+        self.send_response(200)
+        self.send_header('Content-type','text/html')
+        self.end_headers()
+        message = PAGE
+        self.wfile.write(bytes(message, "utf8"))
+
+class web_server_class:
+    def __init__(self, queue):
+        self.queue = queue
+
+    def web_server(self):
+        port = 8080
+        with HTTPServer(('', port), handler) as server:
+            host_name = socket.gethostname()
+            host_ip = socket.gethostbyname(host_name)
+            print('HOST IP:', host_ip)
+            socket_address = (host_ip, port)
+            print("LISTENING AT:", socket_address)
+            # server.set_queue_and_page(self.queue)
+            server.serve_forever()
 
 
-class StreamingServer(socketserver.ThreadingMixIn, server.HTTPServer):
-    allow_reuse_address = True
-    daemon_threads = True
+class producer_class:
+    def __init__(self, queue):
+        self.queue = queue
+
+    def produce(self):
+        while True:
+            time.sleep(1)
+            self.queue.put(datetime.datetime.now())
 
 
-with picamera.PiCamera(resolution='640x480', framerate=24) as camera:
-    output = StreamingOutput()
-    camera.start_recording(output, format='mjpeg')
-    try:
-        address = ('', 8000)
-        server = StreamingServer(address, StreamingHandler)
-        server.serve_forever()
-    finally:
-        camera.stop_recording()
+def main():
+    queue = multiprocessing.Queue()
+    producer = producer_class(queue=queue)
+    web = web_server_class(queue=queue)
+    p_web_server = multiprocessing.Process(target=web.web_server,args=())
+    p_producer = multiprocessing.Process(target=producer.produce, args=())
+    p_web_server.start()
+    p_producer.start()
+
+if __name__ == '__main__':
+    main()
+
+# # class StreamingOutput(object):
+# #     def __init__(self):
+# #         self.frame = None
+# #         self.buffer = io.BytesIO()
+# #         self.condition = Condition()
+# #
+# #     def write(self, buf):
+# #         if buf.startswith(b'\xff\xd8'):
+# #             # New frame, copy the existing buffer's content and notify all
+# #             # clients it's available
+# #             self.buffer.truncate()
+# #             with self.condition:
+# #                 self.frame = self.buffer.getvalue()
+# #                 self.condition.notify_all()
+# #             self.buffer.seek(0)
+# #         return self.buffer.write(buf)
+# #
+# #
+# # class StreamingHandler(server.BaseHTTPRequestHandler):
+# #     def do_GET(self):
+# #         if self.path == '/':
+# #             self.send_response(301)
+# #             self.send_header('Location', '/index.html')
+# #             self.end_headers()
+# #         elif self.path == '/index.html':
+# #             content = PAGE.encode('utf-8')
+# #             self.send_response(200)
+# #             self.send_header('Content-Type', 'text/html')
+# #             self.send_header('Content-Length', len(content))
+# #             self.end_headers()
+# #             self.wfile.write(content)
+# #         elif self.path == '/stream.mjpg' or self.path =='/stream.jpg':
+# #             self.send_response(200)
+# #             self.send_header('Age', 0)
+# #             self.send_header('Cache-Control', 'no-cache, private')
+# #             self.send_header('Pragma', 'no-cache')
+# #             self.send_header('Content-Type', 'multipart/x-mixed-replace; boundary=FRAME')
+# #             self.end_headers()
+# #             try:
+# #                 while True:
+# #                     with output.condition:
+# #                         output.condition.wait()
+# #                         frame = output.frame
+# #                     self.wfile.write(b'--FRAME\r\n')
+# #                     self.send_header('Content-Type', 'image/jpeg')
+# #                     self.send_header('Content-Length', len(frame))
+# #                     self.end_headers()
+# #                     self.wfile.write(frame)
+# #                     self.wfile.write(b'\r\n')
+# #             except Exception as e:
+# #                 logging.warning(
+# #                     'Removed streaming client %s: %s',
+# #                     self.client_address, str(e))
+# #         else:
+# #             self.send_error(404)
+# #             self.end_headers()
+# #
+# #
+# # class StreamingServer(socketserver.ThreadingMixIn, server.HTTPServer):
+# #     allow_reuse_address = True
+# #     daemon_threads = True
+# #
+# #
+# # def main():
+# #     with picamera.PiCamera(resolution='640x480', framerate=24) as camera:
+# #         output = StreamingOutput()
+# #         camera.start_recording(output, format='jpg')
+# #         try:
+# #             address = ('', 8000)
+# #             server = StreamingServer(address, StreamingHandler)
+# #             server.serve_forever()
+# #         finally:
+# #             camera.stop_recording()
+# #
+# # # invoke main
+# # if __name__ == "__main__":
+# #     main()
+# #
