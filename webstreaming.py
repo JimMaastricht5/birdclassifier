@@ -16,22 +16,6 @@ class ThreadedHTTPServer(socketserver.ThreadingMixIn, HTTPServer):
 class HTTPHandler(BaseHTTPRequestHandler):
     def __init__(self, request, client_address, server):
         self.web_filename = '/home/pi/birdclass/index.html'
-        self.page_head = """\
-            <html>
-            <head>
-            <title>picamera MJPEG streaming demo</title>
-            <meta http-equiv="refresh" content="1">
-            </head>
-            <body>
-            <h1>PiCamera MJPEG Streaming Demo</h1>
-            <p>
-            """
-        self.page_tail = """\
-                    </p>
-                    <img src="stream.mjpg" width="640" height="480" />
-                    </body>
-                    </html>
-                    """
         BaseHTTPRequestHandler.__init__(self, request, client_address,
                                         server)  # super's init called after setting attribute
 
@@ -42,12 +26,11 @@ class HTTPHandler(BaseHTTPRequestHandler):
         item = self.read_queue()
         message = item
         print(message)
-
-        # with open('/home/pi/birdclass/index.html', 'r') as f:  # this should not be hardcoded
-        #     message = f.read()
+        with codecs.open('/home/pi/birdclass/index.html', 'r', "utf-8") as f:  # this should not be hardcoded
+            message = f.read()
         #     # message = self.page_head + str(item[0]) + ':' + str(item[1]) + self.page_tail  # redundant
-        if item is not None:
-            self.wfile.write(bytes(message, "utf8"))
+        if message is not None:
+            self.wfile.write(bytes(message, "utf-8"))
 
     def read_queue(self):
         item = None
@@ -92,7 +75,7 @@ class WebControl:
         self.web_file_name = web_filename
         self.gif_filename = gif_filename
         # read template file and reset target html file
-        template_file = codecs.open(template_filename, 'r', "utf8")
+        template_file = codecs.open(template_filename, 'r', "utf-8")
         template_page = template_file.read()
         self.web_file = open(self.web_filename, 'w')  # open file to write msg and images into....
         self.web_file.write(template_page)
@@ -112,16 +95,16 @@ class WidgetProducer:
     def __init__(self, queue):
         self.queue = queue
         self.item_num = 0
-        self.template_filename = '/home/pi/birdclass/template.html'
+        # self.template_filename = '/home/pi/birdclass/template.html'
+        self.web_filename = '/home/pi/birdclass/index.html'
 
     def produce(self):
         while True:
-            with codecs.open(self.template_filename, 'r', "utf-8") as f:
+            with codecs.open(self.web_filename, 'r', "utf-8") as f:
                 self.queue.put(f.read())
             time.sleep(1)
             self.item_num += 1
             # self.queue.put((self.item_num, datetime.datetime.now()))
-
 
 
 def main():
@@ -151,6 +134,22 @@ def main():
 if __name__ == '__main__':
     main()
 
+# self.page_head = """\
+#     <html>
+#     <head>
+#     <title>picamera MJPEG streaming demo</title>
+#     <meta http-equiv="refresh" content="1">
+#     </head>
+#     <body>
+#     <h1>PiCamera MJPEG Streaming Demo</h1>
+#     <p>
+#     """
+# self.page_tail = """\
+#             </p>
+#             <img src="stream.mjpg" width="640" height="480" />
+#             </body>
+#             </html>
+#             """
 # # class StreamingOutput(object):
 # #     def __init__(self):
 # #         self.frame = None
