@@ -71,7 +71,8 @@ def bird_detector(args):
                                        color_chg=args.color_chg,
                                        contrast_chg=args.contrast_chg, sharpness_chg=args.sharpness_chg,
                                        brightness_chg=args.brightness_chg,
-                                       overlap_perc_tolerance=args.overlap_perc_tolerance)
+                                       overlap_perc_tolerance=args.overlap_perc_tolerancek,
+                                       target_object='bird', target_object_min_confidence=.8)
     print('Starting while loop until sun set..... ')
     # loop while the sun is up, look for motion, detect birds, determine species
     while cityweather.sunrise.time() < datetime.now().time() < cityweather.sunset.time():
@@ -80,7 +81,6 @@ def bird_detector(args):
         motion_detect.detect()
         if motion_detect.motion:
             motioncnt += 1
-            # print(f'\r motion {motioncnt}', end=' ')  # indicate motion on monitor
 
         if motion_detect.motion and birds.detect(img=motion_detect.img):  # daytime with motion and birds
             motioncnt = 0  # reset motion count between detected birds

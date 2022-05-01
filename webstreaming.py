@@ -1,65 +1,107 @@
 #!/usr/bin/env python3
+import queue
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import socket
+import socketserver
 import multiprocessing
 import datetime
 import time
+# class handler(BaseHTTPRequestHandler):
+#     def do_GET(self):
+#         self.send_response(200)
+#         self.send_header('Content-type','text/html')
+#         self.end_headers()
+#         message = PAGE
+#         self.wfile.write(bytes(message, "utf8"))
 
-PAGE = """\
-    <html>
-    <head>
-    <title>picamera MJPEG streaming demo</title>
-    </head>
-    <body>
-    <h1>PiCamera MJPEG Streaming Demo</h1>
-    <img src="stream.mjpg" width="640" height="480" />
-    </body>
-    </html>
-    """
+class ThreadedHTTPServer(socketserver.ThreadingMixIn, HTTPServer):
+    """Handle requests in a separate thread."""
 
 
-class handler(BaseHTTPRequestHandler):
+class HTTPHandler(BaseHTTPRequestHandler):
+    def __init__(self, request, client_address, server):
+        self.page_head = """\
+            <html>
+            <head>
+            <title>picamera MJPEG streaming demo</title>
+            <meta http-equiv="refresh" content="1">
+            </head>
+            <body>
+            <h1>PiCamera MJPEG Streaming Demo</h1>
+            <p>
+            """
+        self.page_tail = """\
+                    </p>
+                    <img src="stream.mjpg" width="640" height="480" />
+                    </body>
+                    </html>
+                    """
+        BaseHTTPRequestHandler.__init__(self, request, client_address,
+                                    server)  # super's init called after setting attribute
+
     def do_GET(self):
         self.send_response(200)
-        self.send_header('Content-type','text/html')
+        self.send_header('Content-type', 'text/html')
         self.end_headers()
-        message = PAGE
+        item = self.read_queue()
+        message = self.page_head + str(item[0]) + ':' + str(item[1]) + self.page_tail
         self.wfile.write(bytes(message, "utf8"))
 
-class web_server_class:
-    def __init__(self, queue):
-        self.queue = queue
+    def read_queue(self):
+        item = (0, '')
+        if self.server.queue == None:
+            return item
+        try:
+            while True:
+                item = self.server.queue.get_nowait()
+                self.server.last_item = item
+        except queue.Empty:
+            pass
+        return item
 
-    def web_server(self):
-        port = 8080
-        with HTTPServer(('', port), handler) as server:
-            host_name = socket.gethostname()
-            host_ip = socket.gethostbyname(host_name)
-            print('HOST IP:', host_ip)
-            socket_address = (host_ip, port)
-            print("LISTENING AT:", socket_address)
-            # server.set_queue_and_page(self.queue)
+
+class WebServer:
+    def __init__(self, queue, port=8080):
+        self.port = port
+        self.queue = queue
+        self.last_item = (0, '')
+        self.full_text = ''
+
+    def start_threaded_server(self):
+        server = ThreadedHTTPServer(('', self.port), HTTPHandler)
+        server.queue = self.queue
+        host_name = socket.gethostname()
+        host_ip = socket.gethostbyname(host_name)
+        print('HOST IP:', host_ip)
+        socket_address = (host_ip, self.port)
+        print("LISTENING AT:", socket_address)
+        with server:
             server.serve_forever()
 
 
-class producer_class:
+class WidgetProducer:
     def __init__(self, queue):
         self.queue = queue
+        self.item_num = 0
 
     def produce(self):
         while True:
             time.sleep(1)
-            self.queue.put(datetime.datetime.now())
+            self.item_num += 1
+            self.queue.put((self.item_num, datetime.datetime.now()))
 
 
 def main():
     queue = multiprocessing.Queue()
-    producer = producer_class(queue=queue)
-    web = web_server_class(queue=queue)
-    p_web_server = multiprocessing.Process(target=web.web_server,args=())
-    p_producer = multiprocessing.Process(target=producer.produce, args=())
+    producer = WidgetProducer(queue=queue)
+    web = WebServer(queue=queue, port=8080)
+    p_web_server = multiprocessing.Process(target=web.start_threaded_server, args=(), daemon=True)
+    p_producer = multiprocessing.Process(target=producer.produce, args=(), daemon=True)
     p_web_server.start()
     p_producer.start()
+    p_web_server.join()
+    p_producer.join()
+    # p.terminate(), p.is_alive()
 
 if __name__ == '__main__':
     main()

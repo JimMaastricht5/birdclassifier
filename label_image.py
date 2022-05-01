@@ -62,10 +62,11 @@ class DetectClassify:
                  thresholds='coral.ai.inat_bird_threshold.csv',
                  default_confidence=.98, screenheight=640,
                  screenwidth=480, contrast_chg=1.0, color_chg=1.0, brightness_chg=1.0, sharpness_chg=1.0,
-                 mismatch_penalty=0.3, overlap_perc_tolerance=0.7, min_area=28000):
+                 mismatch_penalty=0.3, overlap_perc_tolerance=0.7, min_area=28000, target_object='bird',
+                 target_object_min_confidence=.8):
         self.detector_file = homedir + 'lite-model_ssd_mobilenet_v1_1_metadata_2.tflite'
         self.detector_labels_file = homedir + 'lite-model_ssd_mobilenet_v1_1_metadata_2_labelmap.txt'
-        self.target_objects = ['bird']
+        self.target_objects = target_object
         self.target_object_found = False
         self.classifier_file = homedir + 'coral.ai.mobilenet_v2_1.0_224_inat_bird_quant.tflite'
         print('Using label file:', labels)
@@ -78,8 +79,8 @@ class DetectClassify:
                                                                          self.classifier_labels_file)
         self.input_mean = 127.5  # recommended default
         self.input_std = 127.5  # recommended default
-        self.detect_obj_min_confidence = .6
-        self.classify_min_confidence = .7
+        self.detect_obj_min_confidence = target_object_min_confidence
+        # self.classify_min_confidence = .7
         self.classify_default_confidence = default_confidence
         self.classify_mismatch_reduction = mismatch_penalty
         self.min_area = min_area
@@ -119,7 +120,7 @@ class DetectClassify:
         with open(filename, 'r') as f:
             return [line.strip() for line in f.readlines()]
 
-    # set working image, add equalized img, detect objects, return boolean if detected objecets in
+    # set working image, add equalized img, detect objects, return boolean if detected objects in
     # target list.  Create color equalized version of img
     # fill detected_confidences, detected_labels, and detected_rects if in target object list
     def detect(self, img):
