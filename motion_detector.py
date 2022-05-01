@@ -65,7 +65,7 @@ class MotionDetector:
         self.motion = False
         print('camera setup completed')
 
-    def capture_image_with_file(self, img_type='jpeg', filename='capture_image.jpg'):
+    def capture_image_with_file(self, img_type='jpeg', filename='/home/pi/birdclass/capture_image.jpg'):
         stream = io.BytesIO()
         self.camera.capture(stream, img_type, use_video_port=True)
         stream.seek(0)
@@ -101,7 +101,7 @@ class MotionDetector:
         print(height, width)
         self.camera.capture(img, img_type)
         img_pil = image_proc.convert(img=img, convert_to='PIL')
-        img_pil.save('alt_camera_img.jpg')
+        img_pil.save('/home/pi/birdclass/alt_camera_img.jpg')
         return img_pil
 
     # once first image is captured call motion detector in a loop to find each subsequent image

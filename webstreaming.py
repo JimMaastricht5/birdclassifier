@@ -6,13 +6,8 @@ import socketserver
 import multiprocessing
 import datetime
 import time
-# class handler(BaseHTTPRequestHandler):
-#     def do_GET(self):
-#         self.send_response(200)
-#         self.send_header('Content-type','text/html')
-#         self.end_headers()
-#         message = PAGE
-#         self.wfile.write(bytes(message, "utf8"))
+import codecs
+
 
 class ThreadedHTTPServer(socketserver.ThreadingMixIn, HTTPServer):
     """Handle requests in a separate thread."""
@@ -20,6 +15,7 @@ class ThreadedHTTPServer(socketserver.ThreadingMixIn, HTTPServer):
 
 class HTTPHandler(BaseHTTPRequestHandler):
     def __init__(self, request, client_address, server):
+        self.web_filename = '/home/pi/birdclass/index.html'
         self.page_head = """\
             <html>
             <head>
@@ -37,19 +33,25 @@ class HTTPHandler(BaseHTTPRequestHandler):
                     </html>
                     """
         BaseHTTPRequestHandler.__init__(self, request, client_address,
-                                    server)  # super's init called after setting attribute
+                                        server)  # super's init called after setting attribute
 
     def do_GET(self):
         self.send_response(200)
         self.send_header('Content-type', 'text/html')
         self.end_headers()
         item = self.read_queue()
-        message = self.page_head + str(item[0]) + ':' + str(item[1]) + self.page_tail
-        self.wfile.write(bytes(message, "utf8"))
+        message = item
+        print(message)
+
+        # with open('/home/pi/birdclass/index.html', 'r') as f:  # this should not be hardcoded
+        #     message = f.read()
+        #     # message = self.page_head + str(item[0]) + ':' + str(item[1]) + self.page_tail  # redundant
+        if item is not None:
+            self.wfile.write(bytes(message, "utf8"))
 
     def read_queue(self):
-        item = (0, '')
-        if self.server.queue == None:
+        item = None
+        if self.server.queue is None:
             return item
         try:
             while True:
@@ -79,19 +81,61 @@ class WebServer:
             server.serve_forever()
 
 
+class WebControl:
+    def __init__(self, web_filename='/home/pi/birdclass/index.html',
+                 template_filename='/home/pi/birdclass/template.html',
+                 gif_filename='/home/pi/birdclass/birds.gif'):
+        self.queue = multiprocessing.Queue()
+        self.web = WebServer(queue=queue, port=8080)
+        self.p_web_server = multiprocessing.Process(target=self.web.start_threaded_server, args=(), daemon=True)
+        self.p_web_server.start()
+        self.web_file_name = web_filename
+        self.gif_filename = gif_filename
+        # read template file and reset target html file
+        template_file = codecs.open(template_filename, 'r', "utf8")
+        template_page = template_file.read()
+        self.web_file = open(self.web_filename, 'w')  # open file to write msg and images into....
+        self.web_file.write(template_page)
+        template_file.close()
+
+    def end_web(self):
+        try:
+            self.web_file.close()
+            self.p_web_server.terminate()
+        finally:
+            return
+
+
+# **** TESTING Code
+# produce class for testing
 class WidgetProducer:
     def __init__(self, queue):
         self.queue = queue
         self.item_num = 0
+        self.template_filename = '/home/pi/birdclass/template.html'
 
     def produce(self):
         while True:
+            with codecs.open(self.template_filename, 'r', "utf-8") as f:
+                self.queue.put(f.read())
             time.sleep(1)
             self.item_num += 1
-            self.queue.put((self.item_num, datetime.datetime.now()))
+            # self.queue.put((self.item_num, datetime.datetime.now()))
+
 
 
 def main():
+    web_filename='/home/pi/birdclass/index.html'
+    template_filename='/home/pi/birdclass/template.html'
+    gif_filename='/home/pi/birdclass/birds.gif'
+    # read template file and reset target html file
+    template_file = codecs.open(template_filename, 'r', "utf-8")
+    template_page = template_file.read()
+    web_file = open(web_filename, 'w')  # open file to write msg and images into....
+    web_file.write(template_page)
+    template_file.close()
+    web_file.close()
+
     queue = multiprocessing.Queue()
     producer = WidgetProducer(queue=queue)
     web = WebServer(queue=queue, port=8080)
@@ -102,6 +146,7 @@ def main():
     p_web_server.join()
     p_producer.join()
     # p.terminate(), p.is_alive()
+
 
 if __name__ == '__main__':
     main()

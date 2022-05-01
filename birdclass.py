@@ -94,14 +94,13 @@ def bird_detector(args):
                 first_img_jpg = birds.add_boxes_and_labels(img=first_img_jpg)
                 gif, gif_filename, animated, best_label, best_confidence = build_bird_animated_gif(args, motion_detect,
                                                                                                    birds, first_img_jpg)
-                birdpop.visitors(best_label, datetime.now())  # update census count and time last seen
-                bird_first_time_seen = birdpop.first_time_seen
+                bird_first_time_seen = birdpop.visitors(best_label, datetime.now())  # update census and last time seen
                 tweet_label = tweet_text(best_label, best_confidence)
                 if animated and bird_first_time_seen:  # doesn't change last_tweet time or override time between tweets
                     print(f'--- First time seeing a {best_label} today.  Tweeting still shot')
-                    first_img_jpg.save('first_img.jpg')
+                    first_img_jpg.save('/home/pi/birdclass/first_img.jpg')
                     bird_tweeter.post_image_from_file(message=f'First time today: {tweet_label}',
-                                                      file_name='first_img.jpg')
+                                                      file_name='/home/pi/birdclass/first_img.jpg')
                 waittime = birdpop.report_single_census_count(best_label) * args.tweetdelay / 10  # wait X min * N bird
                 waittime = args.tweetdelay if waittime >= args.tweetdelay else waittime
                 if animated and ((datetime.now() - last_tweet).total_seconds() >= waittime or bird_first_time_seen):
@@ -218,7 +217,7 @@ if __name__ == "__main__":
     ap.add_argument("-sh", "--screenheight", type=int, default=480, help="max screen height")
     ap.add_argument("-fr", "--framerate", type=int, default=45, help="frame rate for camera")
     ap.add_argument("-gf", "--minanimatedframes", type=int, default=10, help="minimum number of frames with a bird")
-    ap.add_argument("-st", "--save_img", type=bool, default=False, help="write images to disk")
+    ap.add_argument("-bc", "--broadcast", type=bool, default=False, help="stream images and text")
     ap.add_argument("-v", "--verbose", type=bool, default=True, help="To tweet extra stuff or not")
     ap.add_argument("-td", "--tweetdelay", type=int, default=3600,
                     help="Wait time between tweets is N species seen delay/10 with not to exceed max of tweet delay")

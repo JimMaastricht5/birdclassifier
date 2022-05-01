@@ -108,7 +108,7 @@
 107 Icterus cucullatus (Hooded Oriole),0
 108 Icterus graduacauda (Audubon's Oriole),0
 109 Motacilla aguimp (African Pied Wagtail),0
-110 Anas superciliosa \xd7 platyrhynchos (Pacific Black Duck \xd7 Mallard hybrid),0
+110 Anas superciliosa \xd7 platyrhynchos (Pacific Black Duck \xd7 Mallard hybrid),99
 111 Icterus pustulatus (Streak-backed Oriole),-1
 112 Icterus gularis (Altamira Oriole),0
 113 Carduelis cannabina (Eurasian Linnet),0
@@ -345,7 +345,7 @@
 344 Crotophaga ani (Smooth-billed Ani),0
 345 Sialia sialis (Eastern Bluebird),0
 346 Platalea alba (African Spoonbill),0
-347 Bubo virginianus (Great Horned Owl),0
+347 Sciurus Carolinensis (Eastern Gray Squirrel),0
 348 Petrochelidon fulva (Cave Swallow),0
 349 Progne subis (Purple Martin),0
 350 Setophaga coronata auduboni (Audubon's Warbler),0
@@ -817,7 +817,7 @@
 816 Cygnus columbianus (Tundra Swan),0
 817 Cygnus olor (Mute Swan),0
 818 Icterus galbula (Baltimore Oriole),0
-819 Anas platyrhynchos (Mallard),0
+819 Anas platyrhynchos (Mallard),99
 820 Anas acuta (Northern Pintail),0
 821 Anas crecca (Green-winged Teal),0
 822 Anas cyanoptera (Cinnamon Teal),-1
