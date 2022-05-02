@@ -9,7 +9,8 @@ class AssetStream:
 
     def write_asset(self):
         while True:
-            self.queue.put(datetime.datetime.now())
+            item = self.queue.get()  # get the next item in teh queue to write to disk
+            # self.queue.put(datetime.datetime.now())
 
 
 def main():
