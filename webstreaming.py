@@ -7,6 +7,14 @@ import multiprocessing
 import datetime
 import time
 import codecs
+import html
+import io
+import os
+import socketserver
+import sys
+import urllib.parse
+
+SUFFIX = urllib.parse.quote('.xhtml')
 
 
 class ThreadedHTTPServer(socketserver.ThreadingMixIn, HTTPServer):
@@ -75,7 +83,7 @@ class WebControl:
         self.web_file_name = web_filename
         self.gif_filename = gif_filename
         # read template file and reset target html file
-        template_file = codecs.open(template_filename, 'r', "utf-8")
+        template_file = codecs.open(template_filename, 'rb', "utf-8")
         template_page = template_file.read()
         self.web_file = open(self.web_filename, 'w')  # open file to write msg and images into....
         self.web_file.write(template_page)
