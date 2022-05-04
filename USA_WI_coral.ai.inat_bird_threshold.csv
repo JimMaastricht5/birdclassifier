@@ -253,7 +253,7 @@
 252 Tyrannus couchii (Couch's Kingbird),0
 253 Phylloscopus collybita (Common Chiffchaff),0
 254 Circus cyaneus hudsonius (Northern Harrier (American)),0
-255 Grallina cyanoleuca (Magpie-lark),0
+255 Grallina cyanoleuca (Magpie-lark),-1
 256 Plectrophenax nivalis (Snow Bunting),0
 257 Calamospiza melanocorys (Lark Bunting),0
 258 Regulus calendula (Ruby-crowned Kinglet),0
@@ -543,7 +543,7 @@
 542 Himantopus mexicanus (Black-necked Stilt),0
 543 Haematopus bachmani (Black Oystercatcher),0
 544 Pica pica (Eurasian Magpie),0
-545 Haematopus ostralegus (Eurasian Oystercatcher),0
+545 Haematopus ostralegus (Eurasian Oystercatcher),-1
 546 Haematopus unicolor (Variable Oystercatcher),0
 547 Vanellus vanellus (Northern Lapwing),0
 548 Vanellus spinosus (Spur-winged Lapwing),0
