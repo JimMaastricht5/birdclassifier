@@ -1,40 +1,38 @@
 #!/usr/bin/env python3
 import multiprocessing
-import datetime
 import pandas as pd
-import numpy as np
 
 
-# item format is expected to be a tuple with
-# [0]: command: end_process, motion, prediction, prediction_final, motion_jpg, prediction_gif, flush
-# end_process: stops the process and free the creator's block on join()
-# motion, prediction, prediction_final: all contain text for the web site to display
-# motion_jpg, prediction_gif: contain image data
-# flush: writes the current set of in memory content to a file for web site display
-# [1]: data (text or image)
 class AssetStream:
+    # item format is expected to be a tuple with
+    # event_num: unique int key for event
+    # type: end_process, motion, prediction, prediction_final, flush
+    #   end_process or None: stops the process and free the creator's block on join()
+    #   motion, prediction, prediction_final: all contain text for the web site to display
+    #   flush: writes the current set of in memory content to a file for web site display
+    # Date time: string
+    # Prediction: string
+    # Image_name: string, image name on disk
+
     def __init__(self, queue):
         self.queue = queue
-        self.df = pd.DataFrame({'type': pd.Series(dtype='str'),
+        self.df = pd.DataFrame({
+                           'event_num': pd.Series(dtype='int'),
+                           'type': pd.Series(dtype='str'),
                            'Date Time': pd.Series(dtype='str'),
                            'Prediction': pd.Series(dtype='float'),
-                           'Image_Name': pd.Series(dtype='str'),
-                           'Image_Type': pd.Series(dtype='str')})
+                           'Image_Name': pd.Series(dtype='str')})
 
     def request_handler(self):
         while True:
-            item = self.queue.get()  # get the next item in teh queue to write to disk
-            if item[0] == 'end_process':
+            item = self.queue.get()  # get the next item in the queue to write to disk
+            event_type = item[1]
+            if event_type == 'end_process' or event_type is None:
                 break
-            elif item[0] == 'motion':
-                self.df.append(item[0], item[1], 0, '', '')
-                pass
-            elif item[0] == 'prediction' or 'prediction_final':
-                pass
-            elif item[0] == 'motion_jpg' or item[0] == 'prediction_gif':
-                pass
-            elif item[0] == 'flush':
-                pass
+            elif event_type == 'flush':
+                self.df.to_csv('/home/pi/birdclass/webstream.csv')
+            else:
+                self.df.append(item)
         return
 
 
