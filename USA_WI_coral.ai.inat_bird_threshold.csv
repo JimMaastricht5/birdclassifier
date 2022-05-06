@@ -234,7 +234,7 @@
 233 Cacatua galerita (Sulphur-crested Cockatoo),-1
 234 Junco hyemalis oreganus (Oregon Junco),0
 235 Pluvialis fulva (Pacific Golden-Plover),0
-236 Molothrus aeneus (Bronzed Cowbird),0
+236 Molothrus aeneus (Bronzed Cowbird),-1
 237 Molothrus ater (Brown-headed Cowbird),0
 238 Merops pusillus (Little Bee-eater),0
 239 Merops apiaster (European Bee-Eater),0
@@ -530,7 +530,7 @@
 529 Strix nebulosa (Great Gray Owl),0
 530 Anastomus lamelligerus (African Openbill),-1
 531 Pluvialis squatarola (Black-bellied Plover),0
-532 Gymnogyps californianus (California Condor),0
+532 Gymnogyps californianus (California Condor),-1
 533 Muscicapa striata (Spotted Flycatcher),0
 534 Charadrius vociferus (Killdeer),0
 535 Charadrius wilsonia (Wilson's Plover),0
@@ -670,7 +670,7 @@
 669 Troglodytes hiemalis (Winter Wren),0
 670 Passer montanus (Eurasian Tree Sparrow),0
 671 Passer domesticus (House Sparrow),0
-672 Aphelocoma californica (California Scrub-Jay),0
+672 Aphelocoma californica (California Scrub-Jay),-1
 673 Amazilia yucatanensis (Buff-bellied Hummingbird),0
 674 Amazilia tzacatl (Rufous-tailed Hummingbird),0
 675 Dicrurus adsimilis (Fork-tailed Drongo),0
@@ -785,7 +785,7 @@
 784 Vireo griseus (White-eyed Vireo),0
 785 Toxostoma longirostre (Long-billed Thrasher),0
 786 Calidris alba (Sanderling),-1
-787 Toxostoma redivivum (California Thrasher),0
+787 Toxostoma redivivum (California Thrasher),-1
 788 Gallinula galeata (Common Gallinule),0
 789 Calidris himantopus (Stilt Sandpiper),0
 790 Eugenes fulgens (Magnificent Hummingbird),0
@@ -911,7 +911,7 @@
 910 Parabuteo unicinctus (Harris's Hawk),0
 911 Anas platyrhynchos domesticus (Domestic Duck),985
 912 Troglodytes aedon (House Wren),0
-913 Buteo lineatus elegans (California Red-shouldered Hawk),0
+913 Buteo lineatus elegans (California Red-shouldered Hawk),-1
 914 Thamnophilus doliatus (Barred Antshrike),0
 915 Thryomanes bewickii (Bewick's Wren),-1
 916 Tadorna variegata (Paradise Shelduck),0
@@ -926,7 +926,7 @@
 925 Calidris subruficollis (Buff-breasted Sandpiper),0
 926 Phoenicopterus roseus (Greater Flamingo),0
 927 Morus bassanus (Northern Gannet),0
-928 Pelecanus occidentalis californicus (California Brown Pelican),0
+928 Pelecanus occidentalis californicus (California Brown Pelican),-1
 929 Glaucidium brasilianum (Ferruginous Pygmy-Owl),0
 930 Oxyura jamaicensis (Ruddy Duck),0
 931 Myiarchus cinerascens (Ash-throated Flycatcher),0
