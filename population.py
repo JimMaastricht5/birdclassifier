@@ -34,6 +34,7 @@ def default_value():
 class Census:
     def __init__(self):
         self.census_dict = defaultdict(default_value)
+        self.census_occurrence = []
         self.first_time_seen = False
 
     def clear(self):
@@ -58,6 +59,7 @@ class Census:
                 if self.census_dict[visitor_name][0] == 0:
                     self.first_time_seen = True
                 self.census_dict[visitor_name] = (self.census_dict[visitor_name][0] + 1, time_of_visit)
+                self.census_occurrence.append((visitor_name, time_of_visit))
         return self.first_time_seen
 
     # return count of visitors by name along with last seen date time
@@ -73,6 +75,9 @@ class Census:
     # sort census by count
     def get_census_by_count(self):
         return dict(sorted(self.census_dict.items(), key=lambda k_v: k_v[1][0], reverse=True))
+
+    def get_occurences(self):
+        return self.census_occurrence
 
 
 def main():
@@ -93,8 +98,10 @@ def main():
     print('should be two dogs, three cats, and a bird')
     observed = popdogcats.get_census_by_count()  # print count from prior day
     print(observed)
+    print('occurences:')
+    print(popdogcats.get_occurences())
 
-    # mirror daily chorses reporting for tesitng
+    # mirror daily chorses reporting for testing
     def short_name(birdname):
         start = birdname.find('(')
         end = birdname.find(')')

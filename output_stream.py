@@ -23,6 +23,9 @@ class WebStream:
                            'Date Time': pd.Series(dtype='str'),
                            'Message': pd.Series(dtype='str'),
                            'Image Name': pd.Series(dtype='str')})
+        self.df_occurrences = pd.DataFrame({
+                           'Species': pd.Series(dtype='str'),
+                           'Date Time': pd.Series(dtype='str')})
 
     def request_handler(self):
         while True:
@@ -33,6 +36,9 @@ class WebStream:
             elif item[1] == 'flush':  # event type is flush
                 self.df = pd.DataFrame(self.df_list, columns=['Event Num', 'type', 'Date Time', 'Message', 'Image Name'])
                 self.df.to_csv('/home/pi/birdclass/webstream.csv')
+            elif item[1] == 'occurrences':
+                self.df_occurrences = pd.DataFrame(item[3], columns=['Species', 'Date Time'])
+                self.df_occurrences.to_csv('/home/pi/birdclass/web_occurrences.csv')  # species, date time
             else:  # any other event type
                 self.df_list.append(item)
         return
@@ -59,6 +65,12 @@ class Controller:
         item = [event_num, msg_type, datetime.datetime.now().strftime("%H:%M:%S"), message, image_name]
         self.queue.put(item)
         return
+
+    def occurrences(self, occurrence_list):
+        print(occurrence_list)
+        self.queue.put((0, 'occurrences', datetime.datetime.now().strftime("%H:%M:%S"), occurrence_list))
+        return
+
 
     def flush(self):
         item = [0, 'flush', datetime.datetime.now().strftime("%H:%M:%S"), '', '']
@@ -88,6 +100,7 @@ def main():
                        image_name='/home/pi/birdclass/first_img.jpg')
     web_stream.message(event_num=1, msg_type='final_prediction', message='big fat robin 74.0%',
                        image_name='/home/pi/birdclass/birds.gif')
+    web_stream.occurrences([('Robin', '05/07/2022 14:52:00'), ('Robin', '05/07/2022 15:31:00')])
     web_stream.end_stream()
 
 

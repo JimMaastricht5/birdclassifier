@@ -45,17 +45,17 @@ except Exception as e:
 
 class MotionDetector:
     def __init__(self, args):
-        print('initializing camera')
+        # print('initializing camera')
         self.camera = picamera.PiCamera()
         self.min_area = args.minarea
         if args.screenwidth != 0:  # use specified height and width or default values if not passed
             self.camera.resolution = (args.screenheight, args.screenwidth)
         self.camera.vflip = args.flipcamera
         # self.camera.framerate = args.framerate
-        print('sleep to let camera settle')
+        # print('sleep to let camera settle')
         time.sleep(2)  # Wait for the automatic gain control to settle
         # self.shutterspeed = self.camera.exposure_speed
-        print('capturing first image')
+        # print('capturing first image')
         self.img_filename = 'capture.jpg'
         self.capture_image_with_file(filename=self.img_filename)  # capture img
         self.img = Image.open(self.img_filename)
@@ -63,7 +63,7 @@ class MotionDetector:
         self.graymotion = image_proc.gaussianblur(self.gray)  # smooth out image for motion detection
         self.first_img = self.graymotion.copy()
         self.motion = False
-        print('camera setup completed')
+        # print('camera setup completed')
 
     def capture_image_with_file(self, img_type='jpeg', filename='/home/pi/birdclass/capture_image.jpg'):
         stream = io.BytesIO()
@@ -98,7 +98,7 @@ class MotionDetector:
     def capture_image_np(self, img_type='jpeg'):
         height, width = self.camera.resolution
         img = np.empty((height, width, 3), dtype=np.uint8)
-        print(height, width)
+        # print(height, width)
         self.camera.capture(img, img_type)
         img_pil = image_proc.convert(img=img, convert_to='PIL')
         img_pil.save('/home/pi/birdclass/alt_camera_img.jpg')

@@ -38,7 +38,7 @@ def short_name(birdname):
 
 class DailyChores:
 
-    def __init__(self, tweeter_obj, birdpop, city_weather):
+    def __init__(self, tweeter_obj, birdpop, city_weather, output):
         self.curr_day = datetime.now().day
         self.curr_hr = datetime.now().hour
         self.starttime = datetime.now()
@@ -47,6 +47,7 @@ class DailyChores:
         self.tweeter = tweeter_obj
         self.cityweather = city_weather
         self.birdpop = birdpop
+        self.output = output
 
     # end of process report
     def end_report(self):
@@ -112,6 +113,7 @@ class DailyChores:
 
         if self.curr_hr != datetime.now().hour:  # check weather and CPU temp hourly
             self.check_cpu_temp()
+            self.output.occurrences(self.birdpop.get_census_by_count())
 
         self.curr_hr = datetime.now().hour
         self.curr_day = datetime.now().day
