@@ -80,7 +80,14 @@ def main():
     web_stream = Controller()
     web_stream.start_stream()
     web_stream.message('up and running') # place message on queue for child process
-    web_stream.message(event_num=1, msg_type='prediction', message='big fat robin 97.0%', image_name='/home/pi/birdclass/test2.jpg')
+    web_stream.message(event_num=1, msg_type='prediction', message='big fat robin 97.0%',
+                       image_name='/home/pi/birdclass/first_img.jpg')
+    web_stream.message(event_num=1, msg_type='prediction', message='big fat robin 37.0%',
+                       image_name='/home/pi/birdclass/first_img.jpg')
+    web_stream.message(event_num=1, msg_type='prediction', message='big fat robin 96.0%',
+                       image_name='/home/pi/birdclass/first_img.jpg')
+    web_stream.message(event_num=1, msg_type='final_prediction', message='big fat robin 74.0%',
+                       image_name='/home/pi/birdclass/birds.gif')
     web_stream.end_stream()
 
 
