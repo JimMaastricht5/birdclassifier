@@ -36,15 +36,31 @@ class WebStream:
         return
 
 
-class WebStreamController:
+class Controller:
     def __init__(self):
         self.queue = multiprocessing.Queue()
         self.web_stream = WebStream(queue=self.queue)
         self.p_web_stream = multiprocessing.Process(target=self.web_stream.request_handler, args=(), daemon=True)
+        self.df = pd.DataFrame({
+                           'event_num': pd.Series(dtype='int'),
+                           'type': pd.Series(dtype='str'),
+                           'Date Time': pd.Series(dtype='str'),
+                           'Message': pd.Series(dtype='str'),
+                           'Image_Name': pd.Series(dtype='str')})
 
     def start_stream(self):
         self.p_web_stream.start()
         return
+
+    def message(self, message):
+        print(message)
+        item = [0, 'message', datetime.datetime.now().strftime("%H:%M:%S"), message, '']
+        self.queue.put(item)
+        return
+
+    def flush(self):
+        item = [0, 'flush', datetime.datetime.now().strftime("%H:%M:%S"), '', '']
+        self.queue.put(item)
 
     def end_stream(self):
         try:
@@ -53,24 +69,14 @@ class WebStreamController:
                 print('waiting for web stream to finish processing queue....')
                 self.p_web_stream.join()
         finally:
-            pass
-            # p.terminate()
+            print('')
         return
 
 
 def main():
-    # queue = multiprocessing.Queue()
-    web_stream = WebStreamController()
-    print('back')
-    # p_web_stream = multiprocessing.Process(target=web_stream.request_handler, args=(), daemon=True)
-    # web_stream_controller = WebStreamController(queue=queue)
-    print('starting')
+    web_stream = Controller()
     web_stream.start_stream()
-    print('end init controller')
 
-    # web_stream_controller.start_stream()
-    print('ending')
-    # p_web_stream.join()
     web_stream.end_stream()
 
 

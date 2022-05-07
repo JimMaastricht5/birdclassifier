@@ -35,6 +35,7 @@ import tweeter  # twitter helper functions
 import population  # population census object, tracks species total seen and last time
 import dailychores  # handle tasks that occur once per day or per hour
 import weather
+import output_stream
 import argparse  # argument parser
 from datetime import datetime
 from collections import defaultdict
@@ -47,6 +48,7 @@ def default_value():
 
 def bird_detector(args):
     birdpop = population.Census()  # initialize species population census object
+    output = output_stream.Controller()  # initialize class to handle terminal and web output
     motioncnt = 0
     curr_day, curr_hr, last_tweet = datetime.now().day, datetime.now().hour, datetime(2021, 1, 1, 0, 0, 0)
 
@@ -54,13 +56,13 @@ def bird_detector(args):
     # that restarts itself after downloading a new version of this software
     # we want to wait to enter that main while loop until sunrise
     cityweather = weather.CityWeather()  # init class and set var based on default of Madison WI
-    print(f'It is now {datetime.now()}.  \nSunrise at {cityweather.sunrise} and sunset at {cityweather.sunset}.')
+    output.message(f'Now: {datetime.now()}.  \nSunrise: {cityweather.sunrise} Sunset: {cityweather.sunset}.')
     cityweather.wait_until_midnight()  # if after sunset, wait here until after midnight
     cityweather.wait_until_sunrise()  # if before sun rise, wait here
 
     # initial video capture, screen size, and grab first image (no motion)
     motion_detect = motion_detector.MotionDetector(args=args)  # init class
-    print('Done with camera init... setting up classes.')
+    output.message('Done with camera init... setting up classes.')
     bird_tweeter = tweeter.TweeterClass()  # init tweeter2 class twitter handler
     chores = dailychores.DailyChores(bird_tweeter, birdpop, cityweather)
     # init detection and classifier object
@@ -73,7 +75,7 @@ def bird_detector(args):
                                        brightness_chg=args.brightness_chg,
                                        overlap_perc_tolerance=args.overlap_perc_tolerance,
                                        target_object='bird', target_object_min_confidence=.75)
-    print('Starting while loop until sun set..... ')
+    output.message('Starting while loop until sun set..... ')
     # loop while the sun is up, look for motion, detect birds, determine species
     while cityweather.sunrise.time() < datetime.now().time() < cityweather.sunset.time():
         if args.verbose:
@@ -109,7 +111,7 @@ def bird_detector(args):
                         print(f"*** Failed gif tweet")  # failure, don't update last tweet time
                     else:
                         last_tweet = datetime.now()  # update last tweet time if successful
-    print('')  # ending process for evening, print blank line and begin shut down
+    output.end_stream()  # ending process for evening, print blank line and begin shut down
     motion_detect.stop()
     if args.verbose:
         chores.hourly_and_daily(report_pop=True)
