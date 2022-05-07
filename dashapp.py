@@ -4,81 +4,102 @@ import pandas as pd
 from dash.exceptions import PreventUpdate
 import os
 
-external_stylesheets = [""]
-app = Dash(__name__, external_stylesheets=external_stylesheets)
+# external_stylesheets = [""]
+# app = Dash(__name__, external_stylesheets=external_stylesheets)
+#
+# # assume you have a "long-form" data frame
+# # see https://plotly.com/python/px-arguments/ for more options
+# # df = pd.DataFrame({
+# #     "Fruit": ["Apples", "Oranges", "Bananas", "Apples", "Oranges", "Bananas"],
+# #     "Amount": [4, 1, 2, 2, 4, 5],
+# #     "City": ["SF", "SF", "SF", "Montreal", "Montreal", "Montreal"]
+# # })
+# # fig = px.bar(df, x="Fruit", y="Amount", color="City", barmode="group")
+#
+# title = html.H1(children="Tweeter Bird Recognition")
+# subtitle = html.Div(
+#     style={"padding-bottom": 10},
+#     children="Click button to pick a random image from the MNIST dataset and display the deep neural network's prediction on that image.",
+# )
+# button = html.Button(children="Predict Random Image", id="submit-val")
+# space = html.Br()
+# sample_image = html.Img(
+#     style={"padding": 10, "width": "400px", "height": "400px"}, id="image"
+# )
+# model_prediction = html.Div(id="pred", children=None)
+# intermediate = html.Div(id="intermediate-operation", style={"display": "none"})
+#
+# x_test = []
+#
+# app.layout = html.Div(
+#     style={"textAlign": "center"},
+#     children=[
+#         title,
+#         subtitle,
+#         button,
+#         space,
+#         sample_image,
+#         model_prediction,
+#         intermediate,
+#     ],
+# )
+#
+# @app.callback(
+#     Dash.dependencies.Output("intermediate-operation", "children"),
+#     [Dash.dependencies.Input("submit-val", "n_clicks")],
+# )
+# def update_random_image(n_clicks):
+#     if n_clicks is None:
+#         raise PreventUpdate
+#     else:
+#         pass
+#
+# @app.callback(
+#     Dash.dependencies.Output("image", "src"),
+#     [Dash.dependencies.Input("intermediate-operation", "children")],
+# )
+# def update_figure(img_number):
+#     return app.get_asset_url("test_image_" + str(img_number) + ".png")
+#
+# @app.callback(
+#     Dash.dependencies.Output("pred", "children"),
+#     [Dash.dependencies.Input("intermediate-operation", "children")],
+# )
+# def update_prediction(img_number):
+#     img = x_test[img_number]
+#     img = img.reshape([1, 28, 28, 1])
+#     predicted_class = '' # MNIST_model.predict_classes(img)[0]
+#     return "Prediction: " + str(predicted_class)
+#
+# def list_images(dir='\home\pi\birdclass'):
+#     jpg_list, gif_list = [], []
+#     file_list = os.listdir(dir)
+#     jpg_list = [file_name for file_name in file_list if ".jpg" in file_name]
+#     gif_list = [file_name for file_name in file_list if ".gif" in file_name]
+#     return jpg_list, gif_list
 
-# assume you have a "long-form" data frame
-# see https://plotly.com/python/px-arguments/ for more options
-# df = pd.DataFrame({
-#     "Fruit": ["Apples", "Oranges", "Bananas", "Apples", "Oranges", "Bananas"],
-#     "Amount": [4, 1, 2, 2, 4, 5],
-#     "City": ["SF", "SF", "SF", "Montreal", "Montreal", "Montreal"]
-# })
-# fig = px.bar(df, x="Fruit", y="Amount", color="City", barmode="group")
+from dash import Dash, dcc, html, Input, Output
 
-title = html.H1(children="Tweeter Bird Recognition")
-subtitle = html.Div(
-    style={"padding-bottom": 10},
-    children="Click button to pick a random image from the MNIST dataset and display the deep neural network's prediction on that image.",
-)
-button = html.Button(children="Predict Random Image", id="submit-val")
-space = html.Br()
-sample_image = html.Img(
-    style={"padding": 10, "width": "400px", "height": "400px"}, id="image"
-)
-model_prediction = html.Div(id="pred", children=None)
-intermediate = html.Div(id="intermediate-operation", style={"display": "none"})
+app = Dash(__name__)
 
-x_test = []
+app.layout = html.Div([
+    html.H6("Change the value in the text box to see callbacks in action!"),
+    html.Div([
+        "Input: ",
+        dcc.Input(id='my-input', value='initial value', type='text')
+    ]),
+    html.Br(),
+    html.Div(id='my-output'),
 
-app.layout = html.Div(
-    style={"textAlign": "center"},
-    children=[
-        title,
-        subtitle,
-        button,
-        space,
-        sample_image,
-        model_prediction,
-        intermediate,
-    ],
-)
+])
+
 
 @app.callback(
-    Dash.dependencies.Output("intermediate-operation", "children"),
-    [Dash.dependencies.Input("submit-val", "n_clicks")],
+    Output(component_id='my-output', component_property='children'),
+    Input(component_id='my-input', component_property='value')
 )
-def update_random_image(n_clicks):
-    if n_clicks is None:
-        raise PreventUpdate
-    else:
-        pass
-
-@app.callback(
-    Dash.dependencies.Output("image", "src"),
-    [Dash.dependencies.Input("intermediate-operation", "children")],
-)
-def update_figure(img_number):
-    return app.get_asset_url("test_image_" + str(img_number) + ".png")
-
-@app.callback(
-    Dash.dependencies.Output("pred", "children"),
-    [Dash.dependencies.Input("intermediate-operation", "children")],
-)
-def update_prediction(img_number):
-    img = x_test[img_number]
-    img = img.reshape([1, 28, 28, 1])
-    predicted_class = '' # MNIST_model.predict_classes(img)[0]
-    return "Prediction: " + str(predicted_class)
-
-def list_images(dir='\home\pi\birdclass'):
-    jpg_list, gif_list = [], []
-    file_list = os.listdir(dir)
-    jpg_list = [file_name for file_name in file_list if ".jpg" in file_name]
-    gif_list = [file_name for file_name in file_list if ".gif" in file_name]
-    return jpg_list, gif_list
-
-
+def update_output_div(input_value):
+    return f'Output: {input_value}'
 if __name__ == "__main__":
     app.run_server(debug=True, host='0.0.0.0')
 
