@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import multiprocessing
 import pandas as pd
+import datetime
 
 
 class WebStream:
@@ -14,25 +15,26 @@ class WebStream:
     # Prediction: string
     # Image_name: string, image name on disk
     def __init__(self, queue):
-        print('stream init')
         self.queue = queue
+        self.df_list = []
         self.df = pd.DataFrame({
-                           'event_num': pd.Series(dtype='int'),
+                           'Event Num': pd.Series(dtype='int'),
                            'type': pd.Series(dtype='str'),
                            'Date Time': pd.Series(dtype='str'),
-                           'Message': pd.Series(dtype='float'),
-                           'Image_Name': pd.Series(dtype='str')})
-        print('end stream init')
+                           'Message': pd.Series(dtype='str'),
+                           'Image Name': pd.Series(dtype='str')})
 
     def request_handler(self):
         while True:
             item = self.queue.get()  # get the next item in the queue to write to disk
+            # print(item)
             if item is None:  # poison pill, end the process
                 break
             elif item[1] == 'flush':  # event type is flush
+                self.df = pd.DataFrame(self.df_list, columns=['Event Num', 'type', 'Date Time', 'Message', 'Image Name'])
                 self.df.to_csv('/home/pi/birdclass/webstream.csv')
             else:  # any other event type
-                self.df.append(item)
+                self.df_list.append(item)
         return
 
 
@@ -42,19 +44,19 @@ class Controller:
         self.web_stream = WebStream(queue=self.queue)
         self.p_web_stream = multiprocessing.Process(target=self.web_stream.request_handler, args=(), daemon=True)
         self.df = pd.DataFrame({
-                           'event_num': pd.Series(dtype='int'),
+                           'Event Num': pd.Series(dtype='int'),
                            'type': pd.Series(dtype='str'),
                            'Date Time': pd.Series(dtype='str'),
                            'Message': pd.Series(dtype='str'),
-                           'Image_Name': pd.Series(dtype='str')})
+                           'Image Name': pd.Series(dtype='str')})
 
     def start_stream(self):
         self.p_web_stream.start()
         return
 
-    def message(self, message):
+    def message(self, message, event_num=0, msg_type='message', image_name=''):
         print(message)
-        item = [0, 'message', datetime.datetime.now().strftime("%H:%M:%S"), message, '']
+        item = [event_num, msg_type, datetime.datetime.now().strftime("%H:%M:%S"), message, image_name]
         self.queue.put(item)
         return
 
@@ -63,9 +65,10 @@ class Controller:
         self.queue.put(item)
 
     def end_stream(self):
+        self.flush()  # write any pending contents to disk
         try:
-            self.queue.put(None)
-            if self.p_web_stream.is_alive():
+            self.queue.put(None)  # transmit poison pill to stop child process
+            if self.p_web_stream.is_alive():  # wait for the child process to finish if it is still alive
                 print('waiting for web stream to finish processing queue....')
                 self.p_web_stream.join()
         finally:
@@ -76,7 +79,8 @@ class Controller:
 def main():
     web_stream = Controller()
     web_stream.start_stream()
-
+    web_stream.message('up and running') # place message on queue for child process
+    web_stream.message(event_num=1, msg_type='prediction', message='big fat robin 97.0%', image_name='/home/pi/birdclass/test2.jpg')
     web_stream.end_stream()
 
 
