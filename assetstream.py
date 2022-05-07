@@ -40,20 +40,18 @@ class WebStreamController:
     def __init__(self):
         self.queue = multiprocessing.Queue()
         self.web_stream = WebStream(queue=self.queue)
-        print('setting up multiprocessing')
-        self.p_write_asset = multiprocessing.Process(target=self.web_stream.request_handler(), args=(), daemon=True)
-        print('end init controller')
+        self.p_web_stream = multiprocessing.Process(target=self.web_stream.request_handler, args=(), daemon=True)
 
     def start_stream(self):
-        self.p_write_asset.start()
+        self.p_web_stream.start()
         return
 
     def end_stream(self):
         try:
             self.queue.put(None)
-            if self.p_write_asset.is_alive():
+            if self.p_web_stream.is_alive():
                 print('waiting for web stream to finish processing queue....')
-                self.p_write_asset.join()
+                self.p_web_stream.join()
         finally:
             pass
             # p.terminate()
@@ -61,12 +59,45 @@ class WebStreamController:
 
 
 def main():
-    web_stream_controller = WebStreamController()
+    # queue = multiprocessing.Queue()
+    web_stream = WebStreamController()
+    print('back')
+    # p_web_stream = multiprocessing.Process(target=web_stream.request_handler, args=(), daemon=True)
+    # web_stream_controller = WebStreamController(queue=queue)
     print('starting')
-    web_stream_controller.start_stream()
+    web_stream.start_stream()
+    print('end init controller')
+
+    # web_stream_controller.start_stream()
     print('ending')
-    web_stream_controller.end_stream()
+    # p_web_stream.join()
+    web_stream.end_stream()
 
 
 if __name__ == '__main__':
     main()
+
+
+# simple sample queue code
+# from multiprocessing import Process, Queue
+#
+# class WebWriter:
+#     def __init__(self, queue):
+#         self.queue = queue
+#
+#     def request_handler(self):
+#         while True:
+#             message = self.queue.get()
+#             if message is None:
+#                 break
+#             print(message)
+#
+# if __name__ == '__main__':
+#     # Create multiprocessing queue
+#     queue = Queue()
+#     web_writer = WebWriter(queue=queue)
+#     p = Process(target=web_writer.request_handler, args=())
+#     p.start()
+#     for i in range(10):
+#         queue.put(f'{i}ith message')
+#     queue.put(None)
