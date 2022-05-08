@@ -30,7 +30,7 @@ class WebStream:
     def request_handler(self):
         while True:
             item = self.queue.get()  # get the next item in the queue to write to disk
-            # print(item)
+            print(item)
             if item is None:  # poison pill, end the process
                 break
             elif item[1] == 'flush':  # event type is flush
