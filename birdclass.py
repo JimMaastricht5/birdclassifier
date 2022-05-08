@@ -76,6 +76,8 @@ def bird_detector(args):
                                        brightness_chg=args.brightness_chg,
                                        overlap_perc_tolerance=args.overlap_perc_tolerance,
                                        target_object='bird', target_object_min_confidence=.75)
+    output.message('Using label file:', birds.labels)
+    output.message('Using threshold file:', birds.thresholds)
     output.message('Starting while loop until sun set..... ')
     # loop while the sun is up, look for motion, detect birds, determine species
     while cityweather.sunrise.time() < datetime.now().time() < cityweather.sunset.time():
@@ -98,15 +100,16 @@ def bird_detector(args):
                 first_img_jpg = image_proc.enhance_brightness(img=first_img_jpg, factor=args.brightness_chg)
                 birds.set_colors()  # set new colors for this series of bounding boxes
                 first_img_jpg = birds.add_boxes_and_labels(img=first_img_jpg)
-                #  *** add per image output here, one image, many predictions?
+                first_img_jpg.save(img_filename)  # save file
+                max_index = birds.classified_confidences(max(birds.classified_confidences))
+                output.message(message=f'Sighting of a {birds.classified_labels[max_index]}'
+                                       f' {birds.classified_confidences[max_index] * 100:.1f} at '
+                                       f'{datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count,
+                               image_name=img_filename)  # send label and confidence to stream
                 gif, gif_filename, animated, best_label, best_confidence = build_bird_animated_gif(args, motion_detect,
                                                                                                    birds, first_img_jpg)
                 bird_first_time_seen = birdpop.visitors(best_label, datetime.now())  # update census and last time seen
                 tweet_label = tweet_text(best_label, best_confidence)
-                first_img_jpg.save(img_filename)
-                output.message(message=f'Sighting of a {tweet_label} at '
-                                       f'{datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count,
-                               image_name=img_filename)
                 if animated and bird_first_time_seen:  # doesn't change last_tweet time or override time between tweets
                     bird_tweeter.post_image_from_file(message=f'First time today: {best_label} '
                                                               f'{best_confidence * 100:.1f}',
