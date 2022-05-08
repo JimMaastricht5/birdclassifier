@@ -30,7 +30,7 @@ class WebStream:
     def request_handler(self):
         while True:
             item = self.queue.get()  # get the next item in the queue to write to disk
-            print(item)
+            print('web process receiving:', item)
             if item is None:  # poison pill, end the process
                 break
             elif item[1] == 'flush':  # event type is flush
@@ -61,7 +61,7 @@ class Controller:
         return
 
     def message(self, message, event_num=0, msg_type='message', image_name=''):
-        print(message)
+        print('web controller sending: ', message)
         item = [event_num, msg_type, datetime.datetime.now().strftime("%H:%M:%S"), message, image_name]
         self.queue.put(item)
         return
