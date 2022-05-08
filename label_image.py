@@ -263,7 +263,7 @@ class DetectClassify:
             classified_confidences = self.last_known_classified_confidences
         else:
             classified_rects = self.classified_rects
-            classified_labels = self.classified_labels  # assigned but not used below in line 289??
+            classified_labels = self.classified_labels  # assigned but not used below ??
             classified_confidences = self.classified_confidences
 
         for i, rect in enumerate(classified_rects):

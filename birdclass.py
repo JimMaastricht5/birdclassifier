@@ -49,7 +49,7 @@ def default_value():
 def bird_detector(args):
     birdpop = population.Census()  # initialize species population census object
     output = output_stream.Controller()  # initialize class to handle terminal and web output
-    motioncnt = 0
+    motioncnt, event_count = 0, 0
     curr_day, curr_hr, last_tweet = datetime.now().day, datetime.now().hour, datetime(2021, 1, 1, 0, 0, 0)
 
     # while loop below processes from sunrise to sunset.  The python program runs in a bash loop
@@ -91,9 +91,11 @@ def bird_detector(args):
             # classify, grab labels, enhance the shot, and add boxes
             first_img_jpg = birds.img
             if birds.classify(img=first_img_jpg) >= args.default_confidence:  # found a bird we can classify
+                event_count += 1
                 first_img_jpg = image_proc.enhance_brightness(img=first_img_jpg, factor=args.brightness_chg)
                 birds.set_colors()  # set new colors for this series of bounding boxes
                 first_img_jpg = birds.add_boxes_and_labels(img=first_img_jpg)
+                #  *** add per image output here, one image, many predictions?
                 gif, gif_filename, animated, best_label, best_confidence = build_bird_animated_gif(args, motion_detect,
                                                                                                    birds, first_img_jpg)
                 bird_first_time_seen = birdpop.visitors(best_label, datetime.now())  # update census and last time seen

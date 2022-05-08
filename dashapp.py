@@ -3,6 +3,7 @@ import plotly.express as px
 import pandas as pd
 from dash.exceptions import PreventUpdate
 import os
+import socket
 
 # external_stylesheets = [""]
 # app = Dash(__name__, external_stylesheets=external_stylesheets)
@@ -134,10 +135,14 @@ def update_figure(selected_year):
     fig.update_layout(transition_duration=500)
 
     return fig
+
 def update_output_div(input_value):
     return f'Output: {input_value}'
+
 if __name__ == "__main__":
-    app.run_server(debug=True, host='0.0.0.0')
+    port = 8080
+    print(f'Web Server on: {socket.gethostbyname(socket.gethostname())}:{port}')
+    app.run_server(debug=True, host='0.0.0.0', port=port)
 
 # examples from https://dash.plotly.com/layout
 # df = pd.read_csv(
