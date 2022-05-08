@@ -102,54 +102,173 @@ import json
 #     Output(component_id='my-output', component_property='children'),
 #     Input(component_id='my-input', component_property='value')
 # )
-
-from dash import Dash, dcc, html, Input, Output
-import plotly.express as px
-
+#
+# from dash import Dash, dcc, html, Input, Output
+# import plotly.express as px
+#
+# import pandas as pd
+#
+# df = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/gapminderDataFiveYear.csv')
+# df_occurrences = pd.read_csv('/home/pi/birdclass/web_occurrences.csv')
+#
+# app = Dash(__name__)
+#
+# app.layout = html.Div([
+#     dcc.Graph(id='hist-by-hour'),
+#     dcc.Graph(id='graph-with-slider'),
+#     dcc.Slider(
+#         df['year'].min(),
+#         df['year'].max(),
+#         step=None,
+#         value=df['year'].min(),
+#         marks={str(year): str(year) for year in df['year'].unique()},
+#         id='year-slider'
+#     )
+# ])
+# @app.callback(
+#     Output('hist-by-hour', 'figure1'),
+#     Input('year-slider', 'value')
+# )
+# def hist_update(selected_year):
+#     fig1 = px.histogram(df_occurrences, x='Species')
+#     fig1.update_layout()
+#     return fig1
+#
+# @app.callback(
+#     Output('graph-with-slider', 'figure'),
+#     Input('year-slider', 'value'))
+# def update_figure(selected_year):
+#     filtered_df = df[df.year == selected_year]
+#
+#     fig = px.scatter(filtered_df, x="gdpPercap", y="lifeExp",
+#                      size="pop", color="continent", hover_name="country",
+#                      log_x=True, size_max=55)
+#
+#     fig.update_layout(transition_duration=500)
+#
+#     return fig
+#
+# def update_output_div(input_value):
+#     return f'Output: {input_value}'
+import json
+import datetime
+from textwrap import dedent as d
+import dash
+from dash.dependencies import Input, Output
+import dash_core_components as dcc
+import dash_html_components as html
 import pandas as pd
 
-df = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/gapminderDataFiveYear.csv')
-df_occurrences = pd.read_csv('/home/pi/birdclass/web_occurrences.csv')
+df = pd.read_csv(
+    ('https://raw.githubusercontent.com/plotly/'
+     'datasets/master/1962_2006_walmart_store_openings.csv'),
+    parse_dates=[1, 2],
+    infer_datetime_format=True
+)
+future_indices = df['OPENDATE'] > datetime.datetime(year=2050,month=1,day=1)
+df.loc[future_indices, 'OPENDATE'] -= datetime.timedelta(days=365.25*100)
 
-app = Dash(__name__)
+app = dash.Dash(__name__)
+app.scripts.config.serve_locally = True
+app.css.config.serve_locally = True
+
+styles = {
+    'pre': {
+        'border': 'thin lightgrey solid',
+        'overflowX': 'scroll'
+    }
+}
 
 app.layout = html.Div([
-    dcc.Graph(id='hist-by-hour'),
-    dcc.Graph(id='graph-with-slider'),
-    dcc.Slider(
-        df['year'].min(),
-        df['year'].max(),
-        step=None,
-        value=df['year'].min(),
-        marks={str(year): str(year) for year in df['year'].unique()},
-        id='year-slider'
-    )
+    dcc.Graph(
+        id='basic-interactions',
+        figure={
+            'data': [
+                {
+                    'x': df['OPENDATE'],
+                    'text': df['STRCITY'],
+                    'customdata': df['storenum'],
+                    'name': 'Open Date',
+                    'type': 'histogram'
+                },
+                {
+                    'x': df['date_super'],
+                    'text': df['STRCITY'],
+                    'customdata': df['storenum'],
+                    'name': 'Super Date',
+                    'type': 'histogram'
+                }
+            ],
+            'layout': {}
+        }
+    ),
+
+    html.Div(className='row', children=[
+        html.Div([
+            dcc.Markdown(d("""
+                **Hover Data**
+                Mouse over values in the graph.
+            """)),
+            html.Pre(id='hover-data', style=styles['pre'])
+        ], className='three columns'),
+
+        html.Div([
+            dcc.Markdown(d("""
+                **Click Data**
+                Click on points in the graph.
+            """)),
+            html.Pre(id='click-data', style=styles['pre']),
+        ], className='three columns'),
+
+        html.Div([
+            dcc.Markdown(d("""
+                **Selection Data**
+                Choose the lasso or rectangle tool in the graph's menu
+                bar and then select points in the graph.
+            """)),
+            html.Pre(id='selected-data', style=styles['pre']),
+        ], className='three columns'),
+
+        html.Div([
+            dcc.Markdown(d("""
+                **Zoom and Relayout Data**
+                Click and drag on the graph to zoom or click on the zoom
+                buttons in the graph's menu bar.
+                Clicking on legend items will also fire
+                this event.
+            """)),
+            html.Pre(id='relayout-data', style=styles['pre']),
+        ], className='three columns')
+    ])
 ])
-@app.callback(
-    Output('hist-by-hour', 'figure1'),
-    Input('year-slider', 'value')
-)
-def hist_update(selected_year):
-    fig1 = px.histogram(df_occurrences, x='Species')
-    fig1.update_layout()
-    return fig1
+
 
 @app.callback(
-    Output('graph-with-slider', 'figure'),
-    Input('year-slider', 'value'))
-def update_figure(selected_year):
-    filtered_df = df[df.year == selected_year]
+    Output('hover-data', 'children'),
+    [Input('basic-interactions', 'hoverData')])
+def display_hover_data(hoverData):
+    return json.dumps(hoverData, indent=2)
 
-    fig = px.scatter(filtered_df, x="gdpPercap", y="lifeExp",
-                     size="pop", color="continent", hover_name="country",
-                     log_x=True, size_max=55)
 
-    fig.update_layout(transition_duration=500)
+@app.callback(
+    Output('click-data', 'children'),
+    [Input('basic-interactions', 'clickData')])
+def display_click_data(clickData):
+    return json.dumps(clickData, indent=2)
 
-    return fig
 
-def update_output_div(input_value):
-    return f'Output: {input_value}'
+@app.callback(
+    Output('selected-data', 'children'),
+    [Input('basic-interactions', 'selectedData')])
+def display_selected_data(selectedData):
+    return json.dumps(selectedData, indent=2)
+
+
+@app.callback(
+    Output('relayout-data', 'children'),
+    [Input('basic-interactions', 'relayoutData')])
+def display_selected_data(relayoutData):
+    return json.dumps(relayoutData, indent=2)
 
 if __name__ == "__main__":
     port = 8080
