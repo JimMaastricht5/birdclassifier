@@ -104,19 +104,19 @@ def bird_detector(args):
                 gif, gif_filename, animated, best_label, best_confidence = build_bird_animated_gif(args, motion_detect,
                                                                                                    birds, first_img_jpg)
                 # max_index = birds.classified_confidences(max(birds.classified_confidences))
-                output.message(message=f'Sighting of a {best_label} {best_confidence * 100:.1f} at '
+                output.message(message=f'Sighting of a {best_label} {best_confidence * 100:.1f}% at '
                                        f'{datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count,
                                image_name=img_filename)  # send label and confidence to stream
                 bird_first_time_seen = birdpop.visitors(best_label, datetime.now())  # update census and last time seen
                 tweet_label = tweet_text(best_label, best_confidence)
                 if animated and bird_first_time_seen:  # doesn't change last_tweet time or override time between tweets
                     bird_tweeter.post_image_from_file(message=f'First time today: {best_label} '
-                                                              f'{best_confidence * 100:.1f}',
+                                                              f'{best_confidence * 100:.1f}%',
                                                       file_name=img_filename)
                 waittime = birdpop.report_single_census_count(best_label) * args.tweetdelay / 10  # wait X min * N bird
                 waittime = args.tweetdelay if waittime >= args.tweetdelay else waittime
                 if animated and ((datetime.now() - last_tweet).total_seconds() >= waittime or bird_first_time_seen):
-                    output.message(message=f'Tweeted animation of a {tweet_label} {best_confidence * 100:.1f} '
+                    output.message(message=f'Tweeted animation of a {tweet_label} {best_confidence * 100:.1f}% '
                                            f'at {datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count,
                                    image_name=gif_filename)
                     if bird_tweeter.post_image_from_file(tweet_label, gif_filename) is False:  # animated gif
@@ -206,7 +206,7 @@ def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
         best_confidence = confidence_dict[max(confidence_dict, key=confidence_dict.get)] / \
             census_dict[max(confidence_dict, key=confidence_dict.get)]  # sum conf/bird cnt
         best_label = max(confidence_dict, key=confidence_dict.get)
-        print('--- Best label and confidence', best_label, best_confidence)
+        # print('--- Best label and confidence', best_label, best_confidence)
     return gif, gif_filename, animated, best_label, best_confidence
 
 
