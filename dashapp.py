@@ -109,7 +109,7 @@ import plotly.express as px
 import pandas as pd
 
 df = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/gapminderDataFiveYear.csv')
-df_occurrences = pd.read_csv('/home/pi/birds/web_occurrences.csv')
+df_occurrences = pd.read_csv('/home/pi/birdclass/web_occurrences.csv')
 
 app = Dash(__name__)
 
