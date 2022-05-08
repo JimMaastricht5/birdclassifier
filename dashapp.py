@@ -127,9 +127,9 @@ app.layout = html.Div([
 ])
 @app.callback(
     Output('hist-by-hour'),
-    Input('')
+    Input('year-slider', 'value')
 )
-def hist_update():
+def hist_update(selected_year):
     fig1 = px.histogram(df_occurrences, x='Species')
     fig1.update_layout()
     return fig1
