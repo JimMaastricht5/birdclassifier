@@ -126,7 +126,7 @@ app.layout = html.Div([
     )
 ])
 @app.callback(
-    Output('hist-by-hour'),
+    Output('hist-by-hour', 'figure1'),
     Input('year-slider', 'value')
 )
 def hist_update(selected_year):
