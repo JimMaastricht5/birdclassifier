@@ -4,6 +4,9 @@ import pandas as pd
 from dash.exceptions import PreventUpdate
 import os
 import socket
+import requests
+import json
+
 
 # external_stylesheets = [""]
 # app = Dash(__name__, external_stylesheets=external_stylesheets)
@@ -141,7 +144,7 @@ def update_output_div(input_value):
 
 if __name__ == "__main__":
     port = 8080
-    print(f'Web Server on: {socket.gethostbyname(socket.gethostname())}:{port}')
+    print(f'Web Server on: http://{json.loads(requests.get("https://ip.seeip.org/jsonip?").text)["ip"]}:{port}')
     app.run_server(debug=True, host='0.0.0.0', port=port)
 
 # examples from https://dash.plotly.com/layout
