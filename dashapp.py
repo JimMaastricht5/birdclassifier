@@ -109,10 +109,12 @@ import plotly.express as px
 import pandas as pd
 
 df = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/gapminderDataFiveYear.csv')
+df_occurrences = pd.read_csv('/home/pi/birds/web_occurrences.csv')
 
 app = Dash(__name__)
 
 app.layout = html.Div([
+    dcc.Graph(id='hist-by-hour'),
     dcc.Graph(id='graph-with-slider'),
     dcc.Slider(
         df['year'].min(),
@@ -123,7 +125,14 @@ app.layout = html.Div([
         id='year-slider'
     )
 ])
-
+@app.callback(
+    Output('hist-by-hour'),
+    Input('')
+)
+def hist_update():
+    fig1 = px.histogram(df_occurrences, x='Species')
+    fig1.update_layout()
+    return fig1
 
 @app.callback(
     Output('graph-with-slider', 'figure'),
@@ -144,7 +153,7 @@ def update_output_div(input_value):
 
 if __name__ == "__main__":
     port = 8080
-    print(f'Web Server on: http://{json.loads(requests.get("https://ip.seeip.org/jsonip?").text)["ip"]}:{port}')
+    # print(f'Web Server on: http://{socket.gethostbyname_ex(hostname)[2][1]}:{port}')
     app.run_server(debug=True, host='0.0.0.0', port=port)
 
 # examples from https://dash.plotly.com/layout
