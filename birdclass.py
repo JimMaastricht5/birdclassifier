@@ -49,6 +49,7 @@ def default_value():
 def bird_detector(args):
     birdpop = population.Census()  # initialize species population census object
     output = output_stream.Controller()  # initialize class to handle terminal and web output
+    output.start_stream()  # start streaming to terminal and web
     motioncnt, event_count = 0, 0
     curr_day, curr_hr, last_tweet = datetime.now().day, datetime.now().hour, datetime(2021, 1, 1, 0, 0, 0)
 
@@ -86,12 +87,14 @@ def bird_detector(args):
 
         if motion_detect.motion and birds.detect(img=motion_detect.img):  # daytime with motion and birds
             motioncnt = 0  # reset motion count between detected birds
-            print(f'\r Saw a bird {datetime.now().strftime("%I:%M:%S %P")}', end=' ')  # indicate motion on monitor
+            event_count += 1
+            img_filename = '/home/pi/birdclass/' + 'img' + str(event_count) + '.jpg'
+            output.message(message=f'Saw bird#{event_count} at {datetime.now().strftime("%I:%M:%S %P")}',
+                           event_num=event_count, image_name='')
             # keep first shot to add to start of animation or as stand along jpg
             # classify, grab labels, enhance the shot, and add boxes
             first_img_jpg = birds.img
             if birds.classify(img=first_img_jpg) >= args.default_confidence:  # found a bird we can classify
-                event_count += 1
                 first_img_jpg = image_proc.enhance_brightness(img=first_img_jpg, factor=args.brightness_chg)
                 birds.set_colors()  # set new colors for this series of bounding boxes
                 first_img_jpg = birds.add_boxes_and_labels(img=first_img_jpg)
@@ -100,17 +103,22 @@ def bird_detector(args):
                                                                                                    birds, first_img_jpg)
                 bird_first_time_seen = birdpop.visitors(best_label, datetime.now())  # update census and last time seen
                 tweet_label = tweet_text(best_label, best_confidence)
+                first_img_jpg.save(img_filename)
+                output.message(message=f'Sighting of a {tweet_label} at '
+                                       f'{datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count,
+                               image_name=img_filename)
                 if animated and bird_first_time_seen:  # doesn't change last_tweet time or override time between tweets
-                    print(f'--- First time seeing a {best_label} today.  Tweeting still shot')
-                    first_img_jpg.save('/home/pi/birdclass/first_img.jpg')
-                    bird_tweeter.post_image_from_file(message=f'First time today: {tweet_label}',
-                                                      file_name='/home/pi/birdclass/first_img.jpg')
+                    bird_tweeter.post_image_from_file(message=f'First time today: {best_label} '
+                                                              f'{best_confidence * 100:.1f}',
+                                                      file_name=img_filename)
                 waittime = birdpop.report_single_census_count(best_label) * args.tweetdelay / 10  # wait X min * N bird
                 waittime = args.tweetdelay if waittime >= args.tweetdelay else waittime
                 if animated and ((datetime.now() - last_tweet).total_seconds() >= waittime or bird_first_time_seen):
-                    print('--- Tweet animated gif at:', datetime.now())
+                    output.message(message=f'Tweeted animation of a {tweet_label} {best_confidence * 100:.1f} '
+                                           f'at {datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count,
+                                   image_name=gif_filename)
                     if bird_tweeter.post_image_from_file(tweet_label, gif_filename) is False:  # animated gif
-                        print(f"*** Failed gif tweet")  # failure, don't update last tweet time
+                        output.message(f"*** Failed gif tweet")  # failure, don't update last tweet time
                     else:
                         last_tweet = datetime.now()  # update last tweet time if successful
     output.end_stream()  # ending process for evening, print blank line and begin shut down
@@ -159,8 +167,8 @@ def best_confidence_and_label(census_dict, confidence_dict):
         best_census_label = max(census_dict, key=census_dict.get)
     except Exception as e:
         print(e)
-    print('best confidence:', best_confidence, best_confidence_label)
-    print('best census:', best_census, best_census_label)
+    # print('best confidence:', best_confidence, best_confidence_label)
+    # print('best census:', best_census, best_census_label)
     # if best_confidence_label != best_census_label:
     #  what to do here?  Which one is better?  High count or high confidence?
     return best_confidence, best_confidence_label, best_census, best_census_label

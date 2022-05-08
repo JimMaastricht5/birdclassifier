@@ -6,7 +6,7 @@ app = Dash(__name__)
 df = pd.read_csv('/home/pi/birdclass/web_occurrences.csv')
 df['Date Time'] = pd.to_datetime(df['Date Time'])
 df['Hour'] = pd.to_numeric(df['Date Time'].dt.hour)
-print(df)
+# print(df)
 fig = px.histogram(df, x="Hour", color='Species', range_x=[6, 22], nbins=16)
 
 app.layout = html.Div(children=[
