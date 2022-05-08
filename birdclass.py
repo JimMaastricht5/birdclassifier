@@ -104,9 +104,10 @@ def bird_detector(args):
                 gif, gif_filename, animated, best_label, best_confidence = build_bird_animated_gif(args, motion_detect,
                                                                                                    birds, first_img_jpg)
                 # max_index = birds.classified_confidences(max(birds.classified_confidences))
-                output.message(message=f'Sighting of a {best_label} {best_confidence * 100:.1f}% at '
-                                       f'{datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count,
-                               image_name=img_filename)  # send label and confidence to stream
+                if best_label != '' and best_confidence > 0:
+                    output.message(message=f'Sighting of a {best_label} {best_confidence * 100:.1f}% at '
+                                           f'{datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count,
+                                   image_name=img_filename)  # send label and confidence to stream
                 bird_first_time_seen = birdpop.visitors(best_label, datetime.now())  # update census and last time seen
                 tweet_label = tweet_text(best_label, best_confidence)
                 if animated and bird_first_time_seen:  # doesn't change last_tweet time or override time between tweets
