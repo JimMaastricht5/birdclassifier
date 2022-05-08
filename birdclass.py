@@ -91,7 +91,7 @@ def bird_detector(args):
             motioncnt = 0  # reset motion count between detected birds
             event_count += 1
             img_filename = '/home/pi/birdclass/' + 'img' + str(event_count) + '.jpg'
-            output.message(message=f'Saw bird#{event_count} at {datetime.now().strftime("%I:%M:%S %P")}',
+            output.message(message=f'Saw bird #{event_count} at {datetime.now().strftime("%I:%M:%S %P")}',
                            event_num=event_count, image_name='')
             # keep first shot to add to start of animation or as stand along jpg
             # classify, grab labels, enhance the shot, and add boxes
@@ -101,13 +101,12 @@ def bird_detector(args):
                 birds.set_colors()  # set new colors for this series of bounding boxes
                 first_img_jpg = birds.add_boxes_and_labels(img=first_img_jpg)
                 first_img_jpg.save(img_filename)  # save file
-                max_index = birds.classified_confidences(max(birds.classified_confidences))
-                output.message(message=f'Sighting of a {birds.classified_labels[max_index]}'
-                                       f' {birds.classified_confidences[max_index] * 100:.1f} at '
-                                       f'{datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count,
-                               image_name=img_filename)  # send label and confidence to stream
                 gif, gif_filename, animated, best_label, best_confidence = build_bird_animated_gif(args, motion_detect,
                                                                                                    birds, first_img_jpg)
+                # max_index = birds.classified_confidences(max(birds.classified_confidences))
+                output.message(message=f'Sighting of a {best_label} {best_confidence * 100:.1f} at '
+                                       f'{datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count,
+                               image_name=img_filename)  # send label and confidence to stream
                 bird_first_time_seen = birdpop.visitors(best_label, datetime.now())  # update census and last time seen
                 tweet_label = tweet_text(best_label, best_confidence)
                 if animated and bird_first_time_seen:  # doesn't change last_tweet time or override time between tweets
