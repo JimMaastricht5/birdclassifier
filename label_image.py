@@ -63,7 +63,7 @@ class DetectClassify:
                  default_confidence=.98, screenheight=640,
                  screenwidth=480, contrast_chg=1.0, color_chg=1.0, brightness_chg=1.0, sharpness_chg=1.0,
                  mismatch_penalty=0.3, overlap_perc_tolerance=0.7, min_area=28000, target_object='bird',
-                 target_object_min_confidence=.8):
+                 target_object_min_confidence=.8, output_function=print):
         self.detector_file = homedir + 'lite-model_ssd_mobilenet_v1_1_metadata_2.tflite'
         self.detector_labels_file = homedir + 'lite-model_ssd_mobilenet_v1_1_metadata_2_labelmap.txt'
         self.target_objects = target_object
@@ -104,6 +104,7 @@ class DetectClassify:
         self.sharpness_chg = sharpness_chg
         self.overlap_perc_tolerance = overlap_perc_tolerance
         self.img = np.zeros((screenheight, screenwidth, 3), dtype=np.uint8)
+        self.output_function = output_function
 
     # initialize tensor flow model
     def init_tf2(self, model_file, label_file_name):
@@ -221,7 +222,7 @@ class DetectClassify:
                     maxcresult = cresult
                     maxlresult = lresult
         if maxcresult != 0:
-            print(f'match returned: confidence {maxcresult:.3f}, {maxlresult}')
+            self.output_function(f'match returned: confidence {maxcresult:.3f}, {maxlresult}')
         return maxcresult, maxlresult  # highest confidence with best match
 
     # takes a PIL image type and converts it to np array for tensor

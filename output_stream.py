@@ -30,11 +30,12 @@ class WebStream:
     def request_handler(self):
         while True:
             item = self.queue.get()  # get the next item in the queue to write to disk
-            print('web process receiving:', item)
+            # print('web process receiving:', item)
             if item is None:  # poison pill, end the process
                 break
             elif item[1] == 'flush':  # event type is flush
-                self.df = pd.DataFrame(self.df_list, columns=['Event Num', 'type', 'Date Time', 'Message', 'Image Name'])
+                self.df = pd.DataFrame(self.df_list,
+                                       columns=['Event Num', 'type', 'Date Time', 'Message', 'Image Name'])
                 self.df.to_csv('/home/pi/birdclass/webstream.csv')
             elif item[1] == 'occurrences':
                 self.df_occurrences = pd.DataFrame(item[3], columns=['Species', 'Date Time'])
@@ -60,17 +61,18 @@ class Controller:
         self.p_web_stream.start()
         return
 
-    def message(self, message, event_num=0, msg_type='message', image_name=''):
-        print('web controller sending: ', message)
+    def message(self, message, event_num=0, msg_type='message', image_name='', flush=False):
+        # print('web controller sending: ', message)
         item = [event_num, msg_type, datetime.datetime.now().strftime("%H:%M:%S"), message, image_name]
         self.queue.put(item)
+        if flush:
+            self.flush()
         return
 
     def occurrences(self, occurrence_list):
-        print(occurrence_list)
+        # print(occurrence_list)
         self.queue.put((0, 'occurrences', datetime.datetime.now().strftime("%H:%M:%S"), occurrence_list))
         return
-
 
     def flush(self):
         item = [0, 'flush', datetime.datetime.now().strftime("%H:%M:%S"), '', '']
@@ -91,7 +93,7 @@ class Controller:
 def main():
     web_stream = Controller()
     web_stream.start_stream()
-    web_stream.message('up and running') # place message on queue for child process
+    web_stream.message('up and running')  # place message on queue for child process
     web_stream.message(event_num=1, msg_type='prediction', message='big fat robin 97.0%',
                        image_name='/home/pi/birdclass/first_img.jpg')
     web_stream.message(event_num=1, msg_type='prediction', message='big fat robin 37.0%',

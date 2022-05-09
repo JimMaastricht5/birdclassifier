@@ -75,7 +75,8 @@ def bird_detector(args):
                                        contrast_chg=args.contrast_chg, sharpness_chg=args.sharpness_chg,
                                        brightness_chg=args.brightness_chg,
                                        overlap_perc_tolerance=args.overlap_perc_tolerance,
-                                       target_object='bird', target_object_min_confidence=.75)
+                                       target_object='bird', target_object_min_confidence=.75,
+                                       output_function=output.message)
     output.message('Using label file:', birds.labels)
     output.message('Using threshold file:', birds.thresholds)
     output.message('Starting while loop until sun set..... ')
@@ -100,14 +101,14 @@ def bird_detector(args):
                 first_img_jpg = image_proc.enhance_brightness(img=first_img_jpg, factor=args.brightness_chg)
                 birds.set_colors()  # set new colors for this series of bounding boxes
                 first_img_jpg = birds.add_boxes_and_labels(img=first_img_jpg)
-                first_img_jpg.save(img_filename)  # save file
                 gif, gif_filename, animated, best_label, best_confidence = build_bird_animated_gif(args, motion_detect,
                                                                                                    birds, first_img_jpg)
                 # max_index = birds.classified_confidences(max(birds.classified_confidences))
+                first_img_jpg.save(img_filename)  # save file
                 if best_label != '' and best_confidence > 0:
                     output.message(message=f'Sighting of a {best_label} {best_confidence * 100:.1f}% at '
                                            f'{datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count,
-                                   image_name=img_filename)  # send label and confidence to stream
+                                   image_name=img_filename, flush=True)  # send label and confidence to stream
                 bird_first_time_seen = birdpop.visitors(best_label, datetime.now())  # update census and last time seen
                 tweet_label = tweet_text(best_label, best_confidence)
                 if animated and bird_first_time_seen:  # doesn't change last_tweet time or override time between tweets
@@ -119,11 +120,12 @@ def bird_detector(args):
                 if animated and ((datetime.now() - last_tweet).total_seconds() >= waittime or bird_first_time_seen):
                     output.message(message=f'Tweeted animation of a {best_label} {best_confidence * 100:.1f}% '
                                            f'at {datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count,
-                                   image_name=gif_filename)
+                                   image_name=gif_filename, flush=True)
                     if bird_tweeter.post_image_from_file(tweet_label, gif_filename) is False:  # animated gif
-                        output.message(f"*** Failed gif tweet")  # failure, don't update last tweet time
+                        output.message(f"*** Failed gif tweet", flush=True)  # failure, don't update last tweet time
                     else:
                         last_tweet = datetime.now()  # update last tweet time if successful
+
     output.end_stream()  # ending process for evening, print blank line and begin shut down
     motion_detect.stop()
     if args.verbose:
