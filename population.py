@@ -59,7 +59,7 @@ class Census:
                 if self.census_dict[visitor_name][0] == 0:
                     self.first_time_seen = True
                 self.census_dict[visitor_name] = (self.census_dict[visitor_name][0] + 1, time_of_visit)
-                self.census_occurrence.append((visitor_name, time_of_visit))
+                self.census_occurrence.append((visitor_name, time_of_visit.strftime("%Y-%m-%d %H:%M:%S")))
         return self.first_time_seen
 
     # return count of visitors by name along with last seen date time
