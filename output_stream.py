@@ -31,10 +31,11 @@ class WebStream:
         try:
             while True:
                 item = self.queue.get()  # get the next item in the queue to write to disk
-                # print('web process receiving:', item)
                 if item is None:  # poison pill, end the process
-                    break
-                elif item[1] == 'flush':  # event type is flush
+                    break  # end process
+
+                print(item)  # print message to terminal
+                if item[1] == 'flush':  # event type is flush
                     self.df = pd.DataFrame(self.df_list,
                                            columns=['Event Num', 'type', 'Date Time', 'Message', 'Image Name'])
                     self.df.to_csv('/home/pi/birdclass/webstream.csv')
