@@ -65,7 +65,7 @@ def bird_detector(args):
     motion_detect = motion_detector.MotionDetector(args=args)  # init class
     output.message('Done with camera init... setting up classes.')
     bird_tweeter = tweeter.TweeterClass()  # init tweeter2 class twitter handler
-    chores = dailychores.DailyChores(bird_tweeter, birdpop, cityweather, output)
+    chores = dailychores.DailyChores(bird_tweeter, birdpop, cityweather, output.message)
     # init detection and classifier object
     birds = label_image.DetectClassify(homedir=args.homedir, labels=args.labels, thresholds=args.thresholds,
                                        default_confidence=args.default_confidence,
