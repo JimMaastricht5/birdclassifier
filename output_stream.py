@@ -40,6 +40,8 @@ class WebStream:
                                            columns=['Event Num', 'type', 'Date Time', 'Message', 'Image Name'])
                     self.df.to_csv('/home/pi/birdclass/webstream.csv')
                 elif item[1] == 'occurrences':
+                    print('writing occurences to web')
+                    print(item[3])
                     self.df_occurrences = pd.DataFrame(item[3], columns=['Species', 'Date Time'])
                     self.df_occurrences.to_csv('/home/pi/birdclass/web_occurrences.csv')  # species, date time
                 else:  # any other event type
