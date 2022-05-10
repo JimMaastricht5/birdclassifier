@@ -38,7 +38,7 @@ def short_name(birdname):
 
 class DailyChores:
 
-    def __init__(self, tweeter_obj, birdpop, city_weather, output):
+    def __init__(self, tweeter_obj, birdpop, city_weather, output=print):
         self.curr_day = datetime.now().day
         self.curr_hr = datetime.now().hour
         self.starttime = datetime.now()
@@ -47,7 +47,7 @@ class DailyChores:
         self.tweeter = tweeter_obj
         self.cityweather = city_weather
         self.birdpop = birdpop
-        self.output = output
+        self.output = output  # set print function or custom class
 
     # end of process report
     def end_report(self):
@@ -57,13 +57,13 @@ class DailyChores:
     # check current cpu temp, print, shutdown if overheated
     def check_cpu_temp(self):
         cpu = CPUTemperature()
-        print(f'***hourly temp check. cpu temp is: {cpu.temperature}C {(cpu.temperature * 9 / 5) + 32}F')
+        self.output(f'***hourly temp check. cpu temp is: {cpu.temperature}C {(cpu.temperature * 9 / 5) + 32}F')
         try:
             if int(cpu.temperature) >= 86:  # limit is 85 C
                 self.tweeter.post_status(f'***shut down. temp: {cpu.temperature}')
                 call("sudo shutdown -poweroff")
         except Exception as e:
-            print('Error in temp shutdown protection:', e)
+            self.output('Error in temp shutdown protection:', e)
             pass  # uncharted territory....
         return
 
@@ -89,7 +89,7 @@ class DailyChores:
                     if observed[birdkey][0] > 0 else post_txt  # post observed bird if count > 0 else keep prior txt
             self.tweeter.post_status(post_txt[0:279])  # grab full text up to 280 characters
         except Exception as e:
-            print('Error in daily population report:', e)
+            self.output('Error in daily population report:', e)
             pass  # just keep going...
         return
 
