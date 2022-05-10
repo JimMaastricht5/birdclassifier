@@ -34,7 +34,7 @@ class WebStream:
                 if item is None:  # poison pill, end the process
                     break  # end process
 
-                print('Message Type:',item[1])  # print message to terminal
+                # print('Message Type:',item[1])  # print message to terminal
                 if item[1] == 'flush':  # event type is flush
                     self.df = pd.DataFrame(self.df_list,
                                            columns=['Event Num', 'type', 'Date Time', 'Message', 'Image Name'])
