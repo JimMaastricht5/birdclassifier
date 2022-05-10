@@ -76,7 +76,7 @@ class Census:
     def get_census_by_count(self):
         return dict(sorted(self.census_dict.items(), key=lambda k_v: k_v[1][0], reverse=True))
 
-    def get_occurences(self):
+    def get_occurrences(self):
         return self.census_occurrence
 
 
@@ -99,7 +99,7 @@ def main():
     observed = popdogcats.get_census_by_count()  # print count from prior day
     print(observed)
     print('occurences:')
-    print(popdogcats.get_occurences())
+    print(popdogcats.get_occurrences())
 
     # mirror daily chorses reporting for testing
     def short_name(birdname):

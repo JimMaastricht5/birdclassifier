@@ -113,7 +113,7 @@ class DailyChores:
 
         if self.curr_hr != datetime.now().hour:  # check weather and CPU temp hourly
             self.check_cpu_temp()
-            self.output.occurrences(self.birdpop.get_census_by_count())
+            self.output.occurrences(self.birdpop.get_occurrences())
 
         self.curr_hr = datetime.now().hour
         self.curr_day = datetime.now().day
