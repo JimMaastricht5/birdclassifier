@@ -28,20 +28,23 @@ class WebStream:
                            'Date Time': pd.Series(dtype='str')})
 
     def request_handler(self):
-        while True:
-            item = self.queue.get()  # get the next item in the queue to write to disk
-            # print('web process receiving:', item)
-            if item is None:  # poison pill, end the process
-                break
-            elif item[1] == 'flush':  # event type is flush
-                self.df = pd.DataFrame(self.df_list,
-                                       columns=['Event Num', 'type', 'Date Time', 'Message', 'Image Name'])
-                self.df.to_csv('/home/pi/birdclass/webstream.csv')
-            elif item[1] == 'occurrences':
-                self.df_occurrences = pd.DataFrame(item[3], columns=['Species', 'Date Time'])
-                self.df_occurrences.to_csv('/home/pi/birdclass/web_occurrences.csv')  # species, date time
-            else:  # any other event type
-                self.df_list.append(item)
+        try:
+            while True:
+                item = self.queue.get()  # get the next item in the queue to write to disk
+                # print('web process receiving:', item)
+                if item is None:  # poison pill, end the process
+                    break
+                elif item[1] == 'flush':  # event type is flush
+                    self.df = pd.DataFrame(self.df_list,
+                                           columns=['Event Num', 'type', 'Date Time', 'Message', 'Image Name'])
+                    self.df.to_csv('/home/pi/birdclass/webstream.csv')
+                elif item[1] == 'occurrences':
+                    self.df_occurrences = pd.DataFrame(item[3], columns=['Species', 'Date Time'])
+                    self.df_occurrences.to_csv('/home/pi/birdclass/web_occurrences.csv')  # species, date time
+                else:  # any other event type
+                    self.df_list.append(item)
+        except Exception as e:
+            print(e)
         return
 
 
