@@ -34,17 +34,18 @@ class WebStream:
                 if item is None:  # poison pill, end the process
                     break  # end process
 
-                print(item)  # print message to terminal
+                print('Message Type:',item[1])  # print message to terminal
                 if item[1] == 'flush':  # event type is flush
                     self.df = pd.DataFrame(self.df_list,
                                            columns=['Event Num', 'type', 'Date Time', 'Message', 'Image Name'])
                     self.df.to_csv('/home/pi/birdclass/webstream.csv')
                 elif item[1] == 'occurrences':
-                    print('writing occurences to web')
-                    print(item[3])
+                    print('writing occurrences to web')
+                    print(item[3])  # show list of species occurrences
                     self.df_occurrences = pd.DataFrame(item[3], columns=['Species', 'Date Time'])
                     self.df_occurrences.to_csv('/home/pi/birdclass/web_occurrences.csv')  # species, date time
                 else:  # any other event type
+                    print(item[3])  # print message
                     self.df_list.append(item)
         except Exception as e:
             print(e)
