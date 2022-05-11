@@ -83,7 +83,7 @@ def bird_detector(args):
     # loop while the sun is up, look for motion, detect birds, determine species
     while cityweather.sunrise.time() < datetime.now().time() < cityweather.sunset.time():
         if args.verbose:
-            chores.hourly_and_daily(filename='')  # perform chores that take on a schedule such as weather reporting
+            chores.hourly_and_daily(filename='')  # pass file name for seed check img to disk
         motion_detect.detect()
         if motion_detect.motion:
             motioncnt += 1

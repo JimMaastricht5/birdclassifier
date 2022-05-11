@@ -38,7 +38,7 @@ def short_name(birdname):
 
 class DailyChores:
 
-    def __init__(self, tweeter_obj, birdpop, city_weather, output=print):
+    def __init__(self, tweeter_obj, birdpop, city_weather, output_class=None):
         self.curr_day = datetime.now().day
         self.curr_hr = datetime.now().hour
         self.starttime = datetime.now()
@@ -47,7 +47,8 @@ class DailyChores:
         self.tweeter = tweeter_obj
         self.cityweather = city_weather
         self.birdpop = birdpop
-        self.output = output  # set print function or custom class
+        self.output_class = output_class  # take an arguement of class Controller from output_stream.py
+        self.output_func = output_class.message if output_class is not None else print
 
     # end of process report
     def end_report(self):
@@ -57,13 +58,13 @@ class DailyChores:
     # check current cpu temp, print, shutdown if overheated
     def check_cpu_temp(self):
         cpu = CPUTemperature()
-        self.output(f'***hourly temp check. cpu temp is: {cpu.temperature}C {(cpu.temperature * 9 / 5) + 32}F')
+        self.output_func(f'***hourly temp check. cpu temp is: {cpu.temperature}C {(cpu.temperature * 9 / 5) + 32}F')
         try:
             if int(cpu.temperature) >= 86:  # limit is 85 C
                 self.tweeter.post_status(f'***shut down. temp: {cpu.temperature}')
                 call("sudo shutdown -poweroff")
         except Exception as e:
-            self.output('Error in temp shutdown protection:', e)
+            self.output_func('Error in temp shutdown protection:', e)
             pass  # uncharted territory....
         return
 
@@ -89,7 +90,7 @@ class DailyChores:
                     if observed[birdkey][0] > 0 else post_txt  # post observed bird if count > 0 else keep prior txt
             self.tweeter.post_status(post_txt[0:279])  # grab full text up to 280 characters
         except Exception as e:
-            self.output('Error in daily population report:', e)
+            self.output_func('Error in daily population report:', e)
             pass  # just keep going...
         return
 
@@ -113,7 +114,8 @@ class DailyChores:
 
         if self.curr_hr != datetime.now().hour:  # check weather and CPU temp hourly
             self.check_cpu_temp()
-            self.output.occurrences(self.birdpop.get_occurrences())
+            if self.output_class is not None:
+                self.output_class.occurrences(self.birdpop.get_occurrences())
 
         self.curr_hr = datetime.now().hour
         self.curr_day = datetime.now().day
