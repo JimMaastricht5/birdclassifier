@@ -25,7 +25,8 @@ app.layout = html.Div(children=[
         id='example-graph',
         figure=fig
     ),
-    dash_table.DataTable(data=df_stream.to_dict('records'), columns=[{'name': i, 'id': i} for i in df_stream.columns],
+    # dash_table.DataTable(data=df_stream.to_dict('records'), columns=[{'name': i, 'id': i} for i in df_stream.columns],
+    dash_table.DataTable(data=df_stream.to_dict('records'), columns=[{i} for i in df_stream.columns],
                          id='web_stream'
     ),
     dcc.Interval(id='interval', interval=1000, n_intervals=0)
