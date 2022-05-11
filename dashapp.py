@@ -9,6 +9,7 @@ df_occurrence['Date Time'] = pd.to_datetime(df_occurrence['Date Time'])
 df_occurrence['Hour'] = pd.to_numeric(df_occurrence['Date Time'].dt.hour)
 df_occurrence = df_occurrence.reset_index(drop=True)
 df_stream = pd.read_csv('/home/pi/birdclass/webstream.csv')
+df_stream = df_stream.reset_index(drop=True)
 fig = px.histogram(df_occurrence, x="Hour", color='Species', range_x=[6, 22], nbins=16)
 
 
