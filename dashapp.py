@@ -2,6 +2,7 @@ from dash import Dash, html, dcc, dash_table
 from dash.dependencies import Input, Output
 import plotly.express as px
 import pandas as pd
+import dash_bootstrap_components as dbc
 
 path = '/home/pi/birdclass/webstream.csv'
 df_occurrence = pd.read_csv('/home/pi/birdclass/web_occurrences.csv')
@@ -10,9 +11,8 @@ df_occurrence['Hour'] = pd.to_numeric(df_occurrence['Date Time'].dt.hour)
 df_stream = pd.read_csv('/home/pi/birdclass/webstream.csv')
 fig = px.histogram(df_occurrence, x="Hour", color='Species', range_x=[6, 22], nbins=16)
 
-BS = "https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
-app = Dash(external_stylesheets=[BS])
-# app = Dash(__name__)
+app = Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
+
 app.layout = html.Div(children=[
     html.H1(children='Tweeters'),
 
@@ -33,16 +33,15 @@ app.layout = html.Div(children=[
 
 
 @app.callback(Output('web_stream', 'data'),
-              [Input('interval_component', 'n_intervals')])
+              [Input('interval', 'n_intervals')])
 def update_rows(n_intervals, n_clicks):
     data = pd.read_csv('/home/pi/birdclass/webstream.csv')
     dict = data.to_dict('records')
-
     return dict
 
 
 @app.callback(Output('web_stream', 'columns'),
-              [Input('interval_component', 'n_intervals')])
+              [Input('interval', 'n_intervals')])
 def update_cols(n_intervals):
     data = pd.read_csv('/home/pi/birdclass/webstream.csv')
     columns = [{'id': i, 'names': i} for i in data.columns]
