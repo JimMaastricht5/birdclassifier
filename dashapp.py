@@ -48,6 +48,7 @@ def update_cols(n_intervals):
     return columns
 
 
+
 if __name__ == "__main__":
     port = 8080
 
