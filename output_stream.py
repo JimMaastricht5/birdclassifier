@@ -9,8 +9,8 @@ class WebStream:
     # event_num: unique int key for event
     # type: end_process, motion, prediction, prediction_final, flush, message
     #   end_process or None: stops the process and free the creator's block on join()
-    #   motion, prediction, prediction_final, message: all contain text for the web site to display
-    #   flush: writes the current set of in memory content to a file for web site display
+    #   motion, prediction, prediction_final, message: all contain text for the website to display
+    #   flush: writes the current set of in memory content to a file for website display
     # Date time: string
     # Prediction: string
     # Image_name: string, image name on disk
@@ -41,11 +41,10 @@ class WebStream:
                     self.df.to_csv('/home/pi/birdclass/webstream.csv')
                 elif item[1] == 'occurrences':
                     print('writing occurrences to web')
-                    # print('item:', item)
                     print('item[3]:', item[3])  # show list of species occurrences
                     self.df_occurrences = pd.DataFrame(item[3], columns=['Species', 'Date Time'])
                     self.df_occurrences.to_csv('/home/pi/birdclass/web_occurrences.csv')  # species, date time
-                else:  # any other event type
+                else:  # basic message or any other event type
                     print(item[3])  # print message
                     self.df_list.append(item)
         except Exception as e:
@@ -58,6 +57,7 @@ class Controller:
         self.queue = multiprocessing.Queue()
         self.web_stream = WebStream(queue=self.queue)
         self.p_web_stream = multiprocessing.Process(target=self.web_stream.request_handler, args=(), daemon=True)
+        self.last_event_num = 0
         self.df = pd.DataFrame({
                            'Event Num': pd.Series(dtype='int'),
                            'type': pd.Series(dtype='str'),
@@ -71,10 +71,12 @@ class Controller:
 
     def message(self, message, event_num=0, msg_type='message', image_name='', flush=False):
         # print('web controller sending: ', message)
+        event_num = self.last_event_num if event_num == 0 else event_num
         item = [event_num, msg_type, datetime.datetime.now().strftime("%H:%M:%S"), message, image_name]
         self.queue.put(item)
         if flush:
             self.flush()
+        self.last_event_num = event_num
         return
 
     def occurrences(self, occurrence_list):
