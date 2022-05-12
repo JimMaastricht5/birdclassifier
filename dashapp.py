@@ -21,7 +21,8 @@ def load_message_stream():
 def load_bird_occurrences():
     df_occurrence = pd.read_csv('/home/pi/birdclass/web_occurrences.csv')
     df_occurrence['Date Time'] = pd.to_datetime(df_occurrence['Date Time'])
-    df_occurrence['Hour'] = df_occurrence['Date Time'].dt.strftime('%H:%M')
+    df_occurrence['Hour'] = pd.to_numeric(df_occurrence['Date Time'].dt.strftime('%H')) + \
+                            pd.to_numeric(df_occurrence['Date Time'].dt.strftime('%M')) / 60
     return df_occurrence
 
 
