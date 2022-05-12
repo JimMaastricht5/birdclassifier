@@ -2,6 +2,10 @@ from dash import Dash, html, dcc, dash_table
 from dash.dependencies import Input, Output
 import plotly.express as px
 import pandas as pd
+import datetime
+
+def last_refresh():
+    return html.H1('The time is: ' + str(datetime.datetime.now()))
 
 def load_message_stream():
     df_stream = pd.read_csv('/home/pi/birdclass/webstream.csv')
@@ -38,9 +42,18 @@ app.layout = html.Div(children=[
         id='example-graph',
         figure=fig
     ),
+
+    html.Img(src="/home/pi/birdclass/birds.gif",
+             style={
+                 'height': '100px',
+                 'float': 'right'
+             },
+             ),
+
     dash_table.DataTable(data=df_stream.to_dict('records'), columns=[{'name': i, 'id': i} for i in df_stream.columns],
                          id='web_stream'
     ),
+
     dcc.Interval(id='interval', interval=30000, n_intervals=0)  # update every 30 seconds
     ]
 )
