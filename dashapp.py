@@ -13,7 +13,7 @@ def last_refresh():
 def load_message_stream():
     df_stream = pd.read_csv('/home/pi/birdclass/webstream.csv')
     df_stream = df_stream.reset_index(drop=True)
-    df_stream = df_stream.drop(columns=['Unnamed: 0'])
+    df_stream = df_stream.drop(columns=['Unnamed: 0', 'type', 'Image Name'])
     df_stream = df_stream.sort_values(by='Date Time', ascending=False)
     return df_stream
 
@@ -21,7 +21,6 @@ def load_message_stream():
 def load_bird_occurrences():
     df_occurrence = pd.read_csv('/home/pi/birdclass/web_occurrences.csv')
     df_occurrence['Date Time'] = pd.to_datetime(df_occurrence['Date Time'])
-    # df_occurrence['Hour'] = pd.to_numeric(df_occurrence['Date Time'].dt.hour) + pd.to_numeric(df_occurrence['Date Time'].dt.minute) / 60
     df_occurrence['Hour'] = df_occurrence['Date Time'].dt.strftime('%H:%M')
     return df_occurrence
 
@@ -55,7 +54,13 @@ app.layout = html.Div(children=[
              ),
 
     dash_table.DataTable(data=df_stream.to_dict('records'), columns=[{'name': i, 'id': i} for i in df_stream.columns],
-                         id='web_stream'
+        id='web_stream',
+        filter_action="native",
+        sort_action="native",
+        sort_mode="multi",
+        page_action="native",
+        page_current= 0,
+        page_size= 10,
             ),
 
     dcc.Interval(id='interval', interval=30000, n_intervals=0)  # update every 30 seconds
