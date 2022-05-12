@@ -21,7 +21,8 @@ def load_message_stream():
 def load_bird_occurrences():
     df_occurrence = pd.read_csv('/home/pi/birdclass/web_occurrences.csv')
     df_occurrence['Date Time'] = pd.to_datetime(df_occurrence['Date Time'])
-    df_occurrence['Hour'] = pd.to_numeric(df_occurrence['Date Time'].dt.hour) + pd.to_numeric(df_occurrence['Date Time'].dt.minute) / 60
+    # df_occurrence['Hour'] = pd.to_numeric(df_occurrence['Date Time'].dt.hour) + pd.to_numeric(df_occurrence['Date Time'].dt.minute) / 60
+    df_occurrence['Hour'] = df_occurrence['Date Time'].dt.strftime('%H:%M')
     return df_occurrence
 
 
@@ -79,5 +80,5 @@ def update_cols(n_intervals):
 
 if __name__ == "__main__":
     port = 8080
-
     app.run_server(debug=True, host='0.0.0.0', port=port)
+    # app.run_server(debug=True, port=port)
