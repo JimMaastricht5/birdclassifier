@@ -31,7 +31,7 @@ app.layout = html.Div(children=[
     html.H1(children='Tweeters'),
 
     html.Div(children='''
-        Understanding what is happening at the feeder.
+        Understanding what is happening at the feeder.  Chart is update hourly.  Table every 30 seconds.
     '''),
 
     dcc.Graph(
