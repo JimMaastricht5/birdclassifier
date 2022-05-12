@@ -72,7 +72,7 @@ class Controller:
     def message(self, message, event_num=0, msg_type='message', image_name='', flush=False):
         # print('web controller sending: ', message)
         event_num = self.last_event_num if event_num == 0 else event_num
-        item = [event_num, msg_type, datetime.datetime.now().strftime("%H:%M:%S"), message, image_name]
+        item = [event_num, msg_type, datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S"), message, image_name]
         self.queue.put(item)
         if flush:
             self.flush()
@@ -81,7 +81,7 @@ class Controller:
 
     def occurrences(self, occurrence_list):
         # print(occurrence_list)
-        item = [0, 'occurrences', datetime.datetime.now().strftime("%H:%M:%S"), occurrence_list]
+        item = [0, 'occurrences', datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S"), occurrence_list]
         self.queue.put(item)
         return
 
