@@ -15,6 +15,7 @@ def load_message_stream():
     df_stream = df_stream.reset_index(drop=True)
     df_stream = df_stream.drop(columns=['Unnamed: 0', 'type', 'Image Name'])
     df_stream = df_stream.sort_values(by='Date Time', ascending=False)
+    df_stream = df_stream[df_stream['Event Num'] != 0]
     return df_stream
 
 
@@ -29,7 +30,7 @@ def load_bird_occurrences():
 path = '/home/pi/birdclass/webstream.csv'
 df_occurrence = load_bird_occurrences()
 df_stream = load_message_stream()
-fig = px.histogram(df_occurrence, x="Hour", color='Species', range_x=[6, 22], nbins=16)
+fig = px.histogram(df_occurrence, x="Hour", color='Species', range_x=[6, 22], nbins=32, width=800, height=400)
 
 
 app = Dash(__name__)
@@ -49,12 +50,21 @@ app.layout = html.Div(children=[
 
     html.Img(src=app.get_asset_url('birds.gif'),
              style={
-                 'height': '200px',
+                 'height': '100px',
                  'float': 'left'
              },
              ),
 
-    dash_table.DataTable(data=df_stream.to_dict('records'), columns=[{'name': i, 'id': i} for i in df_stream.columns],
+    dash_table.DataTable(
+        data=df_stream.to_dict('records'), columns=[{'name': i, 'id': i} for i in df_stream.columns],
+        style_cell_conditional=[
+            {'if': {'column_id': 'Event Num'},
+             'width': '10px'},
+            {'if': {'column_id': 'Date Time'},
+             'width': '30px'},
+            {'if': {'column_id': 'Message'},
+             'width': '130px'},
+        ],
         id='web_stream',
         filter_action="native",
         sort_action="native",
