@@ -22,7 +22,8 @@ def load_bird_occurrences():
 path = '/home/pi/birdclass/webstream.csv'
 df_occurrence = load_bird_occurrences()
 df_stream = load_message_stream()
-fig = px.histogram(df_occurrence, x="Hour", color='Species', range_x=[6, 22], nbins=16)
+# fig = px.histogram(df_occurrence, x="Hour", color='Species', range_x=[6, 22], nbins=16)
+fig = px.histogram(df_occurrence, x="Hour", color='Species')
 
 
 app = Dash(__name__)
