@@ -15,7 +15,6 @@ def load_message_stream():
     df_stream = df_stream.reset_index(drop=True)
     df_stream = df_stream.drop(columns=['Unnamed: 0'])
     df_stream = df_stream.sort_values(by='Date Time', ascending=False)
-    print(df_stream)
     return df_stream
 
 
@@ -24,11 +23,6 @@ def load_bird_occurrences():
     df_occurrence['Date Time'] = pd.to_datetime(df_occurrence['Date Time'])
     df_occurrence['Hour'] = pd.to_numeric(df_occurrence['Date Time'].dt.hour) + pd.to_numeric(df_occurrence['Date Time'].dt.minute) / 60
     return df_occurrence
-
-
-def load_gif():
-    encoded_image = base64.b64encode(open('/home/pi/birdclass/birds.gif', 'rb').read())
-    return encoded_image
 
 
 path = '/home/pi/birdclass/webstream.csv'
@@ -50,10 +44,12 @@ app.layout = html.Div(children=[
         figure=fig
         ),
 
-    html.Img(src='data:image/png;base64,{}'.format(load_gif()),
+    html.Div(children=''),
+
+    html.Img(src=app.get_asset_url('birds.gif'),
              style={
-                 'height': '100px',
-                 'float': 'right'
+                 'height': '200px',
+                 'float': 'left'
              },
              ),
 
@@ -68,7 +64,6 @@ app.layout = html.Div(children=[
 @app.callback(Output('web_stream', 'data'),
               [Input('interval', 'n_intervals')])
 def update_rows(n_intervals):
-    # data = pd.read_csv('/home/pi/birdclass/webstream.csv')
     data = load_message_stream()
     dict = data.to_dict('records')
     return dict
@@ -77,7 +72,6 @@ def update_rows(n_intervals):
 @app.callback(Output('web_stream', 'columns'),
               [Input('interval', 'n_intervals')])
 def update_cols(n_intervals):
-    # data = pd.read_csv('/home/pi/birdclass/webstream.csv')
     data = load_message_stream()
     columns = [{'id': i, 'name': i} for i in data.columns]
     return columns

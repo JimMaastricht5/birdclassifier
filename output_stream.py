@@ -2,6 +2,7 @@
 import multiprocessing
 import pandas as pd
 import datetime
+import os
 
 
 class WebStream:
@@ -14,8 +15,12 @@ class WebStream:
     # Date time: string
     # Prediction: string
     # Image_name: string, image name on disk
-    def __init__(self, queue):
+    def __init__(self, queue, path=os.getcwd()):
         self.queue = queue
+        self.path = path
+        print(self.path)
+        self.asset_path = self.path + '/assets'
+        print(self.asset_path)
         self.df_list = []
         self.df = pd.DataFrame({
                            'Event Num': pd.Series(dtype='int'),
@@ -38,12 +43,12 @@ class WebStream:
                 if item[1] == 'flush':  # event type is flush
                     self.df = pd.DataFrame(self.df_list,
                                            columns=['Event Num', 'type', 'Date Time', 'Message', 'Image Name'])
-                    self.df.to_csv('/home/pi/birdclass/webstream.csv')
+                    self.df.to_csv(f'{self.path}/webstream.csv')
                 elif item[1] == 'occurrences':
                     print('writing occurrences to web')
                     print('item[3]:', item[3])  # show list of species occurrences
                     self.df_occurrences = pd.DataFrame(item[3], columns=['Species', 'Date Time'])
-                    self.df_occurrences.to_csv('/home/pi/birdclass/web_occurrences.csv')  # species, date time
+                    self.df_occurrences.to_csv(f'{self.path}/web_occurrences.csv')  # species, date time
                 else:  # basic message or any other event type
                     print(item[3])  # print message
                     self.df_list.append(item)
