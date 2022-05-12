@@ -7,7 +7,7 @@ def load_message_stream():
     df_stream = pd.read_csv('/home/pi/birdclass/webstream.csv')
     df_stream = df_stream.reset_index(drop=True)
     # df_stream = df_stream.drop(columns=['Unnamed: 0'])
-    df_stream = df_stream.sort_values(by='Event Num', ascending=False)
+    df_stream = df_stream.sort_values(by='Date Time', ascending=False)
     print(df_stream)
     return df_stream
 
