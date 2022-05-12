@@ -25,6 +25,7 @@
 from PIL import ImageEnhance, Image, ImageOps, ImageStat, ImageFilter, ImageChops
 import numpy as np
 import io
+import os
 
 
 # Pillow img to flip
@@ -171,7 +172,7 @@ def convert_image(img, target='gif'):
 
 
 # takes list of frames and saves as a gif
-def save_gif(frames, frame_rate=30, filename='/home/pi/birdclass/birds.gif'):
+def save_gif(frames, frame_rate=30, filename=os.getcwd()+'/assets/birds.gif'):
     gif_frames = [convert_image(frame, target='gif') for frame in frames]
     try:
         gif_frame_one = gif_frames[0]  # grab a frame to save full image with

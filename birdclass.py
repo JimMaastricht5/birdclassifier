@@ -39,6 +39,7 @@ import output_stream
 import argparse  # argument parser
 from datetime import datetime
 from collections import defaultdict
+import os
 
 
 # default dictionary returns a tuple of zero confidence and zero bird count
@@ -92,7 +93,7 @@ def bird_detector(args):
             motioncnt = 0  # reset motion count between detected birds
             birds.set_colors()  # set new colors for this series of bounding boxes
             event_count += 1
-            img_filename = '/home/pi/birdclass/' + 'img' + str(event_count % 10) + '.jpg'
+            img_filename = os.getcwd() + '/assets/' + str(event_count % 10) + '.jpg'
             output.message(message=f'Saw bird #{event_count} at {datetime.now().strftime("%I:%M:%S %P")}',
                            event_num=event_count, image_name='')
             first_img_jpg = birds.img  # keep first shot for animation and web
