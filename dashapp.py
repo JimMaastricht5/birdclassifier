@@ -3,9 +3,12 @@ from dash.dependencies import Input, Output
 import plotly.express as px
 import pandas as pd
 import datetime
+import base64
+
 
 def last_refresh():
     return html.H1('The time is: ' + str(datetime.datetime.now()))
+
 
 def load_message_stream():
     df_stream = pd.read_csv('/home/pi/birdclass/webstream.csv')
@@ -23,11 +26,15 @@ def load_bird_occurrences():
     return df_occurrence
 
 
+def load_gif():
+    encoded_image = base64.b64encode(open('/home/pi/birdclass/birds.gif', 'rb').read())
+    return encoded_image
+
+
 path = '/home/pi/birdclass/webstream.csv'
 df_occurrence = load_bird_occurrences()
 df_stream = load_message_stream()
 fig = px.histogram(df_occurrence, x="Hour", color='Species', range_x=[6, 22], nbins=32)
-# fig = px.histogram(df_occurrence, x="Hour", color='Species')
 
 
 app = Dash(__name__)
@@ -36,14 +43,14 @@ app.layout = html.Div(children=[
 
     html.Div(children='''
         Understanding what is happening at the feeder.  Chart is update hourly.  Table every 30 seconds.
-    '''),
+        '''),
 
     dcc.Graph(
         id='example-graph',
         figure=fig
-    ),
+        ),
 
-    html.Img(src="/home/pi/birdclass/birds.gif",
+    html.Img(src='data:image/png;base64,{}'.format(load_gif()),
              style={
                  'height': '100px',
                  'float': 'right'
@@ -52,11 +59,10 @@ app.layout = html.Div(children=[
 
     dash_table.DataTable(data=df_stream.to_dict('records'), columns=[{'name': i, 'id': i} for i in df_stream.columns],
                          id='web_stream'
-    ),
+            ),
 
     dcc.Interval(id='interval', interval=30000, n_intervals=0)  # update every 30 seconds
-    ]
-)
+    ])
 
 
 @app.callback(Output('web_stream', 'data'),
