@@ -56,10 +56,8 @@ app.layout = html.Div(children=[
              },
              ),
 
-    html.Img(src=app.get_asset_url('0.jpg'),
-             style={
-                 'height': '150px'
-             },
+    html.Img(src=app.get_asset_url('0.jpg)
+
              ),
 
     dash_table.DataTable(
