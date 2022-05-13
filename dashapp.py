@@ -3,7 +3,7 @@ from dash.dependencies import Input, Output
 import plotly.express as px
 import pandas as pd
 import datetime
-import base64
+import os
 
 
 def last_refresh():
@@ -11,7 +11,7 @@ def last_refresh():
 
 
 def load_message_stream():
-    df_stream = pd.read_csv('/home/pi/birdclass/webstream.csv')
+    df_stream = pd.read_csv(os.getcwd()+'/webstream.csv')
     df_stream = df_stream.reset_index(drop=True)
     df_stream = df_stream.drop(columns=['Unnamed: 0', 'type', 'Image Name'])
     df_stream = df_stream.sort_values(by='Date Time', ascending=False)
@@ -20,14 +20,13 @@ def load_message_stream():
 
 
 def load_bird_occurrences():
-    df_occurrence = pd.read_csv('/home/pi/birdclass/web_occurrences.csv')
+    df_occurrence = pd.read_csv(os.getcwd()+'/web_occurrences.csv')
     df_occurrence['Date Time'] = pd.to_datetime(df_occurrence['Date Time'])
     df_occurrence['Hour'] = pd.to_numeric(df_occurrence['Date Time'].dt.strftime('%H')) + \
                             pd.to_numeric(df_occurrence['Date Time'].dt.strftime('%M')) / 60
     return df_occurrence
 
 
-path = '/home/pi/birdclass/webstream.csv'
 df_occurrence = load_bird_occurrences()
 df_stream = load_message_stream()
 fig = px.histogram(df_occurrence, x="Hour", color='Species', range_x=[4, 22], nbins=36, width=1200, height=500)
@@ -70,8 +69,8 @@ app.layout = html.Div(children=[
         sort_action="native",
         sort_mode="multi",
         page_action="native",
-        page_current= 0,
-        page_size= 10,
+        page_current=0,
+        page_size=10,
             ),
 
     dcc.Interval(id='interval', interval=30000, n_intervals=0)  # update every 30 seconds
