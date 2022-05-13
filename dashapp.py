@@ -52,12 +52,16 @@ app.layout = html.Div(children=[
 
     html.Img(src=app.get_asset_url('birds.gif'),
              style={
-                 'height': '150px'
+                 'height': '240px',
+                 'width': '320px'
              },
              ),
 
-    html.Img(src=app.get_asset_url('0.jpg')
-
+    html.Img(src=app.get_asset_url('0.jpg'),
+            style={
+                 'height': '240px',
+                 'width': '320px'
+             },
              ),
 
     dash_table.DataTable(
