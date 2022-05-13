@@ -63,6 +63,60 @@ app.layout = html.Div(children=[
                  'width': '160px'
              },
              ),
+    html.Img(src=app.get_asset_url('1.jpg'),
+             style={
+                 'height': '213px',
+                 'width': '160px'
+             },
+             ),
+    html.Img(src=app.get_asset_url('2.jpg'),
+             style={
+                 'height': '213px',
+                 'width': '160px'
+             },
+             ),
+    html.Img(src=app.get_asset_url('3.jpg'),
+             style={
+                 'height': '213px',
+                 'width': '160px'
+             },
+             ),
+    html.Img(src=app.get_asset_url('4.jpg'),
+             style={
+                 'height': '213px',
+                 'width': '160px'
+             },
+             ),
+    html.Img(src=app.get_asset_url('5.jpg'),
+             style={
+                 'height': '213px',
+                 'width': '160px'
+             },
+             ),
+    html.Img(src=app.get_asset_url('6.jpg'),
+             style={
+                 'height': '213px',
+                 'width': '160px'
+             },
+             ),
+    html.Img(src=app.get_asset_url('7.jpg'),
+             style={
+                 'height': '213px',
+                 'width': '160px'
+             },
+             ),
+    html.Img(src=app.get_asset_url('8.jpg'),
+             style={
+                 'height': '213px',
+                 'width': '160px'
+             },
+             ),
+    html.Img(src=app.get_asset_url('9.jpg'),
+             style={
+                 'height': '213px',
+                 'width': '160px'
+             },
+             ),
 
     dash_table.DataTable(
         data=df_stream.to_dict('records'), columns=[{'name': i, 'id': i} for i in df_stream.columns],
