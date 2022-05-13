@@ -7,7 +7,7 @@ import os
 
 
 def last_refresh():
-    return html.H1('The time is: ' + str(datetime.datetime.now()))
+    return 'Page last updated: ' + str(datetime.datetime.now().strftime('%H:%M:%S'))
 
 
 def load_message_stream():
@@ -37,8 +37,11 @@ app.layout = html.Div(children=[
     html.H1(children='Tweeters'),
 
     html.Div(children='''
-        Understanding what is happening at the feeder.  Chart is update hourly.  Table every 30 seconds.
+        Here is what is happening at the feeder.  The page has a chart with bird occurrences by hour, last animation, and events from the detector.  
         '''),
+
+    html.Div(children=last_refresh()
+        ),
 
     dcc.Graph(
         id='example-graph',
@@ -49,8 +52,13 @@ app.layout = html.Div(children=[
 
     html.Img(src=app.get_asset_url('birds.gif'),
              style={
-                 'height': '100px',
-                 'float': 'left'
+                 'height': '150px'
+             },
+             ),
+
+    html.Img(src=app.get_asset_url('0.jpg'),
+             style={
+                 'height': '150px'
              },
              ),
 

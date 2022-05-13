@@ -32,7 +32,7 @@
 31 Psilorhinus morio (Brown Jay),-1
 32 Megarynchus pitangua (Boat-billed Flycatcher),-1
 33 Gallinula tenebrosa (Dusky Moorhen),-1
-34 Gallus gallus domesticus (Domestic Chicken),99
+34 Gallus gallus domesticus (Domestic Chicken),990
 35 Numida meleagris (Helmeted Guineafowl),-1
 36 Junco hyemalis caniceps (Gray-headed Junco),0
 37 Tyrannus vociferans (Cassin's Kingbird),-1
@@ -579,7 +579,7 @@
 578 Cochlearius cochlearius (Boat-billed Heron),-1
 579 Anhinga novaehollandiae (Australasian Darter),-1
 580 Anhinga rufa (African Darter),-1
-581 Melozone fusca (Canyon Towhee),0
+581 Melozone fusca (Canyon Towhee),-1
 582 Aquila chrysaetos (Golden Eagle),0
 583 Hylocichla mustelina (Wood Thrush),0
 584 Aphelocoma wollweberi (Mexican Jay),-1
@@ -845,13 +845,13 @@
 844 Aythya ferina (Common Pochard),0
 845 Aythya fuligula (Tufted Duck),0
 846 Numenius americanus (Long-billed Curlew),0
-847 Chen caerulescens (Snow Goose),0
-848 Chamaea fasciata (Wrentit),0
-849 Branta canadensis (Canada Goose),985
+847 Chen caerulescens (Snow Goose),990
+848 Chamaea fasciata (Wrentit),-1
+849 Branta canadensis (Canada Goose),990
 850 Thalasseus elegans (Elegant Tern),0
 851 Branta sandvicensis (Hawaiian Goose),0
 852 Aythya americana (Redhead),0
-853 Aix sponsa (Wood Duck),0
+853 Aix sponsa (Wood Duck),990
 854 Lophodytes cucullatus (Hooded Merganser),0
 855 Histrionicus histrionicus (Harlequin Duck),0
 856 Aratinga nenday (Nanday Parakeet),0
