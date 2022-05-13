@@ -52,15 +52,15 @@ app.layout = html.Div(children=[
 
     html.Img(src=app.get_asset_url('birds.gif'),
              style={
-                 'height': '320px',
-                 'width': '240px'
+                 'height': '213px',
+                 'width': '160px'
              },
              ),
 
     html.Img(src=app.get_asset_url('0.jpg'),
             style={
-                 'height': '320px',
-                 'width': '240px'
+                 'height': '213px',
+                 'width': '160px'
              },
              ),
 
