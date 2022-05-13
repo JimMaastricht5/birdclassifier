@@ -29,7 +29,7 @@ def load_bird_occurrences():
 
 df_occurrence = load_bird_occurrences()
 df_stream = load_message_stream()
-fig = px.histogram(df_occurrence, x="Hour", color='Species', range_x=[4, 22], nbins=36, width=1200, height=500)
+fig = px.histogram(df_occurrence, x="Hour", color='Species', range_x=[4, 22], nbins=36, width=1000, height=400)
 
 
 app = Dash(__name__)
