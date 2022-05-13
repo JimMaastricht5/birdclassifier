@@ -56,7 +56,7 @@ app.layout = html.Div(children=[
              },
              ),
 
-    html.Img(src=app.get_asset_url('0.jpg)
+    html.Img(src=app.get_asset_url('0.jpg')
 
              ),
 
