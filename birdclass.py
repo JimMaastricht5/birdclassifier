@@ -198,7 +198,7 @@ def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
     for i, frame in enumerate(frames):
         frame = image_proc.enhance_brightness(img=frame, factor=args.brightness_chg)
         if birds.detect(img=frame):  # find bird object in frame and set rectangles containing object
-            if birds.classify(img=frame, use_confidence_threshold=False) > 0:   # classify at rectangle & chk confidence
+            if birds.classify(img=frame, use_confidence_threshold=True) > 0:   # classify at rectangle & chk confidence
                 frames_with_birds += 1
                 last_good_frame = i + 1  # found a bird, add one to last good frame to account for insert of 1st image
             census_dict, confidence_dict = build_dict(census_dict, birds.classified_labels, confidence_dict,
@@ -249,7 +249,7 @@ if __name__ == "__main__":
     ap.add_argument("-mp", "--mismatch_penalty", type=float, default=.3,
                     help="confidence penalty if predictions from img and enhance img dont match ")
     ap.add_argument("-ei", "--enhanceimg", type=bool, default=True, help="offset waterproof box blur and enhance img")
-    ap.add_argument("-co", "--default_confidence", type=float, default=.95, help="confidence threshold")
+    ap.add_argument("-co", "--default_confidence", type=float, default=.90, help="confidence threshold")
     ap.add_argument("-op", "--overlap_perc_tolerance", type=float, default=0.8, help="% box overlap to flag as dup")
     ap.add_argument("-ma", "--minarea", type=float, default=5.0, help="motion entropy threshold")  # lower = > motion
     ap.add_argument("-hd", "--homedir", type=str, default='/home/pi/PycharmProjects/birdclassifier/',
