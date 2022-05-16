@@ -264,7 +264,7 @@ class DetectClassify:
             classified_confidences = self.last_known_classified_confidences
         else:
             classified_rects = self.classified_rects
-            classified_labels = self.classified_labels  # assigned but not used below ??
+            classified_labels = self.classified_labels
             classified_confidences = self.classified_confidences
 
         for i, rect in enumerate(classified_rects):
@@ -283,6 +283,16 @@ class DetectClassify:
                        (end_x, end_y), (end_x, start_y), (end_x, start_y), (start_x, start_y)],
                       fill=self.get_next_color(from_index=i), width=2)
         return img
+
+    # used to get a temp copy of data if labeling is delayed
+    def get_obj_data(self):
+        return self.classified_rects, self.classified_labels, self.classified_confidences
+
+    def set_ojb_data(self, classified_rects, classified_labels, classified_confidences):
+        self.classified_rects = classified_rects
+        self.classified_labels = classified_labels
+        self.classified_confidences = classified_confidences
+        return
 
     # pick random color for stream of frames
     def pick_a_color(self):

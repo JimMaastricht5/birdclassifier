@@ -100,6 +100,7 @@ def bird_detector(args):
             # classify, grab labels, output census, send to web and terminal,
             # enhance the shot, and add boxes, grab next set of gifs, build animation, tweet
             if birds.classify(img=first_img_jpg) >= args.default_confidence:  # found a bird we can classify
+                first_rects, first_label, first_conf = birds.get_obj_data()  # grab data from this bird
                 max_index = birds.classified_confidences.index(max(birds.classified_confidences))
                 bird_first_time_seen = birdpop.visitors(birds.classified_labels[max_index], datetime.now())
                 output.message(message=f'Sighting of a {birds.classified_labels[max_index]} '
@@ -108,11 +109,19 @@ def bird_detector(args):
                                image_name=img_filename, flush=True)  # send label and confidence to stream
                 first_img_jpg = first_img_jpg if args.brightness_chg == 0 else \
                     image_proc.enhance_brightness(img=first_img_jpg, factor=args.brightness_chg)  # increase brightness
-                first_img_jpg = birds.add_boxes_and_labels(img=first_img_jpg)
+                # unlabeled first image is passed to gif function, bare copy is annotated later
                 gif, gif_filename, animated, best_label, best_confidence = build_bird_animated_gif(args, motion_detect,
                                                                                                    birds, first_img_jpg)
-                first_img_jpg.save(img_filename)  # save file for web
                 tweet_label = tweet_text(best_label, best_confidence)
+                # annotate bare image copy, use either best gif label or org data
+                best_first_label = convert_to_list(best_label if best_label != '' else first_label)
+                best_first_conf = convert_to_list(best_confidence if best_confidence > 0 else first_conf)
+                birds.set_ojb_data(classified_rects=first_rects, classified_labels=best_first_label,
+                                   classified_confidences=best_first_conf)  # set to first bird
+                first_img_jpg = birds.add_boxes_and_labels(img=first_img_jpg, use_last_known=False)
+                first_img_jpg.save(img_filename)
+
+                # process tweets
                 if animated and bird_first_time_seen:  # doesn't change last_tweet time or override time between tweets
                     bird_tweeter.post_image_from_file(message=f'First time today: {best_label} '
                                                               f'{best_confidence * 100:.1f}%',
@@ -136,12 +145,7 @@ def bird_detector(args):
 
 
 def convert_to_list(input_str_list):
-    output_list = []
-    if type(input_str_list) != list:
-        output_list.append(input_str_list)
-    else:
-        output_list = input_str_list
-    return output_list
+    return input_str_list if isinstance(input_str_list, list) else [input_str_list]
 
 
 # should be passing default dictionary
@@ -194,6 +198,7 @@ def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
     census_dict, confidence_dict = build_dict(census_dict, birds.classified_labels, confidence_dict,
                                               birds.classified_confidences)
     frames = motion_detect.capture_stream()  # capture a list of images
+    first_img_jpg = birds.add_boxes_and_labels(img=first_img_jpg)
     labeled_frames.insert(0, image_proc.convert_image(img=first_img_jpg, target='gif'))  # isrt 1st img
     for i, frame in enumerate(frames):
         frame = image_proc.enhance_brightness(img=frame, factor=args.brightness_chg)
