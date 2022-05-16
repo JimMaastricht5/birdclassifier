@@ -288,7 +288,7 @@
 287 Chloroceryle aenea (American Pygmy Kingfisher),0
 288 Chloroceryle amazona (Amazon Kingfisher),0
 289 Myiozetetes similis (Social Flycatcher),0
-290 Toxostoma curvirostre (Curve-billed Thrasher),0
+290 Toxostoma curvirostre (Curve-billed Thrasher),-1
 291 Megaceryle alcyon (Belted Kingfisher),0
 292 Eremophila alpestris (Horned Lark),0
 293 Alisterus scapularis (Australian King-Parrot),-1
@@ -658,7 +658,7 @@
 657 Tachycineta albilinea (Mangrove Swallow),0
 658 Poecile carolinensis (Carolina Chickadee),-1
 659 Poecile atricapillus (Black-capped Chickadee),0
-660 Poecile gambeli (Mountain Chickadee),0
+660 Poecile gambeli (Mountain Chickadee),-1
 661 Poecile rufescens (Chestnut-backed Chickadee),-1
 662 Periparus ater (Coal Tit),0
 663 Chlorophanes spiza (Green Honeycreeper),0
@@ -692,7 +692,7 @@
 691 Myiarchus tyrannulus (Brown-crested Flycatcher),0
 692 Zosterops lateralis (Silvereye),0
 693 Zonotrichia leucophrys (White-crowned Sparrow),0
-694 Agelaius phoeniceus (Red-winged Blackbird),0
+694 Agelaius phoeniceus (Red-winged Blackbird),990
 695 Parus major (Great Tit),-1
 696 Zonotrichia capensis (Rufous-collared Sparrow),0
 697 Oreothlypis peregrina (Tennessee Warbler),0

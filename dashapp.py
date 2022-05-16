@@ -24,23 +24,56 @@ def load_bird_occurrences():
     df_occurrence['Date Time'] = pd.to_datetime(df_occurrence['Date Time'])
     df_occurrence['Hour'] = pd.to_numeric(df_occurrence['Date Time'].dt.strftime('%H')) + \
                             pd.to_numeric(df_occurrence['Date Time'].dt.strftime('%M')) / 60
+
+    df_occurrence['Common Name'] = df_occurrence['Species']
+    df_occurrence['Common Name'] = df_occurrence['Common Name'].str.extract()
+    # sname = str(label)  # make sure the label is a string
+    # sname = sname[sname.find(' ') + 1:] if sname.find(' ') >= 0 else sname  # remove index number
+    # cname = sname[sname.find('(') + 1: sname.find(')')] if sname.find('(') >= 0 else sname  # retrieve common name
     return df_occurrence
 
+
+
+
+
+app = Dash(__name__)
+
+colors = {
+    'background': '#111111',
+    'text': '#7FDBFF'
+}
 
 df_occurrence = load_bird_occurrences()
 df_stream = load_message_stream()
 fig = px.histogram(df_occurrence, x="Hour", color='Species', range_x=[4, 22], nbins=36, width=1000, height=400)
+fig.update_layout(
+    plot_bgcolor=colors['background'],
+    paper_bgcolor=colors['background'],
+    font_color=colors['text']
+)
 
-
-app = Dash(__name__)
+# body{
+#     background-color: colors['background'];
+#     margin: 0;
+# }
 app.layout = html.Div(children=[
-    html.H1(children='Tweeters'),
+    html.H1(children='Tweeters', style={
+            'textAlign': 'center',
+            'color': colors['text']
+        }),
 
     html.Div(children='''
         Here is what is happening at the feeder.  The page has a chart with bird occurrences by hour, last animation, and events from the detector.  
-        '''),
+        ''', style={
+            'textAlign': 'center',
+            'color': colors['text']
+        }),
 
-    html.Div(children=last_refresh()
+    html.Div(children=last_refresh(),
+             style = {
+            'textAlign': 'center',
+            'color': colors['text']
+        }
         ),
 
     dcc.Graph(
@@ -48,9 +81,10 @@ app.layout = html.Div(children=[
         figure=fig
         ),
 
-    html.Div(children=''),
-
+    html.Br(),
+    html.Div(children=[
     html.Img(src=app.get_asset_url('birds.gif'),
+             id='animated_gif',
              style={
                  'height': '213px',
                  'width': '160px'
@@ -116,7 +150,9 @@ app.layout = html.Div(children=[
                  'height': '213px',
                  'width': '160px'
              },
-             ),
+             )
+    ]
+    ),
 
     dash_table.DataTable(
         data=df_stream.to_dict('records'), columns=[{'name': i, 'id': i} for i in df_stream.columns],
@@ -155,6 +191,7 @@ def update_cols(n_intervals):
     data = load_message_stream()
     columns = [{'id': i, 'name': i} for i in data.columns]
     return columns
+
 
 
 if __name__ == "__main__":
