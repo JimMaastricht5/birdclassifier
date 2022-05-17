@@ -20,16 +20,16 @@ def load_message_stream():
 
 
 def load_bird_occurrences():
+    cname_list = []
     df_occurrence = pd.read_csv(os.getcwd()+'/web_occurrences.csv')
     df_occurrence['Date Time'] = pd.to_datetime(df_occurrence['Date Time'])
     df_occurrence['Hour'] = pd.to_numeric(df_occurrence['Date Time'].dt.strftime('%H')) + \
                             pd.to_numeric(df_occurrence['Date Time'].dt.strftime('%M')) / 60
-
-    df_occurrence['Common Name'] = df_occurrence['Species']
-    df_occurrence['Common Name'] = df_occurrence['Common Name'].str.extract()
-    # sname = str(label)  # make sure the label is a string
-    # sname = sname[sname.find(' ') + 1:] if sname.find(' ') >= 0 else sname  # remove index number
-    # cname = sname[sname.find('(') + 1: sname.find(')')] if sname.find('(') >= 0 else sname  # retrieve common name
+    for sname in df_occurrence['Species']:
+        sname = sname[sname.find(' ') + 1:] if sname.find(' ') >= 0 else sname  # remove index number
+        cname = sname[sname.find('(') + 1: sname.find(')')] if sname.find('(') >= 0 else sname  # retrieve common name
+        cname_list.append(cname)
+    df_occurrence['Common Name'] = cname_list
     return df_occurrence
 
 
