@@ -109,6 +109,7 @@ def bird_detector(args):
                                image_name=img_filename, flush=True)  # send label and confidence to stream
                 first_img_jpg = first_img_jpg if args.brightness_chg == 0 else \
                     image_proc.enhance_brightness(img=first_img_jpg, factor=args.brightness_chg)  # increase brightness
+                first_img_jpg_no_label = first_img_jpg.copy()
                 # unlabeled first image is passed to gif function, bare copy is annotated later
                 gif, gif_filename, animated, best_label, best_confidence = build_bird_animated_gif(args, motion_detect,
                                                                                                    birds, first_img_jpg)
@@ -118,7 +119,7 @@ def bird_detector(args):
                 best_first_conf = convert_to_list(best_confidence if best_confidence > 0 else first_conf)
                 birds.set_ojb_data(classified_rects=first_rects, classified_labels=best_first_label,
                                    classified_confidences=best_first_conf)  # set to first bird
-                first_img_jpg = birds.add_boxes_and_labels(img=first_img_jpg, use_last_known=False)
+                first_img_jpg = birds.add_boxes_and_labels(img=first_img_jpg_no_label, use_last_known=False)
                 first_img_jpg.save(img_filename)
 
                 # process tweets
