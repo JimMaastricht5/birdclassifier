@@ -97,6 +97,7 @@ def bird_detector(args):
             # output.message(message=f'Saw bird #{event_count} at {datetime.now().strftime("%I:%M:%S %P")}',
             #                event_num=event_count, image_name='')
             first_img_jpg = birds.img  # keep first shot for animation and web
+
             # classify, grab labels, output census, send to web and terminal,
             # enhance the shot, and add boxes, grab next set of gifs, build animation, tweet
             if birds.classify(img=first_img_jpg) >= args.default_confidence:  # found a bird we can classify
@@ -107,12 +108,14 @@ def bird_detector(args):
                                        f'{birds.classified_confidences[max_index] * 100:.1f}% at '
                                        f'{datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count,
                                image_name=img_filename, flush=True)  # send label and confidence to stream
-                first_img_jpg = first_img_jpg if args.brightness_chg == 0 or cityweather.isclear else \
-                    image_proc.enhance_brightness(img=first_img_jpg, factor=args.brightness_chg)  # increase brightness
+                # check for need of final image adjustments
+                first_img_jpg = first_img_jpg if args.brightness_chg == 0 \
+                    or cityweather.isclear or cityweather.is_twilight() \
+                    else image_proc.enhance_brightness(img=first_img_jpg, factor=args.brightness_chg)
                 first_img_jpg_no_label = first_img_jpg.copy()
-                # unlabeled first image is passed to gif function, bare copy is annotated later
-                gif, gif_filename, animated, best_label, best_confidence = build_bird_animated_gif(args, motion_detect,
-                                                                                                   birds, first_img_jpg)
+                # create animation: unlabeled first image is passed to gif function, bare copy is annotated later
+                gif, gif_filename, animated, best_label, best_confidence = \
+                    build_bird_animated_gif(args, motion_detect, birds, cityweather, first_img_jpg)
                 tweet_label = tweet_text(best_label, best_confidence)
                 # annotate bare image copy, use either best gif label or org data
                 best_first_label = convert_to_list(best_label if best_label != '' else first_label)
@@ -186,7 +189,7 @@ def best_confidence_and_label(census_dict, confidence_dict):
     return best_confidence, best_confidence_label, best_census, best_census_label
 
 
-def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
+def build_bird_animated_gif(args, motion_detect, birds, cityweather, first_img_jpg):
     # grab a stream of pictures, add first pic from above, and build animated gif
     # return gif, filename, animated boolean, and best label as the max of all confidences
     gif_filename, best_label, best_confidence, labeled_frames = '', '', 0, []
@@ -209,6 +212,9 @@ def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
                 last_good_frame = i + 1  # found a bird, add one to last good frame to account for insert of 1st image
             census_dict, confidence_dict = build_dict(census_dict, birds.classified_labels, confidence_dict,
                                                       birds.classified_confidences)
+        frame = frame if args.brightness_chg == 0 \
+            or cityweather.isclear or cityweather.is_twilight() \
+            else image_proc.enhance_brightness(img=frame, factor=args.brightness_chg)  # increase bright
         labeled_frames.append(birds.add_boxes_and_labels(img=frame, use_last_known=True))  # append image regardless
     if frames_with_birds >= (args.minanimatedframes - 1):  # if bird is in min number of frames build gif
         gif, gif_filename = image_proc.save_gif(frames=labeled_frames[0:last_good_frame], frame_rate=args.framerate)
@@ -247,7 +253,8 @@ if __name__ == "__main__":
     ap.add_argument("-td", "--tweetdelay", type=int, default=1800,
                     help="Wait time between tweets is N species seen * delay/10 with not to exceed max of tweet delay")
 
-    # motion and image processing settings
+    # motion and image processing settings, note adjustments are used as both a detector second prediction and a final
+    # adjustment to the output images.
     ap.add_argument("-b", "--brightness_chg", type=int, default=1.2, help="brightness boost")  # 1 no chg,< 1 -, > 1 +
     ap.add_argument("-c", "--contrast_chg", type=float, default=1.0, help="contrast boost")  # 1 no chg,< 1 -, > 1 +
     ap.add_argument("-cl", "--color_chg", type=float, default=1.0, help="color boost")  # 1 no chg,< 1 -, > 1 +
@@ -255,6 +262,8 @@ if __name__ == "__main__":
     ap.add_argument("-mp", "--mismatch_penalty", type=float, default=.3,
                     help="confidence penalty if predictions from img and enhance img dont match ")
     ap.add_argument("-ei", "--enhanceimg", type=bool, default=True, help="offset waterproof box blur and enhance img")
+
+    # prediction defaults
     ap.add_argument("-co", "--default_confidence", type=float, default=.90, help="confidence threshold")
     ap.add_argument("-op", "--overlap_perc_tolerance", type=float, default=0.8, help="% box overlap to flag as dup")
     ap.add_argument("-ma", "--minarea", type=float, default=5.0, help="motion entropy threshold")  # lower = > motion
