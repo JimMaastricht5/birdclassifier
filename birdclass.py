@@ -57,7 +57,7 @@ def bird_detector(args):
     # while loop below processes from sunrise to sunset.  The python program runs in a bash loop
     # that restarts itself after downloading a new version of this software
     # we want to wait to enter that main while loop until sunrise
-    cityweather = weather.CityWeather()  # init class and set var based on default of Madison WI
+    cityweather = weather.CityWeather(city=args.city, units='Imperial', iscloudy=60)  # init class and set vars
     output.message(f'Now: {datetime.now()}.  \nSunrise: {cityweather.sunrise} Sunset: {cityweather.sunset}.')
     cityweather.wait_until_midnight()  # if after sunset, wait here until after midnight
     cityweather.wait_until_sunrise()  # if before sun rise, wait here
@@ -107,7 +107,7 @@ def bird_detector(args):
                                        f'{birds.classified_confidences[max_index] * 100:.1f}% at '
                                        f'{datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count,
                                image_name=img_filename, flush=True)  # send label and confidence to stream
-                first_img_jpg = first_img_jpg if args.brightness_chg == 0 else \
+                first_img_jpg = first_img_jpg if args.brightness_chg == 0 or cityweather.isclear else \
                     image_proc.enhance_brightness(img=first_img_jpg, factor=args.brightness_chg)  # increase brightness
                 first_img_jpg_no_label = first_img_jpg.copy()
                 # unlabeled first image is passed to gif function, bare copy is annotated later
@@ -248,22 +248,25 @@ if __name__ == "__main__":
                     help="Wait time between tweets is N species seen * delay/10 with not to exceed max of tweet delay")
 
     # motion and image processing settings
-    ap.add_argument("-b", "--brightness_chg", type=int, default=1.0, help="brightness boost")  # 1 no chg,< 1 -, > 1 +
-    ap.add_argument("-c", "--contrast_chg", type=float, default=1.2, help="contrast boost")  # 1 no chg,< 1 -, > 1 +
-    ap.add_argument("-cl", "--color_chg", type=float, default=1.2, help="color boost")  # 1 no chg,< 1 -, > 1 +
-    ap.add_argument("-sp", "--sharpness_chg", type=float, default=1.2, help="sharpeness")  # 1 no chg,< 1 -, > 1 +
+    ap.add_argument("-b", "--brightness_chg", type=int, default=1.2, help="brightness boost")  # 1 no chg,< 1 -, > 1 +
+    ap.add_argument("-c", "--contrast_chg", type=float, default=1.0, help="contrast boost")  # 1 no chg,< 1 -, > 1 +
+    ap.add_argument("-cl", "--color_chg", type=float, default=1.0, help="color boost")  # 1 no chg,< 1 -, > 1 +
+    ap.add_argument("-sp", "--sharpness_chg", type=float, default=1.0, help="sharpeness")  # 1 no chg,< 1 -, > 1 +
     ap.add_argument("-mp", "--mismatch_penalty", type=float, default=.3,
                     help="confidence penalty if predictions from img and enhance img dont match ")
     ap.add_argument("-ei", "--enhanceimg", type=bool, default=True, help="offset waterproof box blur and enhance img")
     ap.add_argument("-co", "--default_confidence", type=float, default=.90, help="confidence threshold")
     ap.add_argument("-op", "--overlap_perc_tolerance", type=float, default=0.8, help="% box overlap to flag as dup")
     ap.add_argument("-ma", "--minarea", type=float, default=5.0, help="motion entropy threshold")  # lower = > motion
+
     ap.add_argument("-hd", "--homedir", type=str, default='/home/pi/PycharmProjects/birdclassifier/',
                     help="home directory for files")
     ap.add_argument("-la", "--labels", type=str, default='coral.ai.inat_bird_labels.txt',
                     help="name of file to use for species labels and thresholds")
     ap.add_argument("-tr", "--thresholds", type=str, default='coral.ai.inat_bird_threshold.csv',
                     help="name of file to use for species labels and thresholds")
+    ap.add_argument("-ct", "--city", type=str, default='Madison,WI,USA',
+                    help="name of city weather station uses OWM web service.  See their site for city options")
 
     arguments = ap.parse_args()
     bird_detector(arguments)
