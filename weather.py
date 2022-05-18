@@ -90,6 +90,13 @@ class CityWeather:
     def is_daytime(self):
         return datetime.now() > self.sunrise or datetime.now() < self.sunset
 
+    def is_twilight(self):
+        from_sunrise_min = datetime.now() - self.sunrise
+        from_sunset_min = self.sunset - datetime.now()
+        from_sunrise_min = from_sunrise_min.total_seconds() / 60
+        from_sunset_min = from_sunset_min.total_seconds() / 60
+        return from_sunrise_min < 60 or from_sunset_min < 60
+
     # update weather conditions
     def update_conditions(self):
         self.local_weather()
@@ -136,6 +143,7 @@ def main():
     print('waittime:', waittime)
     spweather.wait_until_midnight()
     spweather.wait_until_sunrise()
+    print(spweather.is_twilight())
 
 
 # test function
