@@ -11,29 +11,26 @@ def last_refresh():
 
 
 def load_message_stream():
-    df_stream = pd.read_csv(os.getcwd()+'/webstream.csv')
-    df_stream = df_stream.reset_index(drop=True)
-    df_stream = df_stream.drop(columns=['Unnamed: 0', 'type', 'Image Name'])
-    df_stream = df_stream.sort_values(by='Date Time', ascending=False)
-    df_stream = df_stream[df_stream['Event Num'] != 0]
-    return df_stream
+    df = pd.read_csv(os.getcwd()+'/webstream.csv')
+    df = df.reset_index(drop=True)
+    df = df.drop(columns=['Unnamed: 0', 'type', 'Image Name'])
+    df = df.sort_values(by='Date Time', ascending=False)
+    df = df[df['Event Num'] != 0]
+    return df
 
 
 def load_bird_occurrences():
     cname_list = []
-    df_occurrence = pd.read_csv(os.getcwd()+'/web_occurrences.csv')
-    df_occurrence['Date Time'] = pd.to_datetime(df_occurrence['Date Time'])
-    df_occurrence['Hour'] = pd.to_numeric(df_occurrence['Date Time'].dt.strftime('%H')) + \
-                            pd.to_numeric(df_occurrence['Date Time'].dt.strftime('%M')) / 60
-    for sname in df_occurrence['Species']:
+    df = pd.read_csv(os.getcwd()+'/web_occurrences.csv')
+    df['Date Time'] = pd.to_datetime(df['Date Time'])
+    df['Hour'] = pd.to_numeric(df['Date Time'].dt.strftime('%H')) + \
+        pd.to_numeric(df['Date Time'].dt.strftime('%M')) / 60
+    for sname in df['Species']:
         sname = sname[sname.find(' ') + 1:] if sname.find(' ') >= 0 else sname  # remove index number
         cname = sname[sname.find('(') + 1: sname.find(')')] if sname.find('(') >= 0 else sname  # retrieve common name
         cname_list.append(cname)
-    df_occurrence['Common Name'] = cname_list
-    return df_occurrence
-
-
-
+    df['Common Name'] = cname_list
+    return df
 
 
 app = Dash(__name__)
@@ -60,17 +57,18 @@ app.layout = html.Div(children=[
     html.H1(children='Tweeters', style={
             'textAlign': 'center',
             'color': colors['text']
-        }),
+            }),
 
     html.Div(children='''
-        Here is what is happening at the feeder.  The page has a chart with bird occurrences by hour, last animation, and events from the detector.  
+        Here is what is happening at the feeder.  The page has a chart with bird occurrences by hour, 
+        last animation, and events from the detector.  
         ''', style={
             'textAlign': 'center',
             'color': colors['text']
         }),
 
     html.Div(children=last_refresh(),
-             style = {
+             style={
             'textAlign': 'center',
             'color': colors['text']
         }
@@ -83,74 +81,29 @@ app.layout = html.Div(children=[
 
     html.Br(),
     html.Div(children=[
-    html.Img(src=app.get_asset_url('birds.gif'),
-             id='animated_gif',
-             style={
-                 'height': '213px',
-                 'width': '160px'
-             },
-             ),
-
-    html.Img(src=app.get_asset_url('0.jpg'),
-            style={
-                 'height': '213px',
-                 'width': '160px'
-             },
-             ),
-    html.Img(src=app.get_asset_url('1.jpg'),
-             style={
-                 'height': '213px',
-                 'width': '160px'
-             },
-             ),
-    html.Img(src=app.get_asset_url('2.jpg'),
-             style={
-                 'height': '213px',
-                 'width': '160px'
-             },
-             ),
-    html.Img(src=app.get_asset_url('3.jpg'),
-             style={
-                 'height': '213px',
-                 'width': '160px'
-             },
-             ),
-    html.Img(src=app.get_asset_url('4.jpg'),
-             style={
-                 'height': '213px',
-                 'width': '160px'
-             },
-             ),
-    html.Img(src=app.get_asset_url('5.jpg'),
-             style={
-                 'height': '213px',
-                 'width': '160px'
-             },
-             ),
-    html.Img(src=app.get_asset_url('6.jpg'),
-             style={
-                 'height': '213px',
-                 'width': '160px'
-             },
-             ),
-    html.Img(src=app.get_asset_url('7.jpg'),
-             style={
-                 'height': '213px',
-                 'width': '160px'
-             },
-             ),
-    html.Img(src=app.get_asset_url('8.jpg'),
-             style={
-                 'height': '213px',
-                 'width': '160px'
-             },
-             ),
-    html.Img(src=app.get_asset_url('9.jpg'),
-             style={
-                 'height': '213px',
-                 'width': '160px'
-             },
-             )
+        html.Img(src=app.get_asset_url('birds.gif'),
+                 id='animated_gif',
+                 style={'height': '213px', 'width': '160px'},),
+        html.Img(src=app.get_asset_url('0.jpg'),
+                 style={'height': '213px', 'width': '160px'}),
+        html.Img(src=app.get_asset_url('1.jpg'),
+                 style={'height': '213px', 'width': '160px'},),
+        html.Img(src=app.get_asset_url('2.jpg'),
+             style={'height': '213px', 'width': '160px'},),
+        html.Img(src=app.get_asset_url('3.jpg'),
+             style={'height': '213px', 'width': '160px'},),
+        html.Img(src=app.get_asset_url('4.jpg'),
+             style={'height': '213px', 'width': '160px'},),
+        html.Img(src=app.get_asset_url('5.jpg'),
+             style={'height': '213px', 'width': '160px'},),
+        html.Img(src=app.get_asset_url('6.jpg'),
+             style={'height': '213px', 'width': '160px'},),
+        html.Img(src=app.get_asset_url('7.jpg'),
+             style={'height': '213px', 'width': '160px'},),
+        html.Img(src=app.get_asset_url('8.jpg'),
+             style={'height': '213px', 'width': '160px'},),
+        html.Img(src=app.get_asset_url('9.jpg'),
+             style={'height': '213px', 'width': '160px'},)
     ]
     ),
 
@@ -181,8 +134,8 @@ app.layout = html.Div(children=[
               [Input('interval', 'n_intervals')])
 def update_rows(n_intervals):
     data = load_message_stream()
-    dict = data.to_dict('records')
-    return dict
+    msg_dict = data.to_dict('records')
+    return msg_dict
 
 
 @app.callback(Output('web_stream', 'columns'),
@@ -191,7 +144,6 @@ def update_cols(n_intervals):
     data = load_message_stream()
     columns = [{'id': i, 'name': i} for i in data.columns]
     return columns
-
 
 
 if __name__ == "__main__":

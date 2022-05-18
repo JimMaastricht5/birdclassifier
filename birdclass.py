@@ -58,7 +58,8 @@ def bird_detector(args):
     # that restarts itself after downloading a new version of this software
     # we want to wait to enter that main while loop until sunrise
     cityweather = weather.CityWeather(city=args.city, units='Imperial', iscloudy=60)  # init class and set vars
-    output.message(f'Now: {datetime.now()}.  \nSunrise: {cityweather.sunrise} Sunset: {cityweather.sunset}.')
+    output.message(message=f'Now: {datetime.now()}.  \nSunrise: {cityweather.sunrise} Sunset: {cityweather.sunset}.',
+                   msg_type='weather')
     cityweather.wait_until_midnight()  # if after sunset, wait here until after midnight
     cityweather.wait_until_sunrise()  # if before sun rise, wait here
 
