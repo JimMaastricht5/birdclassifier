@@ -66,8 +66,6 @@ class CityWeather:
     def local_weather(self):
         try:  # handle open weather API outages
             response = requests.get(self.full_url)
-            self.fulljson = response.json()
-            # print(self.fulljson)
             self.weather = str(response.json()['weather'])  # find general weather string
             self.weatherdescription = str(response.json()['weather'][0]['description'])
             self.temp = str(response.json()['main']['temp'])
@@ -82,8 +80,9 @@ class CityWeather:
                 self.isclear = True
             else:
                 self.isclear = False
-        except:
+        except Exception as e:
             print('weather error encountered')
+            print(e)
         return
 
     # is it daylight, now must be between sunrise and sunset

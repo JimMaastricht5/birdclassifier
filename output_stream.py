@@ -8,7 +8,7 @@ import os
 class WebStream:
     # item format is expected to be a tuple with
     # event_num: unique int key for event
-    # type: end_process, motion, prediction, prediction_final, flush, message
+    # types: end_process, motion, prediction, prediction_final, flush, message
     #   end_process or None: stops the process and free the creator's block on join()
     #   motion, prediction, prediction_final, message: all contain text for the website to display
     #   flush: writes the current set of in memory content to a file for website display
