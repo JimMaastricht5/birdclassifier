@@ -150,6 +150,12 @@ def update_cols(n_intervals):
     return columns
 
 
+@app.callback(Output('example-graph', 'figure'),
+              [Input('interval', 'n_intervals')])
+def update_chart(n_intervals):
+    return load_chart()
+
+
 if __name__ == "__main__":
     port = 8080
     app.run_server(debug=True, host='0.0.0.0', port=port)
