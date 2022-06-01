@@ -33,6 +33,17 @@ def load_bird_occurrences():
     return df
 
 
+def load_chart():
+    df = load_bird_occurrences()
+    fig1 = px.histogram(df, x="Hour", color='Common Name', range_x=[4, 22], nbins=36, width=1000, height=400)
+    fig1.update_layout(
+        plot_bgcolor=colors['background'],
+        paper_bgcolor=colors['background'],
+        font_color=colors['text']
+    )
+    return fig1
+
+
 app = Dash(__name__)
 
 colors = {
@@ -40,8 +51,8 @@ colors = {
     'text': '#7FDBFF'
 }
 
-df_occurrence = load_bird_occurrences()
 df_stream = load_message_stream()
+df_occurrence = load_bird_occurrences()
 fig = px.histogram(df_occurrence, x="Hour", color='Common Name', range_x=[4, 22], nbins=36, width=1000, height=400)
 fig.update_layout(
     plot_bgcolor=colors['background'],
@@ -76,7 +87,7 @@ app.layout = html.Div(children=[
 
     dcc.Graph(
         id='example-graph',
-        figure=px.histogram(df_occurrence, x="Hour", color='Common Name', range_x=[4, 22], nbins=36, width=1000, height=400)
+        figure=load_chart()
         ),
 
     html.Br(),
