@@ -104,8 +104,7 @@ def bird_detector(args):
             if birds.classify(img=first_img_jpg) >= args.default_confidence:  # found a bird we can classify
                 first_rects, first_label, first_conf = birds.get_obj_data()  # grab data from this bird
                 max_index = birds.classified_confidences.index(max(birds.classified_confidences))
-                bird_first_time_seen = birdpop.visitors(birds.classified_labels[max_index], datetime.now())
-                output.message(message=f'Sighting of a {birds.classified_labels[max_index]} '
+                output.message(message=f'Possible sighting of a {birds.classified_labels[max_index]} '
                                        f'{birds.classified_confidences[max_index] * 100:.1f}% at '
                                        f'{datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count,
                                image_name=img_filename, flush=True)  # send label and confidence to stream
@@ -121,6 +120,7 @@ def bird_detector(args):
                 # annotate bare image copy, use either best gif label or org data
                 best_first_label = convert_to_list(best_label if best_label != '' else first_label)
                 best_first_conf = convert_to_list(best_confidence if best_confidence > 0 else first_conf)
+                bird_first_time_seen = birdpop.visitors(best_first_label, datetime.now())  # increment species count
                 birds.set_ojb_data(classified_rects=first_rects, classified_labels=best_first_label,
                                    classified_confidences=best_first_conf)  # set to first bird
                 first_img_jpg = birds.add_boxes_and_labels(img=first_img_jpg_no_label, use_last_known=False)
