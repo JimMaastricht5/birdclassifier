@@ -52,13 +52,6 @@ colors = {
 }
 
 df_stream = load_message_stream()
-df_occurrence = load_bird_occurrences()
-fig = px.histogram(df_occurrence, x="Hour", color='Common Name', range_x=[4, 22], nbins=36, width=1000, height=400)
-fig.update_layout(
-    plot_bgcolor=colors['background'],
-    paper_bgcolor=colors['background'],
-    font_color=colors['text']
-)
 
 # body{
 #     background-color: colors['background'];
