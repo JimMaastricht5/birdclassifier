@@ -76,7 +76,7 @@ app.layout = html.Div(children=[
 
     dcc.Graph(
         id='example-graph',
-        figure=fig
+        figure=px.histogram(df_occurrence, x="Hour", color='Common Name', range_x=[4, 22], nbins=36, width=1000, height=400)
         ),
 
     html.Br(),
