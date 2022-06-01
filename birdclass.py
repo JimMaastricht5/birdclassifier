@@ -131,6 +131,9 @@ def bird_detector(args):
                     bird_tweeter.post_image_from_file(message=f'First time today: {best_label} '
                                                               f'{best_confidence * 100:.1f}%',
                                                       file_name=img_filename)
+                    output.message(message=f'Tweeted jpg of {best_label} {best_confidence * 100:.1f}% '
+                                           f'at {datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count,
+                                   image_name=img_filename, flush=True)
                 waittime = birdpop.report_single_census_count(best_label) * args.tweetdelay / 10  # wait X min * N bird
                 waittime = args.tweetdelay if waittime >= args.tweetdelay else waittime
                 if animated and ((datetime.now() - last_tweet).total_seconds() >= waittime or bird_first_time_seen):
