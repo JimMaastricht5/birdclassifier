@@ -93,6 +93,7 @@ class Controller:
     def flush(self):
         item = [0, 'flush', datetime.datetime.now().strftime("%H:%M:%S"), '', '']
         self.queue.put(item)
+        return
 
     def end_stream(self):
         self.flush()  # write any pending contents to disk

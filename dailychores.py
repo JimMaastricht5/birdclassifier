@@ -117,6 +117,7 @@ class DailyChores:
             self.check_cpu_temp()
             if self.output_class is not None:
                 self.output_class.occurrences(self.birdpop.get_occurrences())
+                self.output_class.flush()
 
         self.curr_hr = datetime.now().hour
         self.curr_day = datetime.now().day
