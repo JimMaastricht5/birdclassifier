@@ -127,8 +127,9 @@ def bird_detector(args):
                 first_img_jpg.save(img_filename)
 
                 # process tweets
-                if animated and bird_first_time_seen:  # doesn't change last_tweet time or override time between tweets
-                    bird_tweeter.post_image_from_file(message=f'First time today: {best_label} '
+                # if animated and bird_first_time_seen:  # doesn't change last_tweet time or override time between tweet
+                if animated is False:  # doesn't change last_tweet time or override time between tweets
+                    bird_tweeter.post_image_from_file(message=f'Sighted: {best_label} '
                                                               f'{best_confidence * 100:.1f}%',
                                                       file_name=img_filename)
                     output.message(message=f'Tweeted jpg of {best_label} {best_confidence * 100:.1f}% '
@@ -140,7 +141,7 @@ def bird_detector(args):
                     output.message(message=f'Tweeted gif of {best_label} {best_confidence * 100:.1f}% '
                                            f'at {datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count,
                                    image_name=gif_filename, flush=True)
-                    if bird_tweeter.post_image_from_file(tweet_label, gif_filename) is False:  # animated gif
+                    if bird_tweeter.post_image_from_file(tweet_label, gif_filename) is False:  # animated gif success?
                         output.message(f"*** Failed gif tweet", flush=True)  # failure, don't update last tweet time
                     else:
                         last_tweet = datetime.now()  # update last tweet time if successful
@@ -175,22 +176,22 @@ def remove_single_observations(census_dict, conf_dict):
     return census_dict, conf_dict
 
 
-def best_confidence_and_label(census_dict, confidence_dict):
-    best_confidence, best_confidence_label, best_census, best_census_label = 0, '', 0, ''
-    try:
-        census_dict, confidence_dict = remove_single_observations(census_dict, confidence_dict)  # multishots results
-        best_confidence = confidence_dict[max(confidence_dict, key=confidence_dict.get)] / \
-            census_dict[max(confidence_dict, key=confidence_dict.get)]  # sum conf/bird cnt
-        best_confidence_label = max(confidence_dict, key=confidence_dict.get)
-        best_census = census_dict[max(census_dict, key=census_dict.get)]
-        best_census_label = max(census_dict, key=census_dict.get)
-    except Exception as e:
-        print(e)
-    # print('best confidence:', best_confidence, best_confidence_label)
-    # print('best census:', best_census, best_census_label)
-    # if best_confidence_label != best_census_label:
-    #  what to do here?  Which one is better?  High count or high confidence?
-    return best_confidence, best_confidence_label, best_census, best_census_label
+# def best_confidence_and_label(census_dict, confidence_dict):
+#     best_confidence, best_confidence_label, best_census, best_census_label = 0, '', 0, ''
+#     try:
+#         census_dict, confidence_dict = remove_single_observations(census_dict, confidence_dict)  # multishots results
+#         best_confidence = confidence_dict[max(confidence_dict, key=confidence_dict.get)] / \
+#             census_dict[max(confidence_dict, key=confidence_dict.get)]  # sum conf/bird cnt
+#         best_confidence_label = max(confidence_dict, key=confidence_dict.get)
+#         best_census = census_dict[max(census_dict, key=census_dict.get)]
+#         best_census_label = max(census_dict, key=census_dict.get)
+#     except Exception as e:
+#         print(e)
+#     # print('best confidence:', best_confidence, best_confidence_label)
+#     # print('best census:', best_census, best_census_label)
+#     # if best_confidence_label != best_census_label:
+#     #  what to do here?  Which one is better?  High count or high confidence?
+#     return best_confidence, best_confidence_label, best_census, best_census_label
 
 
 def build_bird_animated_gif(args, motion_detect, birds, cityweather, first_img_jpg):
@@ -223,11 +224,10 @@ def build_bird_animated_gif(args, motion_detect, birds, cityweather, first_img_j
     if frames_with_birds >= (args.minanimatedframes - 1):  # if bird is in min number of frames build gif
         gif, gif_filename = image_proc.save_gif(frames=labeled_frames[0:last_good_frame], frame_rate=args.framerate)
         animated = True
-        _, _, _, _ = best_confidence_and_label(census_dict, confidence_dict)
-        best_confidence = confidence_dict[max(confidence_dict, key=confidence_dict.get)] / \
-            census_dict[max(confidence_dict, key=confidence_dict.get)]  # sum conf/bird cnt
-        best_label = max(confidence_dict, key=confidence_dict.get)
-        # print('--- Best label and confidence', best_label, best_confidence)
+    best_confidence = confidence_dict[max(confidence_dict, key=confidence_dict.get)] / \
+        census_dict[max(confidence_dict, key=confidence_dict.get)]  # sum conf/bird cnt
+    best_label = max(confidence_dict, key=confidence_dict.get)
+    # print('--- Best label and confidence', best_label, best_confidence)
     return gif, gif_filename, animated, best_label, best_confidence
 
 
