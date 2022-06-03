@@ -88,16 +88,36 @@ app.layout = html.Div(children=[
         html.A([
             html.Img(src=app.get_asset_url('birds.gif'), id='animated_gif', style={'height': '213px', 'width': '160px'})
         ], href=app.get_asset_url('birds.gif')),
-        html.Img(src=app.get_asset_url('0.jpg'), style={'height': '213px', 'width': '160px'}),
-        html.Img(src=app.get_asset_url('1.jpg'), style={'height': '213px', 'width': '160px'},),
-        html.Img(src=app.get_asset_url('2.jpg'), style={'height': '213px', 'width': '160px'},),
-        html.Img(src=app.get_asset_url('3.jpg'), style={'height': '213px', 'width': '160px'},),
-        html.Img(src=app.get_asset_url('4.jpg'), style={'height': '213px', 'width': '160px'},),
-        html.Img(src=app.get_asset_url('5.jpg'), style={'height': '213px', 'width': '160px'},),
-        html.Img(src=app.get_asset_url('6.jpg'), style={'height': '213px', 'width': '160px'},),
-        html.Img(src=app.get_asset_url('7.jpg'), style={'height': '213px', 'width': '160px'},),
-        html.Img(src=app.get_asset_url('8.jpg'), style={'height': '213px', 'width': '160px'},),
-        html.Img(src=app.get_asset_url('9.jpg'), style={'height': '213px', 'width': '160px'},)
+        html.A([
+            html.Img(src=app.get_asset_url('0.jpg'), style={'height': '213px', 'width': '160px'})
+        ], href=app.get_asset_url('0.jpg')),
+        html.A([
+            html.Img(src=app.get_asset_url('1.jpg'), style={'height': '213px', 'width': '160px'},)
+        ], href=app.get_asset_url('1.jpg')),
+        html.A([
+            html.Img(src=app.get_asset_url('2.jpg'), style={'height': '213px', 'width': '160px'},)
+        ], href=app.get_asset_url('2.jpg')),
+        html.A([
+            html.Img(src=app.get_asset_url('3.jpg'), style={'height': '213px', 'width': '160px'},)
+        ], href=app.get_asset_url('3.jpg')),
+        html.A([
+            html.Img(src=app.get_asset_url('4.jpg'), style={'height': '213px', 'width': '160px'},)
+        ], href=app.get_asset_url('4.jpg')),
+        html.A([
+            html.Img(src=app.get_asset_url('5.jpg'), style={'height': '213px', 'width': '160px'},)
+        ], href=app.get_asset_url('5.jpg')),
+        html.A([
+            html.Img(src=app.get_asset_url('6.jpg'), style={'height': '213px', 'width': '160px'},)
+        ], href=app.get_asset_url('6.jpg')),
+        html.A([
+            html.Img(src=app.get_asset_url('7.jpg'), style={'height': '213px', 'width': '160px'},)
+        ], href=app.get_asset_url('7.jpg')),
+        html.A([
+            html.Img(src=app.get_asset_url('8.jpg'), style={'height': '213px', 'width': '160px'},)
+        ], href=app.get_asset_url('8.jpg')),
+        html.A([
+            html.Img(src=app.get_asset_url('9.jpg'), style={'height': '213px', 'width': '160px'},)
+        ], href=app.get_asset_url('9.jpg')),
     ]
     ),
 
