@@ -116,7 +116,7 @@ def bird_detector(args):
                 # create animation: unlabeled first image is passed to gif function, bare copy is annotated later
                 gif, gif_filename, animated, best_label, best_confidence = \
                     build_bird_animated_gif(args, motion_detect, birds, cityweather, first_img_jpg)
-                tweet_label = tweet_text(best_label, best_confidence)
+
                 # annotate bare image copy, use either best gif label or org data
                 best_first_label = convert_to_list(best_label if best_label != '' else first_label)
                 best_first_conf = convert_to_list(best_confidence if best_confidence > 0 else first_conf)
@@ -126,27 +126,24 @@ def bird_detector(args):
                 first_img_jpg = birds.add_boxes_and_labels(img=first_img_jpg_no_label, use_last_known=False)
                 first_img_jpg.save(img_filename)
 
-                # process tweets
-                # if animated and bird_first_time_seen:  # doesn't change last_tweet time or override time between tweet
-                if animated is False:  # doesn't change last_tweet time or override time between tweets
-                    bird_tweeter.post_image_from_file(message=f'Sighted: {best_label} '
-                                                              f'{best_confidence * 100:.1f}%',
-                                                      file_name=img_filename)
-                    output.message(message=f'Tweeted jpg of {best_label} {best_confidence * 100:.1f}% '
-                                           f'at {datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count,
-                                   image_name=img_filename, flush=True)
+                # process tweets, jpg if not min number of frame, gif otherwise
                 waittime = birdpop.report_single_census_count(best_label) * args.tweetdelay / 10  # wait X min * N bird
                 waittime = args.tweetdelay if waittime >= args.tweetdelay else waittime
-                if animated and ((datetime.now() - last_tweet).total_seconds() >= waittime or bird_first_time_seen):
-                    output.message(message=f'Tweeted gif of {best_label} {best_confidence * 100:.1f}% '
-                                           f'at {datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count,
-                                   image_name=gif_filename, flush=True)
-                    if bird_tweeter.post_image_from_file(tweet_label, gif_filename) is False:  # animated gif success?
-                        output.message(f"*** Failed gif tweet", flush=True)  # failure, don't update last tweet time
-                    else:
-                        last_tweet = datetime.now()  # update last tweet time if successful
+                if (datetime.now() - last_tweet).total_seconds() >= waittime or bird_first_time_seen:
+                    if animated:
+                        output.message(message=f'Tweeted gif of {best_label} {best_confidence * 100:.1f}% '
+                                               f'at {datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count,
+                                       image_name=gif_filename, flush=True)
+                        if bird_tweeter.post_image_from_file(tweet_text(best_label, best_confidence), gif_filename):
+                            last_tweet = datetime.now()  # update last tweet time if successful gif posting, ignore fail
+                    else:  # not animated, post jpg and don't update last tweet time
+                        tweet_jpg_text = tweet_text(best_first_label, best_first_conf)
+                        bird_tweeter.post_image_from_file(message=f'Sighted: {tweet_jpg_text}%', file_name=img_filename)
+                        output.message(message=f'Tweeted jpg of {best_label} {best_confidence * 100:.1f}% '
+                                               f'at {datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count,
+                                       image_name=img_filename, flush=True)
 
-    output.end_stream()  # ending process for evening, print blank line and begin shut down
+    output.end_stream()  # ending process for evening, print blank line and shut down
     motion_detect.stop()
     if args.verbose:
         chores.hourly_and_daily(report_pop=True)
