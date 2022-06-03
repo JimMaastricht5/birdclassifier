@@ -50,14 +50,9 @@ colors = {
     'background': '#111111',
     'text': '#7FDBFF'
 }
-
 df_stream = load_message_stream()
 
-# body{
-#     background-color: colors['background'];
-#     margin: 0;
-# }
-app.layout = html.Div(children=[
+app.layout = html.Div(style={'backgroundColor': colors['background']}, children=[
     html.H1(children='Tweeters', style={
             'textAlign': 'center',
             'color': colors['text']
