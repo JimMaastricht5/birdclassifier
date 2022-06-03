@@ -164,7 +164,7 @@
 163 Saltator coerulescens (Grayish Saltator),0
 164 Saltator atriceps (Black-headed Saltator),0
 165 Sicalis flaveola (Saffron Finch),0
-166 Aix galericulata (Mandarin Duck),0
+166 Aix galericulata (Mandarin Duck),-1
 167 Junco hyemalis hyemalis (Slate-colored Junco),0
 168 Eupsittula canicularis (Orange-fronted Parakeet),0
 169 Microcarbo melanoleucos (Little Pied Cormorant),0
@@ -516,7 +516,7 @@
 515 Caracara cheriway (Crested Caracara),-1
 516 Herpetotheres cachinnans (Laughing Falcon),0
 517 Calcarius lapponicus (Lapland Longspur),0
-518 Milvago chimachima (Yellow-headed Caracara),0
+518 Milvago chimachima (Yellow-headed Caracara),-1
 519 Ciconia ciconia (White Stork),0
 520 Mycteria americana (Wood Stork),0
 521 Mycteria ibis (Yellow-billed Stork),0
@@ -541,7 +541,7 @@
 540 Eumomota superciliosa (Turquoise-browed Motmot),0
 541 Anas querquedula (Garganey),0
 542 Himantopus mexicanus (Black-necked Stilt),0
-543 Haematopus bachmani (Black Oystercatcher),0
+543 Haematopus bachmani (Black Oystercatcher),-1
 544 Pica pica (Eurasian Magpie),0
 545 Haematopus ostralegus (Eurasian Oystercatcher),-1
 546 Haematopus unicolor (Variable Oystercatcher),0
@@ -734,8 +734,8 @@
 733 Tachycineta bicolor (Tree Swallow),0
 734 Larus dominicanus dominicanus (Southern Black-backed Gull),-1
 735 Lonchura oryzivora (Java Sparrow),0
-736 Haematopus palliatus (American Oystercatcher),0
-737 Chloris chloris (European Greenfinch),0
+736 Haematopus palliatus (American Oystercatcher),-1
+737 Chloris chloris (European Greenfinch),-1
 738 Accipiter cooperii (Cooper's Hawk),-1
 739 Vireo solitarius (Blue-headed Vireo),0
 740 Selasphorus platycercus (Broad-tailed Hummingbird),0
