@@ -117,17 +117,29 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
     ),
 
     dash_table.DataTable(
-        data=df_stream.to_dict('records'), columns=[{'name': i, 'id': i} for i in df_stream.columns],
+        data=df_stream.to_dict('records'),
+        columns=[{'name': i, 'id': i} for i in df_stream.columns],
+        style_header={
+            'backgroundColor': 'white',
+            'color': 'black',
+            'fontWeight': 'bold'
+        },
+        style_data={
+            'color': colors['text'],
+            'backgroundColor': colors['background']
+        },
         style_cell_conditional=[
             {'if': {'column_id': 'Event Num'},
-             'width': '10px'},
+             'width': '5px'},
             {'if': {'column_id': 'Date Time'},
-             'width': '30px'},
+             'width': '15px'},
             {'if': {'column_id': 'Message'},
+             'textAlign': 'left',
              'width': '80px'},
             {'if': {'column_id': 'Image Name'},
              'width': '30px'},
         ],
+        style_as_list_view=True,
         id='web_stream',
         filter_action="native",
         sort_action="native",
