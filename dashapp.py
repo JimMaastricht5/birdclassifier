@@ -87,7 +87,7 @@ app.layout = html.Div(children=[
     html.Div(children=[
         html.A([
             html.Img(src=app.get_asset_url('birds.gif'), id='animated_gif', style={'height': '213px', 'width': '160px'})
-        ], href=app.get_asset_url('birds.gif')),
+        ], href=app.get_asset_url('birds.gif'), target="_blank"),
         html.A([
             html.Img(src=app.get_asset_url('0.jpg'), style={'height': '213px', 'width': '160px'})
         ], href=app.get_asset_url('0.jpg')),
