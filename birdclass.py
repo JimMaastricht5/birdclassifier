@@ -138,7 +138,7 @@ def bird_detector(args):
                             last_tweet = datetime.now()  # update last tweet time if successful gif posting, ignore fail
                     else:  # not animated, post jpg and don't update last tweet time
                         tweet_jpg_text = tweet_text(best_first_label, best_first_conf)
-                        bird_tweeter.post_image_from_file(message=f'Sighted: {tweet_jpg_text}%', file_name=img_filename)
+                        bird_tweeter.post_image_from_file(message=f'Sighted: {tweet_jpg_text}', file_name=img_filename)
                         output.message(message=f'Tweeted jpg of {best_label} {best_confidence * 100:.1f}% '
                                                f'at {datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count,
                                        image_name=img_filename, flush=True)
@@ -230,12 +230,18 @@ def build_bird_animated_gif(args, motion_detect, birds, cityweather, first_img_j
 
 def tweet_text(label, confidence):
     # sample url https://www.allaboutbirds.org/guide/Northern_Rough-winged_Swallow/overview
-    sname = str(label)  # make sure the label is a string
-    sname = sname[sname.find(' ') + 1:] if sname.find(' ') >= 0 else sname  # remove index number
-    cname = sname[sname.find('(') + 1: sname.find(')')] if sname.find('(') >= 0 else sname  # retrieve common name
-    hypername = cname.replace(' ', '_')
-    hyperlink = f'https://www.allaboutbirds.org/guide/{hypername}/overview'
-    tweet_label = f'{cname} {confidence * 100:.1f}% {hyperlink}'
+    try:
+        label = str(label[0]) if isinstance(label, list) else str(label)
+        confidence = float(confidence[0]) if isinstance(confidence, list) else float(confidence)
+        sname = str(label)  # make sure the label is a string
+        sname = sname[sname.find(' ') + 1:] if sname.find(' ') >= 0 else sname  # remove index number
+        cname = sname[sname.find('(') + 1: sname.find(')')] if sname.find('(') >= 0 else sname  # retrieve common name
+        hypername = cname.replace(' ', '_')
+        hyperlink = f'https://www.allaboutbirds.org/guide/{hypername}/overview'
+        tweet_label = f'{cname} {confidence * 100:.1f}% {hyperlink}'
+    except Exception as e:
+        tweet_label = ''
+        print(e)
     return tweet_label
 
 
