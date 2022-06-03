@@ -588,7 +588,7 @@
 587 Accipiter gentilis (Northern Goshawk),0
 588 Egretta rufescens (Reddish Egret),0
 589 Bucephala clangula (Common Goldeneye),0
-590 Anous stolidus (Brown Noddy),0
+590 Anous stolidus (Brown Noddy),-1
 591 Actitis macularius (Spotted Sandpiper),0
 592 Ardea purpurea (Purple Heron),-1
 593 Todiramphus chloris (Collared Kingfisher),0
@@ -606,7 +606,7 @@
 605 Buteo swainsoni (Swainson's Hawk),0
 606 Alectoris rufa (Red-legged Partridge),0
 607 Buteo lineatus (Red-shouldered Hawk),0
-608 Buteo jamaicensis (Red-tailed Hawk),0
+608 Buteo jamaicensis (Red-tailed Hawk),995
 609 Charadrius nivosus (Snowy Plover),0
 610 Tringa incana (Wandering Tattler),0
 611 Tringa semipalmata (Willet),0
