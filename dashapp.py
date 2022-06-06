@@ -78,29 +78,18 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
         # image container
         html.Div([
             html.A([
-                html.Img(src=app.get_asset_url('birds.gif'), id='animated_gif1', style={'height': '213px', 'width': '160px'})
+                html.Img(src=app.get_asset_url('birds.gif'), id='animated_gif', style={'height': '213px', 'width': '160px'})
             ], href=app.get_asset_url('birds.gif'), target="_blank"),
         ]),
         # graph container
         html.Div([
-            dcc.Graph(id='example-graph1', figure=load_chart()
+            dcc.Graph(id='example-graph', figure=load_chart()
             )
         ]),
     ], style={'display': 'flex'}),
 
-    html.Div(children=[
-        html.A([
-            html.Img(src=app.get_asset_url('birds.gif'), id='animated_gif2', style={'height': '213px', 'width': '160px'})
-        ], href=app.get_asset_url('birds.gif'), target="_blank"),
-        dcc.Graph(id='example-graph2', figure=load_chart()
-        )
-    ]),
-
     html.Br(),
     html.Div(children=[
-        html.A([
-            html.Img(src=app.get_asset_url('birds.gif'), id='animated_gif', style={'height': '213px', 'width': '160px'})
-        ], href=app.get_asset_url('birds.gif'), target="_blank"),
         html.A([
             html.Img(src=app.get_asset_url('0.jpg'), style={'height': '213px', 'width': '160px'})
         ], href=app.get_asset_url('0.jpg'), target="_blank"),
