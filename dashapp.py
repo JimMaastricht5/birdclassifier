@@ -78,7 +78,7 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
         # image container
         html.Div([
             html.A([
-                html.Img(src=app.get_asset_url('birds.gif'), id='animated_gif', style={'height': '383px', 'width': '288px'})
+                html.Img(src=app.get_asset_url('birds.gif'), id='animated_gif', style={'height': '340px', 'width': '256px'})
             ], href=app.get_asset_url('birds.gif'), target="_blank"),
         ]),
         # graph container
