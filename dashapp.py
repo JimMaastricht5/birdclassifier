@@ -13,7 +13,7 @@ def last_refresh():
 def load_message_stream():
     df = pd.read_csv(os.getcwd()+'/webstream.csv')
     df = df.reset_index(drop=True)
-    df = df.drop(columns=['Unnamed: 0', 'type', 'Image Name'])
+    df = df.drop(columns=['Unnamed: 0', 'type'])
     df = df.sort_values(by='Date Time', ascending=False)
     df = df[df['Event Num'] != 0]
     return df
@@ -78,13 +78,13 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
         # image container
         html.Div([
             html.A([
-                html.Img(src=app.get_asset_url('birds.gif'), id='animated_gif', style={'height': '340px', 'width': '256px'})
+                html.Img(src=app.get_asset_url('birds.gif'), id='animated_gif',
+                         style={'height': '340px', 'width': '256px'})
             ], href=app.get_asset_url('birds.gif'), target="_blank"),
         ]),
         # graph container
         html.Div([
-            dcc.Graph(id='example-graph', figure=load_chart()
-            )
+            dcc.Graph(id='example-graph', figure=load_chart())
         ]),
     ], style={'display': 'flex'}),
 
