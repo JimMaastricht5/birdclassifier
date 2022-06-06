@@ -15,6 +15,8 @@ def load_message_stream():
     df = df.reset_index(drop=True)
     df = df.drop(columns=['Unnamed: 0', 'type'])
     df = df.sort_values(by='Date Time', ascending=False)
+    # Markdown format for image as a link: [![alt text](image link)](web link)
+    df['Image Name'] = f"[![{df['Image Name']}](http:/{df['Image Name']})](http:/{df['Image Name']})"
     df = df[df['Event Num'] != 0]
     return df
 
