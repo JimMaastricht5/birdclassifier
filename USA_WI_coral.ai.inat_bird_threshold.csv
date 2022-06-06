@@ -166,7 +166,7 @@
 165 Sicalis flaveola (Saffron Finch),0
 166 Aix galericulata (Mandarin Duck),-1
 167 Junco hyemalis hyemalis (Slate-colored Junco),0
-168 Eupsittula canicularis (Orange-fronted Parakeet),0
+168 Eupsittula canicularis (Orange-fronted Parakeet),-1
 169 Microcarbo melanoleucos (Little Pied Cormorant),0
 170 Piranga rubra (Summer Tanager),-1
 171 Piranga olivacea (Scarlet Tanager),0
@@ -235,7 +235,7 @@
 234 Junco hyemalis oreganus (Oregon Junco),0
 235 Pluvialis fulva (Pacific Golden-Plover),0
 236 Molothrus aeneus (Bronzed Cowbird),-1
-237 Molothrus ater (Brown-headed Cowbird),0
+237 Molothrus ater (Brown-headed Cowbird),995
 238 Merops pusillus (Little Bee-eater),0
 239 Merops apiaster (European Bee-Eater),0
 240 Pteroglossus torquatus (Collared Aracari),0
@@ -273,7 +273,7 @@
 272 Turdus pilaris (Fieldfare),0
 273 Notiomystis cincta (Stitchbird),0
 274 Sagittarius serpentarius (Secretary Bird),0
-275 Psittacula krameri (Rose-ringed Parakeet),0
+275 Psittacula krameri (Rose-ringed Parakeet),-1
 276 Platycercus eximius (Eastern Rosella),0
 277 Protonotaria citrea (Prothonotary Warbler),0
 278 Megaceryle torquata (Ringed Kingfisher),0
@@ -299,7 +299,7 @@
 298 Streptopelia turtur (European Turtle-Dove),0
 299 Pica hudsonia (Black-billed Magpie),0
 300 Corvus cornix (Hooded Crow),0
-301 Myiopsitta monachus (Monk Parakeet),0
+301 Myiopsitta monachus (Monk Parakeet),-1
 302 Streptopelia decaocto (Eurasian Collared-Dove),-1
 303 Piranga ludoviciana (Western Tanager),0
 304 Ixobrychus exilis (Least Bittern),0
@@ -337,7 +337,7 @@
 336 Camptostoma imberbe (Northern Beardless-Tyrannulet),0
 337 Caracara plancus (Southern Caracara),0
 338 Columbina passerina (Common Ground-Dove),0
-339 Eupsittula nana (Olive-throated Parakeet),0
+339 Eupsittula nana (Olive-throated Parakeet),-1
 340 Nestor notabilis (Kea),-1
 341 Columbina talpacoti (Ruddy Ground-Dove),-1
 342 Geopelia striata (Zebra Dove),0
@@ -392,7 +392,7 @@
 391 Phalacrocorax carbo novaehollandiae (Australasian Great Cormorant),-1
 392 Petroica macrocephala macrocephala (South Island Tomtit),-1
 393 Petroica australis longipes (North Island Robin),-1
-394 Prosthemadera novaeseelandiae novaeseelandiae (Mainland Tui),0
+394 Prosthemadera novaeseelandiae novaeseelandiae (Mainland Tui),-1
 395 Asio flammeus (Short-eared Owl),0
 396 Rhipidura fuliginosa fuliginosa (South Island Fantail),-1
 397 Scolopax minor (American Woodcock),0
@@ -453,7 +453,7 @@
 452 Zenaida asiatica (White-winged Dove),-1
 453 Larus fuscus (Lesser Black-backed Gull),0
 454 Larus californicus (California Gull),-1
-455 Prosthemadera novaeseelandiae (Tui),0
+455 Prosthemadera novaeseelandiae (Tui),-1
 456 Trogon elegans (Elegant Trogon),0
 457 Larus glaucescens (Glaucous-winged Gull),-1
 458 Trogon citreolus (Citreoline Trogon),0
@@ -465,7 +465,7 @@
 464 Threskiornis moluccus (Australian Ibis),-1
 465 Thraupis episcopus (Blue-gray Tanager),-1
 466 Geranoaetus albicaudatus (White-tailed Hawk),0
-467 Sterna paradisaea (Arctic Tern),0
+467 Sterna paradisaea (Arctic Tern),-1
 468 Sterna hirundo (Common Tern),0
 469 Sterna forsteri (Forster's Tern),0
 470 Lanius excubitor (Northern Shrike),0
@@ -572,7 +572,7 @@
 571 Ardeola ralloides (Squacco Heron),-1
 572 Nyctanassa violacea (Yellow-crowned Night-Heron),-1
 573 Aramides cajaneus (Gray-necked Wood-Rail),-1
-574 Bubulcus ibis (Cattle Egret),0
+574 Bubulcus ibis (Cattle Egret),-1
 575 Butorides virescens (Green Heron),-1
 576 Porphyrio martinicus (Purple Gallinule),-1
 577 Botaurus lentiginosus (American Bittern),0
@@ -583,7 +583,7 @@
 582 Aquila chrysaetos (Golden Eagle),0
 583 Hylocichla mustelina (Wood Thrush),0
 584 Aphelocoma wollweberi (Mexican Jay),-1
-585 Accipiter striatus (Sharp-shinned Hawk),0
+585 Accipiter striatus (Sharp-shinned Hawk),995
 586 Accipiter nisus (Eurasian Sparrowhawk),0
 587 Accipiter gentilis (Northern Goshawk),0
 588 Egretta rufescens (Reddish Egret),0
@@ -854,11 +854,11 @@
 853 Aix sponsa (Wood Duck),990
 854 Lophodytes cucullatus (Hooded Merganser),0
 855 Histrionicus histrionicus (Harlequin Duck),0
-856 Aratinga nenday (Nanday Parakeet),0
-857 Psittacara holochlorus (Green Parakeet),0
+856 Aratinga nenday (Nanday Parakeet),-1
+857 Psittacara holochlorus (Green Parakeet),-1
 858 Cairina moschata (Muscovy Duck),0
 859 Netta rufina (Red-crested Pochard),0
-860 Psittacara erythrogenys (Red-masked Parakeet),0
+860 Psittacara erythrogenys (Red-masked Parakeet),-1
 861 Sayornis saya (Say's Phoebe),0
 862 Aythya valisineria (Canvasback),0
 863 Picoides albolarvatus (White-headed Woodpecker),0
@@ -938,7 +938,7 @@
 937 Myiodynastes luteiventris (Sulphur-bellied Flycatcher),0
 938 Contopus sordidulus (Western Wood-Pewee),0
 939 Corvus corone (Carrion Crow),-1
-940 Cyanoramphus novaezelandiae (Red-crowned Parakeet),0
+940 Cyanoramphus novaezelandiae (Red-crowned Parakeet),-1
 941 Contopus virens (Eastern Wood-Pewee),0
 942 Contopus pertinax (Greater Pewee),0
 943 Contopus cooperi (Olive-sided Flycatcher),0
