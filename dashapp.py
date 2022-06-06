@@ -17,7 +17,7 @@ def load_message_stream():
     df = df.sort_values(by='Date Time', ascending=False)
     # Markdown format for image as a link: [![alt text](image link)](web link)
     # df['Image Name'] = df['Image Name'].str[df['Image Name'].str.rfind('/'):]  # cut off directory to get file
-    df['Image Name'] = df['Image Name'].str[-4]
+    df['Image Name'] = df['Image Name'].str[-5:]
     # df['Image Name'] = f"[![{df['Image Name']}](http:/{df['Image Name']})](http:/{df['Image Name']})"
     df = df[df['Event Num'] != 0]
     return df
