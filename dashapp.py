@@ -19,7 +19,7 @@ def load_message_stream():
     # df['Image Name'] = df['Image Name'].str[df['Image Name'].str.rfind('/'):]  # cut off directory to get file
     df['Image Name'] = df['Image Name'].str[-5:]
     # df['Image Name'] = app.get_asset_url(df['Image Name'])
-    df['Image Name'] = f"({df['Image Name'].str.lower()})]({df['Image Name'].str.lower()})"
+    df['Image Name'] = 'http://' + df['Image Name']
     # df['Image Name'] = f"[![{df['Image Name']}](http:/{df['Image Name']})](http:/{df['Image Name']})"
     df = df[df['Event Num'] != 0]
     return df
