@@ -135,7 +135,7 @@
 134 Calidris pusilla (Semipalmated Sandpiper),0
 135 Picoides arcticus (Black-backed Woodpecker),0
 136 Aythya marila (Greater Scaup),0
-137 Phaethon aethereus (Red-billed Tropicbird),0
+137 Phaethon aethereus (Red-billed Tropicbird),-1
 138 Sturnella magna (Eastern Meadowlark),0
 139 Melopsittacus undulatus (Budgerigar),0
 140 Aythya affinis (Lesser Scaup),0
@@ -739,7 +739,7 @@
 738 Accipiter cooperii (Cooper's Hawk),-1
 739 Vireo solitarius (Blue-headed Vireo),0
 740 Selasphorus platycercus (Broad-tailed Hummingbird),0
-741 Chroicocephalus scopulinus (Red-billed Gull),0
+741 Chroicocephalus scopulinus (Red-billed Gull),-1
 742 Aechmophorus occidentalis (Western Grebe),0
 743 Hemiphaga novaeseelandiae (New Zealand Pigeon),-1
 744 Xema sabini (Sabine's Gull),0
