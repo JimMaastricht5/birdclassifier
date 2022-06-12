@@ -138,7 +138,7 @@ def bird_detector(args):
                             last_tweet = datetime.now()  # update last tweet time if successful gif posting, ignore fail
                     else:  # not animated, post jpg and don't update last tweet time
                         tweet_jpg_text = tweet_text(best_first_label, best_first_conf)
-                        # bird_tweeter.post_image_from_file(message=f'Sighted: {tweet_jpg_text}', file_name=img_filename)
+                        bird_tweeter.post_image_from_file(message=f'Sighted: {tweet_jpg_text}', file_name=img_filename)
                         output.message(message=f'Tweeted jpg of {best_label} {best_confidence * 100:.1f}% '
                                                f'at {datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count,
                                        image_name=img_filename, flush=True)
