@@ -11,13 +11,15 @@ def last_refresh():
 
 
 def load_message_stream():
+    url_prefix = 'http://192.168.1.149:8080'
     df = pd.read_csv(os.getcwd()+'/webstream.csv')
     df = df.reset_index(drop=True)
     df = df.drop(columns=['Unnamed: 0', 'type'])
     df = df.sort_values(by='Date Time', ascending=False)
     # Markdown format for image as a link: [![alt text](image link)](web link)
     df['Image Name'] = df['Image Name'].str[-5:]  # drop all but name of file 0.jpg
-    df['Image Name'] = '[![' + df['Image Name'] + '(/assets/' + df['Image Name'] + ')](/assets/' + df['Image Name'] +')'
+    df['Image Name'] = '[![' + df['Image Name'] + url_prefix + '(/assets/' + df['Image Name'] + ')](' + \
+                       url_prefix + '/assets/' + df['Image Name'] + ')'
     # df['Image Name'] = f"[![{df['Image Name']}](http:/{df['Image Name']})](http:/{df['Image Name']})"
     df = df[df['Event Num'] != 0]
     return df
