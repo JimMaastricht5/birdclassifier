@@ -136,7 +136,7 @@ def bird_detector(args):
                                        image_name=gif_filename, flush=True)
                         if bird_tweeter.post_image_from_file(tweet_text(best_label, best_confidence), gif_filename):
                             last_tweet = datetime.now()  # update last tweet time if successful gif posting, ignore fail
-                    else:  # not animated, post jpg
+                    elif best_confidence >= args.default_confidence:  # not animated, post jpg if high enough conf
                         tweet_jpg_text = tweet_text(best_first_label, best_first_conf)
                         output.message(message=f'Tweeted jpg of {best_label} {best_confidence * 100:.1f}% '
                                                f'at {datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count,
@@ -144,6 +144,9 @@ def bird_detector(args):
                         if bird_tweeter.post_image_from_file(message=f'Sighted: {tweet_jpg_text}',
                                                              file_name=img_filename):
                             last_tweet = datetime.now()  # update last tweet time if successful, ignore fail
+                    else:
+                        output.message(message=f'Saw a possible {best_label} {best_confidence * 100:.1f}% '
+                                               f'at {datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count)
 
     output.end_stream()  # ending process for evening, print blank line and shut down
     motion_detect.stop()
