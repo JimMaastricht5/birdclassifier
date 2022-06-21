@@ -362,9 +362,9 @@
 361 Plegadis chihi (White-faced Ibis),-1
 362 Corvus corax (Common Raven),0
 363 Stelgidopteryx serripennis (Northern Rough-winged Swallow),0
-364 Sula dactylatra (Masked Booby),0
-365 Sula sula (Red-footed Booby),0
-366 Sula leucogaster (Brown Booby),0
+364 Sula dactylatra (Masked Booby),-1
+365 Sula sula (Red-footed Booby),-1
+366 Sula leucogaster (Brown Booby),-1
 367 Morus serrator (Australasian Gannet),-1
 368 Eudyptula minor (Little Penguin),-1
 369 Megadyptes antipodes (Yellow-eyed Penguin),-1
