@@ -20,8 +20,6 @@ def load_message_stream():
     df['Image Name'] = df['Image Name'].str[-5:]  # drop all but name of file 0.jpg
     df['Image Name'] = '[![' + df['Image Name'] + '](' + url_prefix + '/assets/' + df['Image Name'] + ')](' + \
                        url_prefix + '/assets/' + df['Image Name'] + ')'
-    df['Image Name'] = "[![New York City](https://upload.wikimedia.org/wikipedia/commons/f/f7/Lower_Manhattan_skyline_-_June_2017.jpg#thumbnail)](https://en.wikipedia.org/wiki/New_York_City)"
-    # [![3.jpg](http: // 192.168.1.149: 8080 / assets / 3.jpg)](http: // 192.168.1.149:8080 / assets / 3.jpg)
 
     df = df[df['Event Num'] != 0]
     return df
