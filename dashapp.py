@@ -11,7 +11,7 @@ def last_refresh():
 
 
 def load_message_stream():
-    url_prefix = 'http://192.168.1.149:8080'
+    url_prefix = '192.168.1.149:8080'
     df = pd.read_csv(os.getcwd()+'/webstream.csv')
     df = df.reset_index(drop=True)
     df = df.drop(columns=['Unnamed: 0', 'type'])
@@ -20,7 +20,10 @@ def load_message_stream():
     df['Image Name'] = df['Image Name'].str[-5:]  # drop all but name of file 0.jpg
     df['Image Name'] = '[![' + df['Image Name'] + '](' + url_prefix + '/assets/' + df['Image Name'] + ')](' + \
                        url_prefix + '/assets/' + df['Image Name'] + ')'
-    # df['Image Name'] = f"[![{df['Image Name']}](http:/{df['Image Name']})](http:/{df['Image Name']})"
+    df['Image Name'] = f"[![{df['Image Name']}](http:/{df['Image Name']})](http:/{df['Image Name']})"
+    # nyc = "[![New York City](https://upload.wikimedia.org/wikipedia/commons/f/f7/Lower_Manhattan_skyline_-_June_2017.jpg#thumbnail)](https://en.wikipedia.org/wiki/New_York_City)"
+    # [![3.jpg](http: // 192.168.1.149: 8080 / assets / 3.jpg)](http: // 192.168.1.149:8080 / assets / 3.jpg)
+
     df = df[df['Event Num'] != 0]
     return df
 
