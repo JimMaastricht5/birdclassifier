@@ -131,7 +131,6 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
 
     dash_table.DataTable(
         data=df_stream.to_dict('records'),
-        markdown_options={'html': True},
         # columns=[{'name': i, 'id': i} for i in df_stream.columns],
         columns=[
                 {"id": "Event Num", "name": "Event Num"},
@@ -139,6 +138,7 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
                 {"id": "Message", "name": "Message"},
                 {"id": "Image Name", "name": "Image Name", "presentation": "markdown"},
             ],
+        markdown_options={"html": True},
         style_header={
             'backgroundColor': 'white',
             'color': 'black',
