@@ -126,7 +126,7 @@ class MotionDetector:
         histogram = image_delta.histogram()
         histlength = sum(histogram)
         probability = [float(h) / histlength for h in histogram]
-        print(-sum([p * math.log(p, 2) for p in probability if p != 0]))
+        # print(-sum([p * math.log(p, 2) for p in probability if p != 0]))
         return -sum([p * math.log(p, 2) for p in probability if p != 0])
 
 
