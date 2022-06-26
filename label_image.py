@@ -278,11 +278,14 @@ class DetectClassify:
             end_y += 25
             draw = PILImageDraw.Draw(img)
             font = draw.getfont()
-            draw.text((text_x, text_y), self.label_text(classified_labels[i], classified_confidences[i], rect),
-                      font=font)  # font = font, fill = self.text_color)
-            draw.line([(start_x, start_y), (start_x, end_y), (start_x, end_y), (end_x, end_y),
-                       (end_x, end_y), (end_x, start_y), (end_x, start_y), (start_x, start_y)],
-                      fill=self.get_next_color(from_index=i), width=2)
+            try:
+                draw.text((text_x, text_y), self.label_text(classified_labels[i], classified_confidences[i], rect),
+                          font=font)  # font = font, fill = self.text_color)
+                draw.line([(start_x, start_y), (start_x, end_y), (start_x, end_y), (end_x, end_y),
+                           (end_x, end_y), (end_x, start_y), (end_x, start_y), (start_x, start_y)],
+                          fill=self.get_next_color(from_index=i), width=2)
+            except Exception as e:
+                print(e)
         return img
 
     # used to get a temp copy of data if labeling is delayed
