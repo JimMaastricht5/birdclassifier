@@ -263,7 +263,7 @@ if __name__ == "__main__":
     ap.add_argument("-sh", "--screenheight", type=int, default=480, help="max screen height")
     ap.add_argument("-fr", "--framerate", type=int, default=45, help="frame rate for camera")
     ap.add_argument("-gf", "--minanimatedframes", type=int, default=10, help="minimum number of frames with a bird")
-    ap.add_argument("-bc", "--broadcast", type=bool, default=False, help="stream images and text")
+    ap.add_argument("-bb", "--broadcast", type=bool, default=False, help="stream images and text")
     ap.add_argument("-v", "--verbose", type=bool, default=True, help="To tweet extra stuff or not")
     ap.add_argument("-td", "--tweetdelay", type=int, default=1800,
                     help="Wait time between tweets is N species seen * delay/10 with not to exceed max of tweet delay")
