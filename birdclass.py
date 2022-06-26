@@ -101,7 +101,9 @@ def bird_detector(args):
 
             # classify, grab labels, output census, send to web and terminal,
             # enhance the shot, and add boxes, grab next set of gifs, build animation, tweet
-            if birds.classify(img=first_img_jpg) >= args.default_confidence:  # found a bird we can classify
+            temp_conf = birds.classify(img=first_img_jpg)
+            print(temp_conf, args.default_confidence)
+            if temp_conf >= args.default_confidence:  # found a bird we can classify
                 first_rects, first_label, first_conf = birds.get_obj_data()  # grab data from this bird
                 max_index = birds.classified_confidences.index(max(birds.classified_confidences))
                 output.message(message=f'Possible sighting of a {birds.classified_labels[max_index]} '
