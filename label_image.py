@@ -171,6 +171,7 @@ class DetectClassify:
             classify_conf, classify_label = self.classify_obj(crop_img, rect, use_confidence_threshold)
             classify_conf_equalized, classify_label_equalized = self.classify_obj(crop_equalizedimg, rect,
                                                                                   use_confidence_threshold)
+            print('classified', classify_conf, classify_label)
             # take the best result between img and enhanced img
             classify_label = classify_label if classify_conf >= classify_conf_equalized else classify_label_equalized
             classify_conf = classify_conf if classify_conf >= classify_conf_equalized else classify_conf_equalized
