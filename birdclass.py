@@ -70,14 +70,15 @@ def bird_detector(args):
     chores = dailychores.DailyChores(bird_tweeter, birdpop, cityweather, output_class=output)
     # init detection and classifier object
     birds = label_image.DetectClassify(homedir=args.homedir, labels=args.labels, thresholds=args.thresholds,
-                                       default_confidence=args.default_confidence,
+                                       detect_object_min_confidence=args.bird_confidence,
+                                       classify_object_min_confidence=args.species_confidence,
                                        mismatch_penalty=args.mismatch_penalty,
                                        screenheight=args.screenheight, screenwidth=args.screenwidth,
                                        color_chg=args.color_chg,
                                        contrast_chg=args.contrast_chg, sharpness_chg=args.sharpness_chg,
                                        brightness_chg=args.brightness_chg,
                                        overlap_perc_tolerance=args.overlap_perc_tolerance,
-                                       target_object='bird', target_object_min_confidence=.75,
+                                       target_object='bird',
                                        output_function=output.message)
     output.message(f'Using label file: {birds.labels}')
     output.message(f'Using threshold file: {birds.thresholds}')
@@ -102,8 +103,8 @@ def bird_detector(args):
             # classify, grab labels, output census, send to web and terminal,
             # enhance the shot, and add boxes, grab next set of gifs, build animation, tweet
             temp_conf = birds.classify(img=first_img_jpg)
-            print(temp_conf, args.default_confidence)
-            if temp_conf >= args.default_confidence:  # found a bird we can classify
+            print(temp_conf, args.species_confidence)
+            if temp_conf >= args.species_confidence:  # found a bird we can classify
                 first_rects, first_label, first_conf = birds.get_obj_data()  # grab data from this bird
                 max_index = birds.classified_confidences.index(max(birds.classified_confidences))
                 output.message(message=f'Possible sighting of a {birds.classified_labels[max_index]} '
@@ -138,7 +139,7 @@ def bird_detector(args):
                                        image_name=gif_filename, flush=True)
                         if bird_tweeter.post_image_from_file(tweet_text(best_label, best_confidence), gif_filename):
                             last_tweet = datetime.now()  # update last tweet time if successful gif posting, ignore fail
-                    elif best_confidence >= args.default_confidence:  # not animated, post jpg if high enough conf
+                    elif best_confidence >= args.species_confidence:  # not animated, post jpg if high enough conf
                         tweet_jpg_text = tweet_text(best_first_label, best_first_conf)
                         output.message(message=f'Tweeted jpg of {best_label} {best_confidence * 100:.1f}% '
                                                f'at {datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count,
@@ -278,7 +279,8 @@ if __name__ == "__main__":
     ap.add_argument("-ei", "--enhanceimg", type=bool, default=True, help="offset waterproof box blur and enhance img")
 
     # prediction defaults
-    ap.add_argument("-co", "--default_confidence", type=float, default=.45, help="confidence threshold")
+    ap.add_argument("-sc", "--species_confidence", type=float, default=.30, help="species confidence threshold")
+    ap.add_argument("-bc", "--bird_confidence", type=float, default=.45, help="bird confidence threshold")
     ap.add_argument("-op", "--overlap_perc_tolerance", type=float, default=0.8, help="% box overlap to flag as dup")
     ap.add_argument("-ma", "--minarea", type=float, default=4.0, help="motion entropy threshold")  # lower = > motion
 

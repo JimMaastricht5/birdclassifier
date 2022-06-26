@@ -60,10 +60,10 @@ except Exception as e:
 class DetectClassify:
     def __init__(self, homedir='/home/pi/PycharmProjects/birdclassifier/', labels='coral.ai.inat_bird_labels.txt',
                  thresholds='coral.ai.inat_bird_threshold.csv',
-                 default_confidence=.98, screenheight=640,
+                 detect_object_min_confidence=.9, screenheight=640,
                  screenwidth=480, contrast_chg=1.0, color_chg=1.0, brightness_chg=1.0, sharpness_chg=1.0,
                  mismatch_penalty=0.3, overlap_perc_tolerance=0.7, min_area=28000, target_object='bird',
-                 target_object_min_confidence=.8, output_function=print):
+                 classify_object_min_confidence=.8, output_function=print):
         self.detector_file = homedir + 'lite-model_ssd_mobilenet_v1_1_metadata_2.tflite'
         self.detector_labels_file = homedir + 'lite-model_ssd_mobilenet_v1_1_metadata_2_labelmap.txt'
         self.target_objects = target_object
@@ -79,9 +79,8 @@ class DetectClassify:
                                                                          self.classifier_labels_file)
         self.input_mean = 127.5  # recommended default
         self.input_std = 127.5  # recommended default
-        self.detect_obj_min_confidence = target_object_min_confidence
-        # self.classify_min_confidence = .7
-        self.classify_default_confidence = default_confidence
+        self.detect_obj_min_confidence = detect_object_min_confidence
+        self.classify_object_min_confidence = classify_object_min_confidence
         self.classify_mismatch_reduction = mismatch_penalty
         self.min_area = min_area
         self.detected_confidences = []
@@ -313,7 +312,8 @@ class DetectClassify:
     # cresult is a decimal % 0 - 1; lindex is % * 10 (no decimals) must div by 1000 to get same scale
     # result needs to also have a minimum area to get a good result.
     def check_threshold(self, cresult, lindex, rect, use_confidence_threshold):
-        label_threshold = self.classify_default_confidence * 1000 if self.classifier_thresholds[int(lindex)][1] == 0 \
+        label_threshold = self.classify_object_min_confidence * 1000 \
+            if self.classifier_thresholds[int(lindex)][1] == 0 \
             else self.classifier_thresholds[int(lindex)][1]
         # push to zero if use threshold boolean is false, this automatically puts any confidence over the threshold
         label_threshold = label_threshold if (use_confidence_threshold or label_threshold == -1) else 0
