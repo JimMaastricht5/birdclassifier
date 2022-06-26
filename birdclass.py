@@ -96,14 +96,14 @@ def bird_detector(args):
             birds.set_colors()  # set new colors for this series of bounding boxes
             event_count += 1
             img_filename = os.getcwd() + '/assets/' + str(event_count % 10) + '.jpg'
-            # output.message(message=f'Saw bird #{event_count} at {datetime.now().strftime("%I:%M:%S %P")}',
-            #                event_num=event_count, image_name='')
+            output.message(message=f'Saw bird #{event_count} at {datetime.now().strftime("%I:%M:%S %P")}',
+                           event_num=event_count, image_name='')
             first_img_jpg = birds.img  # keep first shot for animation and web
 
             # classify, grab labels, output census, send to web and terminal,
             # enhance the shot, and add boxes, grab next set of gifs, build animation, tweet
             temp_conf = birds.classify(img=first_img_jpg)
-            print(temp_conf, args.species_confidence)
+            print('species confidence', temp_conf, args.species_confidence)
             if temp_conf >= args.species_confidence:  # found a bird we can classify
                 first_rects, first_label, first_conf = birds.get_obj_data()  # grab data from this bird
                 max_index = birds.classified_confidences.index(max(birds.classified_confidences))
