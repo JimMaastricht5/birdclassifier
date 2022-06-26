@@ -267,7 +267,7 @@ if __name__ == "__main__":
 
     # motion and image processing settings, note adjustments are used as both a detector second prediction and a final
     # adjustment to the output images.
-    ap.add_argument("-b", "--brightness_chg", type=int, default=1.2, help="brightness boost")  # 1 no chg,< 1 -, > 1 +
+    ap.add_argument("-b", "--brightness_chg", type=int, default=1.1, help="brightness boost")  # 1 no chg,< 1 -, > 1 +
     ap.add_argument("-c", "--contrast_chg", type=float, default=1.0, help="contrast boost")  # 1 no chg,< 1 -, > 1 +
     ap.add_argument("-cl", "--color_chg", type=float, default=1.0, help="color boost")  # 1 no chg,< 1 -, > 1 +
     ap.add_argument("-sp", "--sharpness_chg", type=float, default=1.0, help="sharpeness")  # 1 no chg,< 1 -, > 1 +
@@ -278,7 +278,7 @@ if __name__ == "__main__":
     # prediction defaults
     ap.add_argument("-co", "--default_confidence", type=float, default=.979, help="confidence threshold")
     ap.add_argument("-op", "--overlap_perc_tolerance", type=float, default=0.8, help="% box overlap to flag as dup")
-    ap.add_argument("-ma", "--minarea", type=float, default=5.0, help="motion entropy threshold")  # lower = > motion
+    ap.add_argument("-ma", "--minarea", type=float, default=0.1, help="motion entropy threshold")  # lower = > motion
 
     ap.add_argument("-hd", "--homedir", type=str, default='/home/pi/PycharmProjects/birdclassifier/',
                     help="home directory for files")
