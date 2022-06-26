@@ -81,7 +81,7 @@ class MotionDetector:
         img = Image.open(stream)
         return img
 
-    def capture_stream(self, stream_frames=15):
+    def capture_stream(self, stream_frames=12):
         """
         function returns a list of images
 
