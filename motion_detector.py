@@ -115,7 +115,7 @@ class MotionDetector:
         grayblur = image_proc.gaussianblur(grayimg)  # smooth out image for motion detection
         imgdelta = image_proc.compare_images(self.first_img, grayblur)
         self.motion = (self.image_entropy(imgdelta) >= self.min_area)
-        print('\r', self.motion, self.image_entropy(imgdelta), self.min_area, end='', flush=True)
+        # print('\r', self.motion, self.image_entropy(imgdelta), self.min_area, end='', flush=True)
         return self.motion
 
     def stop(self):
