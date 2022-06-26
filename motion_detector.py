@@ -116,6 +116,7 @@ class MotionDetector:
         imgdelta = image_proc.compare_images(self.first_img, grayblur)
         print(self.image_entropy(imgdelta), self.min_area)
         self.motion = (self.image_entropy(imgdelta) >= self.min_area)
+        print(self.motion)
         return self.motion
 
     def stop(self):
