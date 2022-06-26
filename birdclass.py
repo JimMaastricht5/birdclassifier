@@ -259,8 +259,11 @@ if __name__ == "__main__":
 
     # camera settings
     ap.add_argument("-fc", "--flipcamera", type=bool, default=False, help="flip camera image")
-    ap.add_argument("-sw", "--screenwidth", type=int, default=640, help="max screen width")
-    ap.add_argument("-sh", "--screenheight", type=int, default=480, help="max screen height")
+    ap.add_argument("-sw", "--screenwidth", type=int, default=1024, help="max screen width")
+    ap.add_argument("-sh", "--screenheight", type=int, default=768, help="max screen height")
+    # ap.add_argument("-sw", "--screenwidth", type=int, default=640, help="max screen width")
+    # ap.add_argument("-sh", "--screenheight", type=int, default=480, help="max screen height")
+
     ap.add_argument("-fr", "--framerate", type=int, default=45, help="frame rate for camera")
     ap.add_argument("-gf", "--minanimatedframes", type=int, default=10, help="minimum number of frames with a bird")
     ap.add_argument("-bb", "--broadcast", type=bool, default=False, help="stream images and text")
