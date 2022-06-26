@@ -318,7 +318,7 @@ class DetectClassify:
             else self.classifier_thresholds[int(lindex)][1]
         # push to zero if use threshold boolean is false, this automatically puts any confidence over the threshold
         label_threshold = label_threshold if (use_confidence_threshold or label_threshold == -1) else 0
-        return(int(label_threshold) != -1 and image_proc.area(rect) >= self.min_area and
+        return(int(label_threshold) != -1 and # image_proc.area(rect) >= self.min_area and
                cresult > 0 and cresult >= float(label_threshold) / 1000)
 
     # set label for box in image use short species name instead of scientific name
