@@ -143,7 +143,7 @@ class DetectClassify:
             for index, det_confidence in enumerate(det_confidences[0]):
                 labelidx = int(det_labels_index[0][index])  # get result label index for labels;
                 label = self.obj_detector_possible_labels[labelidx]  # grab text from possible labels
-                print('\rbird detect confidence', det_confidence, end='', flush=True)
+                print('\rbird detect confidence', det_confidence)
                 if det_confidence >= self.detect_obj_min_confidence and \
                         label in self.target_objects:
                     self.target_object_found = True
