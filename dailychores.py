@@ -70,7 +70,8 @@ class DailyChores:
 
     # post weather conditions
     def weather_report(self):
-        self.tweeter.post_status(f'current time and weather: {datetime.now().strftime("%I:%M:%S %P")}, ' +
+        self.tweeter.post_status(f'current time and weather for {self.cityweather.city} '
+                                 f'{datetime.now().strftime("%I:%M:%S %P")}, ' +
                                  f'{self.cityweather.weatherdescription} ' +
                                  f'with {self.cityweather.skycondition}% cloud cover. Visibility of ' +
                                  f'{self.cityweather.visibility} ft.' +
