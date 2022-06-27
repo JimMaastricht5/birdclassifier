@@ -264,7 +264,7 @@ if __name__ == "__main__":
     # ap.add_argument("-sw", "--screenwidth", type=int, default=640, help="max screen width")
     # ap.add_argument("-sh", "--screenheight", type=int, default=480, help="max screen height")
 
-    ap.add_argument("-fr", "--framerate", type=int, default=45, help="frame rate for camera")
+    ap.add_argument("-fr", "--framerate", type=int, default=40, help="frame rate for camera")
     ap.add_argument("-gf", "--minanimatedframes", type=int, default=8, help="minimum number of frames with a bird")
     ap.add_argument("-bb", "--broadcast", type=bool, default=False, help="stream images and text")
     ap.add_argument("-v", "--verbose", type=bool, default=True, help="To tweet extra stuff or not")
