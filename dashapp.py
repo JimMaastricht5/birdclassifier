@@ -59,18 +59,10 @@ colors = {
 df_stream = load_message_stream()
 
 app.layout = html.Div(style={'backgroundColor': colors['background']}, children=[
-    html.H1(children='Tweeters', style={
+    html.H1(children='Tweeters - Sun Prairie, WI USA', style={
             'textAlign': 'center',
             'color': colors['text']
             }),
-
-    html.Div(children='''
-        Here is what is happening at the feeder.  The page has a chart with bird occurrences by hour, 
-        last animation, and events from the detector.  
-        ''', style={
-            'textAlign': 'center',
-            'color': colors['text']
-        }),
 
     html.Div(children=last_refresh(),
              style={
