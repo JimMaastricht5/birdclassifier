@@ -82,7 +82,7 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
         ]),
         # graph container
         html.Div([
-            dcc.Graph(id='example-graph', figure=load_chart())
+            dcc.Graph(id='example-graph', figure=load_chart(), config={'displayModeBar': False})
         ]),
     ], style={'display': 'flex'}),
 
