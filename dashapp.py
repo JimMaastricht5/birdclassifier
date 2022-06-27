@@ -6,6 +6,13 @@ import datetime
 import os
 
 
+#   html.Div(children=last_refresh(),
+#            style={
+#           'textAlign': 'center',
+#           'color': colors['text']
+#       }
+#       ),
+
 def last_refresh():
     return 'Page last updated: ' + str(datetime.datetime.now().strftime('%H:%M:%S'))
 
@@ -63,13 +70,6 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
             'textAlign': 'center',
             'color': colors['text']
             }),
-
-    html.Div(children=last_refresh(),
-             style={
-            'textAlign': 'center',
-            'color': colors['text']
-        }
-        ),
 
     # flex container
     html.Div([
