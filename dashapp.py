@@ -111,9 +111,6 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
         html.A([
             html.Img(src=app.get_asset_url('4.jpg'), style={'height': '160px', 'width': '213px'},)
         ], href=app.get_asset_url('4.jpg'), target="_blank"),
-        html.A([
-            html.Img(src=app.get_asset_url('5.jpg'), style={'height': '160px', 'width': '213px'},)
-        ], href=app.get_asset_url('5.jpg'), target="_blank"),
     ]
     ),
 
