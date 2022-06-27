@@ -97,35 +97,23 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
     html.Br(),
     html.Div(children=[
         html.A([
-            html.Img(src=app.get_asset_url('0.jpg'), style={'height': '213px', 'width': '160px'})
+            html.Img(src=app.get_asset_url('0.jpg'), style={'height': '160px', 'width': '213px'})
         ], href=app.get_asset_url('0.jpg'), target="_blank"),
         html.A([
-            html.Img(src=app.get_asset_url('1.jpg'), style={'height': '213px', 'width': '160px'},)
+            html.Img(src=app.get_asset_url('1.jpg'), style={'height': '160px', 'width': '213px'},)
         ], href=app.get_asset_url('1.jpg'), target="_blank"),
         html.A([
-            html.Img(src=app.get_asset_url('2.jpg'), style={'height': '213px', 'width': '160px'},)
+            html.Img(src=app.get_asset_url('2.jpg'), style={'height': '160px', 'width': '213px'},)
         ], href=app.get_asset_url('2.jpg'), target="_blank"),
         html.A([
-            html.Img(src=app.get_asset_url('3.jpg'), style={'height': '213px', 'width': '160px'},)
+            html.Img(src=app.get_asset_url('3.jpg'), style={'height': '160px', 'width': '213px'},)
         ], href=app.get_asset_url('3.jpg'), target="_blank"),
         html.A([
-            html.Img(src=app.get_asset_url('4.jpg'), style={'height': '213px', 'width': '160px'},)
+            html.Img(src=app.get_asset_url('4.jpg'), style={'height': '160px', 'width': '213px'},)
         ], href=app.get_asset_url('4.jpg'), target="_blank"),
         html.A([
-            html.Img(src=app.get_asset_url('5.jpg'), style={'height': '213px', 'width': '160px'},)
+            html.Img(src=app.get_asset_url('5.jpg'), style={'height': '160px', 'width': '213px'},)
         ], href=app.get_asset_url('5.jpg'), target="_blank"),
-        html.A([
-            html.Img(src=app.get_asset_url('6.jpg'), style={'height': '213px', 'width': '160px'},)
-        ], href=app.get_asset_url('6.jpg'), target="_blank"),
-        html.A([
-            html.Img(src=app.get_asset_url('7.jpg'), style={'height': '213px', 'width': '160px'},)
-        ], href=app.get_asset_url('7.jpg'), target="_blank"),
-        html.A([
-            html.Img(src=app.get_asset_url('8.jpg'), style={'height': '213px', 'width': '160px'},)
-        ], href=app.get_asset_url('8.jpg'), target="_blank"),
-        html.A([
-            html.Img(src=app.get_asset_url('9.jpg'), style={'height': '213px', 'width': '160px'},)
-        ], href=app.get_asset_url('9.jpg'), target="_blank"),
     ]
     ),
 

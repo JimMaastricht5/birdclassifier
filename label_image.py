@@ -60,8 +60,8 @@ except Exception as e:
 class DetectClassify:
     def __init__(self, homedir='/home/pi/PycharmProjects/birdclassifier/', labels='coral.ai.inat_bird_labels.txt',
                  thresholds='coral.ai.inat_bird_threshold.csv',
-                 detect_object_min_confidence=.9, screenheight=640,
-                 screenwidth=480, contrast_chg=1.0, color_chg=1.0, brightness_chg=1.0, sharpness_chg=1.0,
+                 detect_object_min_confidence=.9, screenheight=480,
+                 screenwidth=640, contrast_chg=1.0, color_chg=1.0, brightness_chg=1.0, sharpness_chg=1.0,
                  mismatch_penalty=0.3, overlap_perc_tolerance=0.7, min_area=28000, target_object='bird',
                  classify_object_min_confidence=.8, output_function=print):
         self.detector_file = homedir + 'lite-model_ssd_mobilenet_v1_1_metadata_2.tflite'
