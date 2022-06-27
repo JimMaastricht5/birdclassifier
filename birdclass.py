@@ -227,7 +227,7 @@ def build_bird_animated_gif(args, motion_detect, birds, cityweather, first_img_j
             else image_proc.enhance_brightness(img=frame, factor=args.brightness_chg)  # increase bright
         labeled_frames.append(birds.add_boxes_and_labels(img=frame, use_last_known=True))  # append image regardless
     if frames_with_birds >= (args.minanimatedframes - 1):  # if bird is in min number of frames build gif
-        gif, gif_filename = image_proc.save_gif(frames=labeled_frames[0:last_good_frame], frame_rate=args.framerate)
+        gif, gif_filename = image_proc.save_gif(frames=labeled_frames[0:last_good_frame], frame_rate=motion_detect.FPS)
         animated = True
     best_confidence = confidence_dict[max(confidence_dict, key=confidence_dict.get)] / \
         census_dict[max(confidence_dict, key=confidence_dict.get)]  # sum conf/bird cnt
@@ -264,7 +264,6 @@ if __name__ == "__main__":
     # ap.add_argument("-sw", "--screenwidth", type=int, default=640, help="max screen width")
     # ap.add_argument("-sh", "--screenheight", type=int, default=480, help="max screen height")
 
-    ap.add_argument("-fr", "--framerate", type=int, default=40, help="frame rate for camera")
     ap.add_argument("-gf", "--minanimatedframes", type=int, default=8, help="minimum number of frames with a bird")
     ap.add_argument("-bb", "--broadcast", type=bool, default=False, help="stream images and text")
     ap.add_argument("-v", "--verbose", type=bool, default=True, help="To tweet extra stuff or not")

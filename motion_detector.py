@@ -51,7 +51,6 @@ class MotionDetector:
         if args.screenwidth != 0:  # use specified height and width or default values if not passed
             self.camera.resolution = (args.screenheight, args.screenwidth)
         self.camera.vflip = args.flipcamera
-        # self.camera.framerate = args.framerate
         # print('sleep to let camera settle')
         time.sleep(2)  # Wait for the automatic gain control to settle
         # self.shutterspeed = self.camera.exposure_speed
@@ -63,6 +62,7 @@ class MotionDetector:
         self.graymotion = image_proc.gaussianblur(self.gray)  # smooth out image for motion detection
         self.first_img = self.graymotion.copy()
         self.motion = False
+        self.FPS = 0
         # print('camera setup completed')
 
     def capture_image_with_file(self, img_type='jpeg', filename='/home/pi/birdclass/capture_image.jpg'):
@@ -89,9 +89,11 @@ class MotionDetector:
         :return frames: images is a list containing a number of PIL jpg image
         """
         frames = []
+        start_time = time.time()
         for image_num in range(stream_frames):
             img = self.capture_image_stream()
             frames.append(img)
+        self.FPS = stream_frames / float(time.time() - start_time)
         return frames
 
     # grab an image using NP array: doesn't work!!!!
@@ -137,7 +139,6 @@ if __name__ == '__main__':
     ap.add_argument("-fc", "--flipcamera", type=bool, default=False, help="flip camera image")
     ap.add_argument("-sw", "--screenwidth", type=int, default=640, help="max screen width")
     ap.add_argument("-sh", "--screenheight", type=int, default=480, help="max screen height")
-    ap.add_argument("-fr", "--framerate", type=int, default=30, help="frame rate for camera")
     arguments = ap.parse_args()
 
     motion_detector = MotionDetector(args=arguments)
