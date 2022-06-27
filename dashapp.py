@@ -41,7 +41,7 @@ def load_bird_occurrences():
 
 def load_chart():
     df = load_bird_occurrences()
-    fig1 = px.histogram(df, x="Hour", color='Common Name', range_x=[4, 22], nbins=36, width=1000, height=400)
+    fig1 = px.histogram(df, x="Hour", color='Common Name', range_x=[4, 22], nbins=36, width=800, height=340)
     fig1.update_layout(
         plot_bgcolor=colors['background'],
         paper_bgcolor=colors['background'],
