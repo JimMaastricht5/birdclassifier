@@ -44,7 +44,7 @@
 43 Gallirallus australis (Weka),-1
 44 Calocitta formosa (White-throated Magpie-Jay),-1
 45 Calocitta colliei (Black-throated Magpie-Jay),-1
-46 Fulica americana (American Coot),0
+46 Fulica americana (American Coot),990
 47 Pachyramphus aglaiae (Rose-throated Becard),-1
 48 Buteo lagopus (Rough-legged Hawk),0
 49 Cygnus atratus (Black Swan),-1
@@ -130,7 +130,7 @@
 129 Phalacrocorax brasilianus (Neotropic Cormorant),0
 130 Picoides pubescens (Downy Woodpecker),0
 131 Colinus virginianus (Northern Bobwhite),0
-132 Sporophila torqueola (White-collared Seedeater),0
+132 Sporophila torqueola (White-collared Seedeater),-1
 133 Picoides villosus (Hairy Woodpecker),0
 134 Calidris pusilla (Semipalmated Sandpiper),0
 135 Picoides arcticus (Black-backed Woodpecker),0
@@ -174,7 +174,7 @@
 173 Amphispiza bilineata (Black-throated Sparrow),0
 174 Larus dominicanus (Dominican Gull),0
 175 Piaya cayana (Squirrel Cuckoo),0
-176 Aimophila ruficeps (Rufous-crowned Sparrow),0
+176 Aimophila ruficeps (Rufous-crowned Sparrow),-1
 177 Melanerpes lewis (Lewis's Woodpecker),0
 178 Melanerpes uropygialis (Gila Woodpecker),0
 179 Passerculus sandwichensis (Savannah Sparrow),0
@@ -595,7 +595,7 @@
 594 Grus americana (Whooping Crane),0
 595 Himantopus himantopus (Black-winged Stilt),0
 596 Glaucidium gnoma (Northern Pygmy-Owl),0
-597 Circus approximans (Swamp Harrier),0
+597 Circus approximans (Swamp Harrier),-1
 598 Circus aeruginosus (Western Marsh-Harrier),0
 599 Phalacrocorax sulcirostris (Little Black Cormorant),0
 600 Buteo albonotatus (Zone-tailed Hawk),-1
@@ -807,7 +807,7 @@
 806 Tringa solitaria (Solitary Sandpiper),0
 807 Sitta carolinensis (White-breasted Nuthatch),0
 808 Tringa totanus (Common Redshank),0
-809 Dendrocygna autumnalis (Black-bellied Whistling-Duck),0
+809 Dendrocygna autumnalis (Black-bellied Whistling-Duck),-1
 810 Dendrocygna viduata (White-faced Whistling Duck),0
 811 Dendrocygna bicolor (Fulvous Whistling-Duck),0
 812 Icterus abeillei (Black-backed Oriole),0

@@ -281,7 +281,7 @@ if __name__ == "__main__":
     ap.add_argument("-ei", "--enhanceimg", type=bool, default=True, help="offset waterproof box blur and enhance img")
 
     # prediction defaults
-    ap.add_argument("-sc", "--species_confidence", type=float, default=.85, help="species confidence threshold")
+    ap.add_argument("-sc", "--species_confidence", type=float, default=.9, help="species confidence threshold")
     ap.add_argument("-bc", "--bird_confidence", type=float, default=.45, help="bird confidence threshold")
     ap.add_argument("-op", "--overlap_perc_tolerance", type=float, default=0.8, help="% box overlap to flag as dup")
     ap.add_argument("-ma", "--minarea", type=float, default=4.0, help="motion entropy threshold")  # lower = > motion
