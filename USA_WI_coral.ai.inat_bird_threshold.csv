@@ -59,7 +59,7 @@
 58 Dryocopus lineatus (Lineated Woodpecker),0
 59 Porphyrio melanotus (Australasian Swamphen),-1
 60 Anas bahamensis (White-cheeked Pintail),0
-61 Egretta novaehollandiae (White-faced Heron),0
+61 Egretta novaehollandiae (White-faced Heron),-1
 62 Anas crecca carolinensis (American Green-winged Teal),0
 63 Alectoris chukar (Chukar),-1
 64 Tachybaptus dominicus (Least Grebe),0
@@ -140,7 +140,7 @@
 139 Melopsittacus undulatus (Budgerigar),0
 140 Aythya affinis (Lesser Scaup),0
 141 Aythya novaeseelandiae (New Zealand Scaup),-1
-142 Cyrtonyx montezumae (Montezuma Quail),0
+142 Cyrtonyx montezumae (Montezuma Quail),-1
 143 Pelecanus occidentalis (Brown Pelican),0
 144 Cinclus cinclus (White-throated Dipper),0
 145 Chen rossii (Ross's Goose),0
@@ -269,7 +269,7 @@
 268 Tyrannus dominicensis (Gray Kingbird),0
 269 Chlidonias niger (Black Tern),0
 270 Oriturus superciliosus (Striped Sparrow),0
-271 Psarocolius montezuma (Montezuma Oropendola),0
+271 Psarocolius montezuma (Montezuma Oropendola),-1
 272 Turdus pilaris (Fieldfare),0
 273 Notiomystis cincta (Stitchbird),0
 274 Sagittarius serpentarius (Secretary Bird),0
@@ -531,7 +531,7 @@
 530 Anastomus lamelligerus (African Openbill),-1
 531 Pluvialis squatarola (Black-bellied Plover),0
 532 Gymnogyps californianus (California Condor),-1
-533 Muscicapa striata (Spotted Flycatcher),0
+533 Muscicapa striata (Spotted Flycatcher),-1
 534 Charadrius vociferus (Killdeer),0
 535 Charadrius wilsonia (Wilson's Plover),0
 536 Charadrius melodus (Piping Plover),0
@@ -853,7 +853,7 @@
 852 Aythya americana (Redhead),0
 853 Aix sponsa (Wood Duck),990
 854 Lophodytes cucullatus (Hooded Merganser),0
-855 Histrionicus histrionicus (Harlequin Duck),0
+855 Histrionicus histrionicus (Harlequin Duck),-1
 856 Aratinga nenday (Nanday Parakeet),-1
 857 Psittacara holochlorus (Green Parakeet),-1
 858 Cairina moschata (Muscovy Duck),0

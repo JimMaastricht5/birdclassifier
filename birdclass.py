@@ -96,7 +96,7 @@ def bird_detector(args):
             birds.set_colors()  # set new colors for this series of bounding boxes
             event_count += 1
             img_filename = os.getcwd() + '/assets/' + str(event_count % 10) + '.jpg'
-            output.message(message=f'Saw bird #{event_count} at {datetime.now().strftime("%I:%M:%S %P")}',
+            output.message(message=f'Saw motion #{event_count} at {datetime.now().strftime("%I:%M:%S %P")}',
                            event_num=event_count, image_name='')
             first_img_jpg = birds.img  # keep first shot for animation and web
 
@@ -279,7 +279,7 @@ if __name__ == "__main__":
     ap.add_argument("-ei", "--enhanceimg", type=bool, default=True, help="offset waterproof box blur and enhance img")
 
     # prediction defaults
-    ap.add_argument("-sc", "--species_confidence", type=float, default=.9, help="species confidence threshold")
+    ap.add_argument("-sc", "--species_confidence", type=float, default=.960, help="species confidence threshold")
     ap.add_argument("-bc", "--bird_confidence", type=float, default=.45, help="bird confidence threshold")
     ap.add_argument("-op", "--overlap_perc_tolerance", type=float, default=0.8, help="% box overlap to flag as dup")
     ap.add_argument("-ma", "--minarea", type=float, default=4.0, help="motion entropy threshold")  # lower = > motion
