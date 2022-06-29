@@ -102,9 +102,7 @@ def bird_detector(args):
 
             # classify, grab labels, output census, send to web and terminal,
             # enhance the shot, and add boxes, grab next set of gifs, build animation, tweet
-            temp_conf = birds.classify(img=first_img_jpg)
-            print('species confidence', temp_conf, args.species_confidence)
-            if temp_conf >= args.species_confidence:  # found a bird we can classify
+            if birds.classify(img=first_img_jpg) >= args.species_confidence:  # found a bird we can classify
                 first_rects, first_label, first_conf = birds.get_obj_data()  # grab data from this bird
                 max_index = birds.classified_confidences.index(max(birds.classified_confidences))
                 output.message(message=f'Possible sighting of a {birds.classified_labels[max_index]} '
@@ -272,10 +270,10 @@ if __name__ == "__main__":
 
     # motion and image processing settings, note adjustments are used as both a detector second prediction and a final
     # adjustment to the output images.
-    ap.add_argument("-b", "--brightness_chg", type=int, default=1.1, help="brightness boost")  # 1 no chg,< 1 -, > 1 +
-    ap.add_argument("-c", "--contrast_chg", type=float, default=1.0, help="contrast boost")  # 1 no chg,< 1 -, > 1 +
-    ap.add_argument("-cl", "--color_chg", type=float, default=1.0, help="color boost")  # 1 no chg,< 1 -, > 1 +
-    ap.add_argument("-sp", "--sharpness_chg", type=float, default=1.0, help="sharpeness")  # 1 no chg,< 1 -, > 1 +
+    ap.add_argument("-b", "--brightness_chg", type=int, default=1.2, help="brightness boost")  # 1 no chg,< 1 -, > 1 +
+    ap.add_argument("-c", "--contrast_chg", type=float, default=1.2, help="contrast boost")  # 1 no chg,< 1 -, > 1 +
+    ap.add_argument("-cl", "--color_chg", type=float, default=1.1, help="color boost")  # 1 no chg,< 1 -, > 1 +
+    ap.add_argument("-sp", "--sharpness_chg", type=float, default=1.1, help="sharpeness")  # 1 no chg,< 1 -, > 1 +
     ap.add_argument("-mp", "--mismatch_penalty", type=float, default=.3,
                     help="confidence penalty if predictions from img and enhance img dont match ")
     ap.add_argument("-ei", "--enhanceimg", type=bool, default=True, help="offset waterproof box blur and enhance img")
