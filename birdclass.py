@@ -79,7 +79,7 @@ def bird_detector(args):
                                        brightness_chg=args.brightness_chg,
                                        overlap_perc_tolerance=args.overlap_perc_tolerance,
                                        target_object='bird',
-                                       output_function=output.message)
+                                       output_function=output.message, verbose=args.verbose)
     output.message(f'Using label file: {birds.labels}')
     output.message(f'Using threshold file: {birds.thresholds}')
     output.message('Starting while loop until sun set..... ')

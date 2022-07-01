@@ -63,7 +63,7 @@ class DetectClassify:
                  detect_object_min_confidence=.9, screenheight=480,
                  screenwidth=640, contrast_chg=1.0, color_chg=1.0, brightness_chg=1.0, sharpness_chg=1.0,
                  mismatch_penalty=0.3, overlap_perc_tolerance=0.7, min_area=28000, target_object='bird',
-                 classify_object_min_confidence=.8, output_function=print):
+                 classify_object_min_confidence=.8, output_function=print, verbose=False):
         self.detector_file = homedir + 'lite-model_ssd_mobilenet_v1_1_metadata_2.tflite'
         self.detector_labels_file = homedir + 'lite-model_ssd_mobilenet_v1_1_metadata_2_labelmap.txt'
         self.target_objects = target_object
@@ -104,6 +104,7 @@ class DetectClassify:
         self.overlap_perc_tolerance = overlap_perc_tolerance
         self.img = np.zeros((screenheight, screenwidth, 3), dtype=np.uint8)
         self.output_function = output_function
+        self.verbose = verbose
 
     # initialize tensor flow model
     def init_tf2(self, model_file, label_file_name):
@@ -143,7 +144,8 @@ class DetectClassify:
             for index, det_confidence in enumerate(det_confidences[0]):
                 labelidx = int(det_labels_index[0][index])  # get result label index for labels;
                 label = self.obj_detector_possible_labels[labelidx]  # grab text from possible labels
-                # print('\rbird detect confidence', det_confidence)
+                if self.verbose:
+                    self.output(f'bird detection confidence: {det_confidence}')
                 if det_confidence >= self.detect_obj_min_confidence and \
                         label in self.target_objects:
                     self.target_object_found = True
