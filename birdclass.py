@@ -280,7 +280,7 @@ if __name__ == "__main__":
 
     # prediction defaults
     ap.add_argument("-sc", "--species_confidence", type=float, default=.960, help="species confidence threshold")
-    ap.add_argument("-bc", "--bird_confidence", type=float, default=.45, help="bird confidence threshold")
+    ap.add_argument("-bc", "--bird_confidence", type=float, default=.80, help="bird confidence threshold")
     ap.add_argument("-op", "--overlap_perc_tolerance", type=float, default=0.8, help="% box overlap to flag as dup")
     ap.add_argument("-ma", "--minarea", type=float, default=4.0, help="motion entropy threshold")  # lower = > motion
 
