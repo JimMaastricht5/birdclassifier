@@ -2,6 +2,7 @@ from picamera import PiCamera
 from time import sleep
 import os
 
+# 1024 x 768 or 720 x 640
 screenheight = 720
 screenwidth = 640
 camera = PiCamera()
