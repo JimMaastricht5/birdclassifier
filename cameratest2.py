@@ -5,7 +5,7 @@ import os
 screenheight = 720
 screenwidth = 640
 camera = PiCamera()
-camera.vflip = True
+camera.vflip = False
 camera.resolution = (screenheight, screenwidth)
 camera.start_preview()
 sleep(2)
