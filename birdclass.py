@@ -137,14 +137,14 @@ def bird_detector(args):
                                        image_name=gif_filename, flush=True)
                         if bird_tweeter.post_image_from_file(tweet_text(best_label, best_confidence), gif_filename):
                             last_tweet = datetime.now()  # update last tweet time if successful gif posting, ignore fail
-                    elif best_confidence >= args.species_confidence:  # not animated, post jpg if high enough conf
-                        tweet_jpg_text = tweet_text(best_first_label, best_first_conf)
-                        output.message(message=f'Tweeted jpg of {best_label} {best_confidence * 100:.1f}% '
-                                               f'at {datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count,
-                                       image_name=img_filename, flush=True)
-                        if bird_tweeter.post_image_from_file(message=f'Sighted: {tweet_jpg_text}',
-                                                             file_name=img_filename):
-                            last_tweet = datetime.now()  # update last tweet time if successful, ignore fail
+                    # elif best_confidence >= args.species_confidence:  # not animated, post jpg if high enough conf
+                    #     tweet_jpg_text = tweet_text(best_first_label, best_first_conf)
+                    #     output.message(message=f'Tweeted jpg of {best_label} {best_confidence * 100:.1f}% '
+                    #                            f'at {datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count,
+                    #                    image_name=img_filename, flush=True)
+                    #     if bird_tweeter.post_image_from_file(message=f'Sighted: {tweet_jpg_text}',
+                    #                                          file_name=img_filename):
+                    #         last_tweet = datetime.now()  # update last tweet time if successful, ignore fail
                     else:
                         output.message(message=f'Uncertain about a {best_label} {best_confidence * 100:.1f}% '
                                                f'at {datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count)
@@ -225,7 +225,7 @@ def build_bird_animated_gif(args, motion_detect, birds, cityweather, first_img_j
             else image_proc.enhance_brightness(img=frame, factor=args.brightness_chg)  # increase bright
         labeled_frames.append(birds.add_boxes_and_labels(img=frame, use_last_known=True))  # append image regardless
     if frames_with_birds >= (args.minanimatedframes - 1):  # if bird is in min number of frames build gif
-        gif, gif_filename = image_proc.save_gif(frames=labeled_frames[0:last_good_frame], frame_rate=motion_detect.FPS)
+        gif, gif_filename = image_proc.save_gif(frames=labeled_frames[0:last_good_frame])  #, frame_rate=motion_detect.FPS)
         animated = True
     best_confidence = confidence_dict[max(confidence_dict, key=confidence_dict.get)] / \
         census_dict[max(confidence_dict, key=confidence_dict.get)]  # sum conf/bird cnt
@@ -262,7 +262,7 @@ if __name__ == "__main__":
     ap.add_argument("-sw", "--screenwidth", type=int, default=640, help="max screen width")
     ap.add_argument("-sh", "--screenheight", type=int, default=720, help="max screen height")
 
-    ap.add_argument("-gf", "--minanimatedframes", type=int, default=8, help="minimum number of frames with a bird")
+    ap.add_argument("-gf", "--minanimatedframes", type=int, default=10, help="minimum number of frames with a bird")
     ap.add_argument("-bb", "--broadcast", type=bool, default=False, help="stream images and text")
     ap.add_argument("-v", "--verbose", type=bool, default=True, help="To tweet extra stuff or not")
     ap.add_argument("-td", "--tweetdelay", type=int, default=1800,
@@ -280,7 +280,7 @@ if __name__ == "__main__":
 
     # prediction defaults
     ap.add_argument("-sc", "--species_confidence", type=float, default=.960, help="species confidence threshold")
-    ap.add_argument("-bc", "--bird_confidence", type=float, default=.80, help="bird confidence threshold")
+    ap.add_argument("-bc", "--bird_confidence", type=float, default=.85, help="bird confidence threshold")
     ap.add_argument("-op", "--overlap_perc_tolerance", type=float, default=0.8, help="% box overlap to flag as dup")
     ap.add_argument("-ma", "--minarea", type=float, default=4.0, help="motion entropy threshold")  # lower = > motion
 
