@@ -146,7 +146,7 @@ def bird_detector(args):
                                                              file_name=img_filename):
                             last_tweet = datetime.now()  # update last tweet time if successful, ignore fail
                     else:
-                        output.message(message=f'Saw a possible {best_label} {best_confidence * 100:.1f}% '
+                        output.message(message=f'Uncertain about a {best_label} {best_confidence * 100:.1f}% '
                                                f'at {datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count)
 
     output.end_stream()  # ending process for evening, print blank line and shut down
