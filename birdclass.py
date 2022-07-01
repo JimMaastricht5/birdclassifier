@@ -115,7 +115,7 @@ def bird_detector(args):
                     else image_proc.enhance_brightness(img=first_img_jpg, factor=args.brightness_chg)
                 first_img_jpg_no_label = first_img_jpg.copy()
                 # create animation: unlabeled first image is passed to gif function, bare copy is annotated later
-                gif, gif_filename, animated, best_label, best_confidence = \
+                gif, gif_filename, animated, best_label, best_confidence, frames_with_birds = \
                     build_bird_animated_gif(args, motion_detect, birds, cityweather, first_img_jpg)
 
                 # annotate bare image copy, use either best gif label or org data
@@ -147,6 +147,7 @@ def bird_detector(args):
                     #         last_tweet = datetime.now()  # update last tweet time if successful, ignore fail
                     else:
                         output.message(message=f'Uncertain about a {best_label} {best_confidence * 100:.1f}% '
+                                               f' with {frames_with_birds} frames with birds '
                                                f'at {datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count)
 
     output.end_stream()  # ending process for evening, print blank line and shut down
@@ -231,7 +232,7 @@ def build_bird_animated_gif(args, motion_detect, birds, cityweather, first_img_j
         census_dict[max(confidence_dict, key=confidence_dict.get)]  # sum conf/bird cnt
     best_label = max(confidence_dict, key=confidence_dict.get)
     # print('--- Best label and confidence', best_label, best_confidence)
-    return gif, gif_filename, animated, best_label, best_confidence
+    return gif, gif_filename, animated, best_label, best_confidence, frames_with_birds
 
 
 def tweet_text(label, confidence):
@@ -262,7 +263,7 @@ if __name__ == "__main__":
     ap.add_argument("-sw", "--screenwidth", type=int, default=640, help="max screen width")
     ap.add_argument("-sh", "--screenheight", type=int, default=720, help="max screen height")
 
-    ap.add_argument("-gf", "--minanimatedframes", type=int, default=10, help="minimum number of frames with a bird")
+    ap.add_argument("-gf", "--minanimatedframes", type=int, default=8, help="minimum number of frames with a bird")
     ap.add_argument("-bb", "--broadcast", type=bool, default=False, help="stream images and text")
     ap.add_argument("-v", "--verbose", type=bool, default=True, help="To tweet extra stuff or not")
     ap.add_argument("-td", "--tweetdelay", type=int, default=1800,
