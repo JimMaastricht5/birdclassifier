@@ -81,6 +81,7 @@ class DetectClassify:
         self.input_std = 127.5  # recommended default
         self.detect_obj_min_confidence = detect_object_min_confidence
         self.classify_object_min_confidence = classify_object_min_confidence
+        self.obj_confidence = 0
         self.classify_mismatch_reduction = mismatch_penalty
         self.min_area = min_area
         self.detected_confidences = []
@@ -141,15 +142,15 @@ class DetectClassify:
             det_rects = self.detector.get_tensor(output_details[0]['index'])
             det_labels_index = self.detector.get_tensor(output_details[1]['index'])  # label array for each result
             det_confidences = self.detector.get_tensor(output_details[2]['index'])
-            for index, det_confidence in enumerate(det_confidences[0]):
+            for index, self.obj_confidence in enumerate(det_confidences[0]):
                 labelidx = int(det_labels_index[0][index])  # get result label index for labels;
                 label = self.obj_detector_possible_labels[labelidx]  # grab text from possible labels
-                if self.verbose and det_confidence >= .5:
-                    self.output_function(f'bird detection confidence: {det_confidence}')
-                if det_confidence >= self.detect_obj_min_confidence and \
+                if self.verbose and self.obj_confidence >= .5:
+                    self.output_function(f'bird detection confidence: {self.obj_confidence}')
+                if self.obj_confidence >= self.detect_obj_min_confidence and \
                         label in self.target_objects:
                     self.target_object_found = True
-                    self.detected_confidences.append(det_confidence)
+                    self.detected_confidences.append(self.obj_confidence)
                     self.detected_labels.append(label)
                     self.detected_rects.append(det_rects[0][index])
         return self.target_object_found
