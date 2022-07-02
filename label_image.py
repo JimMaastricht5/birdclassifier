@@ -283,7 +283,7 @@ class DetectClassify:
             font = draw.getfont()
             try:
                 draw.text((text_x, text_y), self.label_text(classified_labels[i], classified_confidences[i], rect),
-                          font=font)  # font = font, fill = self.text_color)
+                          font=font, fill='black')  # font = font, fill = self.text_color)
                 draw.line([(start_x, start_y), (start_x, end_y), (start_x, end_y), (end_x, end_y),
                            (end_x, end_y), (end_x, start_y), (end_x, start_y), (start_x, start_y)],
                           fill=self.get_next_color(from_index=i), width=2)
