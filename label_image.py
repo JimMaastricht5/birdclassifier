@@ -273,21 +273,16 @@ class DetectClassify:
 
         for i, rect in enumerate(classified_rects):
             (start_x, start_y, end_x, end_y) = rect
-            text_x = start_x
-            text_y = start_y
-            start_x += -25
-            start_y += -25
-            end_x += 25
-            end_y += 25
             draw = PILImageDraw.Draw(img)
             font = draw.getfont()
-            try:  # try adding a black shadow to white text
-                draw.text((text_x+1, text_y+1), self.label_text(classified_labels[i], classified_confidences[i], rect),
+            try:
+                draw.text((start_x, start_y), self.label_text(classified_labels[i], classified_confidences[i], rect),
                           font=font, fill='black')  # font = font, fill = self.text_color)
-                draw.text((text_x, text_y), self.label_text(classified_labels[i], classified_confidences[i], rect),
+                draw.text((end_x, start_y), self.label_text(classified_labels[i], classified_confidences[i], rect),
                           font=font, fill='white')
-                draw.line([(start_x, start_y), (start_x, end_y), (start_x, end_y), (end_x, end_y),
-                           (end_x, end_y), (end_x, start_y), (end_x, start_y), (start_x, start_y)],
+                draw.line([(start_x-25, start_y-25), (start_x-25, end_y+25), (start_x-25, end_y+25),
+                           (end_x+25, end_y+25), (end_x+25, end_y+25),
+                           (end_x+25, start_y-25), (end_x+25, start_y-25), (start_x-25, start_y-25)],
                           fill=self.get_next_color(from_index=i), width=2)
             except Exception as e:
                 print(e)
