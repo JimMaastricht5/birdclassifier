@@ -84,15 +84,15 @@ def bird_detector(args):
     output.message(f'Using threshold file: {birds.thresholds}')
     output.message('Starting while loop until sun set..... ')
     # loop while the sun is up, look for motion, detect birds, determine species
-    while cityweather.is_twilight() is False and \
-            cityweather.sunrise.time() < datetime.now().time() < cityweather.sunset.time():
+    while cityweather.sunrise.time() < datetime.now().time() < cityweather.sunset.time():
         if args.verbose:
             chores.hourly_and_daily(filename='')  # pass file name for seed check img to disk
         motion_detect.detect()
         if motion_detect.motion:
             motioncnt += 1
 
-        if motion_detect.motion and birds.detect(img=motion_detect.img):  # daytime with motion and birds
+        if motion_detect.motion and birds.detect(img=motion_detect.img) and \
+                cityweather.is_dawn() is False and cityweather.is_dusk() is False:  # daytime with motion and birds
             motioncnt = 0  # reset motion count between detected birds
             birds.set_colors()  # set new colors for this series of bounding boxes
             event_count += 1
