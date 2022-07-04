@@ -145,8 +145,8 @@ class DetectClassify:
             for index, self.obj_confidence in enumerate(det_confidences[0]):
                 labelidx = int(det_labels_index[0][index])  # get result label index for labels;
                 label = self.obj_detector_possible_labels[labelidx]  # grab text from possible labels
-                if self.verbose and self.obj_confidence >= .5:
-                    self.output_function(f'bird detection confidence: {self.obj_confidence}')
+                # if self.verbose and self.obj_confidence >= .5:
+                #     self.output_function(f'bird detection confidence: {self.obj_confidence}')
                 if self.obj_confidence >= self.detect_obj_min_confidence and \
                         label in self.target_objects:
                     self.target_object_found = True
