@@ -70,14 +70,14 @@ class DailyChores:
 
     # post weather conditions
     def weather_report(self):
-        self.tweeter.post_status(f'current time and weather for {self.cityweather.city} '
+        self.tweeter.post_status(f'Current time and weather for {self.cityweather.city} '
                                  f'{datetime.now().strftime("%I:%M:%S %P")}, ' +
                                  f'{self.cityweather.weatherdescription} ' +
                                  f'with {self.cityweather.skycondition}% cloud cover. Visibility of ' +
                                  f'{self.cityweather.visibility} ft.' +
                                  f' Temp is currently {self.cityweather.temp}F with ' +
                                  f'wind speeds of {self.cityweather.windspeed} MPH.' +
-                                 f'Sunrise: {self.cityweather.sunrise} Sunset: {self.cityweather.sunset}.')
+                                 f'Sunrise was at {self.cityweather.sunrise}. Sunset is at {self.cityweather.sunset}.')
         return
 
     # post a report of the top population for birds
@@ -100,9 +100,9 @@ class DailyChores:
     # housekeeping for day and hour
     # takes a pointer to the population tracking object
     def hourly_and_daily(self, filename='', report_pop=False):
-        # post the weather once during the daytime and during twilight, detector won't start until twilight is over.
+        # post the weather once during the daytime and while the sun is rising
         if self.weather_reported is False and self.cityweather.is_daytime() and \
-                self.cityweather.is_twilight():
+                self.cityweather.is_dawn():
             self.weather_report()
             if filename != '':  # if an img file name was passed post it
                 self.tweeter.post_image_from_file(message=f'Morning seed and camera position check. ',

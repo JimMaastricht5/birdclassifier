@@ -66,7 +66,7 @@
 65 Artemisiospiza belli (Bell's Sparrow),0
 66 Gallus gallus (Red Junglefowl),-1
 67 Cardinalis sinuatus (Pyrrhuloxia),-1
-68 Cardinalis cardinalis (Northern Cardinal),0
+68 Cardinalis cardinalis (Northern Cardinal),900
 69 Melospiza lincolnii (Lincoln's Sparrow),0
 70 Podilymbus podiceps (Pied-billed Grebe),0
 71 Melospiza georgiana (Swamp Sparrow),0
@@ -219,7 +219,7 @@
 218 Cyanerpes cyaneus (Red-legged Honeycreeper),0
 219 Microcarbo melanoleucos brevirostris (Little Shag),0
 220 Sphyrapicus thyroideus (Williamson's Sapsucker),0
-221 Pheucticus ludovicianus (Rose-breasted Grosbeak),0
+221 Pheucticus ludovicianus (Rose-breasted Grosbeak),900
 222 Sphyrapicus ruber (Red-breasted Sapsucker),0
 223 Pheucticus melanocephalus (Black-headed Grosbeak),0
 224 Sphyrapicus nuchalis (Red-naped Sapsucker),0
@@ -482,7 +482,7 @@
 481 Turdus merula (Eurasian Blackbird),-1
 482 Turdus plumbeus (Red-legged Thrush),0
 483 Turdus grayi (Clay-colored Thrush),-1
-484 Turdus migratorius (American Robin),0
+484 Turdus migratorius (American Robin),980
 485 Turdus viscivorus (Mistle Thrush),-1
 486 Cerorhinca monocerata (Rhinoceros Auklet),0
 487 Turdus philomelos (Song Thrush),0
@@ -568,7 +568,7 @@
 567 Ardea cinerea (Grey Heron),-1
 568 Ardea herodias (Great Blue Heron),-1
 569 Nycticorax nycticorax (Black-crowned Night-Heron),-1
-570 Turdus rufopalliatus (Rufous-backed Robin),0
+570 Turdus rufopalliatus (Rufous-backed Robin),980
 571 Ardeola ralloides (Squacco Heron),-1
 572 Nyctanassa violacea (Yellow-crowned Night-Heron),-1
 573 Aramides cajaneus (Gray-necked Wood-Rail),-1
@@ -726,9 +726,9 @@
 725 Acanthis flammea (Common Redpoll),0
 726 Spinus pinus (Pine Siskin),0
 727 Thraupis abbas (Yellow-winged Tanager),0
-728 Spinus psaltria (Lesser Goldfinch),0
-729 Spinus lawrencei (Lawrence's Goldfinch),0
-730 Spinus tristis (American Goldfinch),0
+728 Spinus psaltria (Lesser Goldfinch),-1
+729 Spinus lawrencei (Lawrence's Goldfinch),-1
+730 Spinus tristis (American Goldfinch),900
 731 Threskiornis aethiopicus (African Sacred Ibis),-1
 732 Gygis alba (White Tern),0
 733 Tachycineta bicolor (Tree Swallow),0
@@ -751,7 +751,7 @@
 750 Calypte anna (Anna's Hummingbird),0
 751 Colaptes auratus cafer (Red-shafted Flicker),0
 752 Sula nebouxii (Blue-footed Booby),-1
-753 Copsychus saularis (Oriental Magpie-Robin),0
+753 Copsychus saularis (Oriental Magpie-Robin),-1
 754 Selasphorus sasin (Allen's Hummingbird),0
 755 Selasphorus rufus (Rufous Hummingbird),0
 756 Calothorax lucifer (Lucifer Hummingbird),0

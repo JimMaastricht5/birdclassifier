@@ -221,7 +221,7 @@ class DetectClassify:
             lresult = str(self.classifier_possible_labels[lindex]).strip()  # grab label,push to string instead of tuple
             cresult = float(output[lindex]) if float(output[lindex]) > 0 else 0
             cresult = cresult - math.floor(cresult) if cresult > 1 else cresult  # ignore whole numbers, keep decimals
-            if self.check_threshold(cresult, lindex, rect, use_confidence_threshold):  # confidence>=threshold
+            if self.check_threshold(cresult, lindex, use_confidence_threshold):  # confidence>=threshold
                 if cresult > maxcresult:  # if this above threshold and is a better confidence result store it
                     maxcresult = cresult
                     maxlresult = lresult
@@ -275,9 +275,9 @@ class DetectClassify:
             (start_x, start_y, end_x, end_y) = rect
             draw = PILImageDraw.Draw(img)
             font = draw.getfont()
-            try:
+            try:  # add text to top and bottom of image
                 draw.text((start_x, start_y), self.label_text(classified_labels[i], classified_confidences[i], rect),
-                          font=font, fill='black')  # font = font, fill = self.text_color)
+                          font=font, fill='white')  # font = font, fill = self.text_color)
                 draw.text((start_x, end_y), self.label_text(classified_labels[i], classified_confidences[i], rect),
                           font=font, fill='white')
                 draw.line([(start_x-25, start_y-25), (start_x-25, end_y+25), (start_x-25, end_y+25),
@@ -314,14 +314,14 @@ class DetectClassify:
     # func checks threshold by each label passed as a nparray with text in col 0 and threshold in col 1
     # species cannot be -1 (not present in geo location), confidence cannot be 0,must be equal or exceed minimum score
     # cresult is a decimal % 0 - 1; lindex is % * 10 (no decimals) must div by 1000 to get same scale
-    # result needs to also have a minimum area to get a good result.
-    def check_threshold(self, cresult, lindex, rect, use_confidence_threshold):
+    def check_threshold(self, cresult, lindex, use_confidence_threshold):
+        # grab default if species has 0 confidence, else use species specific score
         label_threshold = self.classify_object_min_confidence * 1000 \
             if self.classifier_thresholds[int(lindex)][1] == 0 \
             else self.classifier_thresholds[int(lindex)][1]
         # push to zero if use threshold boolean is false, this automatically puts any confidence over the threshold
         label_threshold = label_threshold if (use_confidence_threshold or label_threshold == -1) else 0
-        return(int(label_threshold) != -1 and  # image_proc.area(rect) >= self.min_area and
+        return(int(label_threshold) != -1 and
                cresult > 0 and cresult >= float(label_threshold) / 1000)
 
     # set label for box in image use short species name instead of scientific name

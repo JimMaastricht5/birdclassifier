@@ -48,6 +48,7 @@ def default_value():
 
 
 def bird_detector(args):
+    favorite_birds = ['Northern Cardinal', 'Rose-breasted Grosbeak', 'American Goldfinch']
     birdpop = population.Census()  # initialize species population census object
     output = output_stream.Controller()  # initialize class to handle terminal and web output
     output.start_stream()  # start streaming to terminal and web
@@ -85,8 +86,7 @@ def bird_detector(args):
     output.message('Starting while loop until sun set..... ')
     # loop while the sun is up, look for motion, detect birds, determine species
     while cityweather.sunrise.time() < datetime.now().time() < cityweather.sunset.time():
-        if args.verbose:
-            chores.hourly_and_daily(filename='')  # pass file name for seed check img to disk
+        chores.hourly_and_daily()  # initial weather reporting.  Should happen once between sun rise and +30 min.
         motion_detect.detect()
         if motion_detect.motion:
             motioncnt += 1
@@ -110,7 +110,7 @@ def bird_detector(args):
                                        f'{birds.classified_confidences[max_index] * 100:.1f}% at '
                                        f'{datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count,
                                image_name=img_filename, flush=True)  # send label and confidence to stream
-                # check for need of final image adjustments
+                # check for need of final image adjustments, *** won't hit this code with twilight in while loop above
                 first_img_jpg = first_img_jpg if args.brightness_chg == 0 \
                     or cityweather.isclear or cityweather.is_twilight() \
                     else image_proc.enhance_brightness(img=first_img_jpg, factor=args.brightness_chg)
@@ -131,7 +131,8 @@ def bird_detector(args):
                 # process tweets, jpg if not min number of frame, gif otherwise
                 waittime = birdpop.report_single_census_count(best_label) * args.tweetdelay / 10  # wait X min * N bird
                 waittime = args.tweetdelay if waittime >= args.tweetdelay else waittime
-                if (datetime.now() - last_tweet).total_seconds() >= waittime or bird_first_time_seen:
+                if (datetime.now() - last_tweet).total_seconds() >= waittime or bird_first_time_seen or \
+                        best_label in favorite_birds:
                     if animated:
                         output.message(message=f'Tweeted gif of {best_label} {best_confidence * 100:.1f}% '
                                                f'at {datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count,
@@ -179,24 +180,6 @@ def remove_single_observations(census_dict, conf_dict):
     [census_dict.pop(key) for key in key_list]
     [conf_dict.pop(key) for key in key_list]
     return census_dict, conf_dict
-
-
-# def best_confidence_and_label(census_dict, confidence_dict):
-#     best_confidence, best_confidence_label, best_census, best_census_label = 0, '', 0, ''
-#     try:
-#         census_dict, confidence_dict = remove_single_observations(census_dict, confidence_dict)  # multishots results
-#         best_confidence = confidence_dict[max(confidence_dict, key=confidence_dict.get)] / \
-#             census_dict[max(confidence_dict, key=confidence_dict.get)]  # sum conf/bird cnt
-#         best_confidence_label = max(confidence_dict, key=confidence_dict.get)
-#         best_census = census_dict[max(census_dict, key=census_dict.get)]
-#         best_census_label = max(census_dict, key=census_dict.get)
-#     except Exception as e:
-#         print(e)
-#     # print('best confidence:', best_confidence, best_confidence_label)
-#     # print('best census:', best_census, best_census_label)
-#     # if best_confidence_label != best_census_label:
-#     #  what to do here?  Which one is better?  High count or high confidence?
-#     return best_confidence, best_confidence_label, best_census, best_census_label
 
 
 def build_bird_animated_gif(args, motion_detect, birds, cityweather, first_img_jpg):
@@ -251,6 +234,24 @@ def tweet_text(label, confidence):
         tweet_label = ''
         print(e)
     return tweet_label
+
+
+# def best_confidence_and_label(census_dict, confidence_dict):
+#     best_confidence, best_confidence_label, best_census, best_census_label = 0, '', 0, ''
+#     try:
+#         census_dict, confidence_dict = remove_single_observations(census_dict, confidence_dict)  # multishots results
+#         best_confidence = confidence_dict[max(confidence_dict, key=confidence_dict.get)] / \
+#             census_dict[max(confidence_dict, key=confidence_dict.get)]  # sum conf/bird cnt
+#         best_confidence_label = max(confidence_dict, key=confidence_dict.get)
+#         best_census = census_dict[max(census_dict, key=census_dict.get)]
+#         best_census_label = max(census_dict, key=census_dict.get)
+#     except Exception as e:
+#         print(e)
+#     # print('best confidence:', best_confidence, best_confidence_label)
+#     # print('best census:', best_census, best_census_label)
+#     # if best_confidence_label != best_census_label:
+#     #  what to do here?  Which one is better?  High count or high confidence?
+#     return best_confidence, best_confidence_label, best_census, best_census_label
 
 
 if __name__ == "__main__":
