@@ -101,7 +101,7 @@ class Controller:
             self.queue.put(None)  # transmit poison pill to stop child process
             if self.p_web_stream.is_alive():  # wait for the child process to finish if it is still alive
                 print('waiting for web stream to finish processing queue....')
-                self.p_web_stream.join()
+                self.p_web_stream.join(timeout=30)
         finally:
             print('')
         return
