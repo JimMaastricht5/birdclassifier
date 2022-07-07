@@ -136,7 +136,7 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
              'textAlign': 'left',
              'width': '80px'},
             {'if': {'column_id': 'Image Name'},
-             'width': '30px'},
+             'width': '30px', "presentation": "markdown"},
         ],
         # style_as_list_view=True,
         id='web_stream',
