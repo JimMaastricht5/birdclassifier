@@ -1,4 +1,5 @@
 from dash import Dash, html, dcc, dash_table
+import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
 import plotly.express as px
 import pandas as pd
@@ -67,7 +68,22 @@ colors = {
 }
 df_stream = load_message_stream()
 
+top_card = dbc.Card(
+    [
+        dbc.CardImg(src="/static/images/placeholder286x180.png", top=True),
+        dbc.CardBody(
+            html.P("This card has an image at the top", className="card-text")
+        ),
+    ],
+    style={"width": "18rem"},
+)
 
+cards = dbc.Row(
+    [
+        dbc.Col(top_card, width="auto"),
+        dbc.Col(top_card, width="auto"),
+    ]
+)
 app.layout = html.Div(style={'backgroundColor': colors['background']}, children=[
     html.H1(children='Tweeters - Sun Prairie, WI USA', style={
             'textAlign': 'center',
