@@ -28,7 +28,6 @@ def load_message_stream():
         df['Image Name'] = df['Image Name'].str[-5:]  # drop all but name of file 0.jpg
         df['Image Name'] = '[![' + df['Image Name'] + '](' + url_prefix + '/assets/' + df['Image Name'] + ')](' + \
                            url_prefix + '/assets/' + df['Image Name'] + ')'
-        df['Image Name'] = '<img src="0.jpg" alt="bird" width="200" height="200">'
     except Exception as e:
         print(e)
     df = df[df['Event Num'] != 0]
