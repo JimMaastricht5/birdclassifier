@@ -70,7 +70,7 @@ df_stream = load_message_stream()
 
 top_card = dbc.Card(
     [
-        dbc.CardImg(src="/static/images/placeholder286x180.png", top=True),
+        dbc.CardImg(src="birds.gof", top=True),
         dbc.CardBody(
             html.P("This card has an image at the top", className="card-text")
         ),
