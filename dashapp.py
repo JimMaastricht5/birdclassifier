@@ -67,6 +67,7 @@ colors = {
 }
 df_stream = load_message_stream()
 
+
 app.layout = html.Div(style={'backgroundColor': colors['background']}, children=[
     html.H1(children='Tweeters - Sun Prairie, WI USA', style={
             'textAlign': 'center',
@@ -89,6 +90,12 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
     ], style={'display': 'flex'}),
 
     html.Br(),
+
+    html.Div([
+        dcc.Dropdown(['0.jpg', '1.jpg', '2.jpg'], '0.jpg', id='dropdown'),
+        html.Div(id='dd-output-container')
+    ]),
+
     html.Div(children=[
         html.A([
             html.Img(src=app.get_asset_url('0.jpg'), style={'height': '160px', 'width': '213px'})
@@ -150,6 +157,14 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
 
     dcc.Interval(id='interval', interval=30000, n_intervals=0)  # update every 30 seconds
     ])
+
+
+@app.callback(
+    Output('dd-output-container', 'children'),
+    Input('dropdown', 'value')
+)
+def update_output(value):
+    return f'You have selected {value}'
 
 
 @app.callback(Output('web_stream', 'data'),
