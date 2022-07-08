@@ -156,11 +156,11 @@
 155 Sylvia communis (Greater Whitethroat),0
 156 Pinicola enucleator (Pine Grosbeak),0
 157 Coccothraustes vespertinus (Evening Grosbeak),0
-158 Coccothraustes coccothraustes (Hawfinch),0
+158 Coccothraustes coccothraustes (Hawfinch),-1
 159 Vermivora chrysoptera (Golden-winged Warbler),0
 160 Opisthocomus hoazin (Hoatzin),0
 161 Setophaga coronata coronata (Myrtle Warbler),0
-162 Diglossa baritula (Cinnamon-bellied Flowerpiercer),0
+162 Diglossa baritula (Cinnamon-bellied Flowerpiercer),-1
 163 Saltator coerulescens (Grayish Saltator),0
 164 Saltator atriceps (Black-headed Saltator),0
 165 Sicalis flaveola (Saffron Finch),0
@@ -180,7 +180,7 @@
 179 Passerculus sandwichensis (Savannah Sparrow),0
 180 Melanerpes pucherani (Black-cheeked Woodpecker),0
 181 Salpinctes obsoletus (Rock Wren),0
-182 Melanerpes carolinus (Red-bellied Woodpecker),0
+182 Melanerpes carolinus (Red-bellied Woodpecker),990
 183 Melanerpes chrysogenys (Golden-cheeked Woodpecker),0
 184 Melanerpes formicivorus (Acorn Woodpecker),0
 185 Colaptes auratus (Northern Flicker),0
