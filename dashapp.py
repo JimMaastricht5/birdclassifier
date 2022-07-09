@@ -22,7 +22,7 @@ def last_refresh():
 
 
 def load_message_stream():
-    url_prefix = URL_PREFIX if PORT == 0 else URL_PREFIX + ':' + str(PORT)
+    url_prefix = 'http://' + URL_PREFIX if PORT == 0 else 'http://' + URL_PREFIX + ':' + str(PORT)
     df = pd.read_csv(os.getcwd()+'/webstream.csv')
     df = df.reset_index(drop=True)
     df = df.drop(columns=['Unnamed: 0', 'type'])
