@@ -211,7 +211,7 @@ def update_chart(n_intervals):
 if __name__ == "__main__":
     # grab interface with an ip address and print the ip
     for name, interface in ifcfg.interfaces().items():
-        if str(interface['inet']) != 'None':
+        if str(interface['device']) == 'wlan0' and str(interface['inet']) != 'None':
             print(interface['device'])
             print(interface['inet'])
             URL_PREFIX = str(interface['inet'])
