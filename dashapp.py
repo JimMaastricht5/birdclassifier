@@ -8,6 +8,7 @@ import os
 import ifcfg
 
 URL_PREFIX = ''
+PORT = 0
 #   html.Div(children=last_refresh(),
 #            style={
 #           'textAlign': 'center',
@@ -21,7 +22,7 @@ def last_refresh():
 
 
 def load_message_stream():
-    url_prefix = URL_PREFIX
+    url_prefix = URL_PREFIX if PORT == 0 else URL_PREFIX + ':' + str(PORT)
     df = pd.read_csv(os.getcwd()+'/webstream.csv')
     df = df.reset_index(drop=True)
     df = df.drop(columns=['Unnamed: 0', 'type'])
@@ -215,5 +216,5 @@ if __name__ == "__main__":
             print(interface['inet'])
             URL_PREFIX = str(interface['inet'])
 
-    port = 8080
-    app.run_server(debug=True, host='0.0.0.0', port=port)
+    PORT = 8080
+    app.run_server(debug=True, host=URL_PREFIX, port=PORT)
