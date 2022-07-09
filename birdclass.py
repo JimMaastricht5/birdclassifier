@@ -131,6 +131,7 @@ def bird_detector(args):
                 # process tweets, jpg if not min number of frame, gif otherwise
                 waittime = birdpop.report_single_census_count(best_label) * args.tweetdelay / 10  # wait X min * N bird
                 waittime = args.tweetdelay if waittime >= args.tweetdelay else waittime
+                print('in favs?', (best_label in favorite_birds))
                 if (datetime.now() - last_tweet).total_seconds() >= waittime or bird_first_time_seen or \
                         best_label in favorite_birds:
                     if animated:

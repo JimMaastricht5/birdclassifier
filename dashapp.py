@@ -5,8 +5,9 @@ import plotly.express as px
 import pandas as pd
 import datetime
 import os
+import ifcfg
 
-
+URL_PREFIX = ''
 #   html.Div(children=last_refresh(),
 #            style={
 #           'textAlign': 'center',
@@ -14,12 +15,13 @@ import os
 #       }
 #       ),
 
+
 def last_refresh():
     return 'Page last updated: ' + str(datetime.datetime.now().strftime('%H:%M:%S'))
 
 
 def load_message_stream():
-    url_prefix = '192.168.1.149:8080'
+    url_prefix = URL_PREFIX
     df = pd.read_csv(os.getcwd()+'/webstream.csv')
     df = df.reset_index(drop=True)
     df = df.drop(columns=['Unnamed: 0', 'type'])
@@ -206,6 +208,12 @@ def update_chart(n_intervals):
 
 
 if __name__ == "__main__":
+    # grab interface with an ip address and print the ip
+    for name, interface in ifcfg.interfaces().items():
+        if str(interface['inet']) != 'None':
+            print(interface['device'])
+            print(interface['inet'])
+            URL_PREFIX = str(interface['inet'])
+
     port = 8080
     app.run_server(debug=True, host='0.0.0.0', port=port)
-    # app.run_server(debug=True, port=port)

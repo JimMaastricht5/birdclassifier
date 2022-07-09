@@ -13,3 +13,4 @@ tflite-runtime~=2.7.0
 tweepy~=4.5.0
 dash
 plotly
+ifcfg
