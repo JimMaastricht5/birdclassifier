@@ -221,18 +221,19 @@ def build_bird_animated_gif(args, motion_detect, birds, cityweather, first_img_j
     # print('--- Best label and confidence', best_label, best_confidence)
     return gif, gif_filename, animated, best_label, best_confidence, frames_with_birds
 
-
 def tweet_text(label, confidence):
     # sample url https://www.allaboutbirds.org/guide/Northern_Rough-winged_Swallow/overview
     try:
-        label = str(label[0]) if isinstance(label, list) else str(label)
-        confidence = float(confidence[0]) if isinstance(confidence, list) else float(confidence)
-        sname = str(label)  # make sure the label is a string
+        label = str(label[0]) if isinstance(label, list) else str(label)  # handle list or individual string
+        confidence = float(confidence[0]) if isinstance(confidence, list) else float(confidence)  # list or float
+        sname = str(label)
         sname = sname[sname.find(' ') + 1:] if sname.find(' ') >= 0 else sname  # remove index number
+        sex = sname[sname.find('[') + 1: sname.find(']')] if sname.find('[') >= 0 else ''  # retrieve sex
+        sname = sname[0: sname.find('[') - 1] if sname.find('[') >= 0 else sname  # remove sex
         cname = sname[sname.find('(') + 1: sname.find(')')] if sname.find('(') >= 0 else sname  # retrieve common name
         hypername = cname.replace(' ', '_')
         hyperlink = f'https://www.allaboutbirds.org/guide/{hypername}/overview'
-        tweet_label = f'{cname} {confidence * 100:.1f}% {hyperlink}'
+        tweet_label = f'{sex} {cname} {confidence * 100:.1f}% {hyperlink}'
     except Exception as e:
         tweet_label = ''
         print(e)
