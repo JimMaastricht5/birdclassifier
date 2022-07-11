@@ -85,6 +85,7 @@ def bird_detector(args):
                                        output_function=output.message, verbose=args.verbose)
     output.message(f'Using label file: {birds.labels}')
     output.message(f'Using threshold file: {birds.thresholds}')
+    output.message(f'Using classifier file: {birds.classifier_file}')
     output.message('Starting while loop until sun set..... ')
     # loop while the sun is up, look for motion, detect birds, determine species
     while cityweather.sunrise.time() < datetime.now().time() < cityweather.sunset.time():

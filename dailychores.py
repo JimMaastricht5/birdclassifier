@@ -77,7 +77,8 @@ class DailyChores:
                                  f'{self.cityweather.visibility} ft.' +
                                  f' Temp is currently {self.cityweather.temp}F with ' +
                                  f'wind speeds of {self.cityweather.windspeed} MPH.' +
-                                 f'Sunrise was at {self.cityweather.sunrise}. Sunset is at {self.cityweather.sunset}.')
+                                 f'Sunrise was at {self.cityweather.sunrise:%B %d %H:%m}. ' +
+                                 f'Sunset is at {self.cityweather.sunset: %H:%m}.')
         return
 
     # post a report of the top population for birds
