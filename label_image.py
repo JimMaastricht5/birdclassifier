@@ -58,21 +58,25 @@ except Exception as e:
 
 
 class DetectClassify:
-    def __init__(self, homedir='/home/pi/PycharmProjects/birdclassifier/', labels='coral.ai.inat_bird_labels.txt',
-                 thresholds='coral.ai.inat_bird_threshold.csv',
+    def __init__(self, homedir='/home/pi/PycharmProjects/birdclassifier/',
+                 object_model='lite-model_ssd_mobilenet_v1_1_metadata_2.tflite',
+                 object_model_labels='lite-model_ssd_mobilenet_v1_1_metadata_2_labelmap.txt',
+                 classifier_model='coral.ai.mobilenet_v2_1.0_224_inat_bird_quant.tflite',
+                 classifier_labels='coral.ai.inat_bird_labels.txt',
+                 classifier_thresholds='coral.ai.inat_bird_threshold.csv',
                  detect_object_min_confidence=.9, screenheight=480,
                  screenwidth=640, contrast_chg=1.0, color_chg=1.0, brightness_chg=1.0, sharpness_chg=1.0,
                  mismatch_penalty=0.3, overlap_perc_tolerance=0.7, min_area=28000, target_object='bird',
                  classify_object_min_confidence=.8, output_function=print, verbose=False):
-        self.detector_file = homedir + 'lite-model_ssd_mobilenet_v1_1_metadata_2.tflite'
-        self.detector_labels_file = homedir + 'lite-model_ssd_mobilenet_v1_1_metadata_2_labelmap.txt'
+        self.detector_file = homedir + object_model  # object model
+        self.detector_labels_file = homedir + object_model_labels  # obj model label
         self.target_objects = target_object
         self.target_object_found = False
-        self.classifier_file = homedir + 'coral.ai.mobilenet_v2_1.0_224_inat_bird_quant.tflite'
-        self.labels = labels
-        self.thresholds = thresholds
-        self.classifier_labels_file = homedir + labels
-        self.classifier_thresholds_file = homedir + thresholds
+        self.classifier_file = homedir + classifier_model  # classifier model
+        self.labels = classifier_labels
+        self.thresholds = classifier_thresholds
+        self.classifier_labels_file = homedir + classifier_labels
+        self.classifier_thresholds_file = homedir + classifier_thresholds
         self.classifier_thresholds = np.genfromtxt(self.classifier_thresholds_file, delimiter=',')
         self.detector, self.obj_detector_possible_labels = self.init_tf2(self.detector_file, self.detector_labels_file)
         self.classifier, self.classifier_possible_labels = self.init_tf2(self.classifier_file,
