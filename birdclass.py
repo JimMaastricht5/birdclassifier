@@ -70,7 +70,9 @@ def bird_detector(args):
     bird_tweeter = tweeter.TweeterClass()  # init tweeter2 class twitter handler
     chores = dailychores.DailyChores(bird_tweeter, birdpop, cityweather, output_class=output)
     # init detection and classifier object
-    birds = label_image.DetectClassify(homedir=args.homedir, labels=args.labels, thresholds=args.thresholds,
+    birds = label_image.DetectClassify(homedir=args.homedir, classifier_labels=args.labels,
+                                       classifier_model=args.classifier,
+                                       classifier_thresholds=args.thresholds,
                                        detect_object_min_confidence=args.bird_confidence,
                                        classify_object_min_confidence=args.species_confidence,
                                        mismatch_penalty=args.mismatch_penalty,
@@ -211,7 +213,7 @@ def build_bird_animated_gif(args, motion_detect, birds, cityweather, first_img_j
             else image_proc.enhance_brightness(img=frame, factor=args.brightness_chg)  # increase bright
         labeled_frames.append(birds.add_boxes_and_labels(img=frame, use_last_known=True))  # append image regardless
     if frames_with_birds >= (args.minanimatedframes - 1):  # if bird is in min number of frames build gif
-        gif, gif_filename = image_proc.save_gif(frames=labeled_frames[0:last_good_frame])  # frame_rate=motion_detect.FPS)
+        gif, gif_filename = image_proc.save_gif(frames=labeled_frames[0:last_good_frame])  #frame_rate=motion_detect.FPS
         animated = True
     best_confidence = confidence_dict[max(confidence_dict, key=confidence_dict.get)] / \
         census_dict[max(confidence_dict, key=confidence_dict.get)]  # sum conf/bird cnt
@@ -294,6 +296,15 @@ if __name__ == "__main__":
                     help="name of file to use for species labels and thresholds")
     ap.add_argument("-tr", "--thresholds", type=str, default='coral.ai.inat_bird_threshold.csv',
                     help="name of file to use for species labels and thresholds")
+    ap.add_argument("-cm", "--classifier", type=str, default='coral.ai.mobilenet_v2_1.0_224_inat_bird_quant.tflite',
+                    help="model name for species classifier")
+    # ap.add_argument("-la", "--labels", type=str, default='class_labels2022_07v1.txt',
+    #                 help="name of file to use for species labels and thresholds")
+    # ap.add_argument("-tr", "--thresholds", type=str, default='class_labels2022_07v1.csv',
+    #                 help="name of file to use for species labels and thresholds")
+    # ap.add_argument("-cm", "--classifier", type=str, default='mobilenet_tweeters2022_07v1.tflite',
+    #                 help="model name for species classifier")
+
     ap.add_argument("-ct", "--city", type=str, default='Madison,WI,USA',
                     help="name of city weather station uses OWM web service.  See their site for city options")
 

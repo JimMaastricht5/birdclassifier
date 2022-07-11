@@ -1,0 +1,19 @@
+0 American Goldfinch (Female or Juvenile)
+1 American Goldfinch (Male)
+2 Baltimore Oriole (Female or Juvenile)
+3 Baltimore Oriole (Male)
+4 Black-capped Chickadee
+5 Brown-headed Cowbird (Female or Juvenile)
+6 Brown-headed Cowbird (Male)
+7 Common Grackle
+8 House Finch (Female or Juvenile)
+9 House Finch (Male)
+10 Mourning Dove
+11 Northern Cardinal (Adult Male)
+12 Northern Cardinal (Female or Juvenile)
+13 Pine Grosbeak (Female or Juvenile)
+14 Purple Finch (Female or Juvenile)
+15 Purple Finch (Male)
+16 Rose-breasted Grosbeak (Female or Juvenile)
+17 Rose-breasted Grosbeak (Male)
+18 Song Sparrow
