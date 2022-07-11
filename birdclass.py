@@ -100,8 +100,8 @@ def bird_detector(args):
             birds.set_colors()  # set new colors for this series of bounding boxes
             event_count += 1
             img_filename = os.getcwd() + '/assets/' + str(event_count % 10) + '.jpg'
-            output.message(message=f'Saw motion #{event_count} at {datetime.now().strftime("%I:%M:%S %P")}',
-                           event_num=event_count, image_name='')
+            # output.message(message=f'Saw motion #{event_count} at {datetime.now().strftime("%I:%M:%S %P")}',
+            #                event_num=event_count, image_name='')
             first_img_jpg = birds.img  # keep first shot for animation and web
 
             # classify, grab labels, output census, send to web and terminal,
