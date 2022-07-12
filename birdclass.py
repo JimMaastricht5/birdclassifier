@@ -134,8 +134,7 @@ def bird_detector(args):
                 # process tweets, jpg if not min number of frame, gif otherwise
                 waittime = birdpop.report_single_census_count(best_label) * args.tweetdelay / 10  # wait X min * N bird
                 waittime = args.tweetdelay if waittime >= args.tweetdelay else waittime
-                common_name, _, _ = parse_species(best_label)
-                print('in favs?', (common_name in favorite_birds), common_name, favorite_birds)
+                common_name, _, _ = parse_species(best_label)  # pull out common name from full species and sex
                 if (datetime.now() - last_tweet).total_seconds() >= waittime or bird_first_time_seen or \
                         common_name in favorite_birds:
                     if animated:
@@ -284,7 +283,8 @@ if __name__ == "__main__":
     # ap.add_argument("-sw", "--screenwidth", type=int, default=768, help="max screen width")
     # ap.add_argument("-sh", "--screenheight", type=int, default=1024, help="max screen height")
     ap.add_argument("-sw", "--screenwidth", type=int, default=640, help="max screen width")
-    ap.add_argument("-sh", "--screenheight", type=int, default=720, help="max screen height")
+    # ap.add_argument("-sh", "--screenheight", type=int, default=720, help="max screen height")
+    ap.add_argument("-sh", "--screenheight", type=int, default=480, help="max screen height")
 
     ap.add_argument("-gf", "--minanimatedframes", type=int, default=8, help="minimum number of frames with a bird")
     ap.add_argument("-bb", "--broadcast", type=bool, default=False, help="stream images and text")
