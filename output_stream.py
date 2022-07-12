@@ -22,15 +22,25 @@ class WebStream:
         self.asset_path = self.path + '/assets'
         print(self.asset_path)
         self.df_list = []
-        self.df = pd.DataFrame({
-                           'Event Num': pd.Series(dtype='int'),
-                           'type': pd.Series(dtype='str'),
-                           'Date Time': pd.Series(dtype='str'),
-                           'Message': pd.Series(dtype='str'),
-                           'Image Name': pd.Series(dtype='str')})
-        self.df_occurrences = pd.DataFrame({
-                           'Species': pd.Series(dtype='str'),
-                           'Date Time': pd.Series(dtype='str')})
+        # recover from crash without losing data.  Load data if present.  Keep if current, delete if yesterday
+        try:
+            self.df = pd.read_csv(f'{self.path}/webstream.csv')
+            self.df_occurrences = pd.read_csv(f'{self.path}/web_occurrences.csv')
+            df_date = pd.to_datetime(self.df.iloc[0]['Date Time'])
+            if df_date < datetime.datetime.now():  # empty df if yesterday's data
+                self.df.drop(self.df.index, inplace=True)
+                self.df_occurrences.drop(self.df_occurrences.index, inplace=True)
+        except FileNotFoundError:  # if no file was found build an empty df
+            self.df = pd.DataFrame({
+                'Event Num': pd.Series(dtype='int'),
+                'type': pd.Series(dtype='str'),
+                'Date Time': pd.Series(dtype='str'),
+                'Message': pd.Series(dtype='str'),
+                'Image Name': pd.Series(dtype='str')})
+            self.df_occurrences = pd.DataFrame({
+                'Species': pd.Series(dtype='str'),
+                'Date Time': pd.Series(dtype='str')})
+            pass
 
     def request_handler(self):
         try:
