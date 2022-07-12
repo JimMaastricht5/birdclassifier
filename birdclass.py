@@ -134,9 +134,10 @@ def bird_detector(args):
                 # process tweets, jpg if not min number of frame, gif otherwise
                 waittime = birdpop.report_single_census_count(best_label) * args.tweetdelay / 10  # wait X min * N bird
                 waittime = args.tweetdelay if waittime >= args.tweetdelay else waittime
-                print('in favs?', (best_label in favorite_birds), best_label, favorite_birds)
+                common_name, _, _ = parse_species(best_label)
+                print('in favs?', (common_name in favorite_birds), common_name, favorite_birds)
                 if (datetime.now() - last_tweet).total_seconds() >= waittime or bird_first_time_seen or \
-                        best_label in favorite_birds:
+                        common_name in favorite_birds:
                     if animated:
                         output.message(message=f'Tweeted gif of {best_label} {best_confidence * 100:.1f}% '
                                                f'at {datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count,
@@ -222,16 +223,18 @@ def build_bird_animated_gif(args, motion_detect, birds, cityweather, first_img_j
     # print('--- Best label and confidence', best_label, best_confidence)
     return gif, gif_filename, animated, best_label, best_confidence, frames_with_birds
 
+
 def tweet_text(label, confidence):
     # sample url https://www.allaboutbirds.org/guide/Northern_Rough-winged_Swallow/overview
     try:
         label = str(label[0]) if isinstance(label, list) else str(label)  # handle list or individual string
         confidence = float(confidence[0]) if isinstance(confidence, list) else float(confidence)  # list or float
-        sname = str(label)
-        sname = sname[sname.find(' ') + 1:] if sname.find(' ') >= 0 else sname  # remove index number
-        sex = sname[sname.find('[') + 1: sname.find(']')] if sname.find('[') >= 0 else ''  # retrieve sex
-        sname = sname[0: sname.find('[') - 1] if sname.find('[') >= 0 else sname  # remove sex
-        cname = sname[sname.find('(') + 1: sname.find(')')] if sname.find('(') >= 0 else sname  # retrieve common name
+        # sname = str(label)
+        cname, sname, sex = parse_species(str(label))
+        # sname = sname[sname.find(' ') + 1:] if sname.find(' ') >= 0 else sname  # remove index number
+        # sex = sname[sname.find('[') + 1: sname.find(']')] if sname.find('[') >= 0 else ''  # retrieve sex
+        # sname = sname[0: sname.find('[') - 1] if sname.find('[') >= 0 else sname  # remove sex
+        # cname = sname[sname.find('(') + 1: sname.find(')')] if sname.find('(') >= 0 else sname  # retrieve common name
         hypername = cname.replace(' ', '_')
         hyperlink = f'https://www.allaboutbirds.org/guide/{hypername}/overview'
         tweet_label = f'{sex} {cname} {confidence * 100:.1f}% {hyperlink}'
@@ -239,6 +242,19 @@ def tweet_text(label, confidence):
         tweet_label = ''
         print(e)
     return tweet_label
+
+
+def parse_species(name):
+    cname, sname, sex = '', '', ''
+    try:
+        sname = str(name)
+        sname = sname[sname.find(' ') + 1:] if sname.find(' ') >= 0 else sname  # remove index number
+        sex = sname[sname.find('[') + 1: sname.find(']')] if sname.find('[') >= 0 else ''  # retrieve sex
+        sname = sname[0: sname.find('[') - 1] if sname.find('[') >= 0 else sname  # remove sex
+        cname = sname[sname.find('(') + 1: sname.find(')')] if sname.find('(') >= 0 else sname  # retrieve common name
+    except Exception as e:
+        print(e)
+    return cname, sname, sex
 
 
 # def best_confidence_and_label(census_dict, confidence_dict):
