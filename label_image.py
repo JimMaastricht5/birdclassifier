@@ -243,6 +243,11 @@ class DetectClassify:
         width = input_details[0]['shape'][2]
 
         reshape_image = pil_img.resize((width, height))
+        try:
+            reshape_image = tf.image.resize_with_pad(image=pil_img, target_width=width, target_height=height)
+        except Exception as e:
+            print (e)
+            pass
         image_np = image_proc.convert(reshape_image, 'np')
         image_np_expanded = np.expand_dims(image_np, axis=0)
 
