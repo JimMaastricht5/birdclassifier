@@ -342,7 +342,7 @@ class DetectClassify:
             print(cresult)
             label_threshold = 0
             cresult = 0
-            pass
+
         return(float(label_threshold) != -1 and
                cresult > 0 and cresult >= float(label_threshold) / 1000)
 
