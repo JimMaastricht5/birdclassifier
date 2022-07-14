@@ -334,11 +334,14 @@ class DetectClassify:
         # push to zero if use threshold boolean is false, this automatically puts any confidence over the threshold
         label_threshold = label_threshold if (use_confidence_threshold or label_threshold == -1) else 0
         try:
-            label_threshold = float(label_threshold)
+            # label_threshold = float(label_threshold)
+            cresult = float(cresult)
         except Exception as e:
             print(e)
-            print(label_threshold)
-            label_threshold = 0
+            # print(label_threshold)
+            print(cresult)
+            # label_threshold = 0
+            cresult = 0
             pass
         return(int(label_threshold) != -1 and
                cresult > 0 and cresult >= float(label_threshold) / 1000)
