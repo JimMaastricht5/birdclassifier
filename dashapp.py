@@ -99,7 +99,7 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
         html.Div([
             html.A([
                 html.Img(src=app.get_asset_url('birds.gif'), id='animated_gif',
-                         style={'height': '240px', 'width': '320px'})
+                         style={'height': '320px', 'width': '240px'})
             ], href=app.get_asset_url('birds.gif'), target="_blank"),
         ]),
         # graph container
@@ -117,19 +117,19 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
 
     html.Div(children=[
         html.A([
-            html.Img(src=app.get_asset_url('0.jpg'), style={'height': '160px', 'width': '213px'})
+            html.Img(src=app.get_asset_url('0.jpg'), style={'height': '213px', 'width': '160px'})
         ], href=app.get_asset_url('0.jpg'), target="_blank"),
         html.A([
-            html.Img(src=app.get_asset_url('1.jpg'), style={'height': '160px', 'width': '213px'},)
+            html.Img(src=app.get_asset_url('1.jpg'), style={'height': '213px', 'width': '160px'},)
         ], href=app.get_asset_url('1.jpg'), target="_blank"),
         html.A([
-            html.Img(src=app.get_asset_url('2.jpg'), style={'height': '160px', 'width': '213px'},)
+            html.Img(src=app.get_asset_url('2.jpg'), style={'height': '213px', 'width': '160px'},)
         ], href=app.get_asset_url('2.jpg'), target="_blank"),
         html.A([
-            html.Img(src=app.get_asset_url('3.jpg'), style={'height': '160px', 'width': '213px'},)
+            html.Img(src=app.get_asset_url('3.jpg'), style={'height': '213px', 'width': '160px'},)
         ], href=app.get_asset_url('3.jpg'), target="_blank"),
         html.A([
-            html.Img(src=app.get_asset_url('4.jpg'), style={'height': '160px', 'width': '213px'},)
+            html.Img(src=app.get_asset_url('4.jpg'), style={'height': '213px', 'width': '160px'},)
         ], href=app.get_asset_url('4.jpg'), target="_blank"),
     ]
     ),
