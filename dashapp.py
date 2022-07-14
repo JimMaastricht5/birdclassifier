@@ -73,7 +73,7 @@ df_stream = load_message_stream()
 
 top_card = dbc.Card(
     [
-        dbc.CardImg(src="birds.gof", top=True),
+        dbc.CardImg(src="birds.gif", top=True),
         dbc.CardBody(
             html.P("This card has an image at the top", className="card-text")
         ),
@@ -99,7 +99,7 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
         html.Div([
             html.A([
                 html.Img(src=app.get_asset_url('birds.gif'), id='animated_gif',
-                         style={'height': '256px', 'width': '340px'})
+                         style={'height': '240px', 'width': '320px'})
             ], href=app.get_asset_url('birds.gif'), target="_blank"),
         ]),
         # graph container
