@@ -333,7 +333,7 @@ class DetectClassify:
             else self.classifier_thresholds[int(lindex)][1]
         # push to zero if use threshold boolean is false, this automatically puts any confidence over the threshold
         label_threshold = label_threshold if (use_confidence_threshold or label_threshold == -1) else 0
-        try:
+        try:  # handle typos in threshold file or unexpected results from model
             label_threshold = float(label_threshold)
             cresult = float(cresult)
         except Exception as e:
@@ -342,7 +342,6 @@ class DetectClassify:
             print(cresult)
             label_threshold = 0
             cresult = 0
-
         return(float(label_threshold) != -1 and
                cresult > 0 and cresult >= float(label_threshold) / 1000)
 

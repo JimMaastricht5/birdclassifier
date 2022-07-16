@@ -27,10 +27,13 @@ class WebStream:
             self.df = pd.read_csv(f'{self.path}/webstream.csv')
             self.df_occurrences = pd.read_csv(f'{self.path}/web_occurrences.csv')
             df_date = pd.to_datetime(self.df.iloc[0]['Date Time'])
+            print(f'Prior stream date from {df_date}, now: {datetime.datetime.now()}')
             if df_date < datetime.datetime.now():  # empty df if yesterday's data
+                print('Emptying dataframe, data is stale')
                 self.df.drop(self.df.index, inplace=True)
                 self.df_occurrences.drop(self.df_occurrences.index, inplace=True)
         except FileNotFoundError:  # if no file was found build an empty df
+            print('No prior stream file found, creating empty stream')
             self.df = pd.DataFrame({
                 'Event Num': pd.Series(dtype='int'),
                 'type': pd.Series(dtype='str'),

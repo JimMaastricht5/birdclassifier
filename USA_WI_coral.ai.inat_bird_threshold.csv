@@ -110,7 +110,7 @@
 109 Motacilla aguimp (African Pied Wagtail),-1
 110 Anas superciliosa \xd7 platyrhynchos (Pacific Black Duck \xd7 Mallard hybrid),-1
 111 Icterus pustulatus (Streak-backed Oriole),-1
-112 Icterus gularis (Altamira Oriole),0
+112 Icterus gularis (Altamira Oriole),-1
 113 Carduelis cannabina (Eurasian Linnet),-1
 114 Catharus minimus (Gray-cheeked Thrush),-1
 115 Amaurornis phoenicurus (White-breasted Waterhen),-1
@@ -171,7 +171,7 @@
 170 Piranga rubra (Summer Tanager),-1
 171 Piranga olivacea (Scarlet Tanager),-1
 172 Piranga flava (Hepatic Tanager),-1
-173 Amphispiza bilineata (Black-throated Sparrow),0
+173 Amphispiza bilineata (Black-throated Sparrow),-1
 174 Larus dominicanus (Dominican Gull),-1
 175 Piaya cayana (Squirrel Cuckoo),-1
 176 Aimophila ruficeps (Rufous-crowned Sparrow),-1
@@ -196,14 +196,14 @@
 195 Junco phaeonotus (Yellow-eyed Junco),-1
 196 Ammodramus nelsoni (Nelson's Sparrow),0
 197 Ammodramus savannarum (Grasshopper Sparrow),0
-198 Ammodramus maritimus (Seaside Sparrow),0
+198 Ammodramus maritimus (Seaside Sparrow),-1
 199 Coccyzus erythropthalmus (Black-billed Cuckoo),-1
 200 Coccyzus minor (Mangrove Cuckoo),-1
 201 Coccyzus americanus (Yellow-billed Cuckoo),-1
 202 Nucifraga columbiana (Clark's Nutcracker),-1
 203 Crotophaga sulcirostris (Groove-billed Ani),-1
 204 Pooecetes gramineus (Vesper Sparrow),0
-205 Arremonops rufivirgatus (Olive Sparrow),0
+205 Arremonops rufivirgatus (Olive Sparrow),-1
 206 Geococcyx californianus (Greater Roadrunner),-1
 207 Geococcyx velox (Lesser Roadrunner),-1
 208 Coereba flaveola (Bananaquit),-1
@@ -221,7 +221,7 @@
 220 Sphyrapicus thyroideus (Williamson's Sapsucker),-1
 221 Pheucticus ludovicianus (Rose-breasted Grosbeak),0
 222 Sphyrapicus ruber (Red-breasted Sapsucker),-1
-223 Pheucticus melanocephalus (Black-headed Grosbeak),0
+223 Pheucticus melanocephalus (Black-headed Grosbeak),-1
 224 Sphyrapicus nuchalis (Red-naped Sapsucker),-1
 225 Ortalis poliocephala (West Mexican Chachalaca),-1
 226 Ortalis vetula (Plain Chachalaca),-1
@@ -255,7 +255,7 @@
 254 Circus cyaneus hudsonius (Northern Harrier (American)),-1
 255 Grallina cyanoleuca (Magpie-lark),-1
 256 Plectrophenax nivalis (Snow Bunting),0
-257 Calamospiza melanocorys (Lark Bunting),0
+257 Calamospiza melanocorys (Lark Bunting),-1
 258 Regulus calendula (Ruby-crowned Kinglet),-1
 259 Regulus ignicapilla (Common Firecrest),-1
 260 Regulus regulus (Goldcrest),-1
@@ -264,11 +264,11 @@
 263 Pelecanus conspicillatus (Australian Pelican),-1
 264 Aulacorhynchus prasinus (Emerald Toucanet),-1
 265 Todiramphus sanctus (Sacred Kingfisher),-1
-266 Icterus bullockii (Bullock's Oriole),0
+266 Icterus bullockii (Bullock's Oriole),-1
 267 Spiza americana (Dickcissel),-1
 268 Tyrannus dominicensis (Gray Kingbird),-1
 269 Chlidonias niger (Black Tern),-1
-270 Oriturus superciliosus (Striped Sparrow),0
+270 Oriturus superciliosus (Striped Sparrow),-1
 271 Psarocolius montezuma (Montezuma Oropendola),-1
 272 Turdus pilaris (Fieldfare),-1
 273 Notiomystis cincta (Stitchbird),-1
@@ -568,7 +568,7 @@
 567 Ardea cinerea (Grey Heron),-1
 568 Ardea herodias (Great Blue Heron),-1
 569 Nycticorax nycticorax (Black-crowned Night-Heron),-1
-570 Turdus rufopalliatus (Rufous-backed Robin),980
+570 Turdus rufopalliatus (Rufous-backed Robin),-1
 571 Ardeola ralloides (Squacco Heron),-1
 572 Nyctanassa violacea (Yellow-crowned Night-Heron),-1
 573 Aramides cajaneus (Gray-necked Wood-Rail),-1
@@ -728,7 +728,7 @@
 727 Thraupis abbas (Yellow-winged Tanager),-1
 728 Spinus psaltria (Lesser Goldfinch),-1
 729 Spinus lawrencei (Lawrence's Goldfinch),-1
-730 Spinus tristis (American Goldfinch),900
+730 Spinus tristis (American Goldfinch),0
 731 Threskiornis aethiopicus (African Sacred Ibis),-1
 732 Gygis alba (White Tern),-1
 733 Tachycineta bicolor (Tree Swallow),-1
@@ -874,7 +874,7 @@
 873 Meleagris gallopavo silvestris (Eastern Wild Turkey),-1
 874 Ptiliogonys cinereus (Gray Silky-flycatcher),-1
 875 Elanoides forficatus (Swallow-tailed Kite),-1
-876 Carduelis carduelis (European Goldfinch),0
+876 Carduelis carduelis (European Goldfinch),-1
 877 Cassiculus melanicterus (Yellow-winged Cacique),-1
 878 Dendragapus fuliginosus (Sooty Grouse),-1
 879 Psaltriparus minimus (Bushtit),-1
@@ -922,7 +922,7 @@
 921 Parkesia motacilla (Louisiana Waterthrush),-1
 922 Sula granti (Nazca Booby),-1
 923 Ara macao (Scarlet Macaw),-1
-924 Peucaea ruficauda (Stripe-headed Sparrow),0
+924 Peucaea ruficauda (Stripe-headed Sparrow),-1
 925 Calidris subruficollis (Buff-breasted Sandpiper),-1
 926 Phoenicopterus roseus (Greater Flamingo),-1
 927 Morus bassanus (Northern Gannet),-1
