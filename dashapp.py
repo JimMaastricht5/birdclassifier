@@ -34,6 +34,8 @@ def load_message_stream():
                            url_prefix + '/assets/' + df['Image Name'] + ')'
     except Exception as e:
         print(e)
+        df['Image Name'] = ''
+
     df = df[df['Event Num'] != 0]
     return df
 
