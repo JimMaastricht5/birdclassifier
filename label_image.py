@@ -109,6 +109,9 @@ class DetectClassify:
         self.color_chg = color_chg
         self.sharpness_chg = sharpness_chg
         self.overlap_perc_tolerance = overlap_perc_tolerance
+        self.screenwidth = screenwidth
+        self.screenheight = screenheight
+        self.screen_sq_pixels = screenwidth * screenheight
         self.img = np.zeros((screenheight, screenwidth, 3), dtype=np.uint8)
         self.output_function = output_function
         self.verbose = verbose
@@ -174,7 +177,7 @@ class DetectClassify:
         for i, det_confidence in enumerate(self.detected_confidences):  # loop thru detected target objects
             (startX, startY, endX, endY) = self.scale_rect(img, self.detected_rects[i])  # set x,y bounding box
             rect = (startX, startY, endX, endY)
-            rect_area = (endX - startX) * (endY - startY)
+            rect_area = ((endX - startX) * (endY - startY)) / self.screen_sq_pixels * 100  # % of screen covered by img
             crop_img = img.crop((startX, startY, endX, endY))  # extract image for better classification
             equalizedimg = image_proc.enhance(img, brightness=self.brightness_chg, contrast=self.contrast_chg,
                                               color=self.color_chg, sharpness=self.sharpness_chg)
@@ -185,7 +188,9 @@ class DetectClassify:
             # take the best result between img and enhanced img
             classify_label = classify_label if classify_conf >= classify_conf_equalized else classify_label_equalized
             classify_conf = classify_conf if classify_conf >= classify_conf_equalized else classify_conf_equalized
-            self.output_function(f'match returned: confidence {classify_conf:.3f}, {classify_label}, area:{rect_area}')
+            if classify_conf != 0:
+                self.output_function(f'match returned: confidence {classify_conf:.3f}, {classify_label},'
+                                     f' sq pixels %:{rect_area}')
 
             _overlap_perc = image_proc.overlap_area(prior_rect, rect)  # compare current rect and prior rect
             prior_rect = rect  # set prior rect to current rect
