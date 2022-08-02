@@ -214,7 +214,7 @@ def build_bird_animated_gif(args, motion_detect, birds, cityweather, first_img_j
             else image_proc.enhance_brightness(img=frame, factor=args.brightness_chg)  # increase bright
         labeled_frames.append(birds.add_boxes_and_labels(img=frame, use_last_known=True))  # append image regardless
     if frames_with_birds >= (args.minanimatedframes - 1):  # if bird is in min number of frames build gif
-        gif, gif_filename = image_proc.save_gif(frames=labeled_frames[0:last_good_frame])  #frame_rate=motion_detect.FPS
+        gif, gif_filename = image_proc.save_gif(frames=labeled_frames[0:last_good_frame])  # framerate=motion_detect.FPS
         animated = True
     best_confidence = confidence_dict[max(confidence_dict, key=confidence_dict.get)] / \
         census_dict[max(confidence_dict, key=confidence_dict.get)]  # sum conf/bird cnt
