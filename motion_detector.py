@@ -32,7 +32,6 @@ import math
 from PIL import Image
 import numpy as np
 import image_proc
-import argparse
 
 try:
     import picamera
@@ -44,14 +43,16 @@ except Exception as e:
 
 
 class MotionDetector:
-    def __init__(self, args, output_function=print):
-        # print('initializing camera')
+    def __init__(self, motion_min_area=4, screenwidth=640, screenheight=480, flip_camera=False,
+                 iso=800, first_img_name='capture.jpg'):
+
+        print('initializing camera')
         self.camera = picamera.PiCamera()
-        self.min_area = args.minarea
-        if args.screenwidth != 0:  # use specified height and width or default values if not passed
-            self.camera.resolution = (args.screenheight, args.screenwidth)
-        self.camera.vflip = args.flipcamera
-        self.camera.iso = 800  # iso 800 for less blur
+        self.min_area = motion_min_area
+        if screenwidth != 0:  # use specified height and width or default values if not passed
+            self.camera.resolution = (screenheight, screenwidth)
+        self.camera.vflip = flip_camera
+        self.camera.iso = iso  # iso 800 for less blur
         time.sleep(2)  # Wait for the automatic gain control to settle
         # self.shutterspeed = self.camera.exposure_speed
         # self.camera.exposure_mode = 'off'
@@ -59,16 +60,18 @@ class MotionDetector:
         # self.gain = camera.awb_gains
         # self.camera.awb_mode = 'off'
         # self.camera.awb_gains = self.gain
-        print('capturing first image: capture.jpg')
-        self.img_filename = 'capture.jpg'
+
+        # set up first image. base for motion detection
+        print(f'capturing first image: {first_img_name}')
+        self.img_filename = first_img_name
         self.capture_image_with_file(filename=self.img_filename)  # capture img
         self.img = Image.open(self.img_filename)
         self.gray = image_proc.grayscale(self.img)  # convert image to gray scale for motion detection
         self.graymotion = image_proc.gaussianblur(self.gray)  # smooth out image for motion detection
         self.first_img = self.graymotion.copy()
-        self.motion = False
-        self.FPS = 0
-        self.output_function = output_function
+
+        self.motion = False  # init motion detection boolean
+        self.FPS = 0  # calculated frames per second
         print('camera setup completed')
 
     def capture_image_with_file(self, img_type='jpeg', filename='/home/pi/birdclass/capture_image.jpg'):
@@ -139,14 +142,14 @@ class MotionDetector:
         return -sum([p * math.log(p, 2) for p in probability if p != 0])
 
 
-if __name__ == '__main__':
-    # construct the argument parser and parse the arguments
-    ap = argparse.ArgumentParser()
-    # camera settings
-    ap.add_argument("-fc", "--flipcamera", type=bool, default=False, help="flip camera image")
-    ap.add_argument("-sw", "--screenwidth", type=int, default=640, help="max screen width")
-    ap.add_argument("-sh", "--screenheight", type=int, default=480, help="max screen height")
-    arguments = ap.parse_args()
-
-    motion_detector = MotionDetector(args=arguments)
-    frames_test = motion_detector.capture_stream()
+# if __name__ == '__main__':
+#     # construct the argument parser and parse the arguments
+#     ap = argparse.ArgumentParser()
+#     # camera settings
+#     ap.add_argument("-fc", "--flipcamera", type=bool, default=False, help="flip camera image")
+#     ap.add_argument("-sw", "--screenwidth", type=int, default=640, help="max screen width")
+#     ap.add_argument("-sh", "--screenheight", type=int, default=480, help="max screen height")
+#     arguments = ap.parse_args()
+#
+#     motion_detector = MotionDetector(args=arguments)
+#     frames_test = motion_detector.capture_stream()

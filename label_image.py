@@ -66,7 +66,7 @@ class DetectClassify:
                  classifier_thresholds='coral.ai.inat_bird_threshold.csv',
                  detect_object_min_confidence=.9, screenheight=480,
                  screenwidth=640, contrast_chg=1.0, color_chg=1.0, brightness_chg=1.0, sharpness_chg=1.0,
-                 mismatch_penalty=0.3, overlap_perc_tolerance=0.7, min_area=28000, target_object='bird',
+                 min_area=28000, target_object='bird',
                  classify_object_min_confidence=.8, output_function=print, verbose=False):
         self.detector_file = homedir + object_model  # object model
         self.detector_labels_file = homedir + object_model_labels  # obj model label
@@ -86,7 +86,6 @@ class DetectClassify:
         self.detect_obj_min_confidence = detect_object_min_confidence
         self.classify_object_min_confidence = classify_object_min_confidence
         self.obj_confidence = 0
-        self.classify_mismatch_reduction = mismatch_penalty
         self.min_area = min_area
         self.detected_confidences = []
         self.detected_labels = []
@@ -108,7 +107,6 @@ class DetectClassify:
         self.brightness_chg = brightness_chg
         self.color_chg = color_chg
         self.sharpness_chg = sharpness_chg
-        self.overlap_perc_tolerance = overlap_perc_tolerance
         self.screenwidth = screenwidth
         self.screenheight = screenheight
         self.screen_sq_pixels = screenwidth * screenheight
@@ -195,9 +193,6 @@ class DetectClassify:
             _overlap_perc = image_proc.overlap_area(prior_rect, rect)  # compare current rect and prior rect
             prior_rect = rect  # set prior rect to current rect
             # print('overlap percent', overlap_perc)
-            # if overlap_perc > self.overlap_perc_tolerance:  # 0.0 in first loop, if XX% overlap skip bird
-            #     classify_conf = 0
-            #     classify_label = ""
             # record bird classification and location if there is a label
             if len(classify_label.strip()) > 0:
                 self.classified_labels.append(classify_label)

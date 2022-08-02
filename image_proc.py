@@ -64,10 +64,10 @@ def convert(img, convert_to='np'):
 # enhance color, brightness, sharpness, and contrast
 # take either a pil image
 def enhance(img, brightness=1.0, sharpness=1.0, contrast=1.0, color=1.0):
-    img = enhance_brightness(img, brightness)
-    img = enhance_sharpness(img, sharpness)
-    img = enhance_contrast(img, contrast)
-    img = enhance_color(img, color)
+    img = enhance_brightness(img, brightness) if brightness != 1 else img
+    img = enhance_sharpness(img, sharpness) if sharpness != 1 else img
+    img = enhance_contrast(img, contrast) if contrast != 1 else img
+    img = enhance_color(img, color) if color != 1 else img
     return img
 
 

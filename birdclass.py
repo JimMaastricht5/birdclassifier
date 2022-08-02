@@ -65,7 +65,9 @@ def bird_detector(args):
     cityweather.wait_until_sunrise()  # if before sun rise, wait here
 
     # initial video capture, screen size, and grab first image (no motion)
-    motion_detect = motion_detector.MotionDetector(args=args)  # init class
+    motion_detect = motion_detector.MotionDetector(motion_min_area=args.min_area, screenwidth=args.screen_width,
+                                                   screenheight=args.screenheight, flip_camera=args.flip_camera,
+                                                   iso=args.iso)  # init class
     output.message('Done with camera init... setting up classes.')
     bird_tweeter = tweeter.TweeterClass()  # init tweeter2 class twitter handler
     chores = dailychores.DailyChores(bird_tweeter, birdpop, cityweather, output_class=output)
@@ -75,12 +77,10 @@ def bird_detector(args):
                                        classifier_thresholds=args.thresholds,
                                        detect_object_min_confidence=args.bird_confidence,
                                        classify_object_min_confidence=args.species_confidence,
-                                       mismatch_penalty=args.mismatch_penalty,
                                        screenheight=args.screenheight, screenwidth=args.screenwidth,
                                        color_chg=args.color_chg,
                                        contrast_chg=args.contrast_chg, sharpness_chg=args.sharpness_chg,
                                        brightness_chg=args.brightness_chg,
-                                       overlap_perc_tolerance=args.overlap_perc_tolerance,
                                        target_object='bird',
                                        output_function=output.message, verbose=args.verbose)
     output.message(f'Using label file: {birds.labels}')
@@ -280,10 +280,7 @@ if __name__ == "__main__":
 
     # camera settings
     ap.add_argument("-fc", "--flipcamera", type=bool, default=False, help="flip camera image")
-    # ap.add_argument("-sw", "--screenwidth", type=int, default=768, help="max screen width")
-    # ap.add_argument("-sh", "--screenheight", type=int, default=1024, help="max screen height")
     ap.add_argument("-sw", "--screenwidth", type=int, default=640, help="max screen width")
-    # ap.add_argument("-sh", "--screenheight", type=int, default=720, help="max screen height")
     ap.add_argument("-sh", "--screenheight", type=int, default=480, help="max screen height")
 
     ap.add_argument("-gf", "--minanimatedframes", type=int, default=8, help="minimum number of frames with a bird")
@@ -294,19 +291,16 @@ if __name__ == "__main__":
 
     # motion and image processing settings, note adjustments are used as both a detector second prediction and a final
     # adjustment to the output images.
+    ap.add_argument("-is", "--iso", type=int, default=800, help="iso camera sensitivity. higher requires less light")
     ap.add_argument("-b", "--brightness_chg", type=int, default=1.0, help="brightness boost")  # 1 no chg,< 1 -, > 1 +
     ap.add_argument("-c", "--contrast_chg", type=float, default=1.0, help="contrast boost")  # 1 no chg,< 1 -, > 1 +
     ap.add_argument("-cl", "--color_chg", type=float, default=1.0, help="color boost")  # 1 no chg,< 1 -, > 1 +
     ap.add_argument("-sp", "--sharpness_chg", type=float, default=1.0, help="sharpeness")  # 1 no chg,< 1 -, > 1 +
-    ap.add_argument("-mp", "--mismatch_penalty", type=float, default=.3,
-                    help="confidence penalty if predictions from img and enhance img dont match ")
-    ap.add_argument("-ei", "--enhanceimg", type=bool, default=True, help="offset waterproof box blur and enhance img")
 
     # prediction defaults
     ap.add_argument("-sc", "--species_confidence", type=float, default=.960, help="species confidence threshold")
     ap.add_argument("-bc", "--bird_confidence", type=float, default=.6, help="bird confidence threshold")
-    ap.add_argument("-op", "--overlap_perc_tolerance", type=float, default=0.8, help="% box overlap to flag as dup")
-    ap.add_argument("-ma", "--minarea", type=float, default=4.0, help="motion entropy threshold")  # lower = > motion
+    ap.add_argument("-ma", "--minarea", type=float, default=4.0, help="motion area threshold, lower req more")
 
     ap.add_argument("-hd", "--homedir", type=str, default='/home/pi/PycharmProjects/birdclassifier/',
                     help="home directory for files")
