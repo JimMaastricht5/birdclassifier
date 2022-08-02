@@ -51,10 +51,15 @@ class MotionDetector:
         if args.screenwidth != 0:  # use specified height and width or default values if not passed
             self.camera.resolution = (args.screenheight, args.screenwidth)
         self.camera.vflip = args.flipcamera
-        # print('sleep to let camera settle')
+        self.camera.iso = 800  # iso 800 for less blur
         time.sleep(2)  # Wait for the automatic gain control to settle
         # self.shutterspeed = self.camera.exposure_speed
-        # print('capturing first image')
+        # self.camera.exposure_mode = 'off'
+        # self.camera.exposure_mode = 'off'
+        # self.gain = camera.awb_gains
+        # self.camera.awb_mode = 'off'
+        # self.camera.awb_gains = self.gain
+        print('capturing first image: capture.jpg')
         self.img_filename = 'capture.jpg'
         self.capture_image_with_file(filename=self.img_filename)  # capture img
         self.img = Image.open(self.img_filename)
@@ -64,7 +69,7 @@ class MotionDetector:
         self.motion = False
         self.FPS = 0
         self.output_function = output_function
-        # print('camera setup completed')
+        print('camera setup completed')
 
     def capture_image_with_file(self, img_type='jpeg', filename='/home/pi/birdclass/capture_image.jpg'):
         stream = io.BytesIO()

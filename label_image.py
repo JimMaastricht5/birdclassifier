@@ -94,9 +94,11 @@ class DetectClassify:
         self.classified_confidences = []
         self.classified_labels = []
         self.classified_rects = []
+        self.classified_rects_area = []
         self.last_known_classified_confidences = []
         self.last_known_classified_labels = []
         self.last_known_classified_rects = []
+        self.last_known_classified_rects_area = []
         self.colors = np.random.uniform(0, 255, size=(11, 3)).astype(int)  # random colors for bounding boxes
         self.color_index = self.pick_a_color()  # set initial color to use for bounding boxes
         self.text_color_index = self.pick_a_color()  # set initial color to use for text
@@ -165,12 +167,14 @@ class DetectClassify:
     # stash prior classification for later processing if current frame does not find a bird
     def classify(self, img, use_confidence_threshold=True):
         self.classified_rects = []
+        self.classified_rects_area = []
         self.classified_confidences = []
         self.classified_labels = []
         prior_rect = (0, 0, 0, 0)
         for i, det_confidence in enumerate(self.detected_confidences):  # loop thru detected target objects
             (startX, startY, endX, endY) = self.scale_rect(img, self.detected_rects[i])  # set x,y bounding box
             rect = (startX, startY, endX, endY)
+            rect_area = (endX - startX) * (endY - startY)
             crop_img = img.crop((startX, startY, endX, endY))  # extract image for better classification
             equalizedimg = image_proc.enhance(img, brightness=self.brightness_chg, contrast=self.contrast_chg,
                                               color=self.color_chg, sharpness=self.sharpness_chg)
@@ -178,10 +182,11 @@ class DetectClassify:
             classify_conf, classify_label = self.classify_obj(crop_img, rect, use_confidence_threshold)
             classify_conf_equalized, classify_label_equalized = self.classify_obj(crop_equalizedimg, rect,
                                                                                   use_confidence_threshold)
-            # print('classified', classify_conf, classify_label)
             # take the best result between img and enhanced img
             classify_label = classify_label if classify_conf >= classify_conf_equalized else classify_label_equalized
             classify_conf = classify_conf if classify_conf >= classify_conf_equalized else classify_conf_equalized
+            self.output_function(f'match returned: confidence {classify_conf:.3f}, {classify_label}, area:{rect_area}')
+
             _overlap_perc = image_proc.overlap_area(prior_rect, rect)  # compare current rect and prior rect
             prior_rect = rect  # set prior rect to current rect
             # print('overlap percent', overlap_perc)
@@ -193,11 +198,13 @@ class DetectClassify:
                 self.classified_labels.append(classify_label)
                 self.classified_confidences.append(classify_conf)
                 self.classified_rects.append(rect)
+                self.classified_rects_area.append(rect_area)
         if max(self.classified_confidences, default=0) == 0:  # if empty list or zero
             max_confidence = 0
-        else:
+        else:  # set last known to current species if confident
             max_confidence = max(self.classified_confidences)
             self.last_known_classified_rects = self.classified_rects
+            self.last_known_classified_rects_area = self.classified_rects_area
             self.last_known_classified_labels = self.classified_labels
             self.last_known_classified_confidences = self.classified_confidences
         return max_confidence
@@ -229,8 +236,8 @@ class DetectClassify:
                 if cresult > maxcresult:  # if this above threshold and is a better confidence result store it
                     maxcresult = cresult
                     maxlresult = lresult
-        if maxcresult != 0:
-            self.output_function(f'match returned: confidence {maxcresult:.3f}, {maxlresult}')
+        # if maxcresult != 0:
+        #     self.output_function(f'match returned: confidence {maxcresult:.3f}, {maxlresult}')
         return maxcresult, maxlresult  # highest confidence with best match
 
     # takes a PIL image type and converts it to np array for tensor
@@ -287,10 +294,10 @@ class DetectClassify:
             (start_x, start_y, end_x, end_y) = rect
             draw = PILImageDraw.Draw(img)
             font = draw.getfont()
-            try:  # add text to top and bottom of image
-                draw.text((start_x, start_y), self.label_text(classified_labels[i], classified_confidences[i], rect),
+            try:  # add text to top and bottom of image, make box slightly large and put text on top and bottom
+                draw.text((start_x, start_y-50), self.label_text(classified_labels[i], classified_confidences[i], rect),
                           font=font, fill='white')  # font = font, fill = self.text_color)
-                draw.text((start_x, end_y), self.label_text(classified_labels[i], classified_confidences[i], rect),
+                draw.text((start_x, end_y+50), self.label_text(classified_labels[i], classified_confidences[i], rect),
                           font=font, fill='white')
                 draw.line([(start_x-25, start_y-25), (start_x-25, end_y+25), (start_x-25, end_y+25),
                            (end_x+25, end_y+25), (end_x+25, end_y+25),
