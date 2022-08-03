@@ -65,7 +65,7 @@ def bird_detector(args):
     cityweather.wait_until_sunrise()  # if before sun rise, wait here
 
     # initial video capture, screen size, and grab first image (no motion)
-    motion_detect = motion_detector.MotionDetector(motion_min_area=args.min_area, screenwidth=args.screen_width,
+    motion_detect = motion_detector.MotionDetector(motion_min_area=args.minarea, screenwidth=args.screen_width,
                                                    screenheight=args.screenheight, flip_camera=args.flip_camera,
                                                    iso=args.iso)  # init class
     output.message('Done with camera init... setting up classes.')
