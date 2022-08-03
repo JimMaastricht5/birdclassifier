@@ -66,7 +66,7 @@ def bird_detector(args):
 
     # initial video capture, screen size, and grab first image (no motion)
     motion_detect = motion_detector.MotionDetector(motion_min_area=args.minarea, screenwidth=args.screenwidth,
-                                                   screenheight=args.screenheight, flip_camera=args.flip_camera,
+                                                   screenheight=args.screenheight, flip_camera=args.flipcamera,
                                                    iso=args.iso)  # init class
     output.message('Done with camera init... setting up classes.')
     bird_tweeter = tweeter.TweeterClass()  # init tweeter2 class twitter handler
