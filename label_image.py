@@ -283,10 +283,12 @@ class DetectClassify:
         if use_last_known and round(max(self.classified_confidences, default=0), 2) == 0:
             # print('using last known', self.last_known_classified_confidences, self.last_known_classified_labels)
             classified_rects = self.last_known_classified_rects
+            classified_rects_area = self.last_known_classified_rects_area
             classified_labels = self.last_known_classified_labels
             classified_confidences = self.last_known_classified_confidences
         else:
             classified_rects = self.classified_rects
+            classified_rects_area = self.classified_rects_area
             classified_labels = self.classified_labels
             classified_confidences = self.classified_confidences
 
@@ -295,10 +297,11 @@ class DetectClassify:
             draw = PILImageDraw.Draw(img)
             font = draw.getfont()
             try:  # add text to top and bottom of image, make box slightly large and put text on top and bottom
-                draw.text((start_x, start_y-50), self.label_text(classified_labels[i], classified_confidences[i], rect),
-                          font=font, fill='white')  # font = font, fill = self.text_color)
-                draw.text((start_x, end_y+50), self.label_text(classified_labels[i], classified_confidences[i], rect),
-                          font=font, fill='white')
+                # font = font, fill = self.text_color if color font is desired
+                draw.text((start_x, start_y-50), self.label_text(classified_labels[i], classified_confidences[i],
+                                                                 classified_rects_area), font=font, fill='white')
+                draw.text((start_x, end_y+50), self.label_text(classified_labels[i], classified_confidences[i],
+                                                               classified_rects_area), font=font, fill='white')
                 draw.line([(start_x-25, start_y-25), (start_x-25, end_y+25), (start_x-25, end_y+25),
                            (end_x+25, end_y+25), (end_x+25, end_y+25),
                            (end_x+25, start_y-25), (end_x+25, start_y-25), (start_x-25, start_y-25)],
@@ -353,12 +356,12 @@ class DetectClassify:
                cresult > 0 and cresult >= float(label_threshold) / 1000)
 
     # set label for box in image use short species name instead of scientific name
-    def label_text(self, label, confidence, rect):
+    def label_text(self, label, confidence, rect_area):
         sname = str(label)  # make sure label is considered a string
         start = sname.find('(') + 1  # find start of common name, move one character to drop (
         end = sname.find(')')
         cname = sname[start:end] if start >= 0 and end >= 0 else sname
-        common_name = f'{cname} {confidence * 100:.1f}% '
+        common_name = f'{cname} {confidence * 100:.1f}%, frame:{rect_area}%'
         return common_name
 
 
