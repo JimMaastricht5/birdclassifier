@@ -301,9 +301,9 @@ class DetectClassify:
             try:  # add text to top and bottom of image, make box slightly large and put text on top and bottom
                 # font = font, fill = self.text_color if color font is desired
                 draw.text((start_x, start_y-50), self.label_text(classified_labels[i], classified_confidences[i],
-                                                                 classified_rects_area), font=font, fill='white')
+                                                                 classified_rects_area[i]), font=font, fill='white')
                 draw.text((start_x, end_y+50), self.label_text(classified_labels[i], classified_confidences[i],
-                                                               classified_rects_area), font=font, fill='white')
+                                                               classified_rects_area[i]), font=font, fill='white')
                 draw.line([(start_x-25, start_y-25), (start_x-25, end_y+25), (start_x-25, end_y+25),
                            (end_x+25, end_y+25), (end_x+25, end_y+25),
                            (end_x+25, start_y-25), (end_x+25, start_y-25), (start_x-25, start_y-25)],
@@ -354,7 +354,7 @@ class DetectClassify:
             print(cresult)
             label_threshold = 0
             cresult = 0
-        return(float(label_threshold) != -1 and screen_percent >= 10 and
+        return(float(label_threshold) != -1 and screen_percent >= 10 and  # *** need to change fixed set of 10 to param
                cresult > 0 and cresult >= float(label_threshold) / 1000)
 
     # set label for box in image use short species name instead of scientific name
@@ -363,7 +363,7 @@ class DetectClassify:
         start = sname.find('(') + 1  # find start of common name, move one character to drop (
         end = sname.find(')')
         cname = sname[start:end] if start >= 0 and end >= 0 else sname
-        common_name = f'{cname} {confidence * 100:.2f}%, frame:{round(screen_percent,2)}%'
+        common_name = f'{cname} {confidence * 100:.2f}%, frame:{screen_percent:.2f)}%'
         return common_name
 
 
