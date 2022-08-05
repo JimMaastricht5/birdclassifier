@@ -175,20 +175,22 @@ class DetectClassify:
         for i, det_confidence in enumerate(self.detected_confidences):  # loop thru detected target objects
             (startX, startY, endX, endY) = self.scale_rect(img, self.detected_rects[i])  # set x,y bounding box
             rect = (startX, startY, endX, endY)
-            rect_area = ((endX - startX) * (endY - startY)) / self.screen_sq_pixels * 100  # % of screen covered by img
+            rect_percent_scr = ((endX - startX) * (endY - startY)) / self.screen_sq_pixels * 100  # % of screen of img
             crop_img = img.crop((startX, startY, endX, endY))  # extract image for better classification
             equalizedimg = image_proc.enhance(img, brightness=self.brightness_chg, contrast=self.contrast_chg,
                                               color=self.color_chg, sharpness=self.sharpness_chg)
             crop_equalizedimg = equalizedimg.crop((startX, startY, endX, endY))
-            classify_conf, classify_label = self.classify_obj(crop_img, rect, use_confidence_threshold)
+            classify_conf, classify_label = self.classify_obj(crop_img, rect, use_confidence_threshold,
+                                                              rect_percent_scr)
             classify_conf_equalized, classify_label_equalized = self.classify_obj(crop_equalizedimg, rect,
-                                                                                  use_confidence_threshold)
+                                                                                  use_confidence_threshold,
+                                                                                  rect_percent_scr)
             # take the best result between img and enhanced img
             classify_label = classify_label if classify_conf >= classify_conf_equalized else classify_label_equalized
             classify_conf = classify_conf if classify_conf >= classify_conf_equalized else classify_conf_equalized
             if classify_conf != 0:
                 self.output_function(f'match returned: confidence {classify_conf:.3f}, {classify_label},'
-                                     f' sq pixels %:{rect_area}')
+                                     f' screen:{rect_percent_scr:.2f}%')
 
             _overlap_perc = image_proc.overlap_area(prior_rect, rect)  # compare current rect and prior rect
             prior_rect = rect  # set prior rect to current rect
@@ -198,7 +200,7 @@ class DetectClassify:
                 self.classified_labels.append(classify_label)
                 self.classified_confidences.append(classify_conf)
                 self.classified_rects.append(rect)
-                self.classified_rects_area.append(rect_area)
+                self.classified_rects_area.append(rect_percent_scr)
         if max(self.classified_confidences, default=0) == 0:  # if empty list or zero
             max_confidence = 0
         else:  # set last known to current species if confident
@@ -213,7 +215,7 @@ class DetectClassify:
     # the function will sort the results and compare the confidence to the confidence for that label (species)
     # if the ML models confidence is higer than the treshold for that lable (species) it will stop searching and
     # return that best result
-    def classify_obj(self, img, rect, use_confidence_threshold=True):
+    def classify_obj(self, img, rect, use_confidence_threshold=True, screen_percent=100):
         input_details = self.classifier.get_input_details()
         floating_model, input_data = self.convert_img_to_tf(img, input_details)
         self.classifier.set_tensor(input_details[0]['index'], input_data)
@@ -232,7 +234,7 @@ class DetectClassify:
             lresult = str(self.classifier_possible_labels[lindex]).strip()  # grab label,push to string instead of tuple
             cresult = float(output[lindex]) if float(output[lindex]) > 0 else 0
             cresult = cresult - math.floor(cresult) if cresult > 1 else cresult  # ignore whole numbers, keep decimals
-            if self.check_threshold(cresult, lindex, use_confidence_threshold):  # confidence>=threshold
+            if self.check_threshold(cresult, lindex, use_confidence_threshold, screen_percent):
                 if cresult > maxcresult:  # if this above threshold and is a better confidence result store it
                     maxcresult = cresult
                     maxlresult = lresult
@@ -336,7 +338,7 @@ class DetectClassify:
     # func checks threshold by each label passed as a nparray with text in col 0 and threshold in col 1
     # species cannot be -1 (not present in geo location), confidence cannot be 0,must be equal or exceed minimum score
     # cresult is a decimal % 0 - 1; lindex is % * 10 (no decimals) must div by 1000 to get same scale
-    def check_threshold(self, cresult, lindex, use_confidence_threshold):
+    def check_threshold(self, cresult, lindex, use_confidence_threshold, screen_percent):
         # grab default if species has 0 confidence, else use species specific score
         label_threshold = self.classify_object_min_confidence * 1000 \
             if self.classifier_thresholds[int(lindex)][1] == 0 \
@@ -352,7 +354,7 @@ class DetectClassify:
             print(cresult)
             label_threshold = 0
             cresult = 0
-        return(float(label_threshold) != -1 and
+        return(float(label_threshold) != -1 and screen_percent >= 10 and
                cresult > 0 and cresult >= float(label_threshold) / 1000)
 
     # set label for box in image use short species name instead of scientific name
@@ -361,7 +363,7 @@ class DetectClassify:
         start = sname.find('(') + 1  # find start of common name, move one character to drop (
         end = sname.find(')')
         cname = sname[start:end] if start >= 0 and end >= 0 else sname
-        common_name = f'{cname} {confidence * 100:.1f}%, frame:{rect_area:.1f}%'
+        common_name = f'{cname} {confidence * 100:.2f}%, frame:{rect_area:.2f}%'
         return common_name
 
 
