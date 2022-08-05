@@ -363,7 +363,7 @@ class DetectClassify:
         start = sname.find('(') + 1  # find start of common name, move one character to drop (
         end = sname.find(')')
         cname = sname[start:end] if start >= 0 and end >= 0 else sname
-        common_name = f'{cname} {confidence * 100:.2f}%, frame:{screen_percent:.2f)}%'
+        common_name = f'{cname} {confidence * 100:.2f}%, frame:{screen_percent:.2f}%'
         return common_name
 
 
