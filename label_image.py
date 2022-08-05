@@ -358,12 +358,12 @@ class DetectClassify:
                cresult > 0 and cresult >= float(label_threshold) / 1000)
 
     # set label for box in image use short species name instead of scientific name
-    def label_text(self, label, confidence, rect_area):
+    def label_text(self, label, confidence, screen_percent):
         sname = str(label)  # make sure label is considered a string
         start = sname.find('(') + 1  # find start of common name, move one character to drop (
         end = sname.find(')')
         cname = sname[start:end] if start >= 0 and end >= 0 else sname
-        common_name = f'{cname} {confidence * 100:.2f}%, frame:{rect_area:.2f}%'
+        common_name = f'{cname} {confidence * 100:.2f}%, frame:{round(screen_percent,2)}%'
         return common_name
 
 
