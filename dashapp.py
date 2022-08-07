@@ -81,29 +81,31 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
 
     # flex container
     html.Div([
-        dcc.Slider(5, 21,
+        dcc.RangeSlider(5, 21,
+                   id='time_range_slider',
                    step=None,
                    marks={
-                       5: '05 am',
-                       6: '06 am',
-                       7: '07 am',
-                       8: '08 am',
-                       9: '09 am',
-                       10: '10 am',
-                       11: '11 am',
-                       12: '12 pm',
-                       13: '01 pm',
-                       14: '02 pm',
-                       15: '03 pm',
-                       16: '04 pm',
-                       17: '05 pm',
-                       18: '06 pm',
-                       19: '07 pm',
-                       20: '08 pm',
-                       21: '09 pm',
-                       22: '10 pm'
+                       5: '05 AM',
+                       6: '06 AM',
+                       7: '07 AM',
+                       8: '08 AM',
+                       9: '09 AM',
+                       10: '10 AM',
+                       11: '11 AM',
+                       12: '12 PM',
+                       13: '01 PM',
+                       14: '02 PM',
+                       15: '03 PM',
+                       16: '04 PM',
+                       17: '05 PM',
+                       18: '06 PM',
+                       19: '07 PM',
+                       20: '08 PM',
+                       21: '09 PM',
+                       22: '10 PM'
                    },
-                   value=18)
+                   value=18),
+                    html.Div(id='output-container-range-slider')
     ]),
     html.Div([
         # image container
@@ -188,6 +190,11 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
     dcc.Interval(id='interval', interval=30000, n_intervals=0)  # update every 30 seconds
     ])
 
+@app.callback(
+    Output('output-container-range-slider', 'children'),
+    [Input('time_range_slider', 'value')])
+def update_output(value):
+    return 'You have selected "{}"'.format(value)
 
 @app.callback(
     Output('dd-output-container', 'children'),
