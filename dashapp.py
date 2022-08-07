@@ -126,10 +126,10 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
 
     html.Br(),
 
-    # html.Div([
-    #     dcc.Dropdown(DF['Common Name'], DF['Common Name'].at[0,0], id='dropdown'),
-    #     html.Div(id='dd-output-container')
-    # ]),
+    html.Div([
+        dcc.Dropdown(DF['Common Name'], DF['Common Name'].at[0], id='dropdown'),
+        html.Div(id='dd-output-container')
+    ]),
 
     html.Div(children=[
         html.A([
