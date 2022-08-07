@@ -81,7 +81,7 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
 
     # flex container
     html.Div([
-        dcc.RangeSlider(min=5, max=21,
+        dcc.RangeSlider(min=5, max=22,
                    id='time_range_slider',
                    step=None,
                    marks={
