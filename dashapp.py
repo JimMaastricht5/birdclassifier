@@ -73,22 +73,6 @@ colors = {
 }
 df_stream = load_message_stream()
 
-top_card = dbc.Card(
-    [
-        dbc.CardImg(src="birds.gif", top=True),
-        dbc.CardBody(
-            html.P("This card has an image at the top", className="card-text")
-        ),
-    ],
-    style={"width": "18rem"},
-)
-
-cards = dbc.Row(
-    [
-        dbc.Col(top_card, width="auto"),
-        dbc.Col(top_card, width="auto"),
-    ]
-)
 app.layout = html.Div(style={'backgroundColor': colors['background']}, children=[
     html.H1(children='Tweeters - Sun Prairie, WI USA', style={
             'textAlign': 'center',
@@ -97,6 +81,29 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
 
     # flex container
     html.Div([
+        dcc.Slider(5, 21,
+                   step=None,
+                   marks={
+                    5:'05 am',
+                    6:'06 am',
+                    7:'07 am',
+                    8:'08 am',
+                    9:'09 am',
+                    10:'10 am',
+                    11:'11 am',
+                    12:'12 pm',
+                    13:'01 pm',
+                    14:'02 pm',
+                    15:'03 pm',
+                    16:'04 pm',
+                    17:'05 pm',
+                    18:'06 pm',
+                    19:'07 pm',
+                    20:'08 pm',
+                    21:'09 pm',
+                    22:'10 pm'
+                   },
+                   value=18),
         # image container
         html.Div([
             html.A([
