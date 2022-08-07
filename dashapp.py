@@ -7,8 +7,7 @@ import datetime
 import os
 import ifcfg
 
-URL_PREFIX = ''
-PORT = 0
+
 #   html.Div(children=last_refresh(),
 #            style={
 #           'textAlign': 'center',
@@ -67,10 +66,14 @@ def load_chart():
 
 app = Dash(__name__)
 
+DF = load_bird_occurrences()
+URL_PREFIX = ''
+PORT = 0
 colors = {
     'background': '#111111',
     'text': '#7FDBFF'
 }
+
 df_stream = load_message_stream()
 
 app.layout = html.Div(style={'backgroundColor': colors['background']}, children=[
@@ -124,7 +127,7 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
     html.Br(),
 
     html.Div([
-        dcc.Dropdown(['0.jpg', '1.jpg', '2.jpg'], '0.jpg', id='dropdown'),
+        dcc.Dropdown(DF['Common Name'], DF['Common Name'].at[0,0], id='dropdown'),
         html.Div(id='dd-output-container')
     ]),
 
