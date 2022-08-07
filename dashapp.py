@@ -82,7 +82,9 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
             'color': colors['text']
             }),
 
-    # flex container
+    html.Div(children='''
+       Select the time range to display.
+   '''),
     html.Div([
         dcc.RangeSlider(min=5, max=22,
                    id='time_range_slider',
@@ -111,8 +113,13 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
                     html.Div(id='output-container-range-slider')
     ]),
     html.Div(children='''
-           Select the time range to display.
-       '''),
+    Select species:
+    '''),
+    html.Div([
+        dcc.Dropdown(DF['Common Name'].unique(), DF['Common Name'].at[0], id='dropdown'),
+        html.Div(id='dd-output-container')
+    ]),
+# flex container
     html.Div([
         # image container
         html.Div([
@@ -128,11 +135,6 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
     ], style={'display': 'flex'}),
 
     html.Br(),
-
-    html.Div([
-        dcc.Dropdown(DF['Common Name'], DF['Common Name'].at[0], id='dropdown'),
-        html.Div(id='dd-output-container')
-    ]),
 
     html.Div(children=[
         html.A([
