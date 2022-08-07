@@ -110,6 +110,9 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
                    value=[6, 20]),
                     html.Div(id='output-container-range-slider')
     ]),
+    html.Div(children='''
+           Select the time range to display.
+       '''),
     html.Div([
         # image container
         html.Div([
