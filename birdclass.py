@@ -80,7 +80,7 @@ def bird_detector(args):
                                        screenheight=args.screenheight, screenwidth=args.screenwidth,
                                        color_chg=args.color_chg,
                                        contrast_chg=args.contrast_chg, sharpness_chg=args.sharpness_chg,
-                                       brightness_chg=args.brightness_chg,
+                                       brightness_chg=args.brightness_chg, min_img_percent=args.minimgperc,
                                        target_object='bird',
                                        output_function=output.message, verbose=args.verbose)
     output.message(f'Using label file: {birds.labels}')
@@ -301,6 +301,7 @@ if __name__ == "__main__":
     ap.add_argument("-sc", "--species_confidence", type=float, default=.960, help="species confidence threshold")
     ap.add_argument("-bc", "--bird_confidence", type=float, default=.6, help="bird confidence threshold")
     ap.add_argument("-ma", "--minarea", type=float, default=4.0, help="motion area threshold, lower req more")
+    ap.add_argument("-ms", "--minimgperc", type=float, default=10.0, help="ignore objects that are less then % of img")
 
     ap.add_argument("-hd", "--homedir", type=str, default='/home/pi/PycharmProjects/birdclassifier/',
                     help="home directory for files")

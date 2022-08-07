@@ -66,7 +66,7 @@ class DetectClassify:
                  classifier_thresholds='coral.ai.inat_bird_threshold.csv',
                  detect_object_min_confidence=.9, screenheight=480,
                  screenwidth=640, contrast_chg=1.0, color_chg=1.0, brightness_chg=1.0, sharpness_chg=1.0,
-                 min_area=28000, target_object='bird',
+                 min_img_percent=10.0, min_area=28000, target_object='bird',
                  classify_object_min_confidence=.8, output_function=print, verbose=False):
         self.detector_file = homedir + object_model  # object model
         self.detector_labels_file = homedir + object_model_labels  # obj model label
@@ -107,6 +107,7 @@ class DetectClassify:
         self.brightness_chg = brightness_chg
         self.color_chg = color_chg
         self.sharpness_chg = sharpness_chg
+        self.min_img_percent = min_img_percent
         self.screenwidth = screenwidth
         self.screenheight = screenheight
         self.screen_sq_pixels = screenwidth * screenheight
@@ -336,7 +337,8 @@ class DetectClassify:
         return tuple(self.colors[(self.color_index + from_index) % (len(self.colors) - 1)])
 
     # func checks threshold by each label passed as a nparray with text in col 0 and threshold in col 1
-    # species cannot be -1 (not present in geo location), confidence cannot be 0,must be equal or exceed minimum score
+    # object cannot be -1 (not present in geo location), confidence cannot be 0,must be equal or exceed minimum score
+    # img must take up the specified min % of the image or it is tossed out
     # cresult is a decimal % 0 - 1; lindex is % * 10 (no decimals) must div by 1000 to get same scale
     def check_threshold(self, cresult, lindex, use_confidence_threshold, screen_percent):
         # grab default if species has 0 confidence, else use species specific score
@@ -354,7 +356,7 @@ class DetectClassify:
             print(cresult)
             label_threshold = 0
             cresult = 0
-        return(float(label_threshold) != -1 and screen_percent >= 10 and  # *** need to change fixed set of 10 to param
+        return(float(label_threshold) != -1 and screen_percent >= self.min_img_percent and
                cresult > 0 and cresult >= float(label_threshold) / 1000)
 
     # set label for box in image use short species name instead of scientific name
