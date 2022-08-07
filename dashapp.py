@@ -71,7 +71,7 @@ URL_PREFIX = ''
 PORT = 0
 colors = {
     'background': '#111111',
-    'text': '#7FDBFF'
+    'text': '#FFFFFF'
 }
 
 df_stream = load_message_stream()
