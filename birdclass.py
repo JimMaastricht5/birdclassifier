@@ -168,13 +168,16 @@ def convert_to_list(input_str_list):
 
 
 # should be passing default dictionary
-def build_dict(label_dict, input_labels_list, conf_dict, input_confidences_list):
+# keeps track of count in label_dict (census) and confidences totals in conf_dict
+# weighted dict is confidence total * (count-1) to weight away from low # of occurrences
+def build_dict(label_dict, input_labels_list, conf_dict, input_confidences_list, weighted_dict):
     labels_list = convert_to_list(input_labels_list)
     confidences_list = convert_to_list(input_confidences_list)
     for ii, label in enumerate(labels_list):
         label_dict[label] += 1
         conf_dict[label] += confidences_list[ii]
-    return label_dict, conf_dict
+        weighted_dict[label] = (label_dict[label] - 1) * conf_dict[label]
+    return label_dict, conf_dict, weighted_dict
 
 
 # loop thru keys and remove census entries with 1 or zero observations
@@ -196,8 +199,9 @@ def build_bird_animated_gif(args, motion_detect, birds, cityweather, first_img_j
     frames_with_birds = 1  # count of frames with birds, set to 1 for first img
     census_dict = defaultdict(default_value)  # track all results and pick best confidence
     confidence_dict = defaultdict(default_value)  # track all results and pick best confidence
-    census_dict, confidence_dict = build_dict(census_dict, birds.classified_labels, confidence_dict,
-                                              birds.classified_confidences)
+    weighted_dict = defaultdict(default_value)  # conf * (count -1) to put emphasis on # of observations
+    census_dict, confidence_dict, weighted_dict = build_dict(census_dict, birds.classified_labels, confidence_dict,
+                                                             birds.classified_confidences, weighted_dict)
     frames = motion_detect.capture_stream()  # capture a list of images
     first_img_jpg = birds.add_boxes_and_labels(img=first_img_jpg)
     labeled_frames.insert(0, image_proc.convert_image(img=first_img_jpg, target='gif'))  # isrt 1st img
@@ -207,8 +211,9 @@ def build_bird_animated_gif(args, motion_detect, birds, cityweather, first_img_j
             if birds.classify(img=frame, use_confidence_threshold=False) > 0:   # classify at rectangle & chk confidence
                 frames_with_birds += 1
                 last_good_frame = i + 1  # found a bird, add one to last good frame to account for insert of 1st image
-            census_dict, confidence_dict = build_dict(census_dict, birds.classified_labels, confidence_dict,
-                                                      birds.classified_confidences)
+            census_dict, confidence_dict, weighted_dict = build_dict(census_dict, birds.classified_labels,
+                                                                     confidence_dict, birds.classified_confidences,
+                                                                     weighted_dict)
         # frame = frame if args.brightness_chg == 0 \
         #     or cityweather.isclear or cityweather.is_twilight() \
         #     else image_proc.enhance_brightness(img=frame, factor=args.brightness_chg)  # increase bright
@@ -219,7 +224,8 @@ def build_bird_animated_gif(args, motion_detect, birds, cityweather, first_img_j
     best_confidence = confidence_dict[max(confidence_dict, key=confidence_dict.get)] / \
         census_dict[max(confidence_dict, key=confidence_dict.get)]  # sum conf/bird cnt
     best_label = max(confidence_dict, key=confidence_dict.get)
-    # print('--- Best label and confidence', best_label, best_confidence)
+    best_weighted_label = max(weighted_dict, key=weighted_dict.get)
+    print('--- Best label, confidence, and weight', best_label, best_confidence, best_weighted_label)
     return gif, gif_filename, animated, best_label, best_confidence, frames_with_birds
 
 
