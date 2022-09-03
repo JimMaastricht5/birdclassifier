@@ -225,7 +225,8 @@ def build_bird_animated_gif(args, motion_detect, birds, cityweather, first_img_j
         census_dict[max(confidence_dict, key=confidence_dict.get)]  # sum conf/bird cnt
     best_label = max(confidence_dict, key=confidence_dict.get)
     best_weighted_label = max(weighted_dict, key=weighted_dict.get)
-    print('--- Best label, confidence, and weight', best_label, best_confidence, best_weighted_label)
+    if best_label != best_weighted_label:
+        print('--- Best label, confidence, and weight', best_label, best_confidence, best_weighted_label)
     return gif, gif_filename, animated, best_label, best_confidence, frames_with_birds
 
 

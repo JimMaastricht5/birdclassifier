@@ -216,7 +216,7 @@ class DetectClassify:
     # the function will sort the results and compare the confidence to the confidence for that label (species)
     # if the ML models confidence is higer than the treshold for that lable (species) it will stop searching and
     # return that best result
-    def classify_obj(self, img, rect, use_confidence_threshold=True, screen_percent=100):
+    def classify_obj(self, img, rect, use_confidence_threshold=True, screen_percent=100.00):
         input_details = self.classifier.get_input_details()
         floating_model, input_data = self.convert_img_to_tf(img, input_details)
         self.classifier.set_tensor(input_details[0]['index'], input_data)
@@ -310,8 +310,9 @@ class DetectClassify:
                            (end_x+25, start_y-25), (end_x+25, start_y-25), (start_x-25, start_y-25)],
                           fill=self.get_next_color(from_index=i), width=2)
             except Exception as e:
-                print('tried drawing text on the image')
+                print('tried drawing text on the image of ith rectangle:', i)
                 print(e)
+                print(classified_labels, classified_confidences, classified_rects_area)
         return img
 
     # used to get a temp copy of data if labeling is delayed
