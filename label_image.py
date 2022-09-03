@@ -312,6 +312,7 @@ class DetectClassify:
             except Exception as e:
                 print('tried drawing text on the image of ith rectangle:', i)
                 print(e)
+                print(i)
                 print(classified_labels, classified_confidences, classified_rects_area)
         return img
 
