@@ -294,17 +294,17 @@ class DetectClassify:
             classified_rects_area = self.classified_rects_area
             classified_labels = self.classified_labels
             classified_confidences = self.classified_confidences
-
         for i, rect in enumerate(classified_rects):
             (start_x, start_y, end_x, end_y) = rect
             draw = PILImageDraw.Draw(img)
             font = draw.getfont()
             try:  # add text to top and bottom of image, make box slightly large and put text on top and bottom
                 # font = font, fill = self.text_color if color font is desired
+                classified_rect_area = classified_rects_area[i] if len(classified_rects_area) > 0 else ''
                 draw.text((start_x, start_y-50), self.label_text(classified_labels[i], classified_confidences[i],
-                                                                 classified_rects_area[i]), font=font, fill='white')
+                                                                 classified_rects_area), font=font, fill='white')
                 draw.text((start_x, end_y+50), self.label_text(classified_labels[i], classified_confidences[i],
-                                                               classified_rects_area[i]), font=font, fill='white')
+                                                               classified_rects_area), font=font, fill='white')
                 draw.line([(start_x-25, start_y-25), (start_x-25, end_y+25), (start_x-25, end_y+25),
                            (end_x+25, end_y+25), (end_x+25, end_y+25),
                            (end_x+25, start_y-25), (end_x+25, start_y-25), (start_x-25, start_y-25)],
