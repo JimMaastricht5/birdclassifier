@@ -66,6 +66,7 @@ class WebStream:
                     print(item[3])  # print message
                     self.df_list.append(item)
         except Exception as e:
+            print('tried to pull item from the queue and failed')
             print(e)
         return
 
@@ -115,6 +116,9 @@ class Controller:
             if self.p_web_stream.is_alive():  # wait for the child process to finish if it is still alive
                 print('waiting for web stream to finish processing queue....')
                 self.p_web_stream.join(timeout=30)
+        except Exception as e:
+            print('attempted to end stream and failed')
+            print(e)
         finally:
             print('')
         return
