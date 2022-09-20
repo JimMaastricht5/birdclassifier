@@ -311,10 +311,9 @@ class DetectClassify:
                            (end_x+25, start_y-25), (end_x+25, start_y-25), (start_x-25, start_y-25)],
                           fill=self.get_next_color(from_index=i), width=2)
             except Exception as e:
-                print('tried drawing text on the image of ith rectangle:', i)
+                print('tried drawing text on the image of ith rectangle with rect:', i, rect)
                 print(e)
-                print(i)
-                print(classified_labels, classified_confidences, classified_rects_area)
+                print(classified_labels, classified_confidences, classified_rects, classified_rects_area)
         return img
 
     # used to get a temp copy of data if labeling is delayed

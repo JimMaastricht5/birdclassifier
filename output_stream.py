@@ -58,7 +58,7 @@ class WebStream:
                                            columns=['Event Num', 'type', 'Date Time', 'Message', 'Image Name'])
                     self.df.to_csv(f'{self.path}/webstream.csv')
                 elif item[1] == 'occurrences':
-                    print('writing occurrences to web')
+                    print('writing occurrences to web', item)
                     # print('item[3]:', item[3])  # show list of species occurrences
                     self.df_occurrences = pd.DataFrame(item[3], columns=['Species', 'Date Time'])
                     self.df_occurrences.to_csv(f'{self.path}/web_occurrences.csv')  # species, date time
