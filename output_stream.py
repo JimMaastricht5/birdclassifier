@@ -60,7 +60,10 @@ class WebStream:
                 elif item[1] == 'occurrences':
                     print('writing occurrences to web', item)
                     # print('item[3]:', item[3])  # show list of species occurrences
+                    print('loading df_occureeneces')
                     self.df_occurrences = pd.DataFrame(item[3], columns=['Species', 'Date Time'])
+                    print(self.df_occurrences)
+                    print('getting ready to write csv')
                     self.df_occurrences.to_csv(f'{self.path}/web_occurrences.csv')  # species, date time
                 else:  # basic message or any other event type
                     print(item[3])  # print message
