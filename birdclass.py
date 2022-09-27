@@ -161,6 +161,7 @@ def bird_detector(args):
     if args.verbose:
         chores.hourly_and_daily(report_pop=True)
         chores.end_report()  # post a report on run time of the process
+    return  # to main and end process
 
 
 def convert_to_list(input_str_list):

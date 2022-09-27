@@ -51,16 +51,15 @@ class WebStream:
                 item = self.queue.get()  # get the next item in the queue to write to disk
                 if item is None:  # poison pill, end the process
                     break  # end process
-
                 # print('Message Type:',item[1])  # print message to terminal
-                if item[1] == 'flush':  # event type is flush
+                elif item[1] == 'flush':  # event type is flush
                     self.df = pd.DataFrame(self.df_list,
                                            columns=['Event Num', 'type', 'Date Time', 'Message', 'Image Name'])
                     self.df.to_csv(f'{self.path}/webstream.csv')
                 elif item[1] == 'occurrences':
                     print('writing occurrences to web', item)
                     # print('item[3]:', item[3])  # show list of species occurrences
-                    print('loading df_occureeneces')
+                    print('loading df occurences')
                     self.df_occurrences = pd.DataFrame(item[3], columns=['Species', 'Date Time'])
                     print(self.df_occurrences)
                     print('getting ready to write csv')
