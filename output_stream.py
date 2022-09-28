@@ -58,12 +58,12 @@ class WebStream:
                     self.df.to_csv(f'{self.path}/webstream.csv')
                 elif item[1] == 'occurrences':
                     print('writing occurrences to web', item)
-                    # print('item[3]:', item[3])  # show list of species occurrences
-                    print('loading df occurences')
-                    self.df_occurrences = pd.DataFrame(item[3], columns=['Species', 'Date Time'])
-                    print(self.df_occurrences)
-                    print('getting ready to write csv')
-                    self.df_occurrences.to_csv(f'{self.path}/web_occurrences.csv')  # species, date time
+                    if item[3] != []:  # check for empty message
+                        self.df_occurrences = pd.DataFrame(item[3], columns=['Species', 'Date Time'])
+                        print(self.df_occurrences)
+                        self.df_occurrences.to_csv(f'{self.path}/web_occurrences.csv')  # species, date time
+                    else:
+                        pass  # empty message
                 else:  # basic message or any other event type
                     print(item[3])  # print message
                     self.df_list.append(item)
