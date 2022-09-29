@@ -51,21 +51,17 @@ class WebStream:
                 item = self.queue.get()  # get the next item in the queue to write to disk
                 if item is None:  # poison pill, end the process
                     break  # end process
-                # print('Message Type:',item[1])  # print message to terminal
                 elif item[1] == 'flush':  # event type is flush
                     self.df = pd.DataFrame(self.df_list,
                                            columns=['Event Num', 'type', 'Date Time', 'Message', 'Image Name'])
                     self.df.to_csv(f'{self.path}/webstream.csv')
                 elif item[1] == 'occurrences':
-                    print('writing occurrences to web', item)
                     if item[3] != []:  # check for empty message
                         self.df_occurrences = pd.DataFrame(item[3], columns=['Species', 'Date Time'])
-                        print(self.df_occurrences)
                         self.df_occurrences.to_csv(f'{self.path}/web_occurrences.csv')  # species, date time
                     else:
                         pass  # empty message
                 else:  # basic message or any other event type
-                    print(item[3])  # print message
                     self.df_list.append(item)
         except Exception as e:
             print('tried to pull item from the queue and failed')
@@ -115,6 +111,7 @@ class Controller:
         self.flush()  # write any pending contents to disk
         try:
             self.queue.put(None)  # transmit poison pill to stop child process
+            # does not seem to be ending correctly ******
             if self.p_web_stream.is_alive():  # wait for the child process to finish if it is still alive
                 print('waiting for web stream to finish processing queue....')
                 self.p_web_stream.join(timeout=30)
