@@ -57,6 +57,7 @@ class WebStream:
                     self.df.to_csv(f'{self.path}/webstream.csv')
                 elif item[1] == 'occurrences':
                     if item[3] != []:  # check for empty message
+                        print(item)  # send message to console
                         self.df_occurrences = pd.DataFrame(item[3], columns=['Species', 'Date Time'])
                         self.df_occurrences.to_csv(f'{self.path}/web_occurrences.csv')  # species, date time
                     else:
