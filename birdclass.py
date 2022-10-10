@@ -101,6 +101,7 @@ def bird_detector(args):
             event_count += 1
             img_filename = os.getcwd() + '/assets/' + str(event_count % 10) + '.jpg'
             # output.message(message=f'Saw motion #{event_count} at {datetime.now().strftime("%I:%M:%S %P")}',
+            #                msg_type='motion'
             #                event_num=event_count, image_name='')
             first_img_jpg = birds.img  # keep first shot for animation and web
 
@@ -112,7 +113,7 @@ def bird_detector(args):
                 output.message(message=f'Possible sighting of a {birds.classified_labels[max_index]} '
                                        f'{birds.classified_confidences[max_index] * 100:.1f}% at '
                                        f'{datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count,
-                               image_name=img_filename, flush=True)  # send label and confidence to stream
+                               msg_type='possible', image_name=img_filename, flush=True)  # label and confidence 2stream
                 # check for need of final image adjustments, *** won't hit this code with twilight in while loop above
                 first_img_jpg = first_img_jpg if args.brightness_chg == 0 \
                     or cityweather.isclear or cityweather.is_twilight() \
@@ -138,15 +139,16 @@ def bird_detector(args):
                 if (datetime.now() - last_tweet).total_seconds() >= waittime or bird_first_time_seen or \
                         common_name in favorite_birds:
                     if animated:
-                        output.message(message=f'Tweeted gif of {best_label} {best_confidence * 100:.1f}% '
+                        output.message(message=f'Spotted {best_label} {best_confidence * 100:.1f}% '
                                                f'at {datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count,
-                                       image_name=gif_filename, flush=True)
+                                       msg_type='spotted', image_name=gif_filename, flush=True)
                         if bird_tweeter.post_image_from_file(tweet_text(best_label, best_confidence), gif_filename):
                             last_tweet = datetime.now()  # update last tweet time if successful gif posting, ignore fail
                     # elif best_confidence >= args.species_confidence:  # not animated, post jpg if high enough conf
                     #     tweet_jpg_text = tweet_text(best_first_label, best_first_conf)
-                    #     output.message(message=f'Tweeted jpg of {best_label} {best_confidence * 100:.1f}% '
+                    #     output.message(message=f'Spotted {best_label} {best_confidence * 100:.1f}% '
                     #                            f'at {datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count,
+                    #                    msg_type='spotted',
                     #                    image_name=img_filename, flush=True)
                     #     if bird_tweeter.post_image_from_file(message=f'Sighted: {tweet_jpg_text}',
                     #                                          file_name=img_filename):
@@ -154,7 +156,8 @@ def bird_detector(args):
                     else:
                         output.message(message=f'Uncertain about a {best_label} {best_confidence * 100:.1f}% '
                                                f' with {frames_with_birds} frames with birds '
-                                               f'at {datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count)
+                                               f'at {datetime.now().strftime("%I:%M:%S %P")}',
+                                               msg_type='inconclusive', event_num=event_count)
 
     output.end_stream()  # ending process for evening, print blank line and shut down
     motion_detect.stop()

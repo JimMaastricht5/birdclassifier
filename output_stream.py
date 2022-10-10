@@ -57,12 +57,13 @@ class WebStream:
                     self.df.to_csv(f'{self.path}/webstream.csv')
                 elif item[1] == 'occurrences':
                     if item[3] != []:  # check for empty message
-                        print(item)  # send message to console
+                        # print(item)  # send full array to console
                         self.df_occurrences = pd.DataFrame(item[3], columns=['Species', 'Date Time'])
                         self.df_occurrences.to_csv(f'{self.path}/web_occurrences.csv')  # species, date time
                     else:
                         pass  # empty message
                 else:  # basic message or any other event type
+                    print(item)  # send message to console
                     self.df_list.append(item)
         except Exception as e:
             print('tried to pull item from the queue and failed')
