@@ -62,7 +62,7 @@ class WebStream:
                         self.df_occurrences.to_csv(f'{self.path}/web_occurrences.csv')  # species, date time
                     else:
                         pass  # empty message
-                else:  # basic message or any other event type
+                else:  # basic message or other event type: message, motion, spotted, inconclusive, weather, ....
                     print(item)  # send message to console
                     self.df_list.append(item)
         except Exception as e:
