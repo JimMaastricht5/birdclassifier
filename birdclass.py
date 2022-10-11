@@ -82,7 +82,7 @@ def bird_detector(args):
                                        contrast_chg=args.contrast_chg, sharpness_chg=args.sharpness_chg,
                                        brightness_chg=args.brightness_chg, min_img_percent=args.minimgperc,
                                        target_object='bird',
-                                       output_function=output.message, verbose=args.verbose)
+                                       output_class=output, verbose=args.verbose)
     output.message(f'Using label file: {birds.labels}')
     output.message(f'Using threshold file: {birds.thresholds}')
     output.message(f'Using classifier file: {birds.classifier_file}')

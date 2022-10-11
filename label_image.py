@@ -67,7 +67,7 @@ class DetectClassify:
                  detect_object_min_confidence=.9, screenheight=480,
                  screenwidth=640, contrast_chg=1.0, color_chg=1.0, brightness_chg=1.0, sharpness_chg=1.0,
                  min_img_percent=10.0, min_area=28000, target_object='bird',
-                 classify_object_min_confidence=.8, output_function=print, verbose=False):
+                 classify_object_min_confidence=.8, output_class=None, verbose=False):
         self.detector_file = homedir + object_model  # object model
         self.detector_labels_file = homedir + object_model_labels  # obj model label
         self.target_objects = target_object
@@ -112,7 +112,8 @@ class DetectClassify:
         self.screenheight = screenheight
         self.screen_sq_pixels = screenwidth * screenheight
         self.img = np.zeros((screenheight, screenwidth, 3), dtype=np.uint8)
-        self.output_function = output_function
+        self.output_class = output_class
+        self.output_function = output_class.message if output_class is not None else print
         self.verbose = verbose
 
     # initialize tensor flow model
@@ -191,7 +192,7 @@ class DetectClassify:
             classify_conf = classify_conf if classify_conf >= classify_conf_equalized else classify_conf_equalized
             if classify_conf != 0:
                 self.output_function(f'match returned: confidence {classify_conf:.3f}, {classify_label},'
-                                     f' screen:{rect_percent_scr:.2f}%')
+                                     f' screen:{rect_percent_scr:.2f}%', msg_type='match')
 
             _overlap_perc = image_proc.overlap_area(prior_rect, rect)  # compare current rect and prior rect
             prior_rect = rect  # set prior rect to current rect
