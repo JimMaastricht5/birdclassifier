@@ -161,6 +161,7 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
         columns=[
                 {"id": "Event Num", "name": "Event Num"},
                 {"id": "Date Time", "name": "Date Time"},
+                {"id": "Message Type", "name": "Message Type"},
                 {"id": "Message", "name": "Message"},
                 {"id": "Image Name", "name": "Image Name", "presentation": "markdown"},
             ],
@@ -178,6 +179,9 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
             {'if': {'column_id': 'Event Num'},
              'width': '5px'},
             {'if': {'column_id': 'Date Time'},
+             'width': '15px'},
+            {'if': {'column_id': 'Message Type'},
+             'textAlign': 'left',
              'width': '15px'},
             {'if': {'column_id': 'Message'},
              'textAlign': 'left',

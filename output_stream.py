@@ -38,6 +38,7 @@ class WebStream:
                 'Event Num': pd.Series(dtype='int'),
                 'type': pd.Series(dtype='str'),
                 'Date Time': pd.Series(dtype='str'),
+                'Message Type': pd.Series(dtype='str'),
                 'Message': pd.Series(dtype='str'),
                 'Image Name': pd.Series(dtype='str')})
             self.df_occurrences = pd.DataFrame({
@@ -53,7 +54,8 @@ class WebStream:
                     break  # end process
                 elif item[1] == 'flush':  # event type is flush
                     self.df = pd.DataFrame(self.df_list,
-                                           columns=['Event Num', 'type', 'Date Time', 'Message', 'Image Name'])
+                                           columns=['Event Num', 'type', 'Date Time', 'Message Type',
+                                                    'Message', 'Image Name'])
                     self.df.to_csv(f'{self.path}/webstream.csv')
                 elif item[1] == 'occurrences':
                     if item[3] != []:  # check for empty message
@@ -81,6 +83,7 @@ class Controller:
                            'Event Num': pd.Series(dtype='int'),
                            'type': pd.Series(dtype='str'),
                            'Date Time': pd.Series(dtype='str'),
+                           'Message Type': pd.Series(dtype='str'),
                            'Message': pd.Series(dtype='str'),
                            'Image Name': pd.Series(dtype='str')})
 
