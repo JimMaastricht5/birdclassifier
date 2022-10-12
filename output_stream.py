@@ -63,7 +63,7 @@ class WebStream:
                     else:
                         pass  # empty message
                 else:  # basic message or other event type: message, motion, spotted, inconclusive, weather, ....
-                    print(f'event num:{item[0]}, type:{item[1]}, time: {item[2]}, text:{item[3]}')  # send msg 2 console
+                    print(f'event#{item[0]}, type:{item[1]}, {item[2]}, {item[3]}')  # send msg 2 console
                     self.df_list.append(item)
         except Exception as e:
             print('tried to pull item from the queue and failed')
