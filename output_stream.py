@@ -47,6 +47,7 @@ class WebStream:
             pass
 
     def request_handler(self):
+        item = []
         try:
             while True:
                 item = self.queue.get()  # get the next item in the queue to write to disk
@@ -68,7 +69,7 @@ class WebStream:
                     print(f'event#{item[0]}, type:{item[1]}, {item[2]}, {item[3]}')  # send msg 2 console
                     self.df_list.append(item)
         except Exception as e:
-            print('tried to pull item from the queue and failed')
+            print('tried to pull item from the queue and failed with item: ', item)
             print(e)
         return
 
