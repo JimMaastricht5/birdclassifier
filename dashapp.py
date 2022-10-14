@@ -130,13 +130,13 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
                    value=[6, 20]),
                     html.Div(id='output-container-range-slider')
     ]),
-    html.Div(children='''
-    Select species:
-    '''),
-    html.Div([
-        dcc.Dropdown(DF['Common Name'].unique(), DF['Common Name'].at[0], id='dropdown'),
-        html.Div(id='dd-output-container')
-    ]),
+    # html.Div(children='''
+    # Select species:
+    # '''),
+    # html.Div([
+    #     dcc.Dropdown(DF['Common Name'].unique(), DF['Common Name'].at[0], id='dropdown'),
+    #     html.Div(id='dd-output-container')
+    # ]),
 # flex container
     html.Div([
         # image container
