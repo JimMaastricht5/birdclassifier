@@ -109,7 +109,7 @@ class Controller:
         return
 
     def flush(self):
-        item = [0, 'flush', datetime.datetime.now().strftime("%H:%M:%S"), '', '', []]
+        item = [0, 'flush', datetime.datetime.now().strftime("%H:%M:%S"), '', '', '']
         self.queue.put(item)
         return
 
