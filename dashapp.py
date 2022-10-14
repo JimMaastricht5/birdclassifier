@@ -21,35 +21,53 @@ def last_refresh():
 
 
 def load_message_stream():
-    url_prefix = 'http://' + URL_PREFIX if PORT == 0 else 'http://' + URL_PREFIX + ':' + str(PORT)
-    df = pd.read_csv(os.getcwd()+'/webstream.csv')
-    df = df.reset_index(drop=True)
-    df = df.drop(columns=['Unnamed: 0', 'type'])
-    df = df.sort_values(by='Date Time', ascending=False)
-    # Markdown format for image as a link: [![alt text](image link)](web link)
     try:
-        df['Image Name'] = df['Image Name'].str[-5:]  # drop all but name of file 0.jpg
-        df['Image Name'] = '[![' + df['Image Name'] + '](' + url_prefix + '/assets/' + df['Image Name'] + ')](' + \
-                           url_prefix + '/assets/' + df['Image Name'] + ')'
-    except Exception as e:
-        print(e)
-        df['Image Name'] = ''
+        url_prefix = 'http://' + URL_PREFIX if PORT == 0 else 'http://' + URL_PREFIX + ':' + str(PORT)
+        df = pd.read_csv(os.getcwd()+'/webstream.csv')
+        df = df.reset_index(drop=True)
+        df = df.drop(columns=['Unnamed: 0', 'type'])
+        df = df.sort_values(by='Date Time', ascending=False)
+        # Markdown format for image as a link: [![alt text](image link)](web link)
+        try:
+            df['Image Name'] = df['Image Name'].str[-5:]  # drop all but name of file 0.jpg
+            df['Image Name'] = '[![' + df['Image Name'] + '](' + url_prefix + '/assets/' + df['Image Name'] + ')](' + \
+                               url_prefix + '/assets/' + df['Image Name'] + ')'
+        except Exception as e:
+            print(e)
+            df['Image Name'] = ''
 
-    df = df[df['Event Num'] != 0]
+        df = df[df['Event Num'] != 0]
+    except FileNotFoundError:
+        print('No web stream found, creating empty stream')
+        df = pd.DataFrame({
+            'Event Num': pd.Series(dtype='int'),
+            'type': pd.Series(dtype='str'),
+            'Date Time': pd.Series(dtype='str'),
+            'Message Type': pd.Series(dtype='str'),
+            'Message': pd.Series(dtype='str'),
+            'Image Name': pd.Series(dtype='str')})
+        pass
     return df
 
 
 def load_bird_occurrences():
     cname_list = []
-    df = pd.read_csv(os.getcwd()+'/web_occurrences.csv')
-    df['Date Time'] = pd.to_datetime(df['Date Time'])
-    df['Hour'] = pd.to_numeric(df['Date Time'].dt.strftime('%H')) + \
-        pd.to_numeric(df['Date Time'].dt.strftime('%M')) / 60
-    for sname in df['Species']:
-        sname = sname[sname.find(' ') + 1:] if sname.find(' ') >= 0 else sname  # remove index number
-        cname = sname[sname.find('(') + 1: sname.find(')')] if sname.find('(') >= 0 else sname  # retrieve common name
-        cname_list.append(cname)
-    df['Common Name'] = cname_list
+    try:
+        df = pd.read_csv(os.getcwd()+'/web_occurrences.csv')
+        df['Date Time'] = pd.to_datetime(df['Date Time'])
+        df['Hour'] = pd.to_numeric(df['Date Time'].dt.strftime('%H')) + \
+            pd.to_numeric(df['Date Time'].dt.strftime('%M')) / 60
+        for sname in df['Species']:
+            sname = sname[sname.find(' ') + 1:] if sname.find(' ') >= 0 else sname  # remove index number
+            cname = sname[sname.find('(') + 1: sname.find(')')] if sname.find('(') >= 0 else sname  # retrieve common name
+            cname_list.append(cname)
+        df['Common Name'] = cname_list
+    except FileNotFoundError:
+        print('no web occurences found, loading empty occurences')
+        df = pd.DataFrame({
+            'Species': pd.Series(dtype='str'),
+            'Date Time': pd.Series(dtype='str')})
+
     return df
 
 
