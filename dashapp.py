@@ -66,9 +66,8 @@ def load_bird_occurrences():
         print('no web occurences found, loading empty occurences')
         df = pd.DataFrame({
             'Species': pd.Series(dtype='str'),
-            'Date Time': pd.Series(dtype='str'),
-            'Common Name': pd.Series(dtype='str')})
-
+            'Date Time': pd.Series(dtype='str')})
+        df['Common Name'] = cname_list  # null list
     return df
 
 
