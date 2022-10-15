@@ -36,9 +36,8 @@ class WebStream:
             print('No prior stream file found, creating empty stream')
             self.df = pd.DataFrame({
                 'Event Num': pd.Series(dtype='int'),
-                'type': pd.Series(dtype='str'),
-                'Date Time': pd.Series(dtype='str'),
                 'Message Type': pd.Series(dtype='str'),
+                'Date Time': pd.Series(dtype='str'),
                 'Message': pd.Series(dtype='str'),
                 'Image Name': pd.Series(dtype='str')})
             self.df_occurrences = pd.DataFrame({
@@ -55,7 +54,7 @@ class WebStream:
                     break  # end process
                 elif item[1] == 'flush':  # event type is flush
                     self.df = pd.DataFrame(self.df_list,
-                                           columns=['Event Num', 'type', 'Date Time', 'Message Type',
+                                           columns=['Event Num', 'Message Type', 'Date Time',
                                                     'Message', 'Image Name'])
                     self.df.to_csv(f'{self.path}/webstream.csv')
                 elif item[1] == 'occurrences':
@@ -67,11 +66,7 @@ class WebStream:
                         pass  # empty message
                 else:  # basic message or other event type: message, motion, spotted, inconclusive, weather, ....
                     print(f'event#{item[0]}, type:{item[1]}, {item[2]}, {item[3]}')  # send msg 2 console
-                    if len(item) < 6:  # list should be six items long
-                        print(f'error on item list size {len(item)}, with values {item}')
-                        for i in range(len(item), 6):
-                            item.append('')  # pad the error with a blank list item
-                    if len(item) == 6:
+                    if len(item) == 5:  # list should be six items long
                         self.df_list.append(item)
                     else:
                         print(f'error on item list size {len(item)}, with values {item}')
@@ -89,9 +84,8 @@ class Controller:
         self.last_event_num = 0
         self.df = pd.DataFrame({
                            'Event Num': pd.Series(dtype='int'),
-                           'type': pd.Series(dtype='str'),
-                           'Date Time': pd.Series(dtype='str'),
                            'Message Type': pd.Series(dtype='str'),
+                           'Date Time': pd.Series(dtype='str'),
                            'Message': pd.Series(dtype='str'),
                            'Image Name': pd.Series(dtype='str')})
 
