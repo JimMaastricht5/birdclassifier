@@ -71,8 +71,10 @@ class WebStream:
                         print(f'error on item list size {len(item)}, with values {item}')
                         for i in range(len(item), 6):
                             item.append('')  # pad the error with a blank list item
-
-                    self.df_list.append(item)
+                    if len(item) == 6:
+                        self.df_list.append(item)
+                    else:
+                        print(f'error on item list size {len(item)}, with values {item}')
         except Exception as e:
             print('tried to pull item from the queue and failed with item: ', item)
             print(e)
