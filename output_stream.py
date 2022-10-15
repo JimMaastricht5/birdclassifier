@@ -67,6 +67,11 @@ class WebStream:
                         pass  # empty message
                 else:  # basic message or other event type: message, motion, spotted, inconclusive, weather, ....
                     print(f'event#{item[0]}, type:{item[1]}, {item[2]}, {item[3]}')  # send msg 2 console
+                    if len(item) < 6:  # list should be six items long
+                        print(f'error on item list size {len(item)}, with values {item}')
+                        for i in range(len(item), 6):
+                            item.append('')  # pad the error with a blank list item
+
                     self.df_list.append(item)
         except Exception as e:
             print('tried to pull item from the queue and failed with item: ', item)
