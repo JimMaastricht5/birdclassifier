@@ -25,7 +25,7 @@ def load_message_stream():
         url_prefix = 'http://' + URL_PREFIX if PORT == 0 else 'http://' + URL_PREFIX + ':' + str(PORT)
         df = pd.read_csv(os.getcwd()+'/webstream.csv')
         df = df.reset_index(drop=True)
-        df = df.drop(columns=['Unnamed: 0', 'type'])
+        # df = df.drop(columns=['Unnamed: 0'])
         df = df.sort_values(by='Date Time', ascending=False)
         # Markdown format for image as a link: [![alt text](image link)](web link)
         try:
@@ -35,15 +35,15 @@ def load_message_stream():
         except Exception as e:
             print(e)
             df['Image Name'] = ''
+            pass
 
         df = df[df['Event Num'] != 0]
     except FileNotFoundError:
         print('No web stream found, creating empty stream')
         df = pd.DataFrame({
             'Event Num': pd.Series(dtype='int'),
-            'type': pd.Series(dtype='str'),
-            'Date Time': pd.Series(dtype='str'),
             'Message Type': pd.Series(dtype='str'),
+            'Date Time': pd.Series(dtype='str'),
             'Message': pd.Series(dtype='str'),
             'Image Name': pd.Series(dtype='str')})
         pass
