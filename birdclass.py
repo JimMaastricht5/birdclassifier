@@ -329,8 +329,8 @@ if __name__ == "__main__":
 
     ap.add_argument("-ct", "--city", type=str, default='Madison,WI,USA',
                     help="name of city weather station uses OWM web service.  See their site for city options")
-    ap.add_argument('nm', "--feeder_name", type=str, default=hex(uuid.getnode()),
-                    help='feeder name default MAC address')
+    ap.add_argument('fi', "--feeder_id", type=str, default=hex(uuid.getnode()),
+                    help='feeder id default MAC address')
 
     arguments = ap.parse_args()
     bird_detector(arguments)
