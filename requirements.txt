@@ -14,3 +14,4 @@ tweepy~=4.5.0
 dash
 plotly
 ifcfg
+uuid

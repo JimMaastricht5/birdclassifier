@@ -40,6 +40,7 @@ import argparse  # argument parser
 from datetime import datetime
 from collections import defaultdict
 import os
+import uuid
 
 
 # default dictionary returns a tuple of zero confidence and zero bird count
@@ -121,7 +122,7 @@ def bird_detector(args):
                 first_img_jpg_no_label = first_img_jpg.copy()
                 # create animation: unlabeled first image is passed to gif function, bare copy is annotated later
                 gif, gif_filename, animated, best_label, best_confidence, frames_with_birds = \
-                    build_bird_animated_gif(args, motion_detect, birds, cityweather, first_img_jpg)
+                    build_bird_animated_gif(args, motion_detect, birds, first_img_jpg)
 
                 # annotate bare image copy, use either best gif label or org data
                 best_first_label = convert_to_list(best_label if best_label != '' else first_label)
@@ -193,7 +194,7 @@ def remove_single_observations(census_dict, conf_dict):
     return census_dict, conf_dict
 
 
-def build_bird_animated_gif(args, motion_detect, birds, cityweather, first_img_jpg):
+def build_bird_animated_gif(args, motion_detect, birds, first_img_jpg):
     # grab a stream of pictures, add first pic from above, and build animated gif
     # return gif, filename, animated boolean, and best label as the max of all confidences
     gif_filename, best_label, best_confidence, labeled_frames = '', '', 0, []
@@ -218,9 +219,6 @@ def build_bird_animated_gif(args, motion_detect, birds, cityweather, first_img_j
             census_dict, confidence_dict, weighted_dict = build_dict(census_dict, birds.classified_labels,
                                                                      confidence_dict, birds.classified_confidences,
                                                                      weighted_dict)
-        # frame = frame if args.brightness_chg == 0 \
-        #     or cityweather.isclear or cityweather.is_twilight() \
-        #     else image_proc.enhance_brightness(img=frame, factor=args.brightness_chg)  # increase bright
         labeled_frames.append(birds.add_boxes_and_labels(img=frame, use_last_known=True))  # use last label if unknown
     if frames_with_birds >= (args.minanimatedframes - 1):  # if bird is in min number of frames build gif
         gif, gif_filename = image_proc.save_gif(frames=labeled_frames[0:last_good_frame])  # framerate=motion_detect.FPS
@@ -331,6 +329,8 @@ if __name__ == "__main__":
 
     ap.add_argument("-ct", "--city", type=str, default='Madison,WI,USA',
                     help="name of city weather station uses OWM web service.  See their site for city options")
+    ap.add_argument('nm', "--feeder_name", type=str, default=hex(uuid.getnode()),
+                    help='feeder name default MAC address')
 
     arguments = ap.parse_args()
     bird_detector(arguments)
