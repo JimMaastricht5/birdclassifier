@@ -15,13 +15,14 @@ class WebStream:
     # Date time: string
     # Prediction: string
     # Image_name: string, image name on disk
-    def __init__(self, queue, path=os.getcwd()):
+    def __init__(self, queue, path=os.getcwd(), id="default"):
         self.queue = queue
         self.path = path
         print(self.path)
         self.asset_path = self.path + '/assets'
         print(self.asset_path)
         self.df_list = []
+        self.id = id
         # recover from crash without losing data.  Load data if present.  Keep if current, delete if yesterday
         try:
             self.df = pd.read_csv(f'{self.path}/webstream.csv')
@@ -35,12 +36,14 @@ class WebStream:
         except FileNotFoundError:  # if no file was found build an empty df
             print('No prior stream file found, creating empty stream')
             self.df = pd.DataFrame({
+                'Feeder Name': pd.Series(dtype='str'),
                 'Event Num': pd.Series(dtype='int'),
                 'Message Type': pd.Series(dtype='str'),
                 'Date Time': pd.Series(dtype='str'),
                 'Message': pd.Series(dtype='str'),
                 'Image Name': pd.Series(dtype='str')})
             self.df_occurrences = pd.DataFrame({
+                'Feeder Name': pd.Series(dtype='str'),
                 'Species': pd.Series(dtype='str'),
                 'Date Time': pd.Series(dtype='str')})
             pass
@@ -54,19 +57,21 @@ class WebStream:
                     break  # end process
                 elif item[1] == 'flush':  # event type is flush
                     self.df = pd.DataFrame(self.df_list,
-                                           columns=['Event Num', 'Message Type', 'Date Time',
+                                           columns=['Feeder Name', 'Event Num', 'Message Type', 'Date Time',
                                                     'Message', 'Image Name'])
                     self.df.to_csv(f'{self.path}/webstream.csv')
                 elif item[1] == 'occurrences':
-                    if item[3] != []:  # check for empty message
+                    if item[3] != []:  # check for empty list of occurences
                         # print(item)  # send full array to console
                         self.df_occurrences = pd.DataFrame(item[3], columns=['Species', 'Date Time'])
-                        self.df_occurrences.to_csv(f'{self.path}/web_occurrences.csv')  # species, date time
+                        df = self.df_occurrences.insert(0, "Feeder Name", "")
+                        df['Feeder Name'] = self.id
+                        df.to_csv(f'{self.path}/web_occurrences.csv')  # species, date time
                     else:
                         pass  # empty message
                 else:  # basic message or other event type: message, motion, spotted, inconclusive, weather, ....
                     print(f'event#{item[0]}, type:{item[1]}, {item[2]}, {item[3]}')  # send msg 2 console
-                    if len(item) == 5:  # list should be six items long
+                    if len(item) == 6:  # list should be six items long
                         self.df_list.append(item)
                     else:
                         print(f'error on item list size {len(item)}, with values {item}')
@@ -77,12 +82,14 @@ class WebStream:
 
 
 class Controller:
-    def __init__(self):
+    def __init__(self, id="default"):
         self.queue = multiprocessing.Queue()
         self.web_stream = WebStream(queue=self.queue)
         self.p_web_stream = multiprocessing.Process(target=self.web_stream.request_handler, args=(), daemon=True)
         self.last_event_num = 0
+        self.id = id  # id name or number of sender
         self.df = pd.DataFrame({
+                           'Feeder Name': pd.Series(dtype='str'),
                            'Event Num': pd.Series(dtype='int'),
                            'Message Type': pd.Series(dtype='str'),
                            'Date Time': pd.Series(dtype='str'),
@@ -90,13 +97,14 @@ class Controller:
                            'Image Name': pd.Series(dtype='str')})
 
     def start_stream(self):
-        self.p_web_stream.start()
+        self.p_web_stream.start(id=self.id)
         return
 
-    def message(self, message, event_num=0, msg_type='message', image_name='', flush=False):
+    def message(self, message, feeder_name='default', event_num=0, msg_type='message', image_name='', flush=False):
         # print('web controller sending: ', message)
         event_num = self.last_event_num if event_num == 0 else event_num
-        item = [event_num, msg_type, datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S"), message, image_name]
+        item = [feeder_name, event_num, msg_type, datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S"), message,
+                image_name]
         self.queue.put(item)
         if flush:
             self.flush()
@@ -110,7 +118,7 @@ class Controller:
         return
 
     def flush(self):
-        item = [0, 'flush', datetime.datetime.now().strftime("%H:%M:%S"), '', '', '']
+        item = ['', 0, 'flush', datetime.datetime.now().strftime("%H:%M:%S"), '', '']
         self.queue.put(item)
         return
 
@@ -134,13 +142,13 @@ def main():
     web_stream = Controller()
     web_stream.start_stream()
     web_stream.message('up and running')  # place message on queue for child process
-    web_stream.message(event_num=1, msg_type='prediction', message='big fat robin 97.0%',
+    web_stream.message(feeder_name='1SP', event_num=1, msg_type='prediction', message='big fat robin 97.0%',
                        image_name='/home/pi/birdclass/first_img.jpg')
-    web_stream.message(event_num=1, msg_type='prediction', message='big fat robin 37.0%',
+    web_stream.message(feeder_name='1SP', event_num=1, msg_type='prediction', message='big fat robin 37.0%',
                        image_name='/home/pi/birdclass/first_img.jpg')
-    web_stream.message(event_num=1, msg_type='prediction', message='big fat robin 96.0%',
+    web_stream.message(feeder_name='1SP', event_num=1, msg_type='prediction', message='big fat robin 96.0%',
                        image_name='/home/pi/birdclass/first_img.jpg')
-    web_stream.message(event_num=1, msg_type='final_prediction', message='big fat robin 74.0%',
+    web_stream.message(feeder_name='1SP', event_num=1, msg_type='final_prediction', message='big fat robin 74.0%',
                        image_name='/home/pi/birdclass/birds.gif')
     web_stream.occurrences([('Robin', '05/07/2022 14:52:00'), ('Robin', '05/07/2022 15:31:00')])
     web_stream.end_stream()

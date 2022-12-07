@@ -292,7 +292,7 @@ if __name__ == "__main__":
     ap.add_argument("-sw", "--screenwidth", type=int, default=640, help="max screen width")
     ap.add_argument("-sh", "--screenheight", type=int, default=480, help="max screen height")
 
-    ap.add_argument("-gf", "--minanimatedframes", type=int, default=8, help="minimum number of frames with a bird")
+    ap.add_argument("-gf", "--minanimatedframes", type=int, default=5, help="minimum number of frames with a bird")
     ap.add_argument("-bb", "--broadcast", type=bool, default=False, help="stream images and text")
     ap.add_argument("-v", "--verbose", type=bool, default=True, help="To tweet extra stuff or not")
     ap.add_argument("-td", "--tweetdelay", type=int, default=1800,
@@ -307,9 +307,9 @@ if __name__ == "__main__":
     ap.add_argument("-sp", "--sharpness_chg", type=float, default=1.0, help="sharpeness")  # 1 no chg,< 1 -, > 1 +
 
     # prediction defaults
-    ap.add_argument("-sc", "--species_confidence", type=float, default=.960, help="species confidence threshold")
+    ap.add_argument("-sc", "--species_confidence", type=float, default=.90, help="species confidence threshold")
     ap.add_argument("-bc", "--bird_confidence", type=float, default=.6, help="bird confidence threshold")
-    ap.add_argument("-ma", "--minarea", type=float, default=4.0, help="motion area threshold, lower req more")
+    ap.add_argument("-ma", "--minarea", type=float, default=5.0, help="motion area threshold, lower req more")
     ap.add_argument("-ms", "--minimgperc", type=float, default=10.0, help="ignore objects that are less then % of img")
 
     ap.add_argument("-hd", "--homedir", type=str, default='/home/pi/PycharmProjects/birdclassifier/',
