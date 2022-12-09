@@ -118,7 +118,14 @@ class Controller:
 
     def occurrences(self, occurrence_list):
         # print(occurrence_list)
-        item = [0, 'occurrences', datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S"), occurrence_list]
+        # self.df = pd.DataFrame({
+        #     'Feeder Name': pd.Series(dtype='str'),
+        #     'Event Num': pd.Series(dtype='int'),
+        #     'Message Type': pd.Series(dtype='str'),
+        #     'Date Time': pd.Series(dtype='str'),
+        #     'Message': pd.Series(dtype='str'),
+        #     'Image Name': pd.Series(dtype='str')})
+        item = [self.id, 0, 'occurrences', datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S"), occurrence_list]
         self.queue.put(item)
         return
 
