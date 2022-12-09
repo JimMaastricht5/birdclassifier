@@ -53,15 +53,16 @@ class WebStream:
         try:
             while True:
                 item = self.queue.get()  # get the next item in the queue to write to disk
+                msg_type = item[2] # message type is the 3 rd item the df
                 print('getting from q:', item)
                 if item is None:  # poison pill, end the process
                     break  # end process
-                elif item[1] == 'flush':  # event type is flush
+                elif msg_type == 'flush':  # event type is flush
                     self.df = pd.DataFrame(self.df_list,
                                            columns=['Feeder Name', 'Event Num', 'Message Type', 'Date Time',
                                                     'Message', 'Image Name'])
                     self.df.to_csv(f'{self.path}/webstream.csv')
-                elif item[1] == 'occurrences':
+                elif msg_type == 'occurrences':
                     if item[3] != []:  # check for empty list of occurences
                         # print(item)  # send full array to console
                         self.df_occurrences = pd.DataFrame(item[3], columns=['Species', 'Date Time'])
@@ -71,7 +72,7 @@ class WebStream:
                     else:
                         pass  # empty message
                 else:  # basic message or other event type: message, motion, spotted, inconclusive, weather, ....
-                    print(f'event#{item[0]}, type:{item[1]}, {item[2]}, {item[3]}')  # send msg 2 console
+                    print(f'event#{item[1]}, type:{item[2]}, {item[3]}, {item[4]}')  # send msg 2 console
                     if len(item) == 6:  # list should be six items long
                         self.df_list.append(item)
                     else:
