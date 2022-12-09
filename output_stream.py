@@ -53,6 +53,7 @@ class WebStream:
         try:
             while True:
                 item = self.queue.get()  # get the next item in the queue to write to disk
+                print('getting from q:', item)
                 if item is None:  # poison pill, end the process
                     break  # end process
                 elif item[1] == 'flush':  # event type is flush
@@ -101,9 +102,10 @@ class Controller:
         self.p_web_stream.start()
         return
 
-    def message(self, message, feeder_name='default', event_num=0, msg_type='message', image_name='', flush=False):
+    def message(self, message, feeder_name, event_num=0, msg_type='message', image_name='', flush=False):
         # print('web controller sending: ', message)
         event_num = self.last_event_num if event_num == 0 else event_num
+        feeder_name = self.id if feeder_name == '' else feeder_name
         item = [feeder_name, event_num, msg_type, datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S"), message,
                 image_name]
         print('sending to queue', item)
