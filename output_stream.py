@@ -102,7 +102,7 @@ class Controller:
         self.p_web_stream.start()
         return
 
-    def message(self, message, feeder_name, event_num=0, msg_type='message', image_name='', flush=False):
+    def message(self, message, feeder_name='', event_num=0, msg_type='message', image_name='', flush=False):
         # print('web controller sending: ', message)
         event_num = self.last_event_num if event_num == 0 else event_num
         feeder_name = self.id if feeder_name == '' else feeder_name
