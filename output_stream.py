@@ -54,7 +54,7 @@ class WebStream:
             while True:
                 item = self.queue.get()  # get the next item in the queue to write to disk
                 msg_type = item[3]  # message type is the 3 rd item the list
-                print('getting from q:', item)
+                # print('getting from q:', item)
                 if item is None:  # poison pill, end the process
                     break  # end process
                 elif msg_type == 'flush':  # event type is flush
