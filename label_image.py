@@ -191,8 +191,8 @@ class DetectClassify:
             classify_label = classify_label if classify_conf >= classify_conf_equalized else classify_label_equalized
             classify_conf = classify_conf if classify_conf >= classify_conf_equalized else classify_conf_equalized
             if classify_conf != 0:
-                self.output_function(f'match returned: confidence {classify_conf:.3f}, {classify_label},'
-                                     f' screen:{rect_percent_scr:.2f}%', msg_type='match')
+                self.output_function(f'match returned: confidence {classify_conf:.3f}, {classify_label},',
+                                     msg_type='match')
 
             _overlap_perc = image_proc.overlap_area(prior_rect, rect)  # compare current rect and prior rect
             prior_rect = rect  # set prior rect to current rect
