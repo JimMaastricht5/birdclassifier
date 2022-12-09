@@ -51,7 +51,7 @@ def default_value():
 def bird_detector(args):
     favorite_birds = ['Northern Cardinal', 'Rose-breasted Grosbeak', 'American Goldfinch']
     birdpop = population.Census()  # initialize species population census object
-    output = output_stream.Controller(id=args.city)  # initialize class to handle terminal and web output
+    output = output_stream.Controller(caller_id=args.city)  # initialize class to handle terminal and web output
     output.start_stream()  # start streaming to terminal and web
     motioncnt, event_count = 0, 0
     curr_day, curr_hr, last_tweet = datetime.now().day, datetime.now().hour, datetime(2021, 1, 1, 0, 0, 0)
