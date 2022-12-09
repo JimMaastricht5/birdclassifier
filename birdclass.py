@@ -134,7 +134,8 @@ def bird_detector(args):
                                    classified_confidences=best_first_conf)  # set to first bird
                 first_img_jpg = birds.add_boxes_and_labels(img=first_img_jpg_no_label, use_last_known=False)
                 first_img_jpg.save(img_filename)
-                gcs_storage.send_file(name=f'{str(event_count)}.jpg', file_loc_name=img_filename)
+                gcs_storage.send_file(name=f'{datetime.now().strftime("%Y-%m-%d-%H-%M-%S")}'
+                                           f'{str(event_count)}.jpg', file_loc_name=img_filename) # date, time, counter
 
                 # process tweets, jpg if not min number of frame, gif otherwise
                 waittime = birdpop.report_single_census_count(best_label) * args.tweetdelay / 10  # wait X min * N bird
@@ -225,7 +226,8 @@ def build_bird_animated_gif(args, motion_detect, birds, gcs_storage, event_count
         labeled_frames.append(birds.add_boxes_and_labels(img=frame, use_last_known=True))  # use last label if unknown
     if frames_with_birds >= (args.minanimatedframes - 1):  # if bird is in min number of frames build gif
         gif, gif_filename = image_proc.save_gif(frames=labeled_frames[0:last_good_frame])  # framerate=motion_detect.FPS
-        gcs_storage.send_file(name=f'{str(event_count)}.gif', file_loc_name=gif_filename)
+        gcs_storage.send_file(name=f'{datetime.now().strftime("%Y-%m-%d-%H-%M-%S")}'
+                                   f'{str(event_count)}.gif', file_loc_name=gif_filename)
         animated = True
     best_confidence = confidence_dict[max(confidence_dict, key=confidence_dict.get)] / \
         census_dict[max(confidence_dict, key=confidence_dict.get)]  # sum conf/bird cnt
