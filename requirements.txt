@@ -15,3 +15,4 @@ dash
 plotly
 ifcfg
 uuid
+google-cloud-storage
