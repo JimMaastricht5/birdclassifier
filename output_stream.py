@@ -15,14 +15,14 @@ class WebStream:
     # Date time: string
     # Prediction: string
     # Image_name: string, image name on disk
-    def __init__(self, queue, path=os.getcwd(), id="default"):
+    def __init__(self, queue, path=os.getcwd(), caller_id="default"):
         self.queue = queue
         self.path = path
         print(self.path)
         self.asset_path = self.path + '/assets'
         print(self.asset_path)
         self.df_list = []
-        self.id = id
+        self.id = caller_id
         # recover from crash without losing data.  Load data if present.  Keep if current, delete if yesterday
         try:
             self.df = pd.read_csv(f'{self.path}/webstream.csv')
@@ -82,12 +82,12 @@ class WebStream:
 
 
 class Controller:
-    def __init__(self, id="default"):
+    def __init__(self, caller_id="default"):
         self.queue = multiprocessing.Queue()
         self.web_stream = WebStream(queue=self.queue)
         self.p_web_stream = multiprocessing.Process(target=self.web_stream.request_handler, args=(), daemon=True)
         self.last_event_num = 0
-        self.id = id  # id name or number of sender
+        self.id = caller_id  # id name or number of sender
         self.df = pd.DataFrame({
                            'Feeder Name': pd.Series(dtype='str'),
                            'Event Num': pd.Series(dtype='int'),
@@ -106,6 +106,7 @@ class Controller:
         event_num = self.last_event_num if event_num == 0 else event_num
         item = [feeder_name, event_num, msg_type, datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S"), message,
                 image_name]
+        print('sending to queue', item)
         self.queue.put(item)
         if flush:
             self.flush()
