@@ -74,7 +74,7 @@ class MotionDetector:
         self.FPS = 0  # calculated frames per second
         print('camera setup completed')
 
-    def capture_image_with_file(self, img_type='jpeg', filename='/home/pi/birdclass/capture_image.jpg'):
+    def capture_image_with_file(self, img_type='jpeg', filename='/home/pi/capture_image.jpg'):
         stream = io.BytesIO()
         self.camera.capture(stream, img_type, use_video_port=True)
         stream.seek(0)

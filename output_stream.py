@@ -97,7 +97,8 @@ class Controller:
                            'Image Name': pd.Series(dtype='str')})
 
     def start_stream(self):
-        self.p_web_stream.start(id=self.id)
+        #self.p_web_stream.start(id=self.id)
+        self.p_web_stream.start()
         return
 
     def message(self, message, feeder_name='default', event_num=0, msg_type='message', image_name='', flush=False):
