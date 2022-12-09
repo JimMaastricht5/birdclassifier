@@ -53,7 +53,7 @@ class WebStream:
         try:
             while True:
                 item = self.queue.get()  # get the next item in the queue to write to disk
-                msg_type = item[2] # message type is the 3 rd item the df
+                msg_type = item[3]  # message type is the 3 rd item the list
                 print('getting from q:', item)
                 if item is None:  # poison pill, end the process
                     break  # end process
@@ -63,16 +63,16 @@ class WebStream:
                                                     'Message', 'Image Name'])
                     self.df.to_csv(f'{self.path}/webstream.csv')
                 elif msg_type == 'occurrences':
-                    if item[3] != []:  # check for empty list of occurences
-                        # print(item)  # send full array to console
-                        self.df_occurrences = pd.DataFrame(item[3], columns=['Species', 'Date Time'])
-                        df = self.df_occurrences.insert(0, "Feeder Name", "")
-                        df['Feeder Name'] = self.id
-                        df.to_csv(f'{self.path}/web_occurrences.csv')  # species, date time
+                    if item[4] != []:  # list in a list in message position
+                        print(item)  # send full array to console
+                        self.df_occurrences = pd.DataFrame(item[4], columns=['Species', 'Date Time'])  # in msg pos
+                        self.df_occurrences.insert(0, "Feeder Name", "")
+                        self.df_occurrences['Feeder Name'] = self.id
+                        self.df_occurrences.to_csv(f'{self.path}/web_occurrences.csv')  # species, date time
                     else:
                         pass  # empty message
                 else:  # basic message or other event type: message, motion, spotted, inconclusive, weather, ....
-                    print(f'event#{item[1]}, type:{item[2]}, {item[3]}, {item[4]}')  # send msg 2 console
+                    print(f'event#{item[1]}, type:{item[2]}, {item[3]}, {item[4]}')  # list event, type, date time, msg
                     if len(item) == 6:  # list should be six items long
                         self.df_list.append(item)
                     else:
@@ -99,7 +99,7 @@ class Controller:
                            'Image Name': pd.Series(dtype='str')})
 
     def start_stream(self):
-        #self.p_web_stream.start(id=self.id)
+        # self.p_web_stream.start(id=self.id)
         self.p_web_stream.start()
         return
 
@@ -109,7 +109,7 @@ class Controller:
         feeder_name = self.id if feeder_name == '' else feeder_name
         item = [feeder_name, event_num, msg_type, datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S"), message,
                 image_name]
-        print('sending to queue', item)
+        # print('sending to queue', item)
         self.queue.put(item)
         if flush:
             self.flush()
