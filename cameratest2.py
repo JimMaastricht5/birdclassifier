@@ -7,9 +7,13 @@ screenheight = 720
 screenwidth = 640
 camera = PiCamera()
 camera.vflip = False
-camera.iso = 800
+#camera.iso = 800
 camera.resolution = (screenheight, screenwidth)
 camera.start_preview()
 sleep(2)
 camera.capture(os.getcwd()+ '/assets/testcap2.jpg')
 camera.stop_preview()
+
+print(camera.framerate_range.low)
+print(camera.framerate_range.high)
+print(camera.shutter_speed)
