@@ -17,3 +17,10 @@ camera.stop_preview()
 print(camera.framerate_range.low)
 print(camera.framerate_range.high)
 print(camera.shutter_speed)
+
+camera.framerate_range.low=60
+camera.framerate_range.high=120
+print(camera.framerate_range.low)
+print(camera.framerate_range.high)
+print(camera.shutter_speed)
+
