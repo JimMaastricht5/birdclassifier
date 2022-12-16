@@ -70,7 +70,8 @@ def bird_detector(args):
     # initial video capture, screen size, and grab first image (no motion)
     motion_detect = motion_detector.MotionDetector(motion_min_area=args.minarea, screenwidth=args.screenwidth,
                                                    screenheight=args.screenheight, flip_camera=args.flipcamera,
-                                                   iso=args.iso)  # init class
+                                                   iso=args.iso,
+                                                   first_img_name=os.getcwd() + '/assets/' + 'first_img.jpg')  # init
     output.message('Done with camera init... setting up classes.')
     bird_tweeter = tweeter.TweeterClass()  # init tweeter2 class twitter handler
     chores = dailychores.DailyChores(bird_tweeter, birdpop, cityweather, output_class=output)
@@ -135,7 +136,7 @@ def bird_detector(args):
                 first_img_jpg = birds.add_boxes_and_labels(img=first_img_jpg_no_label, use_last_known=False)
                 first_img_jpg.save(img_filename)
                 gcs_storage.send_file(name=f'{datetime.now().strftime("%Y-%m-%d-%H-%M-%S")}'
-                                           f'{str(event_count)}.jpg', file_loc_name=img_filename) # date, time, counter
+                                           f'{str(event_count)}.jpg', file_loc_name=img_filename)  # date,time, counter
 
                 # process tweets, jpg if not min number of frame, gif otherwise
                 waittime = birdpop.report_single_census_count(best_label) * args.tweetdelay / 10  # wait X min * N bird
