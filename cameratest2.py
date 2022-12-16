@@ -7,8 +7,8 @@ screenheight = 640
 screenwidth = 480
 camera = PiCamera()
 camera.vflip = False
-camera.exposure_mode = 'night'
-#camera.iso = 800
+#camera.exposure_mode = 'night'  # sports, off
+camera.iso = 800
 camera.resolution = (screenheight, screenwidth)
 camera.start_preview()
 sleep(2)
@@ -18,10 +18,8 @@ camera.stop_preview()
 print(camera.framerate_range.low)
 print(camera.framerate_range.high)
 print(camera.shutter_speed)
+print(camera.exposure_speed)
+print(camera.exposure_mode)
 
-#camera.shutter_speed=17  # 17 ms is 1/60 of a second
-# camera.iso=800
-print(camera.framerate_range.low)
-print(camera.framerate_range.high)
-print(camera.shutter_speed)
+
 
