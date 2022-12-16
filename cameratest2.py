@@ -3,11 +3,11 @@ from time import sleep
 import os
 
 # 1024 x 768 or 720 x 640
-screenheight = 320
-screenwidth = 240
+screenheight = 640
+screenwidth = 480
 camera = PiCamera()
 camera.vflip = False
-camera.exposure_mode = 'sports'
+#camera.exposure_mode = 'sports'
 camera.iso = 800
 camera.resolution = (screenheight, screenwidth)
 camera.start_preview()
