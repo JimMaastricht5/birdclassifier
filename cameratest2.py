@@ -18,8 +18,7 @@ print(camera.framerate_range.low)
 print(camera.framerate_range.high)
 print(camera.shutter_speed)
 
-camera.framerate_range.low=60
-camera.framerate_range.high=120
+camera.shutter_speed=17  # 17 ms is 1/60 of a second
 print(camera.framerate_range.low)
 print(camera.framerate_range.high)
 print(camera.shutter_speed)
