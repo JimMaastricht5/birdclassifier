@@ -3,6 +3,7 @@ import multiprocessing
 import pandas as pd
 import datetime
 import os
+import gcs
 
 
 class WebStream:
@@ -23,6 +24,7 @@ class WebStream:
         print(self.asset_path)
         self.df_list = []
         self.id = caller_id
+        self.storage = gcs.Storage()
         # recover from crash without losing data.  Load data if present.  Keep if current, delete if yesterday
         try:
             self.df = pd.read_csv(f'{self.path}/webstream.csv')
@@ -62,6 +64,7 @@ class WebStream:
                                            columns=['Feeder Name', 'Event Num', 'Message Type', 'Date Time',
                                                     'Message', 'Image Name'])
                     self.df.to_csv(f'{self.path}/webstream.csv')
+                    self.storage.send_file(name='webstream.csv', file_loc_name='{self.path}/webstream.csv')
                 elif msg_type == 'occurrences':
                     if item[4] != []:  # list in a list in message position
                         print(item)  # send full array to console
@@ -69,6 +72,8 @@ class WebStream:
                         self.df_occurrences.insert(0, "Feeder Name", "")
                         self.df_occurrences['Feeder Name'] = self.id
                         self.df_occurrences.to_csv(f'{self.path}/web_occurrences.csv')  # species, date time
+                        self.storage.send_file(name='web_occurrences.csv',
+                                               file_loc_name='{self.path}/web_occurrences.csv')
                     else:
                         pass  # empty message
                 else:  # basic message or other event type: message, motion, spotted, inconclusive, weather, ....

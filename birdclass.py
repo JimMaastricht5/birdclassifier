@@ -150,15 +150,6 @@ def bird_detector(args):
                                        msg_type='spotted', image_name=gif_filename, flush=True)
                         if bird_tweeter.post_image_from_file(tweet_text(best_label, best_confidence), gif_filename):
                             last_tweet = datetime.now()  # update last tweet time if successful gif posting, ignore fail
-                    # elif best_confidence >= args.species_confidence:  # not animated, post jpg if high enough conf
-                    #     tweet_jpg_text = tweet_text(best_first_label, best_first_conf)
-                    #     output.message(message=f'Spotted {best_label} {best_confidence * 100:.1f}% '
-                    #                            f'at {datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count,
-                    #                    msg_type='spotted',
-                    #                    image_name=img_filename, flush=True)
-                    #     if bird_tweeter.post_image_from_file(message=f'Sighted: {tweet_jpg_text}',
-                    #                                          file_name=img_filename):
-                    #         last_tweet = datetime.now()  # update last tweet time if successful, ignore fail
                     else:
                         output.message(message=f'Uncertain about a {best_label} {best_confidence * 100:.1f}% '
                                                f' with {frames_with_birds} frames with birds '
