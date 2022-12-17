@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import multiprocessing
 import pandas as pd
-import datetime
+from datetime import datetime
 import os
 import gcs
 
@@ -30,8 +30,8 @@ class WebStream:
             self.df = pd.read_csv(f'{self.path}/webstream.csv')
             self.df_occurrences = pd.read_csv(f'{self.path}/web_occurrences.csv')
             df_date = pd.to_datetime(self.df.iloc[0]['Date Time'])
-            print(f'Prior stream date from {df_date}, now: {datetime.datetime.now()}')
-            if df_date < datetime.datetime.now():  # empty df if yesterday's data
+            print(f'Prior stream date from {df_date}, now: {datetime.now()}')
+            if df_date < datetime.now():  # empty df if yesterday's data
                 print('Emptying dataframe, data is stale')
                 self.df.drop(self.df.index, inplace=True)
                 self.df_occurrences.drop(self.df_occurrences.index, inplace=True)
@@ -64,7 +64,9 @@ class WebStream:
                                            columns=['Feeder Name', 'Event Num', 'Message Type', 'Date Time',
                                                     'Message', 'Image Name'])
                     self.df.to_csv(f'{self.path}/webstream.csv')
-                    self.storage.send_file(name='webstream.csv', file_loc_name='{self.path}/webstream.csv')
+                    self.storage.send_file(name=f'{datetime.now().strftime("%Y-%m-%d")}'
+                                                f'webstream.csv',
+                                           file_loc_name='{self.path}/webstream.csv')
                 elif msg_type == 'occurrences':
                     if item[4] != []:  # list in a list in message position
                         print(item)  # send full array to console
@@ -72,7 +74,8 @@ class WebStream:
                         self.df_occurrences.insert(0, "Feeder Name", "")
                         self.df_occurrences['Feeder Name'] = self.id
                         self.df_occurrences.to_csv(f'{self.path}/web_occurrences.csv')  # species, date time
-                        self.storage.send_file(name='web_occurrences.csv',
+                        self.storage.send_file(name=f'{datetime.now().strftime("%Y-%m-%d")}'
+                                                    f'web_occurrences.csv',
                                                file_loc_name='{self.path}/web_occurrences.csv')
                     else:
                         pass  # empty message
@@ -112,7 +115,7 @@ class Controller:
         # print('web controller sending: ', message)
         event_num = self.last_event_num if event_num == 0 else event_num
         feeder_name = self.id if feeder_name == '' else feeder_name
-        item = [feeder_name, event_num, msg_type, datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S"), message,
+        item = [feeder_name, event_num, msg_type, datetime.now().strftime("%m/%d/%Y, %H:%M:%S"), message,
                 image_name]
         # print('sending to queue', item)
         self.queue.put(item)
@@ -130,12 +133,12 @@ class Controller:
         #     'Date Time': pd.Series(dtype='str'),
         #     'Message': pd.Series(dtype='str'),
         #     'Image Name': pd.Series(dtype='str')})
-        item = [self.id, 0, 'occurrences', datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S"), occurrence_list]
+        item = [self.id, 0, 'occurrences', datetime.now().strftime("%m/%d/%Y, %H:%M:%S"), occurrence_list]
         self.queue.put(item)
         return
 
     def flush(self):
-        item = ['', 0, 'flush', datetime.datetime.now().strftime("%H:%M:%S"), '', '']
+        item = ['', 0, 'flush', datetime.now().strftime("%H:%M:%S"), '', '']
         self.queue.put(item)
         return
 
