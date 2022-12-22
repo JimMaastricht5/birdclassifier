@@ -69,7 +69,7 @@ class WebStream:
                                                 f'webstream.csv',
                                            file_loc_name='{self.path}/webstream.csv')
                 elif msg_type == 'occurrences':
-                    if item[4] != []:  # list in a list in message position
+                    if len(item[4]) > 0:  # list in a list in message position
                         print(item)  # send full array to console
                         self.df_occurrences = pd.DataFrame(item[4], columns=['Species', 'Date Time'])  # in msg pos
                         self.df_occurrences.insert(0, "Feeder Name", "")
