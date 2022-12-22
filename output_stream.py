@@ -56,10 +56,11 @@ class WebStream:
             while True:
                 item = self.queue.get()  # get the next item in the queue to write to disk
                 msg_type = item[3]  # message type is the 3 rd item the list
-                # print('getting from q:', item)
+                print('getting from q:', item)
                 if item is None:  # poison pill, end the process
                     return  # end process
                 elif msg_type == 'flush':  # event type is flush
+                    print('flush mem to disk and web')
                     self.df = pd.DataFrame(self.df_list,
                                            columns=['Feeder Name', 'Event Num', 'Message Type', 'Date Time',
                                                     'Message', 'Image Name'])
@@ -73,12 +74,12 @@ class WebStream:
                         self.df_occurrences = pd.DataFrame(item[4], columns=['Species', 'Date Time'])  # in msg pos
                         self.df_occurrences.insert(0, "Feeder Name", "")
                         self.df_occurrences['Feeder Name'] = self.id
+                        print('sending file to disk and web....')
                         self.df_occurrences.to_csv(f'{self.path}/web_occurrences.csv')  # species, date time
-                        print('sending file to web....')
                         self.storage.send_file(name=f'{datetime.now().strftime("%Y-%m-%d")}'
                                                     f'web_occurrences.csv',
                                                file_loc_name='{self.path}/web_occurrences.csv')
-                        print('return from file send to web')
+                        print('return from file send to disk and web')
                     else:
                         pass  # empty message
                 else:  # basic message or other event type: message, motion, spotted, inconclusive, weather, ....
