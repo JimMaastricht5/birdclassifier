@@ -58,7 +58,7 @@ class WebStream:
                 msg_type = item[3]  # message type is the 3 rd item the list
                 # print('getting from q:', item)
                 if item is None:  # poison pill, end the process
-                    break  # end process
+                    return  # end process
                 elif msg_type == 'flush':  # event type is flush
                     self.df = pd.DataFrame(self.df_list,
                                            columns=['Feeder Name', 'Event Num', 'Message Type', 'Date Time',
@@ -74,13 +74,15 @@ class WebStream:
                         self.df_occurrences.insert(0, "Feeder Name", "")
                         self.df_occurrences['Feeder Name'] = self.id
                         self.df_occurrences.to_csv(f'{self.path}/web_occurrences.csv')  # species, date time
+                        print('sending file to web....')
                         self.storage.send_file(name=f'{datetime.now().strftime("%Y-%m-%d")}'
                                                     f'web_occurrences.csv',
                                                file_loc_name='{self.path}/web_occurrences.csv')
+                        print('return from file send to web')
                     else:
                         pass  # empty message
                 else:  # basic message or other event type: message, motion, spotted, inconclusive, weather, ....
-                    print(f'event#{item[1]}, type:{item[2]}, {item[3]}, {item[4]}')  # list event, type, date time, msg
+                    print(item)  # values may be missing so don't subscript here
                     if len(item) == 6:  # list should be six items long
                         self.df_list.append(item)
                     else:
