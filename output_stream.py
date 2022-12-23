@@ -55,12 +55,14 @@ class WebStream:
         try:
             while True:
                 item = self.queue.get()  # get the next item in the queue to write to disk
-                msg_type = item[3]  # message type is the 3 rd item the list
-                print('getting from q:', item)
                 if item is None:  # poison pill, end the process
                     return  # end process
-                elif msg_type == 'flush':  # event type is flush
-                    print('flush mem to disk and web')
+
+                msg_type = item[3]  # message type is the 3 rd item the list
+                print('getting from q:', msg_type)
+                if msg_type == 'flush':  # event type is flush
+                    print('flush mem to disk and web', item)
+                    print('list is', self.df_list)
                     self.df = pd.DataFrame(self.df_list,
                                            columns=['Feeder Name', 'Event Num', 'Message Type', 'Date Time',
                                                     'Message', 'Image Name'])
@@ -69,6 +71,7 @@ class WebStream:
                                                 f'webstream.csv',
                                            file_loc_name='{self.path}/webstream.csv')
                 elif msg_type == 'occurrences':
+                    print('in occurrences', item)
                     if len(item[4]) > 0:  # list in a list in message position
                         print(item)  # send full array to console
                         self.df_occurrences = pd.DataFrame(item[4], columns=['Species', 'Date Time'])  # in msg pos
@@ -83,7 +86,7 @@ class WebStream:
                     else:
                         pass  # empty message
                 else:  # basic message or other event type: message, motion, spotted, inconclusive, weather, ....
-                    print(item)  # values may be missing so don't subscript here
+                    print('in msg else', item)  # values may be missing so don't subscript here
                     if len(item) == 6:  # list should be six items long
                         self.df_list.append(item)
                     else:
