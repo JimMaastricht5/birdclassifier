@@ -69,7 +69,7 @@ class WebStream:
                     self.df.to_csv(f'{self.path}/webstream.csv')
                     self.storage.send_file(name=f'{datetime.now().strftime("%Y-%m-%d")}'
                                                 f'webstream.csv',
-                                           file_loc_name='{self.path}/webstream.csv')
+                                           file_loc_name=f'{self.path}/webstream.csv')
                 elif msg_type == 'occurrences':
                     print('in occurrences', item)
                     if len(item[4]) > 0:  # list in a list in message position
@@ -81,7 +81,7 @@ class WebStream:
                         self.df_occurrences.to_csv(f'{self.path}/web_occurrences.csv')  # species, date time
                         self.storage.send_file(name=f'{datetime.now().strftime("%Y-%m-%d")}'
                                                     f'web_occurrences.csv',
-                                               file_loc_name='{self.path}/web_occurrences.csv')
+                                               file_loc_name=f'{self.path}/web_occurrences.csv')
                         print('return from file send to disk and web')
                     else:
                         pass  # empty message
