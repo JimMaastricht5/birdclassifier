@@ -58,7 +58,7 @@ class WebStream:
                 if item is None:  # poison pill, end the process
                     return  # end process
 
-                msg_type = item[3]  # message type is the 3 rd item the list
+                msg_type = item[2]  # message type is the 3 rd item the list, counjt from 0
                 print('getting from q:', msg_type)
                 if msg_type == 'flush':  # event type is flush
                     print('flush mem to disk and web', item)
