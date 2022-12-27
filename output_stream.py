@@ -67,8 +67,7 @@ class WebStream:
                                            columns=['Feeder Name', 'Event Num', 'Message Type', 'Date Time',
                                                     'Message', 'Image Name'])
                     self.df.to_csv(f'{self.path}/webstream.csv')
-                    self.storage.send_file(name=f'{datetime.now().strftime("%Y-%m-%d-%H-%M-%S")}'
-                                                f'webstream.csv',
+                    self.storage.send_file(name=f'{datetime.now().strftime("%Y-%m-%d")}webstream.csv',
                                            file_loc_name=f'{self.path}/webstream.csv')
                 elif msg_type == 'occurrences':
                     print('in occurrences', item)
@@ -79,8 +78,7 @@ class WebStream:
                         self.df_occurrences['Feeder Name'] = self.id
                         print('sending file to disk and web....')
                         self.df_occurrences.to_csv(f'{self.path}/web_occurrences.csv')  # species, date time
-                        self.storage.send_file(name=f'{datetime.now().strftime("%Y-%m-%d-%H-%M-%S")}'
-                                                    f'web_occurrences.csv',
+                        self.storage.send_file(name=f'{datetime.now().strftime("%Y-%m-%d")}web_occurrences.csv',
                                                file_loc_name=f'{self.path}/web_occurrences.csv')
                         print('return from file send to disk and web')
                     else:
