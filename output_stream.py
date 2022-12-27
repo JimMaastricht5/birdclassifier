@@ -18,10 +18,8 @@ class WebStream:
     # Image_name: string, image name on disk
     def __init__(self, queue, path=os.getcwd(), caller_id="default"):
         self.queue = queue
-        self.path = path
+        self.path = path + '\\assets'
         print(self.path)
-        self.asset_path = self.path + '/assets'
-        print(self.asset_path)
         self.df_list = []
         self.id = caller_id
         self.storage = gcs.Storage()
