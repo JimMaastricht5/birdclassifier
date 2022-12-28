@@ -7,6 +7,7 @@ import datetime
 import os
 import ifcfg
 
+# ************ local testing on pi only ************** #
 
 #   html.Div(children=last_refresh(),
 #            style={
