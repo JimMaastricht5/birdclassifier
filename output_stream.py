@@ -18,7 +18,7 @@ class WebStream:
     # Image_name: string, image name on disk
     def __init__(self, queue, path=os.getcwd(), caller_id="default"):
         self.queue = queue
-        self.path = path + '\\assets'
+        self.path = path + '/assets'
         print(self.path)
         self.df_list = []
         self.id = caller_id
