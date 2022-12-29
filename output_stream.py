@@ -56,11 +56,12 @@ class WebStream:
                 if item is None:  # poison pill, end the process
                     return  # end process
 
-                msg_type = item[2]  # message type is the 3 rd item the list, counjt from 0
-                print('getting from q:', msg_type)
+                msg_type = item[2]  # message type is the 3 rd item the list, count from 0
+                print(item)
+                # print('getting from q:', msg_type)
                 if msg_type == 'flush':  # event type is flush
-                    print('flush mem to disk and web', item)
-                    print('list is', self.df_list)
+                    # print('flush mem to disk and web', item)
+                    # print('list is', self.df_list)
                     self.df = pd.DataFrame(self.df_list,
                                            columns=['Feeder Name', 'Event Num', 'Message Type', 'Date Time',
                                                     'Message', 'Image Name'])
@@ -68,21 +69,21 @@ class WebStream:
                     self.storage.send_file(name=f'{datetime.now().strftime("%Y-%m-%d")}webstream.csv',
                                            file_loc_name=f'{self.path}/webstream.csv')
                 elif msg_type == 'occurrences':
-                    print('in occurrences', item)
+                    # print('in occurrences', item)
                     if len(item[4]) > 0:  # list in a list in message position
                         print(item)  # send full array to console
                         self.df_occurrences = pd.DataFrame(item[4], columns=['Species', 'Date Time'])  # in msg pos
                         self.df_occurrences.insert(0, "Feeder Name", "")
                         self.df_occurrences['Feeder Name'] = self.id
-                        print('sending file to disk and web....')
+                        # print('sending file to disk and web....')
                         self.df_occurrences.to_csv(f'{self.path}/web_occurrences.csv')  # species, date time
                         self.storage.send_file(name=f'{datetime.now().strftime("%Y-%m-%d")}web_occurrences.csv',
                                                file_loc_name=f'{self.path}/web_occurrences.csv')
-                        print('return from file send to disk and web')
+                        # print('return from file send to disk and web')
                     else:
                         pass  # empty message
                 else:  # basic message or other event type: message, motion, spotted, inconclusive, weather, ....
-                    print('in msg else', item)  # values may be missing so don't subscript here
+                    # print('in msg else', item)  # values may be missing so don't subscript here
                     if len(item) == 6:  # list should be six items long
                         self.df_list.append(item)
                     else:

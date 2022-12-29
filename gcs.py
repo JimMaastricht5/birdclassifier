@@ -84,21 +84,27 @@ if __name__ == "__main__":
     web_storage = Storage()
 
     # test dataframe func
-    csv_list = web_storage.get_csv_list()
-    # print(csv_list)
-    for csv in csv_list:
-        df = web_storage.get_df(csv)
-
-    print(df.columns)
-    print(df.iloc[0])
+    # csv_list = web_storage.get_csv_list()
+    # # print(csv_list)
+    # for csv in csv_list:
+    #     df = web_storage.get_df(csv)
+    #
+    # print(df.columns)
+    # print(df.iloc[0])
 
     # test send
     # jpg = Image.open('/home/pi/birdclass/0.jpg')
     # web_storage.send_file(blob_name='test0.jpg', blob_filename='/home/pi/birdclass/0.jpg')
 
     # get list test
-    # file_name_list = web_storage.get_img_list()
-    # print(file_name_list)
+    file_name_list = web_storage.get_img_list()
+    file_name_list.reverse()
+    for file_name in file_name_list:
+        if file_name.find('.gif') != -1:
+            last_gif_name = file_name
+            break
+    print(file_name_list)
+    print(last_gif_name)
 
     # test retrieval in mem
     # p_image = web_storage.get_img_file(file_name_list[1])
