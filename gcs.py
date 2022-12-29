@@ -19,6 +19,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+import pandas as pd
 from google.cloud import storage
 from PIL import Image
 from io import BytesIO
@@ -39,14 +40,14 @@ class Storage:
         blob = self.bucket.blob(name)  # object name in bucket
         blob.upload_from_filename(file_loc_name)  # full qualified file location on disk
 
-    def get_file(self, blob_name):
+    def get_img_file(self, blob_name):
         blob = self.bucket.blob(blob_name)
         with blob.open("rb") as f:
-            blob=f.read()
-            p_image = Image.open(BytesIO(bytes(blob))) # Convert bytes to pil image
-        return p_image
+            blob = f.read()
+            gcs_image = Image.open(BytesIO(bytes(blob)))  # Convert bytes to pil image
+        return gcs_image
 
-    def get_list(self, prefix=''):
+    def get_img_list(self, prefix=''):
         # use prefix= to get folder 'abc/myfolder'
         blob_name_list = []
         for blob in self.storage_client.list_blobs(self.bucket_name, prefix=prefix):
@@ -54,25 +55,54 @@ class Storage:
                 blob_name_list.append(blob.name)
         return blob_name_list
 
-    def get_all_files(self, blob_name_list):
-        p_images = []
+    def get_all_img_files(self, blob_name_list):
+        images = []
         for blob_name in blob_name_list:
-            p_images.append(self.get_file(blob_name))
-        return p_images
+            images.append(self.get_img_file(blob_name))
+        return images
+
+    def get_csv_list(self, prefix=''):
+        # use prefix= to get folder 'abc/myfolder'
+        blob_name_list = []
+        for blob in self.storage_client.list_blobs(self.bucket_name, prefix=prefix):
+            if blob.name.find('.csv') != -1:  # append csv to list
+                blob_name_list.append(blob.name)
+        return blob_name_list
+
+    def send_df(self, df, blob_name):
+        blob = self.bucket.blob(blob_name)
+        blob.upload_from_string(df.to_csv(), 'text/csv')
+
+    def get_df(self, blob_name):
+        blob = self.bucket.blob(blob_name)
+        blob_bytes = blob.download_as_bytes()
+        df = pd.read_csv(BytesIO(blob_bytes), header=0)
+        return df
 
 
 if __name__ == "__main__":
+    web_storage = Storage()
+
+    # test dataframe func
+    csv_list = web_storage.get_csv_list()
+    # print(csv_list)
+    for csv in csv_list:
+        df = web_storage.get_df(csv)
+
+    print(df.columns)
+    print(df.iloc[0])
+
     # test send
-    #jpg = Image.open('/home/pi/birdclass/0.jpg')
+    # jpg = Image.open('/home/pi/birdclass/0.jpg')
     # web_storage.send_file(blob_name='test0.jpg', blob_filename='/home/pi/birdclass/0.jpg')
 
     # get list test
-    web_storage = Storage()
-    blob_name_list = web_storage.get_list()
+    # file_name_list = web_storage.get_img_list()
+    # print(file_name_list)
 
     # test retrieval in mem
-    p_image = web_storage.get_file(blob_name_list[1])
-    p_image.show()
+    # p_image = web_storage.get_img_file(file_name_list[1])
+    # p_image.show()
 
     # test retrieval of all images
     # this takes a long time and will likely cost too much
@@ -82,4 +112,3 @@ if __name__ == "__main__":
 
     # save file if needed
     # p_image.save("c:/home/pi/getblob.jpg")
-
