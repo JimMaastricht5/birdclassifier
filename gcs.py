@@ -107,8 +107,8 @@ if __name__ == "__main__":
     print(last_gif_name)
 
     # test retrieval in mem
-    # p_image = web_storage.get_img_file(file_name_list[1])
-    # p_image.show()
+    p_image = web_storage.get_img_file(file_name_list[1])
+    p_image.show()
 
     # test retrieval of all images
     # this takes a long time and will likely cost too much

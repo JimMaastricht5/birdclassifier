@@ -103,10 +103,8 @@ def bird_detector(args):
             motioncnt = 0  # reset motion count between detected birds
             birds.set_colors()  # set new colors for this series of bounding boxes
             event_count += 1
-            img_filename = os.getcwd() + '/assets/' + str(event_count % 10) + '.jpg'
-            # output.message(message=f'Saw motion #{event_count} at {datetime.now().strftime("%I:%M:%S %P")}',
-            #                msg_type='motion'
-            #                event_num=event_count, image_name='')
+            local_img_filename = os.getcwd() + '/assets/' + str(event_count % 10) + '.jpg'
+            gcs_img_filename = f'{datetime.now().strftime("%Y-%m-%d-%H-%M-%S")}{str(event_count)}.jpg'
             first_img_jpg = birds.img  # keep first shot for animation and web
 
             # classify, grab labels, output census, send to web and terminal,
@@ -117,14 +115,14 @@ def bird_detector(args):
                 output.message(message=f'Possible sighting of a {birds.classified_labels[max_index]} '
                                        f'{birds.classified_confidences[max_index] * 100:.1f}% at '
                                        f'{datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count,
-                               msg_type='possible', image_name=img_filename, flush=True)  # label and confidence 2stream
+                               msg_type='possible', image_name=gcs_img_filename, flush=True)  # 2 web stream
                 # check for need of final image adjustments, *** won't hit this code with twilight in while loop above
                 first_img_jpg = first_img_jpg if args.brightness_chg == 0 \
                     or cityweather.isclear or cityweather.is_twilight() \
                     else image_proc.enhance_brightness(img=first_img_jpg, factor=args.brightness_chg)
                 first_img_jpg_no_label = first_img_jpg.copy()
                 # create animation: unlabeled first image is passed to gif function, bare copy is annotated later
-                gif, gif_filename, animated, best_label, best_confidence, frames_with_birds = \
+                gif, local_gif_filename, gcs_gif_filename, animated, best_label, best_confidence, frames_with_birds = \
                     build_bird_animated_gif(args, motion_detect, birds, gcs_storage, event_count, first_img_jpg)
 
                 # annotate bare image copy, use either best gif label or org data
@@ -134,9 +132,8 @@ def bird_detector(args):
                 birds.set_ojb_data(classified_rects=first_rects, classified_labels=best_first_label,
                                    classified_confidences=best_first_conf)  # set to first bird
                 first_img_jpg = birds.add_boxes_and_labels(img=first_img_jpg_no_label, use_last_known=False)
-                first_img_jpg.save(img_filename)
-                gcs_storage.send_file(name=f'{datetime.now().strftime("%Y-%m-%d-%H-%M-%S")}'
-                                           f'{str(event_count)}.jpg', file_loc_name=img_filename)  # date,time, counter
+                first_img_jpg.save(local_img_filename)
+                gcs_storage.send_file(name=gcs_img_filename, file_loc_name=local_img_filename)
 
                 # process tweets, jpg if not min number of frame, gif otherwise
                 waittime = birdpop.report_single_census_count(best_label) * args.tweetdelay / 10  # wait X min * N bird
@@ -147,8 +144,9 @@ def bird_detector(args):
                     if animated:
                         output.message(message=f'Spotted {best_label} {best_confidence * 100:.1f}% '
                                                f'at {datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count,
-                                       msg_type='spotted', image_name=gif_filename, flush=True)
-                        if bird_tweeter.post_image_from_file(tweet_text(best_label, best_confidence), gif_filename):
+                                       msg_type='spotted', image_name=gcs_gif_filename, flush=True)
+                        if bird_tweeter.post_image_from_file(tweet_text(best_label, best_confidence),
+                                                             local_gif_filename):
                             last_tweet = datetime.now()  # update last tweet time if successful gif posting, ignore fail
                     else:
                         output.message(message=f'Uncertain about a {best_label} {best_confidence * 100:.1f}% '
@@ -193,7 +191,7 @@ def remove_single_observations(census_dict, conf_dict):
 def build_bird_animated_gif(args, motion_detect, birds, gcs_storage, event_count, first_img_jpg):
     # grab a stream of pictures, add first pic from above, and build animated gif
     # return gif, filename, animated boolean, and best label as the max of all confidences
-    gif_filename, best_label, best_confidence, labeled_frames = '', '', 0, []
+    local_gif_filename, gcs_gif_filename, best_label, best_confidence, labeled_frames = '', '', '', 0, []
     animated = False  # set to true if min # of frames captured with birds
     gif = first_img_jpg  # set a default if animated = False
     last_good_frame = 0  # find last frame that has a bird, index zero is good based on first image
@@ -217,9 +215,9 @@ def build_bird_animated_gif(args, motion_detect, birds, gcs_storage, event_count
                                                                      weighted_dict)
         labeled_frames.append(birds.add_boxes_and_labels(img=frame, use_last_known=True))  # use last label if unknown
     if frames_with_birds >= (args.minanimatedframes - 1):  # if bird is in min number of frames build gif
-        gif, gif_filename = image_proc.save_gif(frames=labeled_frames[0:last_good_frame])  # framerate=motion_detect.FPS
-        gcs_storage.send_file(name=f'{datetime.now().strftime("%Y-%m-%d-%H-%M-%S")}'
-                                   f'{str(event_count)}.gif', file_loc_name=gif_filename)
+        gif, local_gif_filename = image_proc.save_gif(frames=labeled_frames[0:last_good_frame])
+        gcs_gif_filename = f'{datetime.now().strftime("%Y-%m-%d-%H-%M-%S")}{str(event_count)}.gif'
+        gcs_storage.send_file(name=gcs_gif_filename, file_loc_name=local_gif_filename)
         animated = True
     best_confidence = confidence_dict[max(confidence_dict, key=confidence_dict.get)] / \
         census_dict[max(confidence_dict, key=confidence_dict.get)]  # sum conf/bird cnt
@@ -227,7 +225,7 @@ def build_bird_animated_gif(args, motion_detect, birds, gcs_storage, event_count
     best_weighted_label = max(weighted_dict, key=weighted_dict.get)
     if best_label != best_weighted_label:
         print('--- Best label, confidence, and weight', best_label, best_confidence, best_weighted_label)
-    return gif, gif_filename, animated, best_label, best_confidence, frames_with_birds
+    return gif, local_gif_filename, gcs_gif_filename, animated, best_label, best_confidence, frames_with_birds
 
 
 def tweet_text(label, confidence):
