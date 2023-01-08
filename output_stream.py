@@ -97,7 +97,7 @@ class WebStream:
 class Controller:
     def __init__(self, caller_id="default"):
         self.queue = multiprocessing.Queue()
-        self.web_stream = WebStream(queue=self.queue)
+        self.web_stream = WebStream(queue=self.queue, caller_id=caller_id)
         self.p_web_stream = multiprocessing.Process(target=self.web_stream.request_handler, args=(), daemon=True)
         self.last_event_num = 0
         self.id = caller_id  # id name or number of sender
@@ -129,13 +129,6 @@ class Controller:
 
     def occurrences(self, occurrence_list):
         # print(occurrence_list)
-        # self.df = pd.DataFrame({
-        #     'Feeder Name': pd.Series(dtype='str'),
-        #     'Event Num': pd.Series(dtype='int'),
-        #     'Message Type': pd.Series(dtype='str'),
-        #     'Date Time': pd.Series(dtype='str'),
-        #     'Message': pd.Series(dtype='str'),
-        #     'Image Name': pd.Series(dtype='str')})
         item = [self.id, 0, 'occurrences', datetime.now().strftime("%m/%d/%Y, %H:%M:%S"), occurrence_list]
         self.queue.put(item)
         return
