@@ -38,7 +38,7 @@ def short_name(birdname):
 
 class DailyChores:
 
-    def __init__(self, tweeter_obj, birdpop, city_weather, output_class=None):
+    def __init__(self, tweeter_obj, birdpop, city_weather, output_class=None, maxcpu_c_temp=86):
         self.curr_day = datetime.now().day
         self.curr_hr = datetime.now().hour
         self.starttime = datetime.now()
@@ -49,6 +49,7 @@ class DailyChores:
         self.birdpop = birdpop
         self.output_class = output_class  # take an arguement of class Controller from output_stream.py
         self.output_func = output_class.message if output_class is not None else print
+        self.maxcpu_c_temp = maxcpu_c_temp
 
     # end of process report
     def end_report(self):
@@ -58,9 +59,10 @@ class DailyChores:
     # check current cpu temp, print, shutdown if overheated
     def check_cpu_temp(self):
         cpu = CPUTemperature()
-        self.output_func(f'***hourly temp check. cpu temp is: {cpu.temperature}C {(cpu.temperature * 9 / 5) + 32}F')
+        self.output_func(f'***hourly temp check. cpu temp is: {cpu.temperature:.1f}C'
+                         f' {(cpu.temperature * 9 / 5) + 32:.1f}F')
         try:
-            if int(cpu.temperature) >= 86:  # limit is 85 C
+            if int(cpu.temperature) >= self.maxcpu_c_temp:  # limit is 85 C
                 self.tweeter.post_status(f'***shut down. temp: {cpu.temperature}')
                 call("sudo shutdown -poweroff")
         except Exception as e:
@@ -105,9 +107,6 @@ class DailyChores:
         if self.weather_reported is False and self.cityweather.is_daytime() and \
                 self.cityweather.is_dawn():
             self.weather_report()
-            if filename != '':  # if an img file name was passed post it
-                self.tweeter.post_image_from_file(message=f'Morning seed and camera position check. ',
-                                                  file_name=filename)
             self.weather_reported = True
 
         if report_pop:  # process is ending report populations observations
@@ -117,8 +116,9 @@ class DailyChores:
 
         if self.curr_hr != datetime.now().hour:  # check weather and CPU temp hourly
             self.check_cpu_temp()
-            if self.output_class is not None:
+            if self.output_class is not None:  # output is not being sent to the default print function
                 self.output_class.occurrences(self.birdpop.get_occurrences())
+                self.output_class.message(message=f'Morning seed and camera position check. ', img_name=filename)
                 self.output_class.flush()
 
         self.curr_hr = datetime.now().hour

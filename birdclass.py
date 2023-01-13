@@ -21,13 +21,15 @@
 # SOFTWARE.
 #
 # motion detector with builtin bird detection and bird classification
+# accompying web site at https://jimmaastricht5-tweetersp-1-main-veglvm.streamlit.app/
 # built by JimMaastricht5@gmail.com
 # uses tflite prebuilt google model for object detection and tensorflow lite model for bird classification
-# currently using a model from coral.ai for species identification.
-# Other species models built with tensor flow  using tools from tensor in colab notebook
+# Other models built with tensor flow  using tools from tensor in colab notebook
 # https://colab.research.google.com/drive/1taZ9JincTaZuZh_JmBSC4pAbSQavxbq5#scrollTo=D3i_6WSXjUhk
-# packages: twitter use twython package, auth.py must be in project for import auth
-#   oauthlib,
+# packages: auth.py must be in project and will contain secret keys to as follows.  format is api_key=''
+#   twitter: api_key, api_secret_key, access_token, access_token_secret, bearer_token
+#   weather: weather_key
+#   google: google_json_key for gcs writes
 import image_proc
 import label_image  # code to init tensor flow model and classify bird type, bird object
 import motion_detector  # motion detector helper functions
@@ -55,7 +57,7 @@ def bird_detector(args):
     output = output_stream.Controller(caller_id=args.city)  # initialize class to handle terminal and web output
     output.start_stream()  # start streaming to terminal and web
     gcs_storage = gcs.Storage()
-    motioncnt, event_count = 0, 0
+    motioncnt, event_count, gcs_img_filename = 0, 0, ''
     curr_day, curr_hr, last_tweet = datetime.now().day, datetime.now().hour, datetime(2021, 1, 1, 0, 0, 0)
 
     # while loop below processes from sunrise to sunset.  The python program runs in a bash loop
@@ -93,7 +95,7 @@ def bird_detector(args):
     output.message('Starting while loop until sun set..... ')
     # loop while the sun is up, look for motion, detect birds, determine species
     while cityweather.sunrise.time() < datetime.now().time() < cityweather.sunset.time():
-        chores.hourly_and_daily()  # initial weather reporting.  Should happen once between sun rise and +30 min.
+        chores.hourly_and_daily(filename=gcs_img_filename)  # weather reporting, cpu checks, last img hourly seed check
         motion_detect.detect()
         if motion_detect.motion:
             motioncnt += 1
@@ -233,12 +235,7 @@ def tweet_text(label, confidence):
     try:
         label = str(label[0]) if isinstance(label, list) else str(label)  # handle list or individual string
         confidence = float(confidence[0]) if isinstance(confidence, list) else float(confidence)  # list or float
-        # sname = str(label)
         cname, sname, sex = parse_species(str(label))
-        # sname = sname[sname.find(' ') + 1:] if sname.find(' ') >= 0 else sname  # remove index number
-        # sex = sname[sname.find('[') + 1: sname.find(']')] if sname.find('[') >= 0 else ''  # retrieve sex
-        # sname = sname[0: sname.find('[') - 1] if sname.find('[') >= 0 else sname  # remove sex
-        # cname = sname[sname.find('(') + 1: sname.find(')')] if sname.find('(') >= 0 else sname  # retrieve common name
         hypername = cname.replace(' ', '_')
         hyperlink = f'https://www.allaboutbirds.org/guide/{hypername}/overview'
         tweet_label = f'{sex} {cname} {confidence * 100:.1f}% {hyperlink}'
@@ -288,6 +285,7 @@ if __name__ == "__main__":
     ap.add_argument("-sw", "--screenwidth", type=int, default=640, help="max screen width")
     ap.add_argument("-sh", "--screenheight", type=int, default=480, help="max screen height")
 
+    # general app settings
     ap.add_argument("-gf", "--minanimatedframes", type=int, default=5, help="minimum number of frames with a bird")
     ap.add_argument("-bb", "--broadcast", type=bool, default=False, help="stream images and text")
     ap.add_argument("-v", "--verbose", type=bool, default=True, help="To tweet extra stuff or not")
@@ -307,7 +305,6 @@ if __name__ == "__main__":
     ap.add_argument("-bc", "--bird_confidence", type=float, default=.6, help="bird confidence threshold")
     ap.add_argument("-ma", "--minarea", type=float, default=5.0, help="motion area threshold, lower req more")
     ap.add_argument("-ms", "--minimgperc", type=float, default=10.0, help="ignore objects that are less then % of img")
-
     ap.add_argument("-hd", "--homedir", type=str, default='/home/pi/PycharmProjects/birdclassifier/',
                     help="home directory for files")
     ap.add_argument("-la", "--labels", type=str, default='coral.ai.inat_bird_labels.txt',
@@ -316,32 +313,13 @@ if __name__ == "__main__":
                     help="name of file to use for species labels and thresholds")
     ap.add_argument("-cm", "--classifier", type=str, default='coral.ai.mobilenet_v2_1.0_224_inat_bird_quant.tflite',
                     help="model name for species classifier")
-    # ap.add_argument("-la", "--labels", type=str, default='class_labels2022_07v1.txt',
-    #                 help="name of file to use for species labels and thresholds")
-    # ap.add_argument("-tr", "--thresholds", type=str, default='class_labels2022_07v1.csv',
-    #                 help="name of file to use for species labels and thresholds")
-    # ap.add_argument("-cm", "--classifier", type=str, default='mobilenet_tweeters2022_07v1.tflite',
-    #                 help="model name for species classifier")
 
+    # feeder defaults
     ap.add_argument("-ct", "--city", type=str, default='Madison,WI,USA',
                     help="name of city weather station uses OWM web service.  See their site for city options")
     ap.add_argument('-fi', "--feeder_id", type=str, default=hex(uuid.getnode()),
                     help='feeder id default MAC address')
+    ap.add_argument('-t', "--feeder_max_temp_c", type=int, default=86, help="Max operating temp for the feeder in C")
 
     arguments = ap.parse_args()
     bird_detector(arguments)
-
-# junk code
-# import objtracker  # keeps track of detected objects between frames
-# birdobj = objtracker.CentroidTracker()
-# birdobj.update(birds.classified_rects, birds.classified_confidences, birds.classified_labels)
-# birdobj.update_null()
-# motion processed, all birds in image processed if detected, add all known objects to image
-# try:
-#    birds.img = birds.add_boxes_and_labels(birds.img, birdobj.objnames, birdobj.rects)
-# except:
-#    print('*** error in boxes and labels using image tracker')
-# if birds.target_object_found:
-#     print('*** bird detect and classify results')
-#     print(birds.classified_labels, birds.classified_rects)
-# placeholder show video w boxes and labels

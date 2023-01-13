@@ -173,27 +173,3 @@ def main():
 if __name__ == '__main__':
     main()
 
-
-# simple sample queue code
-# from multiprocessing import Process, Queue
-#
-# class WebWriter:
-#     def __init__(self, queue):
-#         self.queue = queue
-#
-#     def request_handler(self):
-#         while True:
-#             message = self.queue.get()
-#             if message is None:
-#                 break
-#             print(message)
-#
-# if __name__ == '__main__':
-#     # Create multiprocessing queue
-#     queue = Queue()
-#     web_writer = WebWriter(queue=queue)
-#     p = Process(target=web_writer.request_handler, args=())
-#     p.start()
-#     for i in range(10):
-#         queue.put(f'{i}ith message')
-#     queue.put(None)
