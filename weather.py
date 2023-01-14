@@ -90,11 +90,6 @@ class CityWeather:
         return datetime.now() > self.sunrise or datetime.now() < self.sunset
 
     def is_twilight(self):
-        # from_sunrise_min = datetime.now() - self.sunrise
-        # from_sunset_min = self.sunset - datetime.now()
-        # from_sunrise_min = from_sunrise_min.total_seconds() / 60
-        # from_sunset_min = from_sunset_min.total_seconds() / 60
-        # return from_sunrise_min < 60 or from_sunset_min < 60
         return self.is_dawn() or self.is_dusk()
 
     def is_dawn(self):
