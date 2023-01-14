@@ -118,7 +118,7 @@ class DailyChores:
             self.check_cpu_temp()
             if self.output_class is not None:  # output is not being sent to the default print function
                 self.output_class.occurrences(self.birdpop.get_occurrences())
-                self.output_class.message(message=f'Morning seed and camera position check. ', img_name=filename)
+                self.output_class.message(message=f'Morning seed and camera position check. ', image_name=filename)
                 self.output_class.flush()
 
         self.curr_hr = datetime.now().hour
