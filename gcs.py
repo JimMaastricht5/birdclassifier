@@ -39,6 +39,7 @@ class Storage:
     def send_file(self, name, file_loc_name):
         blob = self.bucket.blob(name)  # object name in bucket
         blob.upload_from_filename(file_loc_name)  # full qualified file location on disk
+        return
 
     def get_img_file(self, blob_name):
         blob = self.bucket.blob(blob_name)
@@ -72,6 +73,7 @@ class Storage:
     def send_df(self, df, blob_name):
         blob = self.bucket.blob(blob_name)
         blob.upload_from_string(df.to_csv(), 'text/csv')
+        return
 
     def get_df(self, blob_name):
         blob = self.bucket.blob(blob_name)

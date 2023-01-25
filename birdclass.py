@@ -57,7 +57,7 @@ def bird_detector(args):
     output = output_stream.Controller(caller_id=args.city)  # initialize class to handle terminal and web output
     output.start_stream()  # start streaming to terminal and web
     gcs_storage = gcs.Storage()
-    motioncnt, event_count, gcs_img_filename = 0, 0, ''
+    motioncnt, event_count, gcs_img_filename, seed_check_gcs_filename = 0, 0, '', ''
     curr_day, curr_hr, last_tweet = datetime.now().day, datetime.now().hour, datetime(2021, 1, 1, 0, 0, 0)
 
     # while loop below processes from sunrise to sunset.  The python program runs in a bash loop
@@ -95,7 +95,7 @@ def bird_detector(args):
     output.message('Starting while loop until sun set..... ')
     # loop while the sun is up, look for motion, detect birds, determine species
     while cityweather.sunrise.time() < datetime.now().time() < cityweather.sunset.time():
-        chores.hourly_and_daily(filename=gcs_img_filename)  # weather reporting, cpu checks, last img hourly seed check
+        chores.hourly_and_daily(filename=seed_check_gcs_filename)  # weather reporting, cpu checks, last img hourly seed check
         motion_detect.detect()
         if motion_detect.motion:
             motioncnt += 1
@@ -136,6 +136,7 @@ def bird_detector(args):
                 first_img_jpg = birds.add_boxes_and_labels(img=first_img_jpg_no_label, use_last_known=False)
                 first_img_jpg.save(local_img_filename)
                 gcs_storage.send_file(name=gcs_img_filename, file_loc_name=local_img_filename)
+                seed_check_gcs_filename = gcs_img_filename  # reference to use for hourly seed check
 
                 # process tweets, jpg if not min number of frame, gif otherwise
                 waittime = birdpop.report_single_census_count(best_label) * args.tweetdelay / 10  # wait X min * N bird
