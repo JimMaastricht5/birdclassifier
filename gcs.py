@@ -19,6 +19,12 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+#
+# module handles all file interactions with google cloud storage
+# google keys must be in a python file called auth.py and that should never be included in git!
+# send file and send df were hardened to protect the bird feeder app from crashing,
+# that is unnecessary for the get functions since that is used by the web app and the page can be refreshed to
+# reinvoke the app
 import pandas as pd
 from google.cloud import storage
 from PIL import Image
@@ -37,8 +43,19 @@ class Storage:
         self.bucket_name = bucket_name
 
     def send_file(self, name, file_loc_name):
-        blob = self.bucket.blob(name)  # object name in bucket
-        blob.upload_from_filename(file_loc_name)  # full qualified file location on disk
+        try:
+            blob = self.bucket.blob(name)  # object name in bucket
+            blob.upload_from_filename(file_loc_name)  # full qualified file location on disk
+        except Exception as e:
+            print(f'Error in GCS send file {e}')
+        return
+
+    def send_df(self, df, blob_name):
+        try:
+            blob = self.bucket.blob(blob_name)
+            blob.upload_from_string(df.to_csv(), 'text/csv')
+        except Exception as e:
+            print(f'failure sending dataframe to GCS: {e}')
         return
 
     def get_img_file(self, blob_name):
@@ -70,11 +87,6 @@ class Storage:
                 blob_name_list.append(blob.name)
         return blob_name_list
 
-    def send_df(self, df, blob_name):
-        blob = self.bucket.blob(blob_name)
-        blob.upload_from_string(df.to_csv(), 'text/csv')
-        return
-
     def get_df(self, blob_name):
         blob = self.bucket.blob(blob_name)
         blob_bytes = blob.download_as_bytes()
@@ -82,6 +94,7 @@ class Storage:
         return df
 
 
+# testing code for this module
 if __name__ == "__main__":
     web_storage = Storage()
 
@@ -99,6 +112,7 @@ if __name__ == "__main__":
     # web_storage.send_file(blob_name='test0.jpg', blob_filename='/home/pi/birdclass/0.jpg')
 
     # get list test
+    last_gif_name = ''
     file_name_list = web_storage.get_img_list()
     file_name_list.reverse()
     for file_name in file_name_list:
