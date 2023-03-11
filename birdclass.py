@@ -95,7 +95,7 @@ def bird_detector(args):
     output.message('Starting while loop until sun set..... ')
     # loop while the sun is up, look for motion, detect birds, determine species
     while cityweather.sunrise.time() < datetime.now().time() < cityweather.sunset.time():
-        chores.hourly_and_daily(filename=seed_check_gcs_filename)  # weather reporting, cpu checks, last img hourly seed check
+        chores.hourly_and_daily(filename=seed_check_gcs_filename)  # weather reporting, cpu checks, last img seed check
         motion_detect.detect()
         if motion_detect.motion:
             motioncnt += 1
@@ -106,7 +106,7 @@ def bird_detector(args):
             birds.set_colors()  # set new colors for this series of bounding boxes
             event_count += 1
             local_img_filename = os.getcwd() + '/assets/' + str(event_count % 10) + '.jpg'
-            # gcs_img_filename = f'{datetime.now().strftime("%Y-%m-%d-%H-%M-%S")}{str(event_count)}.jpg'  # ?? may be redundant
+            # gcs_img_filename = f'{datetime.now().strftime("%Y-%m-%d-%H-%M-%S")}{str(event_count)}.jpg'  # redundant
             first_img_jpg = birds.img  # keep first shot for animation and web
 
             # classify, grab labels, output census, send to web and terminal,
@@ -114,9 +114,8 @@ def bird_detector(args):
             if birds.classify(img=first_img_jpg) >= args.species_confidence:  # found a bird we can classify
                 first_rects, first_label, first_conf = birds.get_obj_data()  # grab data from this bird
                 max_index = birds.classified_confidences.index(max(birds.classified_confidences))
-                cname, _, _ = parse_species(birds.classified_labels[max_index])
                 gcs_img_filename = f'{datetime.now().strftime("%Y-%m-%d-%H-%M-%S")}{str(event_count)}' \
-                                   f'({cname}).jpg'
+                                   f'({common_name(birds.classified_labels[max_index])}).jpg'
                 output.message(message=f'Possible sighting of a {birds.classified_labels[max_index]} '
                                        f'{birds.classified_confidences[max_index] * 100:.1f}% at '
                                        f'{datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count,
@@ -144,9 +143,8 @@ def bird_detector(args):
                 # process tweets, jpg if not min number of frame, gif otherwise
                 waittime = birdpop.report_single_census_count(best_label) * args.tweetdelay / 10  # wait X min * N bird
                 waittime = args.tweetdelay if waittime >= args.tweetdelay else waittime
-                common_name, _, _ = parse_species(best_label)  # pull out common name from full species and sex
                 if (datetime.now() - last_tweet).total_seconds() >= waittime or bird_first_time_seen or \
-                        common_name in favorite_birds:
+                        common_name(best_label) in favorite_birds:
                     if animated:
                         output.message(message=f'Spotted {best_label} {best_confidence * 100:.1f}% '
                                                f'at {datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count,
@@ -185,7 +183,7 @@ def build_dict(label_dict, input_labels_list, conf_dict, input_confidences_list,
     return label_dict, conf_dict, weighted_dict
 
 
-# loop thru keys and remove census entries with 1 or zero observations
+# loop through keys and remove census entries with 1 or zero observations
 def remove_single_observations(census_dict, conf_dict):
     key_list = []
     [key_list.append(key) if census_dict[key] <= 1 else '' for key in census_dict]
@@ -225,11 +223,10 @@ def build_bird_animated_gif(args, motion_detect, birds, gcs_storage, event_count
         census_dict[max(confidence_dict, key=confidence_dict.get)]  # sum conf/bird cnt
     best_label = max(confidence_dict, key=confidence_dict.get)
     best_weighted_label = max(weighted_dict, key=weighted_dict.get)
-    cname, _, _ = parse_species(best_weighted_label)
     if frames_with_birds >= (args.minanimatedframes - 1):  # if bird is in min number of frames build gif
         gif, local_gif_filename = image_proc.save_gif(frames=labeled_frames[0:last_good_frame])
         gcs_gif_filename = f'{datetime.now().strftime("%Y-%m-%d-%H-%M-%S")}{str(event_count)}' \
-                           f'({cname}).gif'
+                           f'({common_name(best_weighted_label)}).gif'
         gcs_storage.send_file(name=gcs_gif_filename, file_loc_name=local_gif_filename)
         animated = True
 
@@ -243,27 +240,27 @@ def tweet_text(label, confidence):
     try:
         label = str(label[0]) if isinstance(label, list) else str(label)  # handle list or individual string
         confidence = float(confidence[0]) if isinstance(confidence, list) else float(confidence)  # list or float
-        cname, sname, sex = parse_species(str(label))
+        cname = common_name(str(label))
         hypername = cname.replace(' ', '_')
         hyperlink = f'https://www.allaboutbirds.org/guide/{hypername}/overview'
-        tweet_label = f'{sex} {cname} {confidence * 100:.1f}% {hyperlink}'
+        tweet_label = f'{cname} {confidence * 100:.1f}% {hyperlink}'
     except Exception as e:
         tweet_label = ''
         print(e)
     return tweet_label
 
 
-def parse_species(name):
-    cname, sname, sex = '', '', ''
+def common_name(name):
+    cname, sname = '', ''
     try:
         sname = str(name)
         sname = sname[sname.find(' ') + 1:] if sname.find(' ') >= 0 else sname  # remove index number
-        sex = sname[sname.find('[') + 1: sname.find(']')] if sname.find('[') >= 0 else ''  # retrieve sex
+        # sex = sname[sname.find('[') + 1: sname.find(']')] if sname.find('[') >= 0 else ''  # retrieve sex
         sname = sname[0: sname.find('[') - 1] if sname.find('[') >= 0 else sname  # remove sex
         cname = sname[sname.find('(') + 1: sname.find(')')] if sname.find('(') >= 0 else sname  # retrieve common name
     except Exception as e:
         print(e)
-    return cname, sname, sex
+    return cname
 
 
 # def best_confidence_and_label(census_dict, confidence_dict):
