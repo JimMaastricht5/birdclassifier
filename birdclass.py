@@ -106,7 +106,7 @@ def bird_detector(args):
             birds.set_colors()  # set new colors for this series of bounding boxes
             event_count += 1
             local_img_filename = os.getcwd() + '/assets/' + str(event_count % 10) + '.jpg'
-            gcs_img_filename = f'{datetime.now().strftime("%Y-%m-%d-%H-%M-%S")}{str(event_count)}.jpg'
+            # gcs_img_filename = f'{datetime.now().strftime("%Y-%m-%d-%H-%M-%S")}{str(event_count)}.jpg'  # ?? may be redundant
             first_img_jpg = birds.img  # keep first shot for animation and web
 
             # classify, grab labels, output census, send to web and terminal,
@@ -114,6 +114,9 @@ def bird_detector(args):
             if birds.classify(img=first_img_jpg) >= args.species_confidence:  # found a bird we can classify
                 first_rects, first_label, first_conf = birds.get_obj_data()  # grab data from this bird
                 max_index = birds.classified_confidences.index(max(birds.classified_confidences))
+                cname, _, _ = parse_species(birds.classified_labels[max_index])
+                gcs_img_filename = f'{datetime.now().strftime("%Y-%m-%d-%H-%M-%S")}{str(event_count)}' \
+                                   f'({cname}).jpg'
                 output.message(message=f'Possible sighting of a {birds.classified_labels[max_index]} '
                                        f'{birds.classified_confidences[max_index] * 100:.1f}% at '
                                        f'{datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count,
@@ -217,15 +220,19 @@ def build_bird_animated_gif(args, motion_detect, birds, gcs_storage, event_count
                                                                      confidence_dict, birds.classified_confidences,
                                                                      weighted_dict)
         labeled_frames.append(birds.add_boxes_and_labels(img=frame, use_last_known=True))  # use last label if unknown
-    if frames_with_birds >= (args.minanimatedframes - 1):  # if bird is in min number of frames build gif
-        gif, local_gif_filename = image_proc.save_gif(frames=labeled_frames[0:last_good_frame])
-        gcs_gif_filename = f'{datetime.now().strftime("%Y-%m-%d-%H-%M-%S")}{str(event_count)}.gif'
-        gcs_storage.send_file(name=gcs_gif_filename, file_loc_name=local_gif_filename)
-        animated = True
+
     best_confidence = confidence_dict[max(confidence_dict, key=confidence_dict.get)] / \
         census_dict[max(confidence_dict, key=confidence_dict.get)]  # sum conf/bird cnt
     best_label = max(confidence_dict, key=confidence_dict.get)
     best_weighted_label = max(weighted_dict, key=weighted_dict.get)
+    cname, _, _ = parse_species(best_weighted_label)
+    if frames_with_birds >= (args.minanimatedframes - 1):  # if bird is in min number of frames build gif
+        gif, local_gif_filename = image_proc.save_gif(frames=labeled_frames[0:last_good_frame])
+        gcs_gif_filename = f'{datetime.now().strftime("%Y-%m-%d-%H-%M-%S")}{str(event_count)}' \
+                           f'({cname}).gif'
+        gcs_storage.send_file(name=gcs_gif_filename, file_loc_name=local_gif_filename)
+        animated = True
+
     if best_label != best_weighted_label:
         print('--- Best label, confidence, and weight', best_label, best_confidence, best_weighted_label)
     return gif, local_gif_filename, gcs_gif_filename, animated, best_label, best_confidence, frames_with_birds
