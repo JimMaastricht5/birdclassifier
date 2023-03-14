@@ -226,7 +226,7 @@ def build_bird_animated_gif(args, motion_detect, birds, gcs_storage, event_count
     if frames_with_birds >= (args.minanimatedframes - 1):  # if bird is in min number of frames build gif
         gif, local_gif_filename = image_proc.save_gif(frames=labeled_frames[0:last_good_frame])
         gcs_gif_filename = f'{datetime.now().strftime("%Y-%m-%d-%H-%M-%S")}{str(event_count)}' \
-                           f'({common_name(best_weighted_label).replace(" ", "")}).gif'
+                           f'({common_name(best_weighted_label).replace(" ", "")}).gif'  # remove spaces from img name
         gcs_storage.send_file(name=gcs_gif_filename, file_loc_name=local_gif_filename)
         animated = True
 
