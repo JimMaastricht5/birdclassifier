@@ -115,7 +115,7 @@ def bird_detector(args):
                 first_rects, first_label, first_conf = birds.get_obj_data()  # grab data from this bird
                 max_index = birds.classified_confidences.index(max(birds.classified_confidences))
                 gcs_img_filename = f'{datetime.now().strftime("%Y-%m-%d-%H-%M-%S")}{str(event_count)}' \
-                                   f'({common_name(birds.classified_labels[max_index])}).jpg'
+                                   f'({common_name(birds.classified_labels[max_index]).replace(" ", "")}).jpg'
                 output.message(message=f'Possible sighting of a {birds.classified_labels[max_index]} '
                                        f'{birds.classified_confidences[max_index] * 100:.1f}% at '
                                        f'{datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count,
@@ -226,7 +226,7 @@ def build_bird_animated_gif(args, motion_detect, birds, gcs_storage, event_count
     if frames_with_birds >= (args.minanimatedframes - 1):  # if bird is in min number of frames build gif
         gif, local_gif_filename = image_proc.save_gif(frames=labeled_frames[0:last_good_frame])
         gcs_gif_filename = f'{datetime.now().strftime("%Y-%m-%d-%H-%M-%S")}{str(event_count)}' \
-                           f'({common_name(best_weighted_label)}).gif'
+                           f'({common_name(best_weighted_label).replace(" ", "")}).gif'
         gcs_storage.send_file(name=gcs_gif_filename, file_loc_name=local_gif_filename)
         animated = True
 
