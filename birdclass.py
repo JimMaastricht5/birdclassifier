@@ -38,7 +38,7 @@ import population  # population census object, tracks species total seen and las
 import dailychores  # handle tasks that occur once per day or per hour
 import weather
 import output_stream
-import argparse  # argument parser
+import argparse, configparser  # argument parser
 from datetime import datetime
 from collections import defaultdict
 import os
@@ -284,6 +284,8 @@ def common_name(name):
 if __name__ == "__main__":
     # construct the argument parser and parse the arguments
     ap = argparse.ArgumentParser()
+    ap.add_argument("-c", "--config_file", type=str, help='Config file')
+    ap.add_argument('-f', '--foo', type=int, default=5, help='Foo Number. Default: 5')
 
     # camera settings
     ap.add_argument("-fc", "--flipcamera", type=bool, default=False, help="flip camera image")
@@ -326,5 +328,14 @@ if __name__ == "__main__":
                     help='feeder id default MAC address')
     ap.add_argument('-t', "--feeder_max_temp_c", type=int, default=86, help="Max operating temp for the feeder in C")
 
-    arguments = ap.parse_args()
-    bird_detector(arguments)
+    args = ap.parse_args()
+
+    if args.config_file:
+        config = configparser.ConfigParser()
+        config.read(args.config_file)
+        defaults = {}
+        defaults.update(dict(config.items()))
+        ap.set_defaults(**defaults)
+        args = ap.parse_args()  # Overwrite arguments with config file
+
+    bird_detector(args)
