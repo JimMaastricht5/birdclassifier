@@ -298,9 +298,9 @@ if __name__ == "__main__":
                     help="Wait time between tweets is N species seen * delay/10 with not to exceed max of tweet delay")
 
     # motion and image processing settings, note adjustments are used as both a detector second prediction and a final
-    # adjustment to the output images.
+    # adjustment to the output images.  # 1 no chg,< 1 -, > 1 +
     ap.add_argument("-is", "--iso", type=int, default=800, help="iso camera sensitivity. higher requires less light")
-    ap.add_argument("-b", "--brightness_chg", type=int, default=1.0, help="brightness boost")  # 1 no chg,< 1 -, > 1 +
+    ap.add_argument("-b", "--brightness_chg", type=int, default=1.2, help="brightness boost twilight")
     ap.add_argument("-c", "--contrast_chg", type=float, default=1.0, help="contrast boost")  # 1 no chg,< 1 -, > 1 +
     ap.add_argument("-cl", "--color_chg", type=float, default=1.0, help="color boost")  # 1 no chg,< 1 -, > 1 +
     ap.add_argument("-sp", "--sharpness_chg", type=float, default=1.0, help="sharpeness")  # 1 no chg,< 1 -, > 1 +
