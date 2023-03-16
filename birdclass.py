@@ -285,7 +285,7 @@ if __name__ == "__main__":
     # construct the argument parser and parse the arguments
     # load settings from config file to allow for simple override
     ap = argparse.ArgumentParser()
-    ap.add_argument("-c", "--config_file", type=str, help='Config file')
+    ap.add_argument("-cf", "--config_file", type=str, help='Config file')
 
     # camera settings
     ap.add_argument("-fc", "--flipcamera", type=bool, default=False, help="flip camera image")
