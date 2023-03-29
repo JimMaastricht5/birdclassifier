@@ -38,12 +38,14 @@ import population  # population census object, tracks species total seen and las
 import dailychores  # handle tasks that occur once per day or per hour
 import weather
 import output_stream
-import argparse, configparser  # argument parser
+import argparse  # argument parser
+import configparser  # read args from ini file
 from datetime import datetime
-from collections import defaultdict
+# from collections import defaultdict
 import os
 import uuid
 import gcs  # save objects to website for viewing
+import animate_gif  # animate gif class
 
 
 # default dictionary returns a tuple of zero confidence and zero bird count
@@ -60,9 +62,8 @@ def bird_detector(args):
     motioncnt, event_count, gcs_img_filename, seed_check_gcs_filename = 0, 0, '', ''
     curr_day, curr_hr, last_tweet = datetime.now().day, datetime.now().hour, datetime(2021, 1, 1, 0, 0, 0)
 
-    # while loop below processes from sunrise to sunset.  The python program runs in a bash loop
-    # that restarts itself after downloading a new version of this software
-    # we want to wait to enter that main while loop until sunrise
+    # while loop below processes from sunrise to sunset.  The python program needs to be restarted daily
+    # wait to enter that main while loop until sunrise
     cityweather = weather.CityWeather(city=args.city, units='Imperial', iscloudy=60)  # init class and set vars
     output.message(message=f'Now: {datetime.now()}.  \nSunrise: {cityweather.sunrise} Sunset: {cityweather.sunset}.',
                    msg_type='weather')
@@ -93,6 +94,11 @@ def bird_detector(args):
     output.message(f'Using threshold file: {birds.thresholds}')
     output.message(f'Using classifier file: {birds.classifier_file}')
     output.message('Starting while loop until sun set..... ')
+
+    bird_gif = animate_gif.BirdGif(motion_detector_cls=motion_detect, birds_cls=birds,
+                                   gcs_storage_cls=gcs_storage, brightness_chg=args.brightness_chg,
+                                   min_animated_frames=args.minanimatedframes)
+
     # loop while the sun is up, look for motion, detect birds, determine species
     while cityweather.sunrise.time() < datetime.now().time() < cityweather.sunset.time():
         chores.hourly_and_daily(filename=seed_check_gcs_filename)  # weather reporting, cpu checks, last img seed check
@@ -126,12 +132,11 @@ def bird_detector(args):
                     else image_proc.enhance_brightness(img=first_img_jpg, factor=args.brightness_chg)
                 first_img_jpg_no_label = first_img_jpg.copy()
                 # create animation: unlabeled first image is passed to gif function, bare copy is annotated later
-                gif, local_gif_filename, gcs_gif_filename, animated, best_label, best_confidence, frames_with_birds = \
-                    build_bird_animated_gif(args, motion_detect, birds, gcs_storage, event_count, first_img_jpg)
+                _gif = bird_gif.build_gif(event_count, first_img_jpg)
 
                 # annotate bare image copy, use either best gif label or org data
-                best_first_label = convert_to_list(best_label if best_label != '' else first_label)
-                best_first_conf = convert_to_list(best_confidence if best_confidence > 0 else first_conf)
+                best_first_label = convert_to_list(bird_gif.best_label if bird_gif.best_label != '' else first_label)
+                best_first_conf = convert_to_list(bird_gif.best_confidence if bird_gif.best_confidence > 0 else first_conf)
                 bird_first_time_seen = birdpop.visitors(best_first_label, datetime.now())  # increment species count
                 birds.set_ojb_data(classified_rects=first_rects, classified_labels=best_first_label,
                                    classified_confidences=best_first_conf)  # set to first bird
@@ -140,21 +145,22 @@ def bird_detector(args):
                 gcs_storage.send_file(name=gcs_img_filename, file_loc_name=local_img_filename)
                 seed_check_gcs_filename = gcs_img_filename  # reference to use for hourly seed check
 
-                # process tweets, jpg if not min number of frame, gif otherwise
-                waittime = birdpop.report_single_census_count(best_label) * args.tweetdelay / 10  # wait X min * N bird
+                # process tweets, jpg if not min number of frame, gif otherwise.  wait X min * N bird before tweeting
+                waittime = birdpop.report_single_census_count(bird_gif.best_label) * args.tweetdelay / 10
                 waittime = args.tweetdelay if waittime >= args.tweetdelay else waittime
                 if (datetime.now() - last_tweet).total_seconds() >= waittime or bird_first_time_seen or \
-                        common_name(best_label) in favorite_birds:
-                    if animated:
-                        output.message(message=f'Spotted {best_label} {best_confidence * 100:.1f}% '
+                        common_name(bird_gif.best_label) in favorite_birds:
+                    if bird_gif.animated:
+                        output.message(message=f'Spotted {bird_gif.best_label} {bird_gif.best_confidence * 100:.1f}% '
                                                f'at {datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count,
-                                       msg_type='spotted', image_name=gcs_gif_filename, flush=True)
-                        if bird_tweeter.post_image_from_file(tweet_text(best_label, best_confidence),
-                                                             local_gif_filename):
+                                       msg_type='spotted', image_name=bird_gif.gcs_gif_filename, flush=True)
+                        if bird_tweeter.post_image_from_file(tweet_text(bird_gif.best_label, bird_gif.best_confidence),
+                                                             bird_gif.local_gif_filename):
                             last_tweet = datetime.now()  # update last tweet time if successful gif posting, ignore fail
                     else:
-                        output.message(message=f'Uncertain about a {best_label} {best_confidence * 100:.1f}% '
-                                               f' with {frames_with_birds} frames with birds '
+                        output.message(message=f'Uncertain about a {bird_gif.best_label} '
+                                               f'{bird_gif.best_confidence * 100:.1f}% '
+                                               f' with {bird_gif.frames_with_birds} frames with birds '
                                                f'at {datetime.now().strftime("%I:%M:%S %P")}',
                                                msg_type='inconclusive', event_num=event_count)
 
@@ -173,66 +179,66 @@ def convert_to_list(input_str_list):
 # should be passing default dictionary
 # keeps track of count in label_dict (census) and confidences totals in conf_dict
 # weighted dict is confidence total * (count-1) to weight away from low # of occurrences
-def build_dict(label_dict, input_labels_list, conf_dict, input_confidences_list, weighted_dict):
-    labels_list = convert_to_list(input_labels_list)
-    confidences_list = convert_to_list(input_confidences_list)
-    for ii, label in enumerate(labels_list):
-        label_dict[label] += 1
-        conf_dict[label] += confidences_list[ii]
-        weighted_dict[label] = (label_dict[label] - 1) * conf_dict[label]
-    return label_dict, conf_dict, weighted_dict
+# def build_dict(label_dict, input_labels_list, conf_dict, input_confidences_list, weighted_dict):
+#     labels_list = convert_to_list(input_labels_list)
+#     confidences_list = convert_to_list(input_confidences_list)
+#     for ii, label in enumerate(labels_list):
+#         label_dict[label] += 1
+#         conf_dict[label] += confidences_list[ii]
+#         weighted_dict[label] = (label_dict[label] - 1) * conf_dict[label]
+#     return label_dict, conf_dict, weighted_dict
 
 
 # loop through keys and remove census entries with 1 or zero observations
-def remove_single_observations(census_dict, conf_dict):
-    key_list = []
-    [key_list.append(key) if census_dict[key] <= 1 else '' for key in census_dict]
-    [census_dict.pop(key) for key in key_list]
-    [conf_dict.pop(key) for key in key_list]
-    return census_dict, conf_dict
+# def remove_single_observations(census_dict, conf_dict):
+#     key_list = []
+#     [key_list.append(key) if census_dict[key] <= 1 else '' for key in census_dict]
+#     [census_dict.pop(key) for key in key_list]
+#     [conf_dict.pop(key) for key in key_list]
+#     return census_dict, conf_dict
 
 
-def build_bird_animated_gif(args, motion_detect, birds, gcs_storage, event_count, first_img_jpg):
-    # grab a stream of pictures, add first pic from above, and build animated gif
-    # return gif, filename, animated boolean, and best label as the max of all confidences
-    local_gif_filename, gcs_gif_filename, best_label, best_confidence, labeled_frames = '', '', '', 0, []
-    animated = False  # set to true if min # of frames captured with birds
-    gif = first_img_jpg  # set a default if animated = False
-    last_good_frame = 0  # find last frame that has a bird, index zero is good based on first image
-    frames_with_birds = 1  # count of frames with birds, set to 1 for first img
-    census_dict = defaultdict(default_value)  # track all results and pick best confidence
-    confidence_dict = defaultdict(default_value)  # track all results and pick best confidence
-    weighted_dict = defaultdict(default_value)  # conf * (count -1) to put emphasis on # of observations
-    census_dict, confidence_dict, weighted_dict = build_dict(census_dict, birds.classified_labels, confidence_dict,
-                                                             birds.classified_confidences, weighted_dict)
-    frames = motion_detect.capture_stream()  # capture a list of images
-    first_img_jpg = birds.add_boxes_and_labels(img=first_img_jpg)
-    labeled_frames.insert(0, image_proc.convert_image(img=first_img_jpg, target='gif'))  # isrt 1st img
-    for i, frame in enumerate(frames):
-        frame = image_proc.enhance_brightness(img=frame, factor=args.brightness_chg)
-        if birds.detect(img=frame):  # find bird object in frame and set rectangles containing object
-            if birds.classify(img=frame, use_confidence_threshold=False) > 0:   # classify at rectangle & chk confidence
-                frames_with_birds += 1
-                last_good_frame = i + 1  # found a bird, add one to last good frame to account for insert of 1st image
-            census_dict, confidence_dict, weighted_dict = build_dict(census_dict, birds.classified_labels,
-                                                                     confidence_dict, birds.classified_confidences,
-                                                                     weighted_dict)
-        labeled_frames.append(birds.add_boxes_and_labels(img=frame, use_last_known=True))  # use last label if unknown
-
-    best_confidence = confidence_dict[max(confidence_dict, key=confidence_dict.get)] / \
-        census_dict[max(confidence_dict, key=confidence_dict.get)]  # sum conf/bird cnt
-    best_label = max(confidence_dict, key=confidence_dict.get)
-    best_weighted_label = max(weighted_dict, key=weighted_dict.get)
-    if frames_with_birds >= (args.minanimatedframes - 1):  # if bird is in min number of frames build gif
-        gif, local_gif_filename = image_proc.save_gif(frames=labeled_frames[0:last_good_frame])
-        gcs_gif_filename = f'{datetime.now().strftime("%Y-%m-%d-%H-%M-%S")}{str(event_count)}' \
-                           f'({common_name(best_weighted_label).replace(" ", "")}).gif'  # remove spaces from img name
-        gcs_storage.send_file(name=gcs_gif_filename, file_loc_name=local_gif_filename)
-        animated = True
-
-    if best_label != best_weighted_label:
-        print('--- Best label, confidence, and weight', best_label, best_confidence, best_weighted_label)
-    return gif, local_gif_filename, gcs_gif_filename, animated, best_label, best_confidence, frames_with_birds
+# def build_bird_animated_gif(args, motion_detect, birds, gcs_storage, event_count, first_img_jpg):
+#     # grab a stream of pictures, add first pic from above, and build animated gif
+#     # return gif, filename, animated boolean, and best label as the max of all confidences
+#     local_gif_filename, gcs_gif_filename, best_label, best_confidence, labeled_frames = '', '', '', 0, []
+#     animated = False  # set to true if min # of frames captured with birds
+#     gif = first_img_jpg  # set a default if animated = False
+#     last_good_frame = 0  # find last frame that has a bird, index zero is good based on first image
+#     frames_with_birds = 1  # count of frames with birds, set to 1 for first img
+#     census_dict = defaultdict(default_value)  # track all results and pick best confidence
+#     confidence_dict = defaultdict(default_value)  # track all results and pick best confidence
+#     weighted_dict = defaultdict(default_value)  # conf * (count -1) to put emphasis on # of observations
+#     census_dict, confidence_dict, weighted_dict = build_dict(census_dict, birds.classified_labels, confidence_dict,
+#                                                              birds.classified_confidences, weighted_dict)
+#     frames = motion_detect.capture_stream()  # capture a list of images
+#     first_img_jpg = birds.add_boxes_and_labels(img=first_img_jpg)
+#     labeled_frames.insert(0, image_proc.convert_image(img=first_img_jpg, target='gif'))  # isrt 1st img
+#     for i, frame in enumerate(frames):
+#         frame = image_proc.enhance_brightness(img=frame, factor=args.brightness_chg)
+#         if birds.detect(img=frame):  # find bird object in frame and set rectangles containing object
+#             if birds.classify(img=frame, use_confidence_threshold=False) > 0:   # classify at rectangle & chk conf
+#                 frames_with_birds += 1
+#                 last_good_frame = i + 1  # found a bird, add one to last good frame to account for insert of 1st image
+#             census_dict, confidence_dict, weighted_dict = build_dict(census_dict, birds.classified_labels,
+#                                                                      confidence_dict, birds.classified_confidences,
+#                                                                      weighted_dict)
+#         labeled_frames.append(birds.add_boxes_and_labels(img=frame, use_last_known=True))  # use last label if unknown
+#
+#     best_confidence = confidence_dict[max(confidence_dict, key=confidence_dict.get)] / \
+#         census_dict[max(confidence_dict, key=confidence_dict.get)]  # sum conf/bird cnt
+#     best_label = max(confidence_dict, key=confidence_dict.get)
+#     best_weighted_label = max(weighted_dict, key=weighted_dict.get)
+#     if frames_with_birds >= (args.minanimatedframes - 1):  # if bird is in min number of frames build gif
+#         gif, local_gif_filename = image_proc.save_gif(frames=labeled_frames[0:last_good_frame])
+#         gcs_gif_filename = f'{datetime.now().strftime("%Y-%m-%d-%H-%M-%S")}{str(event_count)}' \
+#                            f'({common_name(best_weighted_label).replace(" ", "")}).gif'  # remove spaces from img name
+#         gcs_storage.send_file(name=gcs_gif_filename, file_loc_name=local_gif_filename)
+#         animated = True
+#
+#     if best_label != best_weighted_label:
+#         print('--- Best label, confidence, and weight', best_label, best_confidence, best_weighted_label)
+#     return gif, local_gif_filename, gcs_gif_filename, animated, best_label, best_confidence, frames_with_birds
 
 
 def tweet_text(label, confidence):
@@ -261,24 +267,6 @@ def common_name(name):
     except Exception as e:
         print(e)
     return cname
-
-
-# def best_confidence_and_label(census_dict, confidence_dict):
-#     best_confidence, best_confidence_label, best_census, best_census_label = 0, '', 0, ''
-#     try:
-#         census_dict, confidence_dict = remove_single_observations(census_dict, confidence_dict)  # multishots results
-#         best_confidence = confidence_dict[max(confidence_dict, key=confidence_dict.get)] / \
-#             census_dict[max(confidence_dict, key=confidence_dict.get)]  # sum conf/bird cnt
-#         best_confidence_label = max(confidence_dict, key=confidence_dict.get)
-#         best_census = census_dict[max(census_dict, key=census_dict.get)]
-#         best_census_label = max(census_dict, key=census_dict.get)
-#     except Exception as e:
-#         print(e)
-#     # print('best confidence:', best_confidence, best_confidence_label)
-#     # print('best census:', best_census, best_census_label)
-#     # if best_confidence_label != best_census_label:
-#     #  what to do here?  Which one is better?  High count or high confidence?
-#     return best_confidence, best_confidence_label, best_census, best_census_label
 
 
 if __name__ == "__main__":
@@ -328,14 +316,14 @@ if __name__ == "__main__":
                     help='feeder id default MAC address')
     ap.add_argument('-t', "--feeder_max_temp_c", type=int, default=86, help="Max operating temp for the feeder in C")
 
-    args = ap.parse_args()
+    arguments = ap.parse_args()
 
-    if args.config_file:
+    if arguments.config_file:
         config = configparser.ConfigParser()
-        config.read(args.config_file)
+        config.read(arguments.config_file)
         defaults = {}
         defaults.update(dict(config.items()))
         ap.set_defaults(**defaults)
-        args = ap.parse_args()  # Overwrite arguments with config file
+        arguments = ap.parse_args()  # Overwrite arguments with config file
 
-    bird_detector(args)
+    bird_detector(arguments)
