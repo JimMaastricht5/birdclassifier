@@ -27,8 +27,8 @@
 # reinvoke the app
 import pandas as pd
 from google.cloud import storage
-from PIL import Image
-from io import BytesIO
+from PIL import Image  # Pillow
+from io import BytesIO  # built-in package
 from auth import (
     google_json_key
 )
