@@ -39,6 +39,7 @@ class Storage:
         # connect to temp bucket for public send
         self.project = project
         self.storage_client = storage.Client.from_service_account_json(json_credentials_path=google_json_key)
+        # self.storage_client = storage.Client()  # for cloud function, auth and json key not needed!
         self.bucket = self.storage_client.bucket(bucket_name)
         self.bucket_name = bucket_name
 
