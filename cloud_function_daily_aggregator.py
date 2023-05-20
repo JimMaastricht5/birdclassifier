@@ -25,7 +25,7 @@ from datetime import timedelta
 import pytz
 import urllib.request
 from urllib.error import HTTPError
-import gcs  # googe cloud storage utils
+import gcs  # google cloud storage utils
 
 
 def build_common_name(df, target_col):
@@ -76,16 +76,17 @@ def append_to_daily_history(gcs_storage, url_prefix, df):
         df_daily_history = df_daily_history.drop(['Unnamed: 0'], axis='columns')
         df_new_daily_history = pd.concat([df_daily_history, df])
         print(df_new_daily_history)
-        gcs_storage.send_df(df_new_daily_history, 'daily_history.csv')
-        gcs_storage.send_df(df_new_daily_history, 'daily_history99.csv')
+        gcs_storage.send_df(df_new_daily_history, 'daily_history.csv')  # no overwrite permission for local testing
+        # gcs_storage.send_df(df_new_daily_history, 'daily_history99.csv')
     except urllib.error.URLError as e:
         print(f'no daily history found')
         print(e)
-        gcs_storage.send_df(df, 'daily_history30.csv')
+        gcs_storage.send_df(df, 'daily_history.csv')
     return
 
 
 def main():
+# def main(event, context):
     url_prefix = 'https://storage.googleapis.com/tweeterssp-web-site-contents/'
     dates = []
     tz = pytz.timezone("America/Chicago")  # localize time to current madison wi cst bird feeder
