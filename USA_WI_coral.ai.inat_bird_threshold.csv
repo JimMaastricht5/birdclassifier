@@ -154,7 +154,7 @@
 153 Geothlypis trichas (Common Yellowthroat),-1
 154 Trogon melanocephalus (Black-headed Trogon),-1
 155 Sylvia communis (Greater Whitethroat),-1
-156 Pinicola enucleator (Pine Grosbeak),0
+156 Pinicola enucleator (Pine Grosbeak),-1
 157 Coccothraustes vespertinus (Evening Grosbeak),0
 158 Coccothraustes coccothraustes (Hawfinch),-1
 159 Vermivora chrysoptera (Golden-winged Warbler),-1
@@ -300,7 +300,7 @@
 299 Pica hudsonia (Black-billed Magpie),-1
 300 Corvus cornix (Hooded Crow),-1
 301 Myiopsitta monachus (Monk Parakeet),-1
-302 Streptopelia decaocto (Eurasian Collared-Dove),0
+302 Streptopelia decaocto (Eurasian Collared-Dove),-1
 303 Piranga ludoviciana (Western Tanager),-1
 304 Ixobrychus exilis (Least Bittern),-1
 305 Auriparus flaviceps (Verdin),-1
@@ -360,7 +360,7 @@
 359 Eudocimus albus (White Ibis),-1
 360 Plegadis falcinellus (Glossy Ibis),-1
 361 Plegadis chihi (White-faced Ibis),-1
-362 Corvus corax (Common Raven),0
+362 Corvus corax (Common Raven),-1
 363 Stelgidopteryx serripennis (Northern Rough-winged Swallow),-1
 364 Sula dactylatra (Masked Booby),-1
 365 Sula sula (Red-footed Booby),-1
