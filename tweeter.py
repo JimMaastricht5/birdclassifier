@@ -28,7 +28,8 @@ from auth import (
     api_key,
     api_secret_key,
     access_token,
-    access_token_secret
+    access_token_secret,
+    bearer_token
 )
 
 
@@ -44,9 +45,11 @@ class TweeterClass:
 
     # initialize twitter connection and login
     def init(self, consumer_key, consumer_secret, access_token, access_token_secret):
-        auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
-        auth.set_access_token(access_token, access_token_secret)
-        api = tweepy.API(auth)
+        # auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+        # auth.set_access_token(access_token, access_token_secret)
+        # api = tweepy.API(auth)
+        api = tweepy.Client(bearer_token=bearer_token, consumer_key=consumer_key, consumer_secret=consumer_secret,
+                            access_token=access_token, access_token_secret=access_token_secret)
         return api
 
     # reset hourly tweet count if new hour
@@ -62,7 +65,8 @@ class TweeterClass:
         if self.tweetcnt < self.tweetmax_per_hour:
             self.tweetcnt += 1
             try:
-                self.twitter.update_status(status=message)
+                # self.twitter.update_status(status=message)
+                self.twitter.create_tweet(text=message)
                 print(message)
                 self.tweeted = True
             except Exception as e:
@@ -71,6 +75,23 @@ class TweeterClass:
         else:
             self.tweeted = False
         return
+
+    def post_image_url(self, message, url):
+        self.check_hour()
+        if self.tweetcnt < self.tweetmax_per_hour:
+            try:
+                # media = self.twitter.media_upload(filename=file_name)
+                # self.twitter.update_status(status=message, media_ids=[media.media_id])
+                self.twitter.create_tweet(text=url + ' ' + message)
+                print(message)
+                self.tweetcnt += 1
+                self.tweeted = True
+            except Exception as e:
+                print(e)
+                self.tweeted = False
+        else:
+            self.tweeted = False
+        return self.tweeted
 
     # set status and add an image
     def post_image_from_file(self, message, file_name):
@@ -93,7 +114,7 @@ class TweeterClass:
         self.check_hour()
         if self.tweetcnt < self.tweetmax_per_hour:
             try:
-                img.save(file_name)
+                # img.save(file_name)
                 # response = self.twitter.upload_media(media=img)  # doesn't work!
                 # media = self.twitter.media_upload(filename=file_name, file=img)  # doesn't work
                 media = self.twitter.media_upload(filename=file_name)
@@ -108,12 +129,12 @@ class TweeterClass:
         return self.tweeted
 
     # get direct messages, returns numpy array with x, 2 shape
-    def get_direct_messages(self):
-        dm_array = []
-        direct_messages = self.twitter.get_direct_messages()  # returns json
-        for dm in direct_messages['events']:  # unpack json and build list
-            dm_array.append((dm['id'], dm['message_create']['message_data']['text']))  # insert row of 2 columns
-        return np.array(dm_array)
+    # def get_direct_messages(self):
+    #     dm_array = []
+    #     direct_messages = self.twitter.get_direct_messages()  # returns json
+    #     for dm in direct_messages['events']:  # unpack json and build list
+    #         dm_array.append((dm['id'], dm['message_create']['message_data']['text']))  # insert row of 2 columns
+    #     return np.array(dm_array)
 
     # destroy all direct messages, takes numpy array with id and text
     # def destroy_direct_messages(self, direct_messages):
@@ -123,12 +144,8 @@ class TweeterClass:
 
 
 # test code
-# def main_test():
-#     tweeter_obj = TweeterClass()
-    # direct_messages = tweeter_obj.get_direct_messages()
-    # print(direct_messages)
-    # print(direct_messages.shape)
-    # tweeter_obj.destroy_direct_messages(direct_messages)
+def main_test():
+    tweeter_obj = TweeterClass()
 
     # test code to tweet a message
     # message = 'Python status'
@@ -136,11 +153,12 @@ class TweeterClass:
     # print('tweeted: %s' % message)
 
     # test code to tweet a picture
-    # message = 'Python image test'
+    message = 'Python image test'
+    url = 'https://storage.googleapis.com/tweeterssp-web-site-contents/2023-05-19-08-04-37167(CommonGrackle).jpg'
     # twtimage = open('cardinal.jpg', 'rb')
-    # tweeter_obj.post_image(message, twtimage)
-    # print('tweeted: %s' % message)
+    tweeter_obj.post_image_url(message, url)
+    print('tweeted: %s' % message)
 
 
-# if __name__ == "__main__":
-#     main_test()
+if __name__ == "__main__":
+    main_test()
