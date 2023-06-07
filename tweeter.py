@@ -148,16 +148,16 @@ def main_test():
     tweeter_obj = TweeterClass()
 
     # test code to tweet a message
-    # message = 'Python status'
-    # tweeter_obj.post_status(message)
-    # print('tweeted: %s' % message)
+    message = 'Python status'
+    tweeter_obj.post_status(message)
+    print('tweeted: %s' % message)
 
     # test code to tweet a picture
-    message = 'Python image test'
-    url = 'https://storage.googleapis.com/tweeterssp-web-site-contents/2023-05-19-08-04-37167(CommonGrackle).jpg'
-    # twtimage = open('cardinal.jpg', 'rb')
-    tweeter_obj.post_image_url(message, url)
-    print('tweeted: %s' % message)
+    # message = 'Python image test'
+    # url = 'https://storage.googleapis.com/tweeterssp-web-site-contents/2023-05-19-08-04-37167(CommonGrackle).jpg'
+    # # twtimage = open('cardinal.jpg', 'rb')
+    # tweeter_obj.post_image_url(message, url)
+    # print('tweeted: %s' % message)
 
 
 if __name__ == "__main__":

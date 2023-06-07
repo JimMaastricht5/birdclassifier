@@ -27,6 +27,7 @@
 from datetime import datetime
 from gpiozero import CPUTemperature
 from subprocess import call
+import subprocess
 
 
 # find common / short name in species label
@@ -64,9 +65,10 @@ class DailyChores:
         try:
             if int(cpu.temperature) >= self.maxcpu_c_temp:  # limit is 85 C
                 self.tweeter.post_status(f'***shut down. temp: {cpu.temperature}')
-                call("sudo shutdown -poweroff")
+                subprocess.call(["shutdown", "-s", "now"])
+                # call("sudo shutdown -poweroff")
         except Exception as e:
-            self.output_func('Error in temp shutdown protection:', e)
+            self.output_func(f'Error in temp shutdown protection: {e}')
             pass  # uncharted territory....
         return
 
