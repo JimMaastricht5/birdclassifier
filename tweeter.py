@@ -21,6 +21,9 @@
 # SOFTWARE.
 # auth.py must be located in project; protect this file as it contains keys
 # code by JimMaastricht5@gmail.com
+import requests
+import base64
+import json
 import tweepy
 import numpy as np
 from datetime import datetime
@@ -29,7 +32,9 @@ from auth import (
     api_secret_key,
     access_token,
     access_token_secret,
-    bearer_token
+    bearer_token,
+    client_id,
+    client_secret
 )
 
 
@@ -47,9 +52,9 @@ class TweeterClass:
     def init(self, consumer_key, consumer_secret, access_token, access_token_secret):
         # auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
         # auth.set_access_token(access_token, access_token_secret)
-        # api = tweepy.API(auth)
+        # api = tweepy.API(auth)  # api v1
         api = tweepy.Client(bearer_token=bearer_token, consumer_key=consumer_key, consumer_secret=consumer_secret,
-                            access_token=access_token, access_token_secret=access_token_secret)
+                            access_token=access_token, access_token_secret=access_token_secret)  # api v2
         return api
 
     # reset hourly tweet count if new hour
@@ -95,38 +100,83 @@ class TweeterClass:
 
     # set status and add an image
     def post_image_from_file(self, message, file_name):
-        self.check_hour()
-        if self.tweetcnt < self.tweetmax_per_hour:
-            try:
-                media = self.twitter.media_upload(filename=file_name)
-                self.twitter.update_status(status=message, media_ids=[media.media_id])
-                self.tweetcnt += 1
-                self.tweeted = True
-            except Exception as e:
-                print(e)
-                self.tweeted = False
-        else:
-            self.tweeted = False
-        return self.tweeted
+        # Read the media file as binary data
+        with open(file_name, 'rb') as file:
+            media_data = file.read()
 
-    # set status and add an image
-    def post_image(self, message, img, file_name):
-        self.check_hour()
-        if self.tweetcnt < self.tweetmax_per_hour:
-            try:
-                # img.save(file_name)
-                # response = self.twitter.upload_media(media=img)  # doesn't work!
-                # media = self.twitter.media_upload(filename=file_name, file=img)  # doesn't work
-                media = self.twitter.media_upload(filename=file_name)
-                self.twitter.update_status(status=message, media_ids=[media.media_id])
-                self.tweetcnt += 1
-                self.tweeted = True
-            except Exception as e:
-                print(e)
-                self.tweeted = False
+        # Base64 encode the media file
+        base64_media = base64.b64encode(media_data)
+
+        # Make the POST request to upload the media
+        upload_url = 'https://upload.twitter.com/1.1/media/upload.json'
+        headers = {
+            'Authorization': f'Bearer {bearer_token}',
+            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+        }
+        data = {
+            'media_data': base64_media.decode('utf-8')
+        }
+        response = requests.post(upload_url, headers=headers, data=data)
+        print(response)
+        response_data = json.loads(response.text)
+
+        # Get the media ID from the response
+        media_id = response_data['media_id']
+
+        # Create a tweet with the uploaded media
+        tweet_text = message
+        tweet_url = 'https://api.twitter.com/1.1/statuses/update.json'
+        headers = {
+            'Authorization': f'Bearer {bearer_token}',
+            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+        }
+        data = {
+            'status': tweet_text,
+            'media_ids': media_id
+        }
+        response = requests.post(tweet_url, headers=headers, data=data)
+
+        # Check the response status
+        if response.status_code == 200:
+            print('Tweet successfully posted.')
         else:
-            self.tweeted = False
-        return self.tweeted
+            print('Error posting tweet:', response.text)
+        return
+
+    # api v1 code
+    # def post_image_from_file(self, message, file_name):
+    #     self.check_hour()
+    #     if self.tweetcnt < self.tweetmax_per_hour:
+    #         try:
+    #             media = self.twitter.media_upload(filename=file_name)
+    #             self.twitter.update_status(status=message, media_ids=[media.media_id])
+    #             self.tweetcnt += 1
+    #             self.tweeted = True
+    #         except Exception as e:
+    #             print(e)
+    #             self.tweeted = False
+    #     else:
+    #         self.tweeted = False
+    #     return self.tweeted
+    #
+    # # set status and add an image
+    # def post_image(self, message, img, file_name):
+    #     self.check_hour()
+    #     if self.tweetcnt < self.tweetmax_per_hour:
+    #         try:
+    #             # img.save(file_name)
+    #             # response = self.twitter.upload_media(media=img)  # doesn't work!
+    #             # media = self.twitter.media_upload(filename=file_name, file=img)  # doesn't work
+    #             media = self.twitter.media_upload(filename=file_name)
+    #             self.twitter.update_status(status=message, media_ids=[media.media_id])
+    #             self.tweetcnt += 1
+    #             self.tweeted = True
+    #         except Exception as e:
+    #             print(e)
+    #             self.tweeted = False
+    #     else:
+    #         self.tweeted = False
+    #     return self.tweeted
 
     # get direct messages, returns numpy array with x, 2 shape
     # def get_direct_messages(self):
@@ -148,15 +198,16 @@ def main_test():
     tweeter_obj = TweeterClass()
 
     # test code to tweet a message
-    # message = 'Python status'
-    # tweeter_obj.post_status(message)
-    # print('tweeted: %s' % message)
+    message = 'Python status'
+    tweeter_obj.post_status(message)
+    print('tweeted: %s' % message)
 
     # test code to tweet a picture
     message = 'Python image test'
     url = 'https://storage.googleapis.com/tweeterssp-web-site-contents/2023-05-19-08-04-37167(CommonGrackle).jpg'
     # twtimage = open('cardinal.jpg', 'rb')
-    tweeter_obj.post_image_url(message, url)
+    # tweeter_obj.post_image_url(message, url)
+    tweeter_obj.post_image_from_file(message='test', file_name='cardinal.jpg')
     print('tweeted: %s' % message)
 
 

@@ -26,7 +26,8 @@
 # import weather
 from datetime import datetime
 from gpiozero import CPUTemperature
-from subprocess import call
+import time
+# from subprocess import call
 
 
 # find common / short name in species label
@@ -63,8 +64,10 @@ class DailyChores:
                          f' {(cpu.temperature * 9 / 5) + 32:.1f}F')
         try:
             if int(cpu.temperature) >= self.maxcpu_c_temp:  # limit is 85 C
-                self.tweeter.post_status(f'***shut down. temp: {cpu.temperature}')
-                call("sudo shutdown -poweroff")
+                self.tweeter.post_status(f'***sleeping for 30 minutes. temp: {cpu.temperature}C'
+                                         f' {(cpu.temperature * 9 / 5) + 32:.1f}F')
+                time.sleep(1800)  # 1800 seconds is 30 min, allow CPU to cool
+                # call("sudo shutdown -poweroff")
         except Exception as e:
             self.output_func('Error in temp shutdown protection:', e)
             pass  # uncharted territory....
