@@ -23,9 +23,19 @@ import pandas as pd
 from datetime import datetime
 from datetime import timedelta
 import pytz
-import urllib.request
-from urllib.error import HTTPError
-import gcs  # google cloud storage utils
+import gcs
+# import base64
+from google.cloud import storage
+
+# def pubsub_trigger(event, context):
+#     """Triggered from a message on a Cloud Pub/Sub topic.
+#     Args:
+#          event (dict): Event payload.
+#          context (google.cloud.functions.Context): Metadata for the event.
+#     """
+#     pubsub_message = base64.b64decode(event['data']).decode('utf-8')
+#     print(pubsub_message)
+
 
 
 def build_common_name(df, target_col):
@@ -37,22 +47,22 @@ def build_common_name(df, target_col):
     return df
 
 
-def load_bird_occurrences(url_prefix, dates):
+def load_bird_occurrences(gcs_storage, dates):
     # setup df like file, pulled from streamlit website function
     df = pd.DataFrame(data=None, columns=['Unnamed: 0', 'Feeder Name', 'Species',
                                           'Date Time', 'Hour'], dtype=None)
     df['Date Time'] = pd.to_datetime(df['Date Time'])
     for date in dates:
         try:  # read 3 days of files
-            urllib.request.urlretrieve(url_prefix + date + 'web_occurrences.csv', 'web_occurrences.csv')
-            df_read = pd.read_csv('web_occurrences.csv')
+            df_read = gcs_storage.get_df(date + 'web_occurrences.csv')
+
             df_read['Date Time'] = pd.to_datetime(df_read['Date Time'])
             df_read['Year'] = df_read['Date Time'].dt.year
             df_read['Month'] = df_read['Date Time'].dt.month
             df_read['Day'] = df_read['Date Time'].dt.day
             df_read['Hour'] = df_read['Date Time'].dt.hour
             df = pd.concat([df, df_read])
-        except urllib.error.URLError as e:
+        except Exception as e:
             print(f'no web occurrences found for {date}')
             print(e)
             dates.remove(date)  # remove date if not found
@@ -69,25 +79,24 @@ def daily_summary(df):
     return df_daily
 
 
-def append_to_daily_history(gcs_storage, url_prefix, df):
+def append_to_daily_history(gcs_storage, df):
     try:
-        urllib.request.urlretrieve(url_prefix + 'daily_history.csv', 'daily_history.csv')
-        df_daily_history = pd.read_csv('daily_history.csv')
+        # urllib.request.urlretrieve(url_prefix + 'daily_history.csv', 'daily_history.csv')
+        # df_daily_history = pd.read_csv('daily_history.csv')
+        df_daily_history = gcs_storage.get_df('daily_history.csv')
+
         df_daily_history = df_daily_history.drop(['Unnamed: 0'], axis='columns')
         df_new_daily_history = pd.concat([df_daily_history, df])
         print(df_new_daily_history)
-        gcs_storage.send_df(df_new_daily_history, 'daily_history.csv')  # no overwrite permission for local testing
-        # gcs_storage.send_df(df_new_daily_history, 'daily_history99.csv')
-    except urllib.error.URLError as e:
+        gcs_storage.send_df(df_new_daily_history, 'daily_history.csv')  # need overwrite permissions
+    except Exception as e:
         print(f'no daily history found')
         print(e)
         gcs_storage.send_df(df, 'daily_history.csv')
     return
 
 
-def main():
-# def main(event, context):
-    url_prefix = 'https://storage.googleapis.com/tweeterssp-web-site-contents/'
+def main(event, context):
     dates = []
     tz = pytz.timezone("America/Chicago")  # localize time to current madison wi cst bird feeder
     gcs_storage = gcs.Storage()
@@ -95,16 +104,11 @@ def main():
     dates.append(datetime.now(tz).strftime('%Y-%m-%d'))
     dates.append((datetime.now(tz) - timedelta(days=1)).strftime('%Y-%m-%d'))
     dates.append((datetime.now(tz) - timedelta(days=2)).strftime('%Y-%m-%d'))
-    df = load_bird_occurrences(url_prefix, [dates[1]])  # only process yesterday's date, date[1]
+    df = load_bird_occurrences(gcs_storage, [dates[1]])  # only process yesterday's date, date[1]
     df_daily_summary = daily_summary(df)
     print(df_daily_summary)
     # df_daily_summary.to_csv('daily_test.csv', index=False)
     # gcs_storage.send_df(df_daily_summary, 'daily_history.csv')
-    append_to_daily_history(gcs_storage, url_prefix, df_daily_summary)
+    append_to_daily_history(gcs_storage, df_daily_summary)
     # df_new_daily_summary.to_csv('daily_test2.csv', index=False)
     return
-
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    main()
