@@ -100,6 +100,10 @@ class TweeterClass:
 
     # set status and add an image
     def post_image_from_file(self, message, file_name):
+        # need to build new version
+        return
+
+    def post_image_from_file_v2(self, message, file_name):
         # Read the media file as binary data
         with open(file_name, 'rb') as file:
             media_data = file.read()
@@ -207,7 +211,7 @@ def main_test():
     url = 'https://storage.googleapis.com/tweeterssp-web-site-contents/2023-05-19-08-04-37167(CommonGrackle).jpg'
     # twtimage = open('cardinal.jpg', 'rb')
     # tweeter_obj.post_image_url(message, url)
-    tweeter_obj.post_image_from_file(message='test', file_name='cardinal.jpg')
+    tweeter_obj.post_image_from_file_v2(message='test', file_name='cardinal.jpg')
     print('tweeted: %s' % message)
 
 
