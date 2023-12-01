@@ -295,17 +295,25 @@ class DetectClassify:
             classified_rects_area = self.classified_rects_area
             classified_labels = self.classified_labels
             classified_confidences = self.classified_confidences
+
+        draw = PILImageDraw.Draw(img)
+        font = draw.getfont()
+        c_labs_len = len(classified_labels)
         for i, rect in enumerate(classified_rects):
             (start_x, start_y, end_x, end_y) = rect
-            draw = PILImageDraw.Draw(img)
-            font = draw.getfont()
+            # draw = PILImageDraw.Draw(img)
+            # font = draw.getfont()
             try:  # add text to top and bottom of image, make box slightly large and put text on top and bottom
                 # font = font, fill = self.text_color if color font is desired
                 rect_area = classified_rects_area[i] if len(classified_rects_area) > 0 \
                     else (rect[2] - rect[0]) * (rect[3] - rect[1])  # if area is empty calculate from rect
-                draw.text((start_x, start_y-50), self.label_text(classified_labels[i], classified_confidences[i],
+                # sometimes the label and conf are the same for more than one rect, handle that here....
+                classified_label = classified_labels[i] if c_labs_len > i - 1 else classified_labels[-1]
+                classified_confidence = classified_confidences[i] if c_labs_len > i - 1 else classified_confidences[-1]
+
+                draw.text((start_x, start_y-50), self.label_text(classified_label, classified_confidence,
                                                                  rect_area), font=font, fill='white')
-                draw.text((start_x, end_y+50), self.label_text(classified_labels[i], classified_confidences[i],
+                draw.text((start_x, end_y+50), self.label_text(classified_label, classified_confidence,
                                                                rect_area), font=font, fill='white')
                 draw.line([(start_x-25, start_y-25), (start_x-25, end_y+25), (start_x-25, end_y+25),
                            (end_x+25, end_y+25), (end_x+25, end_y+25),
