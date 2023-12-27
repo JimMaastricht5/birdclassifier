@@ -53,7 +53,7 @@ def default_value():
 
 
 def bird_detector(args):
-    favorite_birds = ['Rose-breasted Grosbeak', 'Red-bellied Woodpecker']  # rare birds or just birds you want to see
+    favorite_birds = ['Rose-breasted Grosbeak', 'Red-bellied Woodpecker', 'Northern Cardinal']  # rare birds or just birds you want to see
     birdpop = population.Census()  # initialize species population census object
     output = output_stream.Controller(caller_id=args.city)  # initialize class to handle terminal and web output
     output.start_stream()  # start streaming to terminal and web

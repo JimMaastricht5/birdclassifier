@@ -61,8 +61,16 @@ def convert(img, convert_to='np'):
     return img
 
 
-# enhance color, brightness, sharpness, and contrast
-# take either a pil image
+# enhance color, brightness, sharpness, and contrast or resize
+def resize(img, new_height, new_width, maintain_aspect=True, box=None, resample=None):
+    width, height = img.size
+    new_height = int(height * (new_width / width)) if maintain_aspect else new_height
+    # resample=Resampling.LANCZOS for improved downsample, BICUBIC default
+    # box is the subset of the image to perform an op on, default is entire img
+    # box must be int the format of (starting_width, starting_height, ending_width, ending_height) as a tuple
+    img = img.resize((new_width, new_height), resample=resample, box=box)
+    return img
+
 def enhance(img, brightness=1.0, sharpness=1.0, contrast=1.0, color=1.0):
     img = enhance_brightness(img, brightness) if brightness != 1 else img
     img = enhance_sharpness(img, sharpness) if sharpness != 1 else img
@@ -189,8 +197,9 @@ def save_gif(frames, frame_rate=30, filename=os.getcwd()+'/assets/birds.gif'):
 # testing code
 def main():
 
-    print(overlap_area((1, 1, 10, 10), (1, 1, 2, 2)))
-    # img1 = Image.open('/home/pi/birdclass/test.gif')
+    # print(overlap_area((1, 1, 10, 10), (1, 1, 2, 2)))
+    img_org = Image.open('/home/pi/birdclass/test.gif')
+    img = resize(img_org, 100, 100, maintain_aspect=False)
     # gif1 = convert_image(img1, target='gif', save_test_img=True)
     # img2 = Image.open('/home/pi/birdclass/test2.jpg')
     # img2_gif = convert_image(img=img2, target='gif')
@@ -198,7 +207,8 @@ def main():
     # img3_gif.save('/home/pi/birdclass/test stream.gif', 'gif')
     # gif2 = convert_image(img2, target='gif', save_test_img=True)
     # save_gif([img1, img2], frame_rate=10, filename='/home/pi/birdclass/test4.gif')
-    # img.show()
+    img.show()
+    img_org.show()
 
     # img = enhance_brightness(img, 1)
     # img = enhance_sharpness(img, 1.2)
