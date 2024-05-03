@@ -53,7 +53,8 @@ def default_value():
 
 
 def bird_detector(args):
-    favorite_birds = ['Rose-breasted Grosbeak', 'Red-bellied Woodpecker', 'Northern Cardinal']  # rare birds or just birds you want to see
+    favorite_birds = ['Rose-breasted Grosbeak', 'Red-bellied Woodpecker',
+                      'Northern Cardinal']  # rare birds or just birds you want to see
     birdpop = population.Census()  # initialize species population census object
     output = output_stream.Controller(caller_id=args.city)  # initialize class to handle terminal and web output
     output.start_stream()  # start streaming to terminal and web
@@ -135,7 +136,8 @@ def bird_detector(args):
 
                 # annotate bare image copy, use either best gif label or org data
                 best_first_label = convert_to_list(bird_gif.best_label if bird_gif.best_label != '' else first_label)
-                best_first_conf = convert_to_list(bird_gif.best_confidence if bird_gif.best_confidence > 0 else first_conf)
+                best_first_conf = convert_to_list(bird_gif.best_confidence if bird_gif.best_confidence > 0 else
+                                                  first_conf)
                 bird_first_time_seen = birdpop.visitors(best_first_label, datetime.now())  # increment species count
                 birds.set_ojb_data(classified_rects=first_rects, classified_labels=best_first_label,
                                    classified_confidences=best_first_conf)  # set to first bird
