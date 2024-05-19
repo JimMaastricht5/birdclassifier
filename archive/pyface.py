@@ -8,7 +8,7 @@
 # install OpenCv version 4.1.0.25 to resolve the issue on the pi
 # packages: pan tilt uses PCA9685-Driver
 import cv2  # opencv2
-import PanTilt9685  # pan tilt control code
+from archive import PanTilt9685
 import motion_detector  # motion detector helper functions
 import tweeter  # twitter helper functions
 import argparse  # argument parser
@@ -49,7 +49,7 @@ def face_detector(args):
                 # twitter.post_image("found face", face_img)
 
             currpan, currtilt = PanTilt9685.trackobject(pwm, cv2, currpan, currtilt, img, faces,
-                                                       args["screenwidth"], args["screenheight"])
+                                                        args["screenwidth"], args["screenheight"])
 
 
         cv2.imshow('gray', graymotion)
