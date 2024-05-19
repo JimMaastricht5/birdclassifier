@@ -131,7 +131,7 @@ def main_test_twitter():
     print('tweeted: %s' % message)
 
     # media_path = 'cardinal.jpg'
-    media_path = 'birds.gif'
+    media_path = 'archive/birds.gif'
     tweeted_b = tweeter_obj.post_image_from_file(message=f'{datetime.now()}test post image from file',
                                                  file_name=media_path)
     print(tweeted_b)
