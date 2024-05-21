@@ -90,7 +90,7 @@ async def main_test_meta():
     message = f'Python status {datetime.now()}'
     # await post_status(meta_threads_api,message)
     # await post_include_image_from_url(meta_threads_api, message, 'https://storage.googleapis.com/tweeterssp-web-site-contents/2023-09-16-15-15-321359(HouseFinch).gif')
-    await post_include_image(meta_threads_api, message, 'archive/birds.gif')
+    await post_include_image(meta_threads_api, message, 'birds.gif')
     await meta_threads_api.close_gracefully()
 
 
