@@ -17,3 +17,8 @@ Software:
 6. create your auth.py file with the Twitter keys and the open weather key.  When you get to this point let me know and we can work together on it.  Twitter: api_key, api_secret_key, access_token, access_token_secretOMW: weather_key
 7. I have some bash scripts to start the process and can share those too when you get here.  I just haven't gotten around to putting them in git.  
 8. tweek the parameters for your use case.  I have the threshold set really high so I get less confusing results, but that might not trigger enough for you.  
+
+The complete project spans several repos:
+1. Web site: https://github.com/JimMaastricht5/tweetersp
+2. Cloud storage: archive jpgs for analysis, otherwise gcs purges after 3-5 days.  Runs nightly, scheduled  https://github.com/JimMaastricht5/cloud_move_jpeg_buckets
+3. Data Aggregation: web site uses a pre-aggregation by day calculation.  That is done in this cloud function scheduled nightly: https://github.com/JimMaastricht5/cloud_data_aggregation
