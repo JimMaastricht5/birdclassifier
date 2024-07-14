@@ -92,7 +92,8 @@ class BirdGif:
     def build_gif(self, event_count, first_img_jpg):
         # grab a stream of pictures, add first pic from above, and build animated gif
         # return gif, filename, animated boolean, and best label as the max of all confidences
-        self.local_gif_filename, self.gcs_gif_filename, self.best_label, self.best_confidence, labeled_frames = '', '', '', 0, []
+        self.local_gif_filename, self.gcs_gif_filename, self.best_label, self.best_confidence = ('', '', '', 0)
+        labeled_frames = []
         self.animated = False  # set to true if min # of frames captured with birds
         gif = first_img_jpg  # set a default if animated = False
         last_good_frame = 0  # find last frame that has a bird, index zero is good based on first image

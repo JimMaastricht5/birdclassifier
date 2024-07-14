@@ -43,7 +43,7 @@ class Census:
 
     def convert_to_list(self, input_str_list):
         output_list = []
-        if type(input_str_list) != list:
+        if isinstance(input_str_list, list):
             output_list.append(input_str_list)
         else:
             output_list = input_str_list

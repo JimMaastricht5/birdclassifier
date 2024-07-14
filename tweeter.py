@@ -36,7 +36,6 @@ class TweeterClass:
         self.client_v1 = self.get_twitter_conn_v1(api_key, api_secret_key, access_token, access_token_secret)
         self.client_v2 = self.get_twitter_conn_v2(api_key, api_secret_key, access_token, access_token_secret)
 
-
         self.curr_day = datetime.now().day
         self.curr_hr = datetime.now().hour
         self.tweetcnt = 0
@@ -139,4 +138,3 @@ def main_test_twitter():
     # media = tweeter_obj.client_v1.media_upload(filename=media_path)
     # media_id = media.media_id
     # tweeter_obj.client_v2.create_tweet(text="Tweet text", media_ids=[media_id])
-
