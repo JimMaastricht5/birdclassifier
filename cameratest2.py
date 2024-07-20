@@ -49,7 +49,7 @@ camera = Picamera2()
 camera.vflip = False
 
 # Configure preview resolution
-config = picamera2.preview.preview_configuration(
+config = Picamera2.preview.preview_configuration(
     size=(screenwidth, screenheight)
 )
 
