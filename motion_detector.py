@@ -45,7 +45,7 @@ except Exception as e:
 
 class MotionDetector:
     def __init__(self, motion_min_area=4, screenwidth=640, screenheight=480, flip_camera=False,
-                 iso=800, first_img_name='capture.jpg', file_dest='/assets'):
+                 iso=800, first_img_name='capture.jpg', file_dest='assets'):
 
         print('initializing camera')
         self.camera2 = Picamera2()
