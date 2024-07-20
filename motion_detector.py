@@ -62,8 +62,8 @@ class MotionDetector:
         print(f'capturing first image: {first_img_name}')
         self.first_img_filename = first_img_name
         self.file_dest = file_dest
-        self.capture_image_with_file()  # capture img
-        self.img = Image.open(f'{self.file_dest}/{self.first_img_filename}')
+        self.img = self.capture_image_with_file()  # capture img
+        # self.img = Image.open(f'{self.file_dest}/{self.first_img_filename}')
         self.gray = image_proc.grayscale(self.img)  # convert image to gray scale for motion detection
         self.graymotion = image_proc.gaussianblur(self.gray)  # smooth out image for motion detection
         self.first_img = self.graymotion.copy()
@@ -72,14 +72,16 @@ class MotionDetector:
         self.FPS = 0  # calculated frames per second
         print('camera setup completed')
 
-    def capture_image_with_file(self):
-        self.camera2.capture_file(f'{self.file_dest}/{self.first_img_filename}')
+    def capture_image_with_file(self, filename=None):
+        filename = self.first_img_filename if filename is None else filename
+        self.camera2.capture_file(f'{self.file_dest}/{filename}')
+        img = Image.open(f'{self.file_dest}/{filename}')
         # stream = io.BytesIO()
         # self.camera.capture(stream, img_type, use_video_port=True)
         # stream.seek(0)
         # img = Image.open(stream)
         # img.save(filename)
-        return
+        return img
 
     # grab and image and store in mem, NOT TESTED with Picamera2
     # def capture_image_stream(self, img_type='jpeg'):
@@ -132,7 +134,7 @@ class MotionDetector:
     # if the difference is more than the tolerance we have something new in the frame aka motion
     def detect(self):
         try:  # trap any camera or image errors gracefully
-            self.img = self.capture_image_stream()
+            self.img = self.capture_image_with_file(filename='capture.jpg')
             grayimg = image_proc.grayscale(self.img)  # convert image to gray scale
             grayblur = image_proc.gaussianblur(grayimg)  # smooth out image for motion detection
             imgdelta = image_proc.compare_images(self.first_img, grayblur)
