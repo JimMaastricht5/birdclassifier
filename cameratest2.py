@@ -54,7 +54,7 @@ config = Picamera2.preview.preview_configuration(
 )
 
 # Create preview stream (optional, comment out if not needed)
-preview_stream = camera.create_preview_stream(config)
+# preview_stream = camera.create_preview_stream(config)
 # preview_stream.start()  # Uncomment to show preview
 sleep(2)  # Adjust sleep duration as needed
 
