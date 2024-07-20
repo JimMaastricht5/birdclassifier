@@ -75,7 +75,8 @@ def bird_detector(args):
     motion_detect = motion_detector.MotionDetector(motion_min_area=args.minarea, screenwidth=args.screenwidth,
                                                    screenheight=args.screenheight, flip_camera=args.flipcamera,
                                                    iso=args.iso,
-                                                   first_img_name=os.getcwd() + '/assets/' + 'first_img.jpg')  # init
+                                                   first_img_name='first_img.jpg')
+    # old code.... first_img_name = os.getcwd() + '/assets/' + 'first_img.jpg')  # init
     output.message('Done with camera init... setting up classes.')
     bird_tweeter = tweeter.TweeterClass()  # init tweeter2 class twitter handler
     chores = dailychores.DailyChores(bird_tweeter, birdpop, cityweather, output_class=output)
