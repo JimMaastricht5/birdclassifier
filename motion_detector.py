@@ -26,26 +26,19 @@
 # compare gray scale image to first image.  If different than motion
 # return image captured, gray scale, guassian blured version, thresholds, first_img, and countours
 # code by JimMaastricht5@gmail.com based on https://www.pyimagesearch.com/category/object-tracking/
-import io
+# import io
+# import numpy as np
 import time
 import math
 from PIL import Image
-import numpy as np
 import image_proc
-
-try:
-    from picamera2 import Picamera2, Preview
-    from libcamera import Transform
-    # import picamera2 on rasp pi otherwise test code on windows
-except Exception as e:
-    print(e)
-    print('picamera2 import failed....  continuing motion detection setup for windows testing....')
-    pass
+from picamera2 import Picamera2, Preview
+from libcamera import Transform
 
 
 class MotionDetector:
     def __init__(self, motion_min_area=4, screenwidth=640, screenheight=480, flip_camera=False,
-                 iso=800, first_img_name='capture.jpg', file_dest='assets'):
+                 first_img_name='capture.jpg', file_dest='assets'):
 
         print('initializing camera')
         self.camera2 = Picamera2()
@@ -63,11 +56,9 @@ class MotionDetector:
         self.first_img_filename = first_img_name
         self.file_dest = file_dest
         self.img = self.capture_image_with_file()  # capture img
-        # self.img = Image.open(f'{self.file_dest}/{self.first_img_filename}')
         self.gray = image_proc.grayscale(self.img)  # convert image to gray scale for motion detection
         self.graymotion = image_proc.gaussianblur(self.gray)  # smooth out image for motion detection
         self.first_img = self.graymotion.copy()
-
         self.motion = False  # init motion detection boolean
         self.FPS = 0  # calculated frames per second
         print('camera setup completed')
@@ -76,38 +67,12 @@ class MotionDetector:
         filename = self.first_img_filename if filename is None else filename
         self.camera2.capture_file(f'{self.file_dest}/{filename}')
         img = Image.open(f'{self.file_dest}/{filename}')
-        # stream = io.BytesIO()
-        # self.camera.capture(stream, img_type, use_video_port=True)
-        # stream.seek(0)
-        # img = Image.open(stream)
-        # img.save(filename)
         return img
 
-    # grab and image and store in mem, NOT TESTED with Picamera2
-    # def capture_image_stream(self, img_type='jpeg'):
-    #     # stream = io.BytesIO()
-    #     # self.camera.capture_file(stream, img_type, use_video_port=True)
-    #     # stream.seek(0)
-    #     # img = Image.open(stream)
-    #     # Set up capture configuration (adjust resolution as needed)
-    #     config = self.camera2.create_still_capture_configuration(size=(self.screenheight, self.screenwidth))
-    #     capture_request = self.camera2.create_still_capture_request(config, main={"format": "jpeg"})
-    #     # Capture the image
-    #     with self.camera2.capture_continuous(capture_request) as stream:
-    #         for frame in stream:
-    #             image_buffer = frame.get_buffer("main")  # Get the captured JPEG image buffer
-    #             image_in_memory = BytesIO()  # Get the captured JPEG image buffer
-    #             image_in_memory.write(image_buffer.as_memoryview())
-    #             image_buffer.recycle()  # Reset the buffer for the next frame (optional)
-    #     return image_in_memory
-
     def capture_stream(self, num_frames=12):
-        """
-        function returns a list of images
-
-        :param num_frames: int value with number of frames to capture
-        :return frames: images is a list containing a number of PIL jpg image
-        """
+        # function returns a list of images
+        # param num_frames: int value with number of frames to capture
+        # return frames: images is a list containing jpg images
         frames = []
         start_time = time.time()
         self.camera2.capture_files(name=self.file_dest+'/stream{:d}.jpg',
@@ -118,16 +83,6 @@ class MotionDetector:
             frames.append(img)
         self.FPS = num_frames / float(time.time() - start_time)
         return frames
-
-    # grab an image using NP array: doesn't work!!!!
-    # def capture_image_np(self, img_type='jpeg'):
-    #     height, width = self.camera.resolution
-    #     img = np.empty((height, width, 3), dtype=np.uint8)
-    #     # print(height, width)
-    #     self.camera.capture(img, img_type)
-    #     img_pil = image_proc.convert(img=img, convert_to='PIL')
-    #     img_pil.save('/home/pi/birdclass/alt_camera_img.jpg')
-    #     return img_pil
 
     # once first image is captured call motion detector in a loop to find each subsequent image
     # motion detection, compute the absolute difference between the current frame and first frame
@@ -157,13 +112,3 @@ class MotionDetector:
 
 
 # if __name__ == '__main__':
-#     # construct the argument parser and parse the arguments
-#     ap = argparse.ArgumentParser()
-#     # camera settings
-#     ap.add_argument("-fc", "--flipcamera", type=bool, default=False, help="flip camera image")
-#     ap.add_argument("-sw", "--screenwidth", type=int, default=640, help="max screen width")
-#     ap.add_argument("-sh", "--screenheight", type=int, default=480, help="max screen height")
-#     arguments = ap.parse_args()
-#
-#     motion_detector = MotionDetector(args=arguments)
-#     frames_test = motion_detector.capture_stream()
