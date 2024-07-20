@@ -48,7 +48,7 @@ class MotionDetector:
                  iso=800, first_img_name='capture.jpg', file_dest='/assets'):
 
         print('initializing camera')
-        self.camera2 = PiCamera2()
+        self.camera2 = Picamera2()
         self.min_area = motion_min_area
         self.screenwidth = screenwidth
         self.screenheight = screenheight
