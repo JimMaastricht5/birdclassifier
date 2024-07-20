@@ -38,14 +38,6 @@ from PIL import ImageDraw as PILImageDraw
 import image_proc
 import math
 
-# attempt to load picamera, fails on windows
-# try:
-#     import picamera
-# except Exception as e:
-#     print(e)
-#     print('picamera import fails on windows')
-#     pass
-
 # attempt to load tensor flow lite,will fail if not raspberry pi, switch to full tensorflow for windows
 try:
     import tflite_runtime.interpreter as tflite  # for pi4 with install wheel above
@@ -368,8 +360,8 @@ class DetectClassify:
             print(cresult)
             label_threshold = 0
             cresult = 0
-        return(float(label_threshold) != -1 and screen_percent >= self.min_img_percent and
-               cresult > 0 and cresult >= float(label_threshold) / 1000)
+        return (float(label_threshold) != -1 and screen_percent >= self.min_img_percent and
+                cresult > 0 and cresult >= float(label_threshold) / 1000)
 
     # set label for box in image use short species name instead of scientific name
     def label_text(self, label, confidence, screen_percent):
