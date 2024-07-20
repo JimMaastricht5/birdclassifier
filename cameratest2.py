@@ -20,14 +20,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-from picamera2 import PiCamera2
+from picamera2 import Picamera2
 from time import sleep
 import os
 
 # 1024 x 768 or 720 x 640
 screenheight = 640
 screenwidth = 480
-camera = PiCamera2()
+camera = Picamera2()
 camera.vflip = False
 #camera.exposure_mode = 'night'  # sports, off
 #camera.iso = 800
