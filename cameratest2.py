@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-from picamera import PiCamera
+from picamera2 import PiCamera
 from time import sleep
 import os
 
