@@ -80,19 +80,17 @@ import os
 from picamera2 import Picamera2, Preview
 
 picam2 = Picamera2()
-picam2.start_preview()
-preview_config = picam2.create_preview_configuration()
-capture_config = picam2.create_still_configuration()
 
+preview_config = picam2.create_preview_configuration(main={"size": (800, 600)})
 picam2.configure(preview_config)
+
+picam2.start_preview(Preview.QTGL)
+
 picam2.start()
 sleep(2)
 
-image = picam2.switch_mode_and_capture_image(capture_config)
-image.show()
-
-
-sleep(5)
+metadata = picam2.capture_file("test.jpg")
+print(metadata)
 
 picam2.close()
 
