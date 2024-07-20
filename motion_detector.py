@@ -63,7 +63,7 @@ class MotionDetector:
         self.first_img_filename = first_img_name
         self.file_dest = file_dest
         self.capture_image_with_file()  # capture img
-        self.img = Image.open(self.first_img_filename)
+        self.img = Image.open(f'{self.file_dest}/{self.first_img_filename}')
         self.gray = image_proc.grayscale(self.img)  # convert image to gray scale for motion detection
         self.graymotion = image_proc.gaussianblur(self.gray)  # smooth out image for motion detection
         self.first_img = self.graymotion.copy()
