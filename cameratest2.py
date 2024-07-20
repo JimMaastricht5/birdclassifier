@@ -38,45 +38,62 @@
 # print(camera.exposure_speed)
 # print(camera.exposure_mode)
 
-from picamera2 import Picamera2
+# from picamera2 import Picamera2, Preview
 from time import sleep
 import os
 
-screenheight = 640
-screenwidth = 480
+# screenheight = 640
+# screenwidth = 480
+#
+# camera = Picamera2()
+# camera.vflip = False
+#
+# # Configure preview resolution
+# config = camera.preview.preview_configuration(
+#     size=(screenwidth, screenheight)
+# )
+#
+# # Create preview stream (optional, comment out if not needed)
+# # preview_stream = camera.create_preview_stream(config)
+# camera.start()  # Uncomment to show preview
+# sleep(2)  # Adjust sleep duration as needed
+#
+# # Create capture request
+# capture_request = camera.create_still_capture_request(config)
+#
+# # Capture image
+# camera.capture(capture_request)
+#
+# # Save captured image
+# with camera.capture_file(os.getcwd() + '/assets/testcap2.jpg') as file:
+#     file.write(camera.capture_buffer)
+#
+# # Information printing (modify as needed based on picamera2 documentation)
+# print("Frame rate range:", camera.framerate_range)  # Might require different method
+# # ... Consult documentation for other properties ...
+#
+# # Stop preview if started
+# # preview_stream.stop()
+#
+# camera.close()  # Close camera resources
 
-camera = Picamera2()
-camera.vflip = False
+from picamera2 import Picamera2, Preview
 
-# Configure preview resolution
-config = Picamera2.preview.preview_configuration(
-    size=(screenwidth, screenheight)
-)
+picam2 = Picamera2()
+picam2.start_preview(Preview.QTGL)
+preview_config = picam2.create_preview_configuration()
+capture_config = picam2.create_still_configuration()
 
-# Create preview stream (optional, comment out if not needed)
-# preview_stream = camera.create_preview_stream(config)
-# preview_stream.start()  # Uncomment to show preview
-sleep(2)  # Adjust sleep duration as needed
+picam2.configure(preview_config)
+picam2.start()
+sleep(2)
 
-# Create capture request
-capture_request = camera.create_still_capture_request(config)
-
-# Capture image
-camera.capture(capture_request)
-
-# Save captured image
-with camera.capture_file(os.getcwd() + '/assets/testcap2.jpg') as file:
-    file.write(camera.capture_buffer)
-
-# Information printing (modify as needed based on picamera2 documentation)
-print("Frame rate range:", camera.framerate_range)  # Might require different method
-# ... Consult documentation for other properties ...
-
-# Stop preview if started
-# preview_stream.stop()
-
-camera.close()  # Close camera resources
+image = picam2.switch_mode_and_capture_image(capture_config)
+image.show()
 
 
+sleep(5)
+
+picam2.close()
 
 
