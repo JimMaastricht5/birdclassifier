@@ -80,7 +80,7 @@ import os
 from picamera2 import Picamera2, Preview
 
 picam2 = Picamera2()
-picam2.start_preview(Preview.QTGL)
+picam2.start_preview()
 preview_config = picam2.create_preview_configuration()
 capture_config = picam2.create_still_configuration()
 
