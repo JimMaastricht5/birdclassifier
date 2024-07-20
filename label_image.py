@@ -39,12 +39,12 @@ import image_proc
 import math
 
 # attempt to load picamera, fails on windows
-try:
-    import picamera
-except Exception as e:
-    print(e)
-    print('picamera import fails on windows')
-    pass
+# try:
+#     import picamera
+# except Exception as e:
+#     print(e)
+#     print('picamera import fails on windows')
+#     pass
 
 # attempt to load tensor flow lite,will fail if not raspberry pi, switch to full tensorflow for windows
 try:
