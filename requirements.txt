@@ -3,7 +3,7 @@ requests
 Pillow
 pandas
 gpiozero
-picamera
+picamera2
 matplotlib
 scipy
 tflite-runtime
