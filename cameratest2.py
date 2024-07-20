@@ -20,24 +20,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-# old picamera 1 code
-# 1024 x 768 or 720 x 640
-# screenheight = 640
-# screenwidth = 480
-# camera = PiCamera()
-# camera.vflip = False
-# camera.resolution = (screenheight, screenwidth)
-# camera.start_preview()
-# sleep(2)
-# camera.capture(os.getcwd()+ '/assets/testcap2.jpg')
-# camera.stop_preview()
-#
-# print(camera.framerate_range.low)
-# print(camera.framerate_range.high)
-# print(camera.shutter_speed)
-# print(camera.exposure_speed)
-# print(camera.exposure_mode)
-
 from time import sleep
 import os
 from picamera2 import Picamera2, Preview
@@ -46,13 +28,12 @@ screenheight = 640
 screenwidth = 480
 picam2 = Picamera2()
 
-preview_config = picam2.create_preview_configuration(main={"size": (screenheight, screenwidth)})
-picam2.configure(preview_config)
+config = picam2.create_preview_configuration(main={"size": (screenheight, screenwidth)})
+picam2.configure(config)
 # picam2.start_preview(Preview.QTGL)  # does not work, may need to install qt graphics lib
 picam2.start()
 sleep(2)  # let the camera settle
 metadata = picam2.capture_file(os.getcwd()+ '/assets/testcap2.jpg')
-# metadata = picam2.capture_file("test.jpg")  # writes file to current dir
 print(metadata)
 
 picam2.close()
