@@ -54,6 +54,8 @@ class MotionDetector:
         self.screenheight = screenheight
         self.config = self.camera2.create_preview_configuration(main={"size": (screenheight, screenwidth)},
                                                                 transform=Transform(vflip=flip_camera))
+        self.camera2.configure(self.config)
+        self.camera2.start()
         time.sleep(2)  # Wait for the automatic gain control to settle
 
         # set up first image. base for motion detection
@@ -141,7 +143,7 @@ class MotionDetector:
         return self.motion
 
     def stop(self):
-        self.camera.close()
+        self.camera2.close()
         return
 
     # determine change between static image and new frame
