@@ -23,6 +23,7 @@
 from time import sleep
 import os
 from picamera2 import Picamera2, Preview
+from libcamera import Transform  # add import to test setup for motion detector
 
 screenheight = 640
 screenwidth = 480

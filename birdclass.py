@@ -60,7 +60,8 @@ def bird_detector(args):
     output.start_stream()  # start streaming to terminal and web
     gcs_storage = gcs.Storage()
     motioncnt, event_count, gcs_img_filename, seed_check_gcs_filename = 0, 0, '', ''
-    curr_day, curr_hr, last_tweet = datetime.now().day, datetime.now().hour, datetime(2021, 1, 1, 0, 0, 0)
+    curr_day, curr_hr, last_tweet = (datetime.now().day, datetime.now().hour,
+                                     datetime(2021, 1, 1, 0, 0, 0))
 
     # while loop below processes from sunrise to sunset.  The python program needs to be restarted daily
     # wait to enter that main while loop until sunrise
@@ -236,7 +237,7 @@ if __name__ == "__main__":
     ap.add_argument("-bc", "--bird_confidence", type=float, default=.6, help="bird confidence threshold")
     ap.add_argument("-ma", "--minarea", type=float, default=5.0, help="motion area threshold, lower req more")
     ap.add_argument("-ms", "--minimgperc", type=float, default=10.0, help="ignore objects that are less then % of img")
-    ap.add_argument("-hd", "--homedir", type=str, default='/home/pi/PycharmProjects/birdclassifier/',
+    ap.add_argument("-hd", "--homedir", type=str, default='/home/pi/birdclassifier/',
                     help="home directory for files")
     ap.add_argument("-la", "--labels", type=str, default='coral.ai.inat_bird_labels.txt',
                     help="name of file to use for species labels and thresholds")

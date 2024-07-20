@@ -34,38 +34,34 @@ import numpy as np
 import image_proc
 
 try:
-    import picamera
-    # import picamera.array
+    from picamera2 import Picamera2, Preview
+    from libcamera import Transform
+    # import picamera2 on rasp pi otherwise test code on windows
 except Exception as e:
     print(e)
-    print('continuing motion detection setup....')
+    print('picamera2 import failed....  continuing motion detection setup for windows testing....')
     pass
 
 
 class MotionDetector:
     def __init__(self, motion_min_area=4, screenwidth=640, screenheight=480, flip_camera=False,
-                 iso=800, first_img_name='capture.jpg'):
+                 iso=800, first_img_name='capture.jpg', file_dest='/assets'):
 
         print('initializing camera')
-        self.camera = picamera.PiCamera()
+        self.camera2 = PiCamera2()
         self.min_area = motion_min_area
-        if screenwidth != 0:  # use specified height and width or default values if not passed
-            self.camera.resolution = (screenheight, screenwidth)
-        self.camera.vflip = flip_camera
-        self.camera.iso = iso  # iso 800 for less blur
+        self.screenwidth = screenwidth
+        self.screenheight = screenheight
+        self.config = self.camera2.create_preview_configuration(main={"size": (screenheight, screenwidth)},
+                                                                transform=Transform(vflip=flip_camera))
         time.sleep(2)  # Wait for the automatic gain control to settle
-        # self.shutterspeed = self.camera.exposure_speed
-        # self.camera.exposure_mode = 'off'
-        # self.camera.exposure_mode = 'off'
-        # self.gain = camera.awb_gains
-        # self.camera.awb_mode = 'off'
-        # self.camera.awb_gains = self.gain
 
         # set up first image. base for motion detection
         print(f'capturing first image: {first_img_name}')
-        self.img_filename = first_img_name
-        self.capture_image_with_file(filename=self.img_filename)  # capture img
-        self.img = Image.open(self.img_filename)
+        self.first_img_filename = first_img_name
+        self.file_dest = file_dest
+        self.capture_image_with_file()  # capture img
+        self.img = Image.open(self.first_img_filename)
         self.gray = image_proc.grayscale(self.img)  # convert image to gray scale for motion detection
         self.graymotion = image_proc.gaussianblur(self.gray)  # smooth out image for motion detection
         self.first_img = self.graymotion.copy()
@@ -74,46 +70,60 @@ class MotionDetector:
         self.FPS = 0  # calculated frames per second
         print('camera setup completed')
 
-    def capture_image_with_file(self, img_type='jpeg', filename='/home/pi/capture_image.jpg'):
-        stream = io.BytesIO()
-        self.camera.capture(stream, img_type, use_video_port=True)
-        stream.seek(0)
-        img = Image.open(stream)
-        img.save(filename)
+    def capture_image_with_file(self):
+        self.camera2.capture_file(f'{self.file_dest}/{self.first_img_filename}')
+        # stream = io.BytesIO()
+        # self.camera.capture(stream, img_type, use_video_port=True)
+        # stream.seek(0)
+        # img = Image.open(stream)
+        # img.save(filename)
         return
 
-    # grab and image and store in mem
-    def capture_image_stream(self, img_type='jpeg'):
-        stream = io.BytesIO()
-        self.camera.capture(stream, img_type, use_video_port=True)
-        stream.seek(0)
-        img = Image.open(stream)
-        return img
+    # grab and image and store in mem, NOT TESTED with Picamera2
+    # def capture_image_stream(self, img_type='jpeg'):
+    #     # stream = io.BytesIO()
+    #     # self.camera.capture_file(stream, img_type, use_video_port=True)
+    #     # stream.seek(0)
+    #     # img = Image.open(stream)
+    #     # Set up capture configuration (adjust resolution as needed)
+    #     config = self.camera2.create_still_capture_configuration(size=(self.screenheight, self.screenwidth))
+    #     capture_request = self.camera2.create_still_capture_request(config, main={"format": "jpeg"})
+    #     # Capture the image
+    #     with self.camera2.capture_continuous(capture_request) as stream:
+    #         for frame in stream:
+    #             image_buffer = frame.get_buffer("main")  # Get the captured JPEG image buffer
+    #             image_in_memory = BytesIO()  # Get the captured JPEG image buffer
+    #             image_in_memory.write(image_buffer.as_memoryview())
+    #             image_buffer.recycle()  # Reset the buffer for the next frame (optional)
+    #     return image_in_memory
 
-    def capture_stream(self, stream_frames=12):
+    def capture_stream(self, num_frames=12):
         """
         function returns a list of images
 
-        :param stream_frames: int value with number of frames to capture
+        :param num_frames: int value with number of frames to capture
         :return frames: images is a list containing a number of PIL jpg image
         """
         frames = []
         start_time = time.time()
-        for image_num in range(stream_frames):
-            img = self.capture_image_stream()
+        self.camera2.capture_files(name=self.file_dest+'/stream{:d}.jpg',
+                                   num_files=num_frames, capture_mode='still')
+        for image_num in range(num_frames):
+            # img = self.capture_image_stream()
+            img = Image.open(f'{self.file_dest}/stream{image_num:d}.jpg')
             frames.append(img)
-        self.FPS = stream_frames / float(time.time() - start_time)
+        self.FPS = num_frames / float(time.time() - start_time)
         return frames
 
     # grab an image using NP array: doesn't work!!!!
-    def capture_image_np(self, img_type='jpeg'):
-        height, width = self.camera.resolution
-        img = np.empty((height, width, 3), dtype=np.uint8)
-        # print(height, width)
-        self.camera.capture(img, img_type)
-        img_pil = image_proc.convert(img=img, convert_to='PIL')
-        img_pil.save('/home/pi/birdclass/alt_camera_img.jpg')
-        return img_pil
+    # def capture_image_np(self, img_type='jpeg'):
+    #     height, width = self.camera.resolution
+    #     img = np.empty((height, width, 3), dtype=np.uint8)
+    #     # print(height, width)
+    #     self.camera.capture(img, img_type)
+    #     img_pil = image_proc.convert(img=img, convert_to='PIL')
+    #     img_pil.save('/home/pi/birdclass/alt_camera_img.jpg')
+    #     return img_pil
 
     # once first image is captured call motion detector in a loop to find each subsequent image
     # motion detection, compute the absolute difference between the current frame and first frame
