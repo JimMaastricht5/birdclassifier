@@ -51,7 +51,7 @@ picam2.configure(preview_config)
 # picam2.start_preview(Preview.QTGL)  # does not work, may need to install qt graphics lib
 picam2.start()
 sleep(2)  # let the camera settle
-metadata = picam2.capture(os.getcwd()+ '/assets/testcap2.jpg')
+metadata = picam2.capture_file(os.getcwd()+ '/assets/testcap2.jpg')
 # metadata = picam2.capture_file("test.jpg")  # writes file to current dir
 print(metadata)
 
