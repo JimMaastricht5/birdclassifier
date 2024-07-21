@@ -78,7 +78,7 @@ class MotionDetector:
         # self.camera2.capture_files(name=self.file_dest+'/stream{:d}.jpg',
         #                            num_files=num_frames, capture_mode='still')
         for image_num in range(num_frames):
-            img = self.capture_image_with_file(filename=f'{self.file_dest}/stream{image_num:d}.jpg')
+            img = self.capture_image_with_file(filename=f'stream{image_num:d}.jpg')
             # img = Image.open(f'{self.file_dest}/stream{image_num:d}.jpg')
             frames.append(img)
         self.FPS = num_frames / float(time.time() - start_time)
