@@ -25,8 +25,8 @@ import os
 from picamera2 import Picamera2, Preview
 from libcamera import Transform  # add import to test setup for motion detector
 
-screenheight = 640
-screenwidth = 480
+screenheight = 480
+screenwidth = 640
 picam2 = Picamera2()
 
 config = picam2.create_preview_configuration(main={"size": (screenheight, screenwidth)})

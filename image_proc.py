@@ -26,7 +26,7 @@ from PIL import ImageEnhance, Image, ImageOps, ImageStat, ImageFilter, ImageChop
 import numpy as np
 import io
 import os
-
+WASHOUT_RED_THRESHOLD = .50  # 40% more red in bottom is cut off for determining washout images
 
 # Pillow img to flip
 def flip(img):
@@ -78,6 +78,18 @@ def enhance(img, brightness=1.0, sharpness=1.0, contrast=1.0, color=1.0):
     img = enhance_color(img, color) if color != 1 else img
     return img
 
+
+# detect image problems where bottom half of the image is washed from suns reflection, must be jpg
+def is_sun_reflection(jpg_img):
+    img_np_array = convert(jpg_img, convert_to='np')
+    height, width, channel = img_np_array.shape  # Get image dimensions
+    top_half = img_np_array[:height // 2, :]  # Split the image into top and bottom halves
+    bottom_half = img_np_array[height // 2:, :]
+    # Calculate average red intensity for each half, washed out images are pink on the bottom half
+    top_red_avg = np.mean(top_half[:, :, 0])
+    bottom_red_avg = np.mean(bottom_half[:, :, 0])
+    reflection_b = True if bottom_red_avg > top_red_avg * (1 + WASHOUT_RED_THRESHOLD) else False
+    return reflection_b
 
 # color enhance image
 # factor of 1 is no change. < 1 reduces color,  > 1 increases color
@@ -198,8 +210,9 @@ def save_gif(frames, frame_rate=30, filename=os.getcwd()+'/assets/birds.gif'):
 def main():
 
     # print(overlap_area((1, 1, 10, 10), (1, 1, 2, 2)))
-    img_org = Image.open('/home/pi/birdclass/test.gif')
-    img = resize(img_org, 100, 100, maintain_aspect=False)
+    img = Image.open('/home/pi/birdclass/washout3.jpg')
+    print(is_sun_reflection(img))
+    # img = resize(img_org, 100, 100, maintain_aspect=False)
     # gif1 = convert_image(img1, target='gif', save_test_img=True)
     # img2 = Image.open('/home/pi/birdclass/test2.jpg')
     # img2_gif = convert_image(img=img2, target='gif')
@@ -208,7 +221,6 @@ def main():
     # gif2 = convert_image(img2, target='gif', save_test_img=True)
     # save_gif([img1, img2], frame_rate=10, filename='/home/pi/birdclass/test4.gif')
     img.show()
-    img_org.show()
 
     # img = enhance_brightness(img, 1)
     # img = enhance_sharpness(img, 1.2)

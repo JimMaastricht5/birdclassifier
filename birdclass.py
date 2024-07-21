@@ -108,10 +108,11 @@ def bird_detector(args):
             motioncnt += 1
 
         if motion_detect.motion and birds.detect(img=motion_detect.img) and \
-                cityweather.is_dawn() is False and cityweather.is_dusk() is False:  # daytime with motion and birds
+                cityweather.is_dawn() is False and cityweather.is_dusk() is False\
+                and image_proc.is_sun_reflection(jpg_img=motion_detect.img) is False:  # daytime with motion and birds
             motioncnt = 0  # reset motion count between detected birds
             birds.set_colors()  # set new colors for this series of bounding boxes
-            event_count += 1
+            event_count += 1  # increment event code for log and messages
             local_img_filename = os.getcwd() + '/assets/' + str(event_count % 10) + '.jpg'
             # gcs_img_filename = f'{datetime.now().strftime("%Y-%m-%d-%H-%M-%S")}{str(event_count)}.jpg'  # redundant
             first_img_jpg = birds.img  # keep first shot for animation and web
