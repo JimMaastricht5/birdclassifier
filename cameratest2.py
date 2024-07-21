@@ -31,7 +31,7 @@ picam2 = Picamera2()
 
 config = picam2.create_preview_configuration(main={"size": (screenheight, screenwidth)})
 picam2.configure(config)
-# picam2.start_preview(Preview.QTGL)  # does not work, may need to install qt graphics lib
+picam2.start_preview(Preview.XVID)  # QTGL does not work properly.  need to test XVID
 picam2.start()
 sleep(2)  # let the camera settle
 metadata = picam2.capture_file(os.getcwd()+ '/assets/testcap2.jpg')
