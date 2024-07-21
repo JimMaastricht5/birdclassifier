@@ -50,14 +50,14 @@ class Census:
         return output_list
 
     # find visitor by census name, increment count, and update time
+    # make sure visitor names is a list and not a string
     def visitors(self, visitor_names, time_of_visit=datetime.now()):
         self.first_time_seen = False
-        print(visitor_names)
-        visitor_name_list = self.convert_to_list(visitor_names)
+        visitor_name_list = visitor_names if isinstance(visitor_names, list) else self.convert_to_list(visitor_names)
         for i, visitor_name in enumerate(visitor_name_list):
             print(visitor_name)
-            if isinstance(visitor_name, str) and visitor_name.rstrip() != '':
-                if self.census_dict[visitor_name][0] == 0:
+            if isinstance(visitor_name, str) and visitor_name.rstrip() != '':  # do we have a name?
+                if self.census_dict[visitor_name][0] == 0:  # check census to see count for this species
                     self.first_time_seen = True
                 self.census_dict[visitor_name] = (self.census_dict[visitor_name][0] + 1, time_of_visit)
                 self.census_occurrence.append((visitor_name, time_of_visit.strftime("%Y-%m-%d %H:%M:%S")))
