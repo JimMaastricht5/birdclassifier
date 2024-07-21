@@ -52,9 +52,11 @@ class Census:
     # find visitor by census name, increment count, and update time
     def visitors(self, visitor_names, time_of_visit=datetime.now()):
         self.first_time_seen = False
+        print(visitor_names)
         visitor_name_list = self.convert_to_list(visitor_names)
         for i, visitor_name in enumerate(visitor_name_list):
-            if visitor_name.rstrip() != '':
+            print(visitor_name)
+            if isinstance(visitor_name, str) and visitor_name.rstrip() != '':
                 if self.census_dict[visitor_name][0] == 0:
                     self.first_time_seen = True
                 self.census_dict[visitor_name] = (self.census_dict[visitor_name][0] + 1, time_of_visit)
