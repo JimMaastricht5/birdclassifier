@@ -74,7 +74,6 @@ def bird_detector(args):
     # initial video capture, screen size, and grab first image (no motion)
     motion_detect = motion_detector.MotionDetector(motion_min_area=args.minarea, screenwidth=args.screenwidth,
                                                    screenheight=args.screenheight, flip_camera=args.flipcamera,
-                                                   iso=args.iso,
                                                    first_img_name='first_img.jpg')
     # old code.... first_img_name = os.getcwd() + '/assets/' + 'first_img.jpg')  # init
     output.message('Done with camera init... setting up classes.')
