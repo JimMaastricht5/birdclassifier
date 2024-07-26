@@ -36,20 +36,22 @@ Software:
 9. [Note: add link here] Setup a developer Twitter account for the bot to broadcast to...  twitter has good directions  
 10. Setup a free account on OpenWeatherMap (http://api.openweathermap.org)cat   
 11. create your auth.py file with the Twitter keys and the open weather key.  
-    set a file in the birdclassifier directory and call it auth.py  
-    enter the keys from your twitter account into the file  
+    set a file in the birdclassifier directory and call it auth.py. I would suggest using "nano auth.py"  
+    enter the keys from your twitter account into the file. 
    \# Twitter keys  
    api_key =''   
    api_secret_key =''   
    access_token= ''  
-   access_token_secret = ''  
+   access_token_secret = ''   
    bear_token = ''  
+   client_id = ''  
+   client_secret = ''  
    \# weather  
    weather_key = ''  
    \# google  
    google_json_key = ''  
-12. Note: what about google GCS key?  
-13. [Note: add crontab setup] I have some bash scripts to start the process every day on a schedule.  
+13. Note: what about google GCS containesd in the json_key_file?  
+14. [Note: add crontab setup] I have some bash scripts to start the process every day on a schedule.  
 
 
 The complete project spans several repos:  
