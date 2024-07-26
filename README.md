@@ -28,11 +28,13 @@ Software:
    sudo apt install python3-picamera2  
 8. Install other software  
    (remote control software from windows with RDP): sudo apt install xrdp  
-10. Setup the software  
+10. Setup the software and the virtual environment for python
     mkdir birdclassifiercd 
     git clone https://github.com/JimMaastricht5/birdclassifier.git
     cd birdclassifier
-    ls 
+    ls
+    python -m venv venv
+    pip install -r requirements.txt
 9. [Note: add link here] Setup a developer Twitter account for the bot to broadcast to...  twitter has good directions  
 10. Setup a free account on OpenWeatherMap (http://api.openweathermap.org)cat   
 11. create your auth.py file with the Twitter keys and the open weather key.  
