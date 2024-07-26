@@ -38,15 +38,15 @@ Software:
 11. create your auth.py file with the Twitter keys and the open weather key.  
     set a file in the birdclassifier directory and call it auth.py  
     enter the keys from your twitter account into the file  
-   # Twitter keys  
+   \# Twitter keys  
    api_key =''   
    api_secret_key =''   
    access_token= ''  
    access_token_secret = ''  
    bear_token = ''  
-   # weather  
+   \# weather  
    weather_key = ''  
-   # google  
+   \# google  
    google_json_key = ''  
 12. Note: what about google GCS key?  
 13. [Note: add crontab setup] I have some bash scripts to start the process every day on a schedule.  
