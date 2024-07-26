@@ -3,7 +3,7 @@ requests
 Pillow
 pandas
 gpiozero
-picamera2
+# picamera2  # globally installed, hard to install, use global site packages
 matplotlib
 scipy
 tflite-runtime

@@ -26,7 +26,7 @@ from PIL import ImageEnhance, Image, ImageOps, ImageStat, ImageFilter, ImageChop
 import numpy as np
 import io
 import os
-WASHOUT_RED_THRESHOLD = .50  # 40% more red in bottom is cut off for determining washout images
+
 
 # Pillow img to flip
 def flip(img):
@@ -71,6 +71,7 @@ def resize(img, new_height, new_width, maintain_aspect=True, box=None, resample=
     img = img.resize((new_width, new_height), resample=resample, box=box)
     return img
 
+
 def enhance(img, brightness=1.0, sharpness=1.0, contrast=1.0, color=1.0):
     img = enhance_brightness(img, brightness) if brightness != 1 else img
     img = enhance_sharpness(img, sharpness) if sharpness != 1 else img
@@ -80,7 +81,10 @@ def enhance(img, brightness=1.0, sharpness=1.0, contrast=1.0, color=1.0):
 
 
 # detect image problems where bottom half of the image is washed from suns reflection, must be jpg
-def is_sun_reflection(jpg_img):
+def is_sun_reflection_jpg(jpg_img, washout_red_threshold=.50):
+    if jpg_img != 'JPG':
+        raise ValueError('jpg_img must by of type JPG and not GIF or numpy array')
+        return
     img_np_array = convert(jpg_img, convert_to='np')
     height, width, channel = img_np_array.shape  # Get image dimensions
     top_half = img_np_array[:height // 2, :]  # Split the image into top and bottom halves
@@ -88,8 +92,9 @@ def is_sun_reflection(jpg_img):
     # Calculate average red intensity for each half, washed out images are pink on the bottom half
     top_red_avg = np.mean(top_half[:, :, 0])
     bottom_red_avg = np.mean(bottom_half[:, :, 0])
-    reflection_b = True if bottom_red_avg > top_red_avg * (1 + WASHOUT_RED_THRESHOLD) else False
+    reflection_b = True if bottom_red_avg > top_red_avg * (1 + washout_red_threshold) else False
     return reflection_b
+
 
 # color enhance image
 # factor of 1 is no change. < 1 reduces color,  > 1 increases color
@@ -191,6 +196,16 @@ def convert_image(img, target='gif'):
     return new_img
 
 
+# exposure average
+def avg_exposure(img):
+    img_np = img if isinstance(img, np.ndarray) else np.array(img)
+    return np.mean(img_np)
+
+
+# normalize a jpg
+def normalize(img):
+    return(np.array(img, dtype=np.float32) / 255.0)
+
 # takes list of frames and saves as a gif
 def save_gif(frames, frame_rate=30, filename=os.getcwd()+'/assets/birds.gif'):
     gif_frames = [convert_image(frame, target='gif') for frame in frames]
@@ -210,8 +225,10 @@ def save_gif(frames, frame_rate=30, filename=os.getcwd()+'/assets/birds.gif'):
 def main():
 
     # print(overlap_area((1, 1, 10, 10), (1, 1, 2, 2)))
-    img = Image.open('/home/pi/birdclass/washout3.jpg')
-    print(is_sun_reflection(img))
+    img = Image.open('/home/pi/birdclass/birds.gif')
+    print(img.format)
+    print(avg_exposure(img))
+    # print(is_sun_reflection_jpg(img))
     # img = resize(img_org, 100, 100, maintain_aspect=False)
     # gif1 = convert_image(img1, target='gif', save_test_img=True)
     # img2 = Image.open('/home/pi/birdclass/test2.jpg')
