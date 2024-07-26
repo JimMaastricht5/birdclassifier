@@ -23,12 +23,28 @@ Software:
 7. Install Picamera2 (if necessary), this is suppossed to be installed by default.  Verify that with pip3 and install it if necessary with the next command
    pip3 show picamera2
    sudo apt install python3-picamera2
-8. Setup a developer Twitter account for the bot to broadcast to...  twitter has good directions
-10. Setup a free account on OpenWeatherMap (http://api.openweathermap.org)
-11. Clone the bird classifier project: https://github.com/JimMaastricht5/birdclassifier
-12. create your auth.py file with the Twitter keys and the open weather key.  When you get to this point let me know and we can work together on it.  Twitter: api_key, api_secret_key, access_token, access_token_secretOMW: weather_key
-13. I have some bash scripts to start the process every day on a schedule.  
-14. tweek the parameters for your use case.  I have the threshold set really high so I get less confusing results
+8. Install other software
+   (remote control software from windows with RDP): suod apt install xrdp
+9. Check that the locale, and time are correct in the Pi/Perferences/Raspberry Pi Configuration menu
+10. Clone the bird classifier project: https://github.com/JimMaastricht5/birdclassifier
+11. [Note: add link here] Setup a developer Twitter account for the bot to broadcast to...  twitter has good directions
+12. Setup a free account on OpenWeatherMap (http://api.openweathermap.org)cat 
+14. create your auth.py file with the Twitter keys and the open weather key.
+    set a file in the birdclassifier directory and call it auth.py
+    enter the keys from your twitter account into the file
+   # Twitter keys
+   api_key ='' 
+   api_secret_key ='' 
+   access_token= ''
+   access_token_secret = ''
+   bear_token = ''
+   # weather
+   weather_key = ''
+   # google
+   google_json_key = ''
+15. [Note: add crontab setup] I have some bash scripts to start the process every day on a schedule.
+16. Note: what about google GCS key?
+
 
 The complete project spans several repos:
 1. Web site: https://github.com/JimMaastricht5/tweetersp
