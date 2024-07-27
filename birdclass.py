@@ -109,7 +109,7 @@ def bird_detector(args):
 
         if motion_detect.motion and birds.detect(img=motion_detect.img) and \
                 cityweather.is_dawn() is False and cityweather.is_dusk() is False\
-                and image_proc.is_sun_reflection_jpg(jpg_img=motion_detect.img) is False:  # daytime with motion & bird
+                and image_proc.is_sun_reflection_jpg(img=motion_detect.img) is False:  # daytime with motion & bird
             motioncnt = 0  # reset motion count between detected birds
             birds.set_colors()  # set new colors for this series of bounding boxes
             event_count += 1  # increment event code for log and messages
