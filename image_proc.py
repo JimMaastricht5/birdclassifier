@@ -83,8 +83,9 @@ def enhance(img, brightness=1.0, sharpness=1.0, contrast=1.0, color=1.0):
 # detect image problems where bottom half of the image is washed from suns reflection, must be jpg
 def is_sun_reflection_jpg(jpg_img, washout_red_threshold=.50):
     if jpg_img != 'JPG':
-        raise ValueError('jpg_img must by of type JPG and not GIF or numpy array')
-        return
+        # raise ValueError('jpg_img must by of type JPG and not GIF or numpy array')
+        print('is_sun_reflection_jpg received a gif.  skipping test')
+        return False
     img_np_array = convert(jpg_img, convert_to='np')
     height, width, channel = img_np_array.shape  # Get image dimensions
     top_half = img_np_array[:height // 2, :]  # Split the image into top and bottom halves
@@ -228,7 +229,7 @@ def main():
     img = Image.open('/home/pi/birdclass/birds.gif')
     print(img.format)
     print(avg_exposure(img))
-    # print(is_sun_reflection_jpg(img))
+    print(is_sun_reflection_jpg(img))
     # img = resize(img_org, 100, 100, maintain_aspect=False)
     # gif1 = convert_image(img1, target='gif', save_test_img=True)
     # img2 = Image.open('/home/pi/birdclass/test2.jpg')
