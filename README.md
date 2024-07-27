@@ -38,6 +38,7 @@ Software:
     pip install --upgrade pip
     pip install -r requirements.txt
     bash /home/pi/birdclassifier/bash_cmds/cameratest2.sh
+    chmod +x bash_cmds/birdclass.sh
 9. [Note: add link here] Setup a developer Twitter account for the bot to broadcast to...  twitter has good directions  
 10. Setup a free account on OpenWeatherMap (http://api.openweathermap.org)cat   
 11. create your auth.py file with the Twitter keys and the open weather key.  
