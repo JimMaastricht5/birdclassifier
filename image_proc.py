@@ -89,13 +89,17 @@ def is_sun_reflection_jpg(img, washout_red_threshold=.50):
     else:
         img_np_array = np.array(img)
 
-    height, width, channel = img_np_array.shape  # Get image dimensions
-    top_half = img_np_array[:height // 2, :]  # Split the image into top and bottom halves
-    bottom_half = img_np_array[height // 2:, :]
-    # Calculate average red intensity for each half, washed out images are pink on the bottom half
-    top_red_avg = np.mean(top_half[:, :, 0])
-    bottom_red_avg = np.mean(bottom_half[:, :, 0])
-    reflection_b = True if bottom_red_avg > top_red_avg * (1 + washout_red_threshold) else False
+    if img_np_array.shape == 3:
+        height, width, channel = img_np_array.shape  # Get image dimensions
+        top_half = img_np_array[:height // 2, :]  # Split the image into top and bottom halves
+        bottom_half = img_np_array[height // 2:, :]
+        # Calculate average red intensity for each half, washed out images are pink on the bottom half
+        top_red_avg = np.mean(top_half[:, :, 0])
+        bottom_red_avg = np.mean(bottom_half[:, :, 0])
+        reflection_b = True if bottom_red_avg > top_red_avg * (1 + washout_red_threshold) else False
+    else:
+        print('image_proc.py is_sun_reflection got np array with something other than 3 dimensions')
+        reflection_b = False  # drop thru and return false if conversion or np dimensions does not return 3 channels
     return reflection_b
 
 
@@ -207,7 +211,8 @@ def avg_exposure(img):
 
 # normalize a jpg
 def normalize(img):
-    return(np.array(img, dtype=np.float32) / 255.0)
+    return np.array(img, dtype=np.float32) / 255.0
+
 
 # takes list of frames and saves as a gif
 def save_gif(frames, frame_rate=30, filename=os.getcwd()+'/assets/birds.gif'):
