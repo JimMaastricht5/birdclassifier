@@ -254,7 +254,8 @@ class DetectClassify:
         # except Exception as e:
         #     print(e)
         #     pass
-        image_np = image_proc.convert(reshape_image, 'np')
+        # image_np = image_proc.convert(reshape_image, 'np')
+        image_np = np.array(reshape_image)
         image_np_expanded = np.expand_dims(image_np, axis=0)
 
         if floating_model:
