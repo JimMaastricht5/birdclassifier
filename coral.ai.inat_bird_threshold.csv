@@ -296,7 +296,7 @@
 295 Xiphorhynchus flavigaster (Ivory-billed Woodcreeper),0
 296 Jacana jacana (Wattled Jacana),0
 297 Phalaropus fulicarius (Red Phalarope),-1
-298 Streptopelia turtur (European Turtle-Dove),0
+298 Streptopelia turtur (European Turtle-Dove),-1
 299 Pica hudsonia (Black-billed Magpie),0
 300 Corvus cornix (Hooded Crow),0
 301 Myiopsitta monachus (Monk Parakeet),0
@@ -331,16 +331,16 @@
 330 Megascops kennicottii (Western Screech-Owl),0
 331 Porphyrio poliocephalus (Gray-headed Swamphen),0
 332 Megascops asio (Eastern Screech-Owl),0
-333 Zenaida auriculata (Eared Dove),0
+333 Zenaida auriculata (Eared Dove),-1
 334 Hymenolaimus malacorhynchos (Blue Duck),0
 335 Setophaga caerulescens (Black-throated Blue Warbler),0
 336 Camptostoma imberbe (Northern Beardless-Tyrannulet),0
 337 Caracara plancus (Southern Caracara),0
-338 Columbina passerina (Common Ground-Dove),0
+338 Columbina passerina (Common Ground-Dove),-1
 339 Eupsittula nana (Olive-throated Parakeet),0
 340 Nestor notabilis (Kea),0
 341 Columbina talpacoti (Ruddy Ground-Dove),-1
-342 Geopelia striata (Zebra Dove),0
+342 Geopelia striata (Zebra Dove),-1
 343 Athene noctua (Little Owl),0
 344 Crotophaga ani (Smooth-billed Ani),0
 345 Sialia sialis (Eastern Bluebird),0
@@ -549,7 +549,7 @@
 548 Vanellus spinosus (Spur-winged Lapwing),0
 549 Vanellus armatus (Blacksmith Lapwing),0
 550 Luscinia svecica (Bluethroat),0
-551 Columbina inca (Inca Dove),0
+551 Columbina inca (Inca Dove),-1
 552 Recurvirostra avosetta (Pied Avocet),0
 553 Phasianus colchicus (Ring-necked Pheasant),0
 554 Pluvialis dominica (American Golden-Plover),0
@@ -724,7 +724,7 @@
 723 Melanerpes erythrocephalus (Red-headed Woodpecker),0
 724 Emberiza calandra (Corn Bunting),0
 725 Acanthis flammea (Common Redpoll),0
-726 Spinus pinus (Pine Siskin),0
+726 Spinus pinus (Pine Siskin),-1
 727 Thraupis abbas (Yellow-winged Tanager),0
 728 Spinus psaltria (Lesser Goldfinch),0
 729 Spinus lawrencei (Lawrence's Goldfinch),0
