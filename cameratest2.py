@@ -37,7 +37,7 @@ def camera_test(args):
     picam2.start_preview(Preview.QT)  # QTGL does not work properly.
     picam2.start()
     sleep(args.sleep_time)  # let the camera settle
-    metadata = picam2.capture_file(os.getcwd() + '/assets/testcap2.jpg')
+    metadata = picam2.capture_file(os.getcwd() + '/home/pi/birdclassifier/assets/testcap2.jpg')
     print(metadata)
 
     picam2.close()
