@@ -27,6 +27,10 @@ from libcamera import Transform  # add import to test setup for motion detector
 
 
 def camera_test(args):
+    """ function tests camera on rasp pi
+    :param args: command line arguments, include screenheight, screenwidth, and flipcamera (vertical)
+    :return: Nothing
+    """
     picam2 = Picamera2()
 
     config = picam2.create_preview_configuration(main={"size": (args.screenheight, args.screenwidth)},
