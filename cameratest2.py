@@ -27,11 +27,10 @@ from libcamera import Transform  # add import to test setup for motion detector
 
 
 def camera_test(args):
-    screenheight = 480
-    screenwidth = 640
     picam2 = Picamera2()
 
-    config = picam2.create_preview_configuration(main={"size": (screenheight, screenwidth)})
+    config = picam2.create_preview_configuration(main={"size": (args.screenheight, args.screenwidth)},
+                                                 transform=Transform(vflip=args.flip_camera))
     picam2.configure(config)
     picam2.start_preview(Preview.QT)  # QTGL does not work properly.
     picam2.start()
@@ -55,6 +54,6 @@ if __name__ == "__main__":
     # general app settings
     ap.add_argument("-st", "--sleep_time", type=int, default=2, help="time to hold preview")
     ap.add_argument("-dr", "--directory", type=str, default="/home/pi/birdclassifier/assets",
-                     help="directory to write test file")
+                    help="directory to write test file")
 
     camera_test(ap.parse_args())
