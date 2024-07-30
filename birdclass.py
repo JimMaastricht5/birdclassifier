@@ -72,7 +72,7 @@ def bird_detector(args):
     cityweather.wait_until_sunrise()  # if before sun rise, wait here
 
     # initial video capture, screen size, and grab first image (no motion)
-    motion_detect = motion_detector.MotionDetector(motion_min_area=args.minarea, screenwidth=args.screenwidth,
+    motion_detect = motion_detector.MotionDetector(min_entropy=args.minentropy, screenwidth=args.screenwidth,
                                                    screenheight=args.screenheight, flip_camera=args.flipcamera,
                                                    first_img_name='first_img.jpg')
     # old code.... first_img_name = os.getcwd() + '/assets/' + 'first_img.jpg')  # init
@@ -236,7 +236,8 @@ if __name__ == "__main__":
     # prediction defaults
     ap.add_argument("-sc", "--species_confidence", type=float, default=.90, help="species confidence threshold")
     ap.add_argument("-bc", "--bird_confidence", type=float, default=.6, help="bird confidence threshold")
-    ap.add_argument("-ma", "--minarea", type=float, default=5.0, help="motion area threshold, lower req more")
+    ap.add_argument("-ma", "--minentropy", type=float, default=5.0,
+                    help="min change from first img to current to trigger motion")
     ap.add_argument("-ms", "--minimgperc", type=float, default=10.0, help="ignore objects that are less then % of img")
     ap.add_argument("-hd", "--homedir", type=str, default='/home/pi/birdclassifier/',
                     help="home directory for files")

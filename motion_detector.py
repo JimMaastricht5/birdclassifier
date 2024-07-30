@@ -20,11 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-# code to handle motion detection for pyface and tweetercam
-# pass in opencv, capture settings, and first_img
-# first_img should be without motion.
-# compare gray scale image to first image.  If different than motion
-# return image captured, gray scale, guassian blured version, thresholds, first_img, and countours
+# first_img should be without birds.
+# compare new gray scale image to first image.  If different than motion
 # code by JimMaastricht5@gmail.com based on https://www.pyimagesearch.com/category/object-tracking/
 # import io
 # import numpy as np
@@ -37,12 +34,20 @@ from libcamera import Transform
 
 
 class MotionDetector:
-    def __init__(self, motion_min_area=4, screenwidth=640, screenheight=480, flip_camera=False,
-                 first_img_name='capture.jpg', file_dest='assets'):
-
+    def __init__(self, min_entropy: int = 4, screenwidth: int = 640, screenheight: int = 480,
+                 flip_camera: bool = False, first_img_name: str = 'capture.jpg', file_dest: str = 'assets') -> None:
+        """
+        initialize motion detector class
+        :param min_entropy: motion detection is based on the amount of change from the first img the sys takes
+        :param screenwidth:
+        :param screenheight:
+        :param flip_camera: flip vertically
+        :param first_img_name: file name for first image
+        :param file_dest: location of directory to write out images
+        """
         print('initializing camera')
         self.camera2 = Picamera2()
-        self.min_area = motion_min_area
+        self.min_entropy = min_entropy
         self.screenwidth = screenwidth
         self.screenheight = screenheight
         self.config = self.camera2.create_preview_configuration(main={"size": (screenheight, screenwidth)},
@@ -62,38 +67,48 @@ class MotionDetector:
         self.motion = False  # init motion detection boolean
         self.FPS = 0  # calculated frames per second
         print('camera setup completed')
+        return
 
-    def capture_image_with_file(self, filename=None):
+    def capture_image_with_file(self, filename: str = None) -> Image.Image:
+        """
+        capture a single image, write it to disk, and return it in mem
+        :param filename: filename of image to capture, uses file dest from class init
+        :return: img captured
+        """
         filename = self.first_img_filename if filename is None else filename
         self.camera2.capture_file(f'{self.file_dest}/{filename}')
         img = Image.open(f'{self.file_dest}/{filename}')
         return img
 
-    def capture_stream(self, num_frames=12):
-        # function returns a list of images
-        # param num_frames: int value with number of frames to capture
-        # return frames: images is a list containing jpg images
+    def capture_stream(self, num_frames=12) -> list:
+        """
+        function returns a list of images
+        param num_frames:
+        return
+        :param num_frames: int value with number of frames to capture
+        :return: a list containing jpg images
+        """
         frames = []
         start_time = time.time()
-        # self.camera2.capture_files(name=self.file_dest+'/stream{:d}.jpg',
-        #                            num_files=num_frames, capture_mode='still')
         for image_num in range(num_frames):
             img = self.capture_image_with_file(filename=f'stream{image_num:d}.jpg')
-            # img = Image.open(f'{self.file_dest}/stream{image_num:d}.jpg')
             frames.append(img)
         self.FPS = num_frames / float(time.time() - start_time)
         return frames
 
-    # once first image is captured call motion detector in a loop to find each subsequent image
-    # motion detection, compute the absolute difference between the current frame and first frame
-    # if the difference is more than the tolerance we have something new in the frame aka motion
-    def detect(self):
+    def detect(self) -> bool:
+        """
+        once first image is captured call motion detector in a loop to find each subsequent image
+        motion detection, compute the absolute difference between the current frame and first frame
+        if the difference is more than the tolerance we have something new in the frame aka motion
+        :return: was motion detected true or false
+        """
         try:  # trap any camera or image errors gracefully
             self.img = self.capture_image_with_file(filename='capture.jpg')
-            grayimg = image_proc.grayscale(self.img)  # convert image to gray scale
-            grayblur = image_proc.gaussianblur(grayimg)  # smooth out image for motion detection
-            imgdelta = image_proc.compare_images(self.first_img, grayblur)
-            self.motion = (self.image_entropy(imgdelta) >= self.min_area)
+            # grayimg = image_proc.grayscale(self.img)  # convert image to gray scale
+            # grayblur = image_proc.gaussianblur(grayimg)  # smooth out image for motion detection
+            # imgdelta = image_proc.compare_images(self.first_img, grayblur)
+            self.motion = (self.image_entropy() >= self.min_entropy)  # higher entropy indicates a bird arrival
         except Exception as e:
             self.motion = False
             print(e)
@@ -103,12 +118,21 @@ class MotionDetector:
         self.camera2.close()
         return
 
-    # determine change between static image and new frame
-    def image_entropy(self, image_delta):
-        histogram = image_delta.histogram()
+    def image_entropy(self):
+        """
+        determine change between static image and new frame, creates a gray scale img, applies a blur to get
+        contours and compares the result to the first img
+        calculates the entropy of the probability distribution.
+        Entropy is a measure of randomness or uncertainty. The formula used here is the Shannon entropy formula.
+        :return: bool with true if image has a large enough change
+        """
+        grayimg = image_proc.grayscale(self.img)  # convert image to gray scale
+        grayblur = image_proc.gaussianblur(grayimg)  # smooth out image for motion detection
+        image_delta = image_proc.compare_images(self.first_img, grayblur)  # first img is already gray scale
+        histogram = image_delta.histogram()  # count of distribution of differences
         histlength = sum(histogram)
-        probability = [float(h) / histlength for h in histogram]
-        return -sum([p * math.log(p, 2) for p in probability if p != 0])
+        probability = [float(h) / histlength for h in histogram]  # for each divide count by length to get prob of chg
+        return -sum([p * math.log(p, 2) for p in probability if p != 0])  # Shannon's entropy formula
 
 
 # if __name__ == '__main__':
