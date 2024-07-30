@@ -54,7 +54,7 @@ if __name__ == "__main__":
 
     # general app settings
     ap.add_argument("-st", "--sleep_time", type=int, default=2, help="time to hold preview")
-    ap,add_arguement("-dr", "--directory", type=str, default="/home/pi/birdclassifier/assets",
+    ap.add_argument("-dr", "--directory", type=str, default="/home/pi/birdclassifier/assets",
                      help="directory to write test file")
 
     camera_test(ap.parse_args())
