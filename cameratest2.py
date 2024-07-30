@@ -30,7 +30,7 @@ def camera_test(args):
     picam2 = Picamera2()
 
     config = picam2.create_preview_configuration(main={"size": (args.screenheight, args.screenwidth)},
-                                                 transform=Transform(vflip=args.flip_camera))
+                                                 transform=Transform(vflip=args.flipcamera))
     picam2.configure(config)
     picam2.start_preview(Preview.QT)  # QTGL does not work properly.
     picam2.start()
