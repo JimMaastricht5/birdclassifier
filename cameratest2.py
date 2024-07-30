@@ -22,7 +22,6 @@
 #
 import argparse  # argument parser
 from time import sleep
-import os
 from picamera2 import Picamera2, Preview
 from libcamera import Transform  # add import to test setup for motion detector
 
@@ -37,7 +36,7 @@ def camera_test(args):
     picam2.start_preview(Preview.QT)  # QTGL does not work properly.
     picam2.start()
     sleep(args.sleep_time)  # let the camera settle
-    metadata = picam2.capture_file(os.getcwd() + 'home/pi/birdclassifier/assets/testcap2.jpg')
+    metadata = picam2.capture_file(args.directory + '/testcap2.jpg')
     print(metadata)
 
     picam2.close()
@@ -55,5 +54,7 @@ if __name__ == "__main__":
 
     # general app settings
     ap.add_argument("-st", "--sleep_time", type=int, default=2, help="time to hold preview")
+    ap,add_arguement("-dr", "--directory", type=str, default="/home/pi/birdclassifier/assets",
+                     help="directory to write test file")
 
     camera_test(ap.parse_args())
