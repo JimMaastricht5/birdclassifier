@@ -56,4 +56,4 @@ if __name__ == "__main__":
     # general app settings
     ap.add_argument("-st", "--sleep_time", type=int, default=2, help="time to hold preview")
 
-    camera_test(args)
+    camera_test(ap.parse_args())
