@@ -23,8 +23,7 @@
 # first_img should be without birds.
 # compare new gray scale image to first image.  If different than motion
 # code by JimMaastricht5@gmail.com based on https://www.pyimagesearch.com/category/object-tracking/
-# import io
-# import numpy as np
+import csv
 import time
 import math
 from PIL import Image
@@ -134,15 +133,17 @@ class MotionDetector:
         histogram = image_delta.histogram()  # count of distribution of differences
         histlength = sum(histogram)
         if self.debug:
-            self.first_gray_img.save('test_first_gray_img.jpg')
-            grayimg.save('test_grayimg_cap.jpg')
-            image_delta.save('test_image_delta.jpg')  # is image delta a pillow img?
-            print(histogram)
+            self.first_gray_img.save('assets/test_first_gray_img.jpg')
+            grayimg.save('assets/test_grayimg_cap.jpg')
+            image_delta.save('assets/test_image_delta.jpg')  # is image delta a pillow img?
+            with open('assets/image_delta_hist.csv', 'w', newline='') as csvfile:
+                csv_writer = csv.writer(csvfile)
+                csv_writer.writerows(histogram)
         probability = [float(h) / histlength for h in histogram]  # for each divide count by length to get prob of chg
         return -sum([p * math.log(p, 2) for p in probability if p != 0])  # Shannon's entropy formula
 
 
 if __name__ == '__main__':
     md = MotionDetector(debug=True)
-    input("Press a key to continue with capture motion image")
+    input("Press enter to continue with capture motion image")
     md.detect()
