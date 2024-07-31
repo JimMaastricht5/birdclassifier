@@ -137,7 +137,7 @@ class MotionDetector:
             grayimg.save('assets/test_grayimg_cap.jpg')
             image_delta.save('assets/test_image_delta.jpg')  # is image delta a pillow img?
             print(histogram)
-            np.savetext('assets/test_image_delta_hist.csv', histogram, delimiter=',')
+            np.savetxt('assets/test_image_delta_hist.csv', histogram, delimiter=',')
         probability = [float(h) / histlength for h in histogram]  # for each divide count by length to get prob of chg
         return -sum([p * math.log(p, 2) for p in probability if p != 0])  # Shannon's entropy formula
 
