@@ -144,4 +144,5 @@ class MotionDetector:
 
 if __name__ == '__main__':
     md = MotionDetector(debug=True)
+    input("Press a key to continue with capture motion image")
     md.detect()
