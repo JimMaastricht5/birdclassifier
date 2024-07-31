@@ -35,7 +35,8 @@ from libcamera import Transform
 
 class MotionDetector:
     def __init__(self, min_entropy: int = 4, screenwidth: int = 640, screenheight: int = 480,
-                 flip_camera: bool = False, first_img_name: str = 'capture.jpg', file_dest: str = 'assets') -> None:
+                 flip_camera: bool = False, first_img_name: str = 'capture.jpg', file_dest: str = 'assets',
+                 debug: bool = False) -> None:
         """
         initialize motion detector class
         :param min_entropy: motion detection is based on the amount of change from the first img the sys takes
@@ -45,6 +46,7 @@ class MotionDetector:
         :param first_img_name: file name for first image
         :param file_dest: location of directory to write out images
         """
+        self.debug = debug
         print('initializing camera')
         self.camera2 = Picamera2()
         self.min_entropy = min_entropy
@@ -63,7 +65,7 @@ class MotionDetector:
         self.img = self.capture_image_with_file()  # capture img
         self.gray = image_proc.grayscale(self.img)  # convert image to gray scale for motion detection
         self.graymotion = image_proc.gaussianblur(self.gray)  # smooth out image for motion detection
-        self.first_img = self.graymotion.copy()
+        self.first_gray_img = self.graymotion.copy()
         self.motion = False  # init motion detection boolean
         self.FPS = 0  # calculated frames per second
         print('camera setup completed')
@@ -128,11 +130,18 @@ class MotionDetector:
         """
         grayimg = image_proc.grayscale(self.img)  # convert image to gray scale
         grayblur = image_proc.gaussianblur(grayimg)  # smooth out image for motion detection
-        image_delta = image_proc.compare_images(self.first_img, grayblur)  # first img is already gray scale
+        image_delta = image_proc.compare_images(self.first_gray_img, grayblur)  # first img is already gray scale
         histogram = image_delta.histogram()  # count of distribution of differences
         histlength = sum(histogram)
+        if self.debug:
+            self.first_gray_img.save('test_first_gray_img.jpg')
+            grayimg.save('test_grayimg_cap.jpg')
+            image_delta.save('test_image_delta.jpg')  # is image delta a pillow img?
+            print(histogram.shape)
         probability = [float(h) / histlength for h in histogram]  # for each divide count by length to get prob of chg
         return -sum([p * math.log(p, 2) for p in probability if p != 0])  # Shannon's entropy formula
 
 
-# if __name__ == '__main__':
+if __name__ == '__main__':
+    md = MotionDetector(debug=True)
+    md.detect()
