@@ -23,7 +23,7 @@
 # first_img should be without birds.
 # compare new gray scale image to first image.  If different than motion
 # code by JimMaastricht5@gmail.com based on https://www.pyimagesearch.com/category/object-tracking/
-import csv
+import numpy as np
 import time
 import math
 from PIL import Image
@@ -136,9 +136,8 @@ class MotionDetector:
             self.first_gray_img.save('assets/test_first_gray_img.jpg')
             grayimg.save('assets/test_grayimg_cap.jpg')
             image_delta.save('assets/test_image_delta.jpg')  # is image delta a pillow img?
-            with open('assets/image_delta_hist.csv', 'w', newline='') as csvfile:
-                csv_writer = csv.writer(csvfile)
-                csv_writer.writerows(histogram)
+            print(histogram)
+            np.savetext('assets/test_image_delta_hist.csv', histogram, delimiter=',')
         probability = [float(h) / histlength for h in histogram]  # for each divide count by length to get prob of chg
         return -sum([p * math.log(p, 2) for p in probability if p != 0])  # Shannon's entropy formula
 
