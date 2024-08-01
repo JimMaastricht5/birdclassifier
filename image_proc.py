@@ -79,6 +79,13 @@ def enhance(img, brightness=1.0, sharpness=1.0, contrast=1.0, color=1.0):
 
 # detect image problems where bottom half of the image is washed from suns reflection, must be jpg
 def is_sun_reflection_jpg(img, washout_red_threshold=.50):
+    """
+    function looks at an image and determines if it is overexposed.  On current hardware that results in
+    the bottom half of the image having a pink or red hue.  Do the test is color diff from top to bottom
+    :param img: jpg or gif to test for over exposure aka washout
+    :param washout_red_threshold: threshold that is the % change from the bottom of the image in red spectrum
+    :return: bool true if the image is over exposed
+    """
     if img.format == 'GIF':
         first_frame = img.copy().convert('RGB')  # copy the img as RGB so we have three channels
         img.seek(1)  # get to first frame
@@ -101,40 +108,40 @@ def is_sun_reflection_jpg(img, washout_red_threshold=.50):
     return reflection_b
 
 
-# color enhance image
-# factor of 1 is no change. < 1 reduces color,  > 1 increases color
-# recommended values for color pop of 1.2
-# recommended values for reductions 0.8
 def enhance_color(img, factor):
+    # color enhance image
+    # factor of 1 is no change. < 1 reduces color,  > 1 increases color
+    # recommended values for color pop of 1.2
+    # recommended values for reductions 0.8
     return ImageEnhance.Color(img).enhance(factor)
 
 
-# brighten or darken an image
-# factor of 1 is no change. < 1 reduces color,  > 1 increases color
-# recommended values of 1.2 or 0.8
 def enhance_brightness(img, factor):
+    # brighten or darken an image
+    # factor of 1 is no change. < 1 reduces color,  > 1 increases color
+    # recommended values of 1.2 or 0.8
     return ImageEnhance.Brightness(img).enhance(factor)
 
 
-# increases or decreases contrast
-# factor of 1 is no change. < 1 reduces color,  > 1 increases color
-# recommended values 1.5, 3, 0.8
 def enhance_contrast(img, factor):
+    # increases or decreases contrast
+    # factor of 1 is no change. < 1 reduces color,  > 1 increases color
+    # recommended values 1.5, 3, 0.8
     return ImageEnhance.Contrast(img).enhance(factor)
 
 
-# increases or decreases sharpness
-# factor of 1 is no change. < 1 reduces color,  > 1 increases color
-# recommended values 1.5, 3
-# use 0.2 for blur
 def enhance_sharpness(img, factor):
+    # increases or decreases sharpness
+    # factor of 1 is no change. < 1 reduces color,  > 1 increases color
+    # recommended values 1.5, 3
+    # use 0.2 for blur
     return ImageEnhance.Sharpness(img).enhance(factor)
 
 
-# check in image to see if is low contrast, return True or False
-# input image and threshold as a decimal with .35 or 35% being the default
-# takes an image as pil format
 def is_color_low_contrast(colorimg, threshold=.35):
+    # check in image to see if is low contrast, return True or False
+    # input image and threshold as a decimal with .35 or 35% being the default
+    # takes an image as pil format
     stats = ImageStat.Stat(colorimg)
     if stats.stdev < threshold:
         return False
@@ -142,40 +149,40 @@ def is_color_low_contrast(colorimg, threshold=.35):
         return True
 
 
-# adjust contrast of gray image to improve process
-# apply histogram equalization to boost contrast
 def equalize_gray(grayimg):
+    # adjust contrast of gray image to improve process
+    # apply histogram equalization to boost contrast
     return ImageOps.equalize(grayimg)
 
 
-# color histogram equalization
 def equalize_color(img):
+    # color histogram equalization
     return ImageOps.equalize(img)
 
 
-# from pyimagesearch.com color detection
-def predominant_color(pil_img):
-    img = pil_img.copy()
-    img.convert("RGB")
-    img.resize((1, 1), resample=0)
-    dominant_color = img.getpixel((0, 0))
-    return dominant_color
+# def predominant_color(pil_img):
+#     # find most prominent color, uses image resize to get a single pixel
+#     img = pil_img.copy()
+#     img.convert("RGB")
+#     img.resize((1, 1), resample=0)
+#     dominant_color = img.getpixel((0, 0))
+#     return dominant_color
 
 
-# find the ratio of width/height
 def ratio(rect):
+    # find the ratio of width/height
     (startX, startY, endX, endY) = rect
     return round((endX - startX) / (endY - startY), 3)
 
 
-# find area of an image
 def area(rect):
+    # find area of an image
     (startX, startY, endX, endY) = rect
     return abs(endX - startX) * abs(endY - startY)
 
 
-# find the % area in 2 rectangles that overlap
 def overlap_area(rect1, rect2):
+    # find the % area in 2 rectangles that overlap
     (XA1, YA1, XA2, YA2) = rect1
     (XB1, YB1, XB2, YB2) = rect2
     sa = area(rect1)
@@ -185,12 +192,12 @@ def overlap_area(rect1, rect2):
     return si/su
 
 
-# compare two PIL images for differences
-# returns an array of the differences
-def compare_images(img1, img2):
-    if np.array(img1).shape != np.array(img2).shape:
-        raise Exception(f'images are not the same shape img1:{np.array(img1).shape}, img2:{np.array(img2).shape}')
-    return ImageChops.difference(img2, img1)
+def compare_images(img_c1, img_c2):
+    # compare two PIL images for differences
+    # returns an array of the differences
+    if np.array(img_c1).shape != np.array(img_c2).shape:
+        raise Exception(f'images are not the same shape img1:{np.array(img_c1).shape}, img2:{np.array(img_c2).shape}')
+    return ImageChops.difference(img_c2, img_c1)
 
 
 def convert_image(img, target='gif'):
@@ -201,19 +208,25 @@ def convert_image(img, target='gif'):
     return new_img
 
 
-# exposure average
 def avg_exposure(img):
+    # exposure average
     img_np = img if isinstance(img, np.ndarray) else np.array(img)
     return np.mean(img_np)
 
 
-# normalize a jpg
 def normalize(img):
+    # normalize a jpg
     return np.array(img, dtype=np.float32) / 255.0
 
 
-# takes list of frames and saves as a gif
 def save_gif(frames, frame_rate=30, filename=os.getcwd()+'/assets/birds.gif'):
+    """
+    takes a list of jpg images and converts them to an animated gif
+    :param frames: list of jpgs
+    :param frame_rate: used to calc time in ml seconds per frame displayed
+    :param filename: filename to write gif out
+    :return: animated gif and the name of the file
+    """
     gif_frames = [convert_image(frame, target='gif') for frame in frames]
     try:
         gif_frame_one = gif_frames[0]  # grab a frame to save full image with
@@ -227,20 +240,21 @@ def save_gif(frames, frame_rate=30, filename=os.getcwd()+'/assets/birds.gif'):
     return gif, filename
 
 
-# testing code
-def main():
-
+# invoke main
+if __name__ == "__main__":
     # print(overlap_area((1, 1, 10, 10), (1, 1, 2, 2)))
-    img = Image.open('/home/pi/birdclass/birds.gif')
+    img1 = Image.open('/home/pi/birdclass/birds.gif')
     # img = Image.open('/home/pi/birdclass/washout3.jpg')
-    print(img.format)
-    print(avg_exposure(img))
-    print(is_sun_reflection_jpg(img))
+    print(img1.format)
+    print(avg_exposure(img1))
+    print(is_sun_reflection_jpg(img1))
+    img1.show()
 
-    img = Image.open('/home/pi/birdclass/washout3.jpg')
-    print(img.format)
-    print(avg_exposure(img))
-    print(is_sun_reflection_jpg(img))
+    img2 = Image.open('/home/pi/birdclass/washout3.jpg')
+    print(img2.format)
+    print(avg_exposure(img2))
+    print(is_sun_reflection_jpg(img2))
+    img2.show()
 
     # img = resize(img_org, 100, 100, maintain_aspect=False)
     # gif1 = convert_image(img1, target='gif', save_test_img=True)
@@ -250,7 +264,6 @@ def main():
     # img3_gif.save('/home/pi/birdclass/test stream.gif', 'gif')
     # gif2 = convert_image(img2, target='gif', save_test_img=True)
     # save_gif([img1, img2], frame_rate=10, filename='/home/pi/birdclass/test4.gif')
-    img.show()
 
     # img = enhance_brightness(img, 1)
     # img = enhance_sharpness(img, 1.2)
@@ -270,8 +283,3 @@ def main():
     # equalizedcolorimg = equalize_color(img)
     # equalizedcolorimg.show()
     # print(predominant_color(equalizedcolorimg))
-
-
-# invoke main
-if __name__ == "__main__":
-    main()
