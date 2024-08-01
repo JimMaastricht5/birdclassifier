@@ -20,54 +20,51 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-# lib of image enhancement and processing techniques
-# required Pillow, scikit-image library in project
+# lib of image enhancement and processing techniques along with testing code
+# many of the functions that are here are simple wrappers for Pillow functions.  Easier to remember this way
 from PIL import ImageEnhance, Image, ImageOps, ImageStat, ImageFilter, ImageChops
 import numpy as np
 import io
 import os
 
 
-# Pillow img to flip
 def flip(img):
+    # Pillow img to flip
     return ImageOps.flip(img)
 
 
-# create a gray scale image
 def grayscale(img):
+    # create a gray scale image
     return ImageOps.grayscale(img)
 
 
-# blur the image
 def gaussianblur(img):
+    # blur the image
     img.filter(ImageFilter.GaussianBlur)
     return img
 
 
-# find countours of the image
 def contour(img):
+    # find contours of the image
     img.filter(ImageFilter.CONTOUR)
     return img
 
 
-# func provides both formats for conversion
-# default conversion is to numpy array
-# def convert(img, convert_to='np'):
-#     if isinstance(img, Image.Image) and convert_to == 'np':
-#         img = np.array(img)
-#     elif isinstance(img, np.ndarray) and convert_to == 'PIL':
-#         img = Image.fromarray(img)
-#     # else requires no conversion
-#     return img
-
-
-# enhance color, brightness, sharpness, and contrast or resize
-def resize(img, new_height, new_width, maintain_aspect=True, box=None, resample=None):
+def resize(img: Image.Image, new_height: int, new_width: int, maintain_aspect: bool = True,
+           box: tuple = None, resample: int = None):
+    """
+    function to resize image.  Full image or subset
+    box is the subset of the image to perform an op on, default is entire img
+    :param img: Pillow jpg img to process
+    :param new_height: int with new height of image
+    :param new_width: int with new width of image
+    :param maintain_aspect: true or false, default is true
+    :param box: tuple in the format of (starting_width, starting_height, ending_width, ending_height)
+    :param resample: Image.BICUBIC(3) default.  Use LANCZOS(1) for improved down sampling, slower, BILINEAR (2) fastest
+    :return: img
+    """
     width, height = img.size
     new_height = int(height * (new_width / width)) if maintain_aspect else new_height
-    # resample=Resampling.LANCZOS for improved downsample, BICUBIC default
-    # box is the subset of the image to perform an op on, default is entire img
-    # box must be int the format of (starting_width, starting_height, ending_width, ending_height) as a tuple
     img = img.resize((new_width, new_height), resample=resample, box=box)
     return img
 
@@ -86,6 +83,7 @@ def is_sun_reflection_jpg(img, washout_red_threshold=.50):
         first_frame = img.copy().convert('RGB')  # copy the img as RGB so we have three channels
         img.seek(1)  # get to first frame
         img_np_array = np.array(first_frame)
+        print(f'image_proc.py is_sun_reflection got a GIF, np_array dim is: {img_np_array.shape}')
     else:
         img_np_array = np.array(img)
 
