@@ -96,7 +96,8 @@ def is_sun_reflection_jpg(img, washout_red_threshold=.50):
         bottom_red_avg = np.mean(bottom_half[:, :, 0])
         reflection_b = True if bottom_red_avg > top_red_avg * (1 + washout_red_threshold) else False
     else:
-        print('image_proc.py is_sun_reflection got np array with something other than 3 dimensions')
+        print(f'image_proc.py is_sun_reflection got np array with something other than 3 dimensions. '
+              f'{img.format} with {img_np_array.shape}')
         reflection_b = False  # drop thru and return false if conversion or np dimensions does not return 3 channels
     return reflection_b
 
