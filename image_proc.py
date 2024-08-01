@@ -83,11 +83,10 @@ def is_sun_reflection_jpg(img, washout_red_threshold=.50):
         first_frame = img.copy().convert('RGB')  # copy the img as RGB so we have three channels
         img.seek(1)  # get to first frame
         img_np_array = np.array(first_frame)
-        print(f'image_proc.py is_sun_reflection got a GIF, np_array dim is: {img_np_array.shape}')
     else:
         img_np_array = np.array(img)
 
-    if img_np_array.shape == 3:
+    if img_np_array.shape[2] == 3:  # is the 3rd dimension 3 for RGB
         height, width, channel = img_np_array.shape  # Get image dimensions
         top_half = img_np_array[:height // 2, :]  # Split the image into top and bottom halves
         bottom_half = img_np_array[height // 2:, :]
