@@ -106,9 +106,6 @@ class MotionDetector:
         """
         try:  # trap any camera or image errors gracefully
             self.img = self.capture_image_with_file(filename='capture.jpg')
-            # grayimg = image_proc.grayscale(self.img)  # convert image to gray scale
-            # grayblur = image_proc.gaussianblur(grayimg)  # smooth out image for motion detection
-            # imgdelta = image_proc.compare_images(self.first_img, grayblur)
             self.motion = (self.image_entropy() >= self.min_entropy)  # higher entropy indicates a bird arrival
         except Exception as e:
             self.motion = False

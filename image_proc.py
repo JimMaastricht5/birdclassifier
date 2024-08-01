@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-# lib of image enhancement and processing techniques along with testing code
+# collection of image enhancement and processing techniques along with testing code
 # many of the functions that are here are simple wrappers for Pillow functions.  Easier to remember this way
 from PIL import ImageEnhance, Image, ImageOps, ImageStat, ImageFilter, ImageChops
 import numpy as np
@@ -28,53 +28,26 @@ import io
 import os
 
 
-def flip(img):
-    # Pillow img to flip
-    return ImageOps.flip(img)
+# def flip(img):
+#     # Pillow img to flip
+#     return ImageOps.flip(img)
 
 
 def grayscale(img):
-    # create a gray scale image
+    # create a gray scale image, used in motion detector to simplify image comparision
     return ImageOps.grayscale(img)
 
 
 def gaussianblur(img):
-    # blur the image
+    # blur the image, used in motion detector to enhance contours of objects
     img.filter(ImageFilter.GaussianBlur)
     return img
 
 
-def contour(img):
-    # find contours of the image
-    img.filter(ImageFilter.CONTOUR)
-    return img
-
-
-def resize(img: Image.Image, new_height: int, new_width: int, maintain_aspect: bool = True,
-           box: tuple = None, resample: int = None):
-    """
-    function to resize image.  Full image or subset
-    box is the subset of the image to perform an op on, default is entire img
-    :param img: Pillow jpg img to process
-    :param new_height: int with new height of image
-    :param new_width: int with new width of image
-    :param maintain_aspect: true or false, default is true
-    :param box: tuple in the format of (starting_width, starting_height, ending_width, ending_height)
-    :param resample: Image.BICUBIC(3) default.  Use LANCZOS(1) for improved down sampling, slower, BILINEAR (2) fastest
-    :return: img
-    """
-    width, height = img.size
-    new_height = int(height * (new_width / width)) if maintain_aspect else new_height
-    img = img.resize((new_width, new_height), resample=resample, box=box)
-    return img
-
-
-def enhance(img, brightness=1.0, sharpness=1.0, contrast=1.0, color=1.0):
-    img = enhance_brightness(img, brightness) if brightness != 1 else img
-    img = enhance_sharpness(img, sharpness) if sharpness != 1 else img
-    img = enhance_contrast(img, contrast) if contrast != 1 else img
-    img = enhance_color(img, color) if color != 1 else img
-    return img
+# def contour(img):
+#     # find contours of the image
+#     img.filter(ImageFilter.CONTOUR)
+#     return img
 
 
 # detect image problems where bottom half of the image is washed from suns reflection, must be jpg
@@ -108,75 +81,105 @@ def is_sun_reflection_jpg(img, washout_red_threshold=.50):
     return reflection_b
 
 
-def enhance_color(img, factor):
-    # color enhance image
-    # factor of 1 is no change. < 1 reduces color,  > 1 increases color
-    # recommended values for color pop of 1.2
-    # recommended values for reductions 0.8
-    return ImageEnhance.Color(img).enhance(factor)
+def resize(img: Image.Image, new_height: int, new_width: int, maintain_aspect: bool = True,
+           box: tuple = None, resample: int = None):
+    """
+    function to resize image.  Full image or subset
+    box is the subset of the image to perform an op on, default is entire img
+    :param img: Pillow jpg img to process
+    :param new_height: int with new height of image
+    :param new_width: int with new width of image
+    :param maintain_aspect: true or false, default is true
+    :param box: tuple in the format of (starting_width, starting_height, ending_width, ending_height)
+    :param resample: Image.BICUBIC(3) default.  Use LANCZOS(1) for improved down sampling, slower, BILINEAR (2) fastest
+    :return: img
+    """
+    width, height = img.size
+    new_height = int(height * (new_width / width)) if maintain_aspect else new_height
+    img = img.resize((new_width, new_height), resample=resample, box=box)
+    return img
 
 
-def enhance_brightness(img, factor):
-    # brighten or darken an image
-    # factor of 1 is no change. < 1 reduces color,  > 1 increases color
-    # recommended values of 1.2 or 0.8
-    return ImageEnhance.Brightness(img).enhance(factor)
+def enhance(img, brightness=1.0, sharpness=1.0, contrast=1.0, color=1.0):
+    """
+    img is passed in along with brightness, sharpness, contrast and color changes
+    1.0 is the default value and is no change
+    decimal values can be used to reduce or increase an item
+    .8 brightness would reduce the image brightness by 20%
+    recommended values .8 to 1.2
+    :param img: jpg
+    :param brightness: adjust brightness
+    :param sharpness: adjust sharpness
+    :param contrast: adjust contrast
+    :param color: adjust color
+    :return: enhanced image
+    """
+    img = ImageEnhance.Color(img).enhance(brightness) if brightness != 1.0 else img
+    img = ImageEnhance.Sharpness(img).enhance(sharpness) if sharpness != 1.0 else img
+    img = ImageEnhance.Contrast(img).enhance(contrast) if contrast != 1.0 else img
+    img = ImageEnhance.Color(img).enhance(color) if color != 1.0 else img
+    return img
 
 
-def enhance_contrast(img, factor):
-    # increases or decreases contrast
-    # factor of 1 is no change. < 1 reduces color,  > 1 increases color
-    # recommended values 1.5, 3, 0.8
-    return ImageEnhance.Contrast(img).enhance(factor)
+# def enhance_color(img, factor):
+#     # color enhance image
+#     # factor of 1 is no change. < 1 reduces color,  > 1 increases color
+#     # recommended values for color pop of 1.2
+#     # recommended values for reductions 0.8
+#     return ImageEnhance.Color(img).enhance(factor)
+#
+#
+# def enhance_brightness(img, factor):
+#     # brighten or darken an image
+#     # factor of 1 is no change. < 1 reduces color,  > 1 increases color
+#     # recommended values of 1.2 or 0.8
+#     return ImageEnhance.Brightness(img).enhance(factor)
+#
+#
+# def enhance_contrast(img, factor):
+#     # increases or decreases contrast
+#     # factor of 1 is no change. < 1 reduces color,  > 1 increases color
+#     # recommended values 1.5, 3, 0.8
+#     return ImageEnhance.Contrast(img).enhance(factor)
+#
+#
+# def enhance_sharpness(img, factor):
+#     # increases or decreases sharpness
+#     # factor of 1 is no change. < 1 reduces color,  > 1 increases color
+#     # recommended values 1.5, 3
+#     # use 0.2 for blur
+#     return ImageEnhance.Sharpness(img).enhance(factor)
 
 
-def enhance_sharpness(img, factor):
-    # increases or decreases sharpness
-    # factor of 1 is no change. < 1 reduces color,  > 1 increases color
-    # recommended values 1.5, 3
-    # use 0.2 for blur
-    return ImageEnhance.Sharpness(img).enhance(factor)
+# def is_color_low_contrast(colorimg, threshold=.35):
+#     # check in image to see if is low contrast, return True or False
+#     # input image and threshold as a decimal with .35 or 35% being the default
+#     stats = ImageStat.Stat(colorimg)
+#     if stats.stdev < threshold:
+#         return False
+#     else:
+#         return True
 
 
-def is_color_low_contrast(colorimg, threshold=.35):
-    # check in image to see if is low contrast, return True or False
-    # input image and threshold as a decimal with .35 or 35% being the default
-    # takes an image as pil format
-    stats = ImageStat.Stat(colorimg)
-    if stats.stdev < threshold:
-        return False
-    else:
-        return True
+# def equalize_gray(grayimg):
+#     # adjust contrast of gray image to improve process
+#     # apply histogram equalization to boost contrast
+#     return ImageOps.equalize(grayimg)
 
 
-def equalize_gray(grayimg):
-    # adjust contrast of gray image to improve process
-    # apply histogram equalization to boost contrast
-    return ImageOps.equalize(grayimg)
+# def equalize_color(img):
+#     # color histogram equalization
+#     return ImageOps.equalize(img)
 
 
-def equalize_color(img):
-    # color histogram equalization
-    return ImageOps.equalize(img)
-
-
-# def predominant_color(pil_img):
-#     # find most prominent color, uses image resize to get a single pixel
-#     img = pil_img.copy()
-#     img.convert("RGB")
-#     img.resize((1, 1), resample=0)
-#     dominant_color = img.getpixel((0, 0))
-#     return dominant_color
-
-
-def ratio(rect):
-    # find the ratio of width/height
-    (startX, startY, endX, endY) = rect
-    return round((endX - startX) / (endY - startY), 3)
+# def ratio(rect):
+#     # find the ratio of width/height
+#     (startX, startY, endX, endY) = rect
+#     return round((endX - startX) / (endY - startY), 3)
 
 
 def area(rect):
-    # find area of an image
+    # find area of an image, used by overlap area
     (startX, startY, endX, endY) = rect
     return abs(endX - startX) * abs(endY - startY)
 
@@ -265,11 +268,6 @@ if __name__ == "__main__":
     # gif2 = convert_image(img2, target='gif', save_test_img=True)
     # save_gif([img1, img2], frame_rate=10, filename='/home/pi/birdclass/test4.gif')
 
-    # img = enhance_brightness(img, 1)
-    # img = enhance_sharpness(img, 1.2)
-    # img = enhance_contrast(img, 1.2)
-    # img = enhance_color(img, 1.2)
-    # img = equalize_color(img)
     # img = enhance(img, brightness=1.3, sharpness=1.2, contrast=1.2, color=1.2)
     # img.show()
 
