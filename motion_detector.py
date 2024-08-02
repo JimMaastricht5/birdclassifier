@@ -20,9 +20,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-# first_img should be without birds.
-# compare new gray scale image to first image.  If different than motion
-# code by JimMaastricht5@gmail.com based on https://www.pyimagesearch.com/category/object-tracking/
+# Class captures a blank image to start the process.  Each new images is compared to the
+# original to detect differences.  If the differences are high enough than that is considered the
+# arrival of a new object and is hence motion
+
 import numpy as np
 import time
 import math

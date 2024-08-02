@@ -20,17 +20,18 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-# motion detector with builtin bird detection and bird classification
-# accompying web site at https://jimmaastricht5-tweetersp-1-main-veglvm.streamlit.app/
-# built by JimMaastricht5@gmail.com
+# App to detect motion on a bird feeder, classify the object (is it a bird?),
+# determine the species, record the appearance, send the image to twitter and the cloud for
+# display. Web site at https://jimmaastricht5-tweetersp-1-main-veglvm.streamlit.app/
+#
 # uses tflite prebuilt google model for object detection and tensorflow lite model for bird classification
 # Other models built with tensor flow  using tools from tensor in colab notebook
 # https://colab.research.google.com/drive/1taZ9JincTaZuZh_JmBSC4pAbSQavxbq5#scrollTo=D3i_6WSXjUhk
-# packages: auth.py must be in project and will contain secret keys to as follows.  format is api_key=''
-#   twitter: api_key, api_secret_key, access_token, access_token_secret, bearer_token
-#   weather: weather_key
-#   google: google_json_key for gcs writes
+# see read me for auth.py format requirements: https://github.com/JimMaastricht5/birdclassifier
+# built by JimMaastricht5@gmail.com
 import image_proc
+import static_functions
+from typing import Union
 import label_image  # code to init tensor flow model and classify bird type, bird object
 import motion_detector  # motion detector helper functions
 import tweeter  # twitter helper functions
@@ -49,10 +50,49 @@ import animate_gif  # animate gif class
 
 # default dictionary returns a tuple of zero confidence and zero bird count
 def default_value():
+    # default dictionary returns a zero if asked for a key that doesn't exist
     return 0
 
 
-def bird_detector(args):
+def bird_detector(args) -> None:
+    """
+    main function for the bird feeder detector, takes a list of arguments from the command line or a file
+    :param args: parsed arguments from arg parser list below
+        "-cf", "--config_file", type=str, help='Config file'
+        # camera settings
+        "-fc", "--flipcamera", type=bool, default=False, help="flip camera image"
+        "-sw", "--screenwidth", type=int, default=640, help="max screen width"
+        "-sh", "--screenheight", type=int, default=480, help="max screen height"
+
+        # general app settings
+        "-gf", "--minanimatedframes", type=int, default=10, help="minimum number of frames with a bird"
+        "-bb", "--broadcast", type=bool, default=False, help="stream images and text"
+        "-v", "--verbose", type=bool, default=True, help="To tweet extra stuff or not"
+        "-td", "--tweetdelay", type=int, default=1800
+            help="Wait time between tweets is N species seen * delay/10 with not to exceed max of tweet delay"
+
+        # motion and image processing settings,
+        # note adjustments are used as both a detector second prediction and a final
+        # adjustment to the output images.  # 1 no chg,< 1 -, > 1 +
+        "-b", "--brightness_chg", type=int, default=1.2, help="brightness boost twilight"
+
+        # prediction defaults
+        "-sc", "--species_confidence", type=float, default=.90, help="species confidence threshold"
+        "-bc", "--bird_confidence", type=float, default=.6, help="bird confidence threshold"
+        "-ma", "--minentropy", type=float, default=5.0, help="min change from first img to current to trigger motion"
+        "-ms", "--minimgperc", type=float, default=10.0, help="ignore objects that are less than % of img"
+        "-hd", "--homedir", type=str, default='/home/pi/birdclassifier/', help="home directory for files"
+        "-la", "--labels", type=str, default='coral.ai.inat_bird_labels.txt', help="file for species labels "
+        "-tr", "--thresholds", type=str, default='coral.ai.inat_bird_threshold.csv', help="file for species thresholds"
+        "-cm", "--classifier", type=str, default='coral.ai.mobilenet_v2_1.0_224_inat_bird_quant.tflite',
+            help="model name for species classifier"
+
+        # feeder defaults
+        "-ct", "--city", type=str, default='Madison,WI,USA', help="city name weather station uses OWM web service."
+        '-fi', "--feeder_id", type=str, default=hex(uuid.getnode()), help='feeder id default MAC address'
+        '-t', "--feeder_max_temp_c", type=int, default=86, help="Max operating temp for the feeder in C"
+    :return: None
+    """
     favorite_birds = ['Rose-breasted Grosbeak', 'Red-bellied Woodpecker',
                       'Northern Cardinal']  # rare birds or just birds you want to see
     birdpop = population.Census()  # initialize species population census object
@@ -122,8 +162,9 @@ def bird_detector(args):
             if birds.classify(img=first_img_jpg) >= args.species_confidence:  # found a bird we can classify
                 first_rects, first_label, first_conf = birds.get_obj_data()  # grab data from this bird
                 max_index = birds.classified_confidences.index(max(birds.classified_confidences))
+                file_name = static_functions.common_name(birds.classified_labels[max_index]).replace(" ", "")
                 gcs_img_filename = f'{datetime.now().strftime("%Y-%m-%d-%H-%M-%S")}{str(event_count)}' \
-                                   f'({common_name(birds.classified_labels[max_index]).replace(" ", "")}).jpg'
+                                   f'({file_name}).jpg'
                 output.message(message=f'Possible sighting of a {birds.classified_labels[max_index]} '
                                        f'{birds.classified_confidences[max_index] * 100:.1f}% at '
                                        f'{datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count,
@@ -137,9 +178,11 @@ def bird_detector(args):
                 _gif = bird_gif.build_gif(event_count, first_img_jpg)
 
                 # annotate bare image copy, use either best gif label or org data
-                best_first_label = convert_to_list(bird_gif.best_label if bird_gif.best_label != '' else first_label)
-                best_first_conf = convert_to_list(bird_gif.best_confidence if bird_gif.best_confidence > 0 else
-                                                  first_conf)
+                best_first_label = (
+                    static_functions.convert_to_list(bird_gif.best_label if bird_gif.best_label != '' else first_label))
+                best_first_conf = (
+                    static_functions.convert_to_list(bird_gif.best_confidence if bird_gif.best_confidence > 0 else
+                                                     first_conf))
                 bird_first_time_seen = birdpop.visitors(best_first_label, datetime.now())  # increment species count
                 birds.set_ojb_data(classified_rects=first_rects, classified_labels=best_first_label,
                                    classified_confidences=best_first_conf)  # set to first bird
@@ -152,7 +195,7 @@ def bird_detector(args):
                 waittime = birdpop.report_single_census_count(bird_gif.best_label) * args.tweetdelay / 10
                 waittime = args.tweetdelay if waittime >= args.tweetdelay else waittime
                 if (datetime.now() - last_tweet).total_seconds() >= waittime or bird_first_time_seen or \
-                        common_name(bird_gif.best_label) in favorite_birds:
+                        static_functions.common_name(bird_gif.best_label) in favorite_birds:
                     if bird_gif.animated:
                         output.message(message=f'Spotted {bird_gif.best_label} {bird_gif.best_confidence * 100:.1f}% '
                                                f'at {datetime.now().strftime("%I:%M:%S %P")}', event_num=event_count,
@@ -175,16 +218,26 @@ def bird_detector(args):
     return  # to main and end process
 
 
-def convert_to_list(input_str_list):
-    return input_str_list if isinstance(input_str_list, list) else [input_str_list]
+# def convert_to_list(input_str_list):
+#     """
+#     :param input_str_list:
+#     :return:
+#     """
+#     return input_str_list if isinstance(input_str_list, list) else [input_str_list]
 
 
-def tweet_text(label, confidence):
+def tweet_text(label: Union[list, str], confidence: Union[list, float]) -> str:
+    """
+    grab the best label and confidence, use that to generate a twitter text label
+    :param label: list of labels or string contain label
+    :param confidence: list of confidences or single float
+    :return: tweet label as a string
+    """
     # sample url https://www.allaboutbirds.org/guide/Northern_Rough-winged_Swallow/overview
     try:
         label = str(label[0]) if isinstance(label, list) else str(label)  # handle list or individual string
         confidence = float(confidence[0]) if isinstance(confidence, list) else float(confidence)  # list or float
-        cname = common_name(str(label))
+        cname = static_functions.common_name(str(label))
         hypername = cname.replace(' ', '_')
         hyperlink = f'https://www.allaboutbirds.org/guide/{hypername}/overview'
         tweet_label = f'{cname} {confidence * 100:.1f}% {hyperlink}'
@@ -194,17 +247,20 @@ def tweet_text(label, confidence):
     return tweet_label
 
 
-def common_name(name):
-    cname, sname = '', ''
-    try:
-        sname = str(name)
-        sname = sname[sname.find(' ') + 1:] if sname.find(' ') >= 0 else sname  # remove index number
-        # sex = sname[sname.find('[') + 1: sname.find(']')] if sname.find('[') >= 0 else ''  # retrieve sex
-        sname = sname[0: sname.find('[') - 1] if sname.find('[') >= 0 else sname  # remove sex
-        cname = sname[sname.find('(') + 1: sname.find(')')] if sname.find('(') >= 0 else sname  # retrieve common name
-    except Exception as e:
-        print(e)
-    return cname
+# def common_name(name):
+#     """
+#     :param name:
+#     :return:
+#     """
+#     cname, sname = '', ''
+#     try:
+#         sname = str(name)
+#         sname = sname[sname.find(' ') + 1:] if sname.find(' ') >= 0 else sname  # remove index number
+#         sname = sname[0: sname.find('[') - 1] if sname.find('[') >= 0 else sname  # remove sex
+#         cname = sname[sname.find('(') + 1: sname.find(')')] if sname.find('(') >= 0 else sname  # retrieve common name
+#     except Exception as e:
+#         print(e)
+#     return cname
 
 
 if __name__ == "__main__":
@@ -227,11 +283,11 @@ if __name__ == "__main__":
 
     # motion and image processing settings, note adjustments are used as both a detector second prediction and a final
     # adjustment to the output images.  # 1 no chg,< 1 -, > 1 +
-    ap.add_argument("-is", "--iso", type=int, default=800, help="iso camera sensitivity. higher requires less light")
+    # ap.add_argument("-is", "--iso", type=int, default=800, help="iso camera sensitivity. higher requires less light")
     ap.add_argument("-b", "--brightness_chg", type=int, default=1.2, help="brightness boost twilight")
-    ap.add_argument("-c", "--contrast_chg", type=float, default=1.0, help="contrast boost")  # 1 no chg,< 1 -, > 1 +
-    ap.add_argument("-cl", "--color_chg", type=float, default=1.0, help="color boost")  # 1 no chg,< 1 -, > 1 +
-    ap.add_argument("-sp", "--sharpness_chg", type=float, default=1.0, help="sharpeness")  # 1 no chg,< 1 -, > 1 +
+    # ap.add_argument("-c", "--contrast_chg", type=float, default=1.0, help="contrast boost")  # 1 no chg,< 1 -, > 1 +
+    # ap.add_argument("-cl", "--color_chg", type=float, default=1.0, help="color boost")  # 1 no chg,< 1 -, > 1 +
+    # ap.add_argument("-sp", "--sharpness_chg", type=float, default=1.0, help="sharpness")  # 1 no chg,< 1 -, > 1 +
 
     # prediction defaults
     ap.add_argument("-sc", "--species_confidence", type=float, default=.90, help="species confidence threshold")
