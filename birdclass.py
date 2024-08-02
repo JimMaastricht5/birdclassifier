@@ -131,7 +131,7 @@ def bird_detector(args):
                 # check for need of final image adjustments, *** won't hit this code with twilight in while loop above
                 first_img_jpg = first_img_jpg if args.brightness_chg == 0 \
                     or cityweather.isclear or cityweather.is_twilight() \
-                    else image_proc.enhance_brightness(img=first_img_jpg, factor=args.brightness_chg)
+                    else image_proc.enhance(img=first_img_jpg, brightness=args.brightness_chg)
                 first_img_jpg_no_label = first_img_jpg.copy()
                 # create animation: unlabeled first image is passed to gif function, bare copy is annotated later
                 _gif = bird_gif.build_gif(event_count, first_img_jpg)

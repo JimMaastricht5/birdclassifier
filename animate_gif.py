@@ -25,16 +25,6 @@ from datetime import datetime
 from collections import defaultdict
 
 
-# loop through keys and remove census entries with 1 or zero observations
-# not used in current code base
-# def remove_single_observations(census_dict, conf_dict):
-#     key_list = []
-#     [key_list.append(key) if census_dict[key] <= 1 else '' for key in census_dict]
-#     [census_dict.pop(key) for key in key_list]
-#     [conf_dict.pop(key) for key in key_list]
-#     return census_dict, conf_dict
-
-
 # default dictionary returns a tuple of zero confidence and zero bird count
 def default_value():
     return 0
@@ -105,9 +95,9 @@ class BirdGif:
 
         frames = self.motion_detect.capture_stream()  # capture a list of images
         first_img_jpg = self.birds.add_boxes_and_labels(img=first_img_jpg)
-        labeled_frames.insert(0, image_proc.convert_image(img=first_img_jpg, target='gif'))  # isrt 1st img
+        labeled_frames.insert(0, image_proc.convert_image(img=first_img_jpg))  # isrt 1st img
         for i, frame in enumerate(frames):
-            frame = image_proc.enhance_brightness(img=frame, factor=self.brightness_chg)
+            frame = image_proc.enhance(img=frame, brightness=self.brightness_chg)
             if self.birds.detect(img=frame):  # find bird object in frame and set rectangles containing object
                 if self.birds.classify(img=frame, use_confidence_threshold=False) > 0:   # classify at rect & chk conf
                     self.frames_with_birds += 1
@@ -132,6 +122,7 @@ class BirdGif:
         return gif
 
 
+# old code....
 # def best_confidence_and_label(census_dict, confidence_dict):
 #     best_confidence, best_confidence_label, best_census, best_census_label = 0, '', 0, ''
 #     try:

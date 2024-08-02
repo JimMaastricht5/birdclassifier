@@ -22,36 +22,34 @@
 #
 # collection of image enhancement and processing techniques along with testing code
 # many of the functions that are here are simple wrappers for Pillow functions.  Easier to remember this way
-from PIL import ImageEnhance, Image, ImageOps, ImageStat, ImageFilter, ImageChops
+# from PIL import ImageStat
+from PIL import ImageEnhance, Image, ImageOps, ImageFilter, ImageChops
 import numpy as np
 import io
 import os
 
 
-# def flip(img):
-#     # Pillow img to flip
-#     return ImageOps.flip(img)
-
-
-def grayscale(img):
-    # create a gray scale image, used in motion detector to simplify image comparision
+def grayscale(img: Image.Image) -> Image.Image:
+    """
+    create a gray scale image, used in motion detector to simplify image comparison
+    :param img: RGB color jpg img
+    :return: img
+    """
     return ImageOps.grayscale(img)
 
 
-def gaussianblur(img):
-    # blur the image, used in motion detector to enhance contours of objects
+def gaussianblur(img: Image.Image) -> Image.Image:
+    """
+    blur the image, used in motion detector to enhance contours of objects
+    :param img: jpg
+    :return: img
+    """
     img.filter(ImageFilter.GaussianBlur)
     return img
 
 
-# def contour(img):
-#     # find contours of the image
-#     img.filter(ImageFilter.CONTOUR)
-#     return img
-
-
 # detect image problems where bottom half of the image is washed from suns reflection, must be jpg
-def is_sun_reflection_jpg(img, washout_red_threshold=.50):
+def is_sun_reflection_jpg(img: Image.Image, washout_red_threshold: float = .50) -> bool:
     """
     function looks at an image and determines if it is overexposed.  On current hardware that results in
     the bottom half of the image having a pink or red hue.  Do the test is color diff from top to bottom
@@ -82,7 +80,7 @@ def is_sun_reflection_jpg(img, washout_red_threshold=.50):
 
 
 def resize(img: Image.Image, new_height: int, new_width: int, maintain_aspect: bool = True,
-           box: tuple = None, resample: int = None):
+           box: tuple = None, resample: int = None) -> Image.Image:
     """
     function to resize image.  Full image or subset
     box is the subset of the image to perform an op on, default is entire img
@@ -100,7 +98,8 @@ def resize(img: Image.Image, new_height: int, new_width: int, maintain_aspect: b
     return img
 
 
-def enhance(img, brightness=1.0, sharpness=1.0, contrast=1.0, color=1.0):
+def enhance(img: Image.Image, brightness: float = 1.0, sharpness: float = 1.0, contrast: float = 1.0,
+            color: float = 1.0) -> Image.Image:
     """
     img is passed in along with brightness, sharpness, contrast and color changes
     1.0 is the default value and is no change
@@ -121,6 +120,144 @@ def enhance(img, brightness=1.0, sharpness=1.0, contrast=1.0, color=1.0):
     return img
 
 
+def area(rect: tuple) -> float:
+    """
+    :param rect: tuple with starting x, y, and ending x and y
+    :return: float with area of rectangle
+    """
+    # find area of an image, used by overlap area
+    (startX, startY, endX, endY) = rect
+    return abs(endX - startX) * abs(endY - startY)
+
+
+def overlap_area(rect1: tuple, rect2: tuple) -> float:
+    """
+    find the % area in 2 rectangles that overlaps, used to understand how much of a predicted box overlaps
+    another on an image
+    :param rect1: tuple starting x, y and ending x, y
+    :param rect2: tuple starting x, y and ending x, y
+    :return: float containing ratio of overlap 0 to 1.0
+    """
+    # find the % area in 2 rectangles that overlap
+    (XA1, YA1, XA2, YA2) = rect1
+    (XB1, YB1, XB2, YB2) = rect2
+    sa = area(rect1)
+    sb = area(rect2)
+    si = max(0, min(XA2, XB2) - max(XA1, XB1)) * max(0, min(YA2, YB2) - max(YA1, YB1))
+    su = sa + sb - si
+    return si/su
+
+
+def compare_images(img_c1: Image.Image, img_c2: Image.Image) -> Image.Image:
+    """
+    compare two PIL images for differences
+    :param img_c1: img 1
+    :param img_c2: img 2
+    :return: returns an img that is the brightness differences in each channel
+    """
+    if np.array(img_c1).shape != np.array(img_c2).shape:
+        raise Exception(f'images are not the same shape img1:{np.array(img_c1).shape}, img2:{np.array(img_c2).shape}')
+    return ImageChops.difference(img_c2, img_c1)
+
+
+def convert_image(img: Image.Image) -> Image.Image:
+    """
+    convert a jpb image to a gif
+    img: jpg img
+    :return: gif image
+    """
+    stream = io.BytesIO()
+    img.save(stream, 'gif')
+    stream.seek(0)
+    new_img = Image.open(stream)
+    return new_img
+
+
+def avg_exposure(img: Image.Image) -> float:
+    """
+    determine the avg exposure for an image
+    :param img: jpg
+    :return: float with average for entire image
+    """
+    return float(np.mean(np.array(img)))
+
+
+def normalize(img: Image.Image) -> np.array:
+    """
+    normalize a jpg with values from 0 to 1 by dividing by max value of 255
+    :param img: jpg img
+    :return: np array with scaled image data 0 to 1
+    """
+    return np.array(img, dtype=np.float32) / 255.0
+
+
+def save_gif(frames: list, frame_rate: int = 30,
+             filename: str = os.getcwd()+'/assets/birds.gif') -> tuple[Image.Image, str]:
+    """
+    takes a list of jpg images and converts them to an animated gif
+    :param frames: list of jpgs
+    :param frame_rate: used to calc time in ml seconds per frame displayed
+    :param filename: filename to write gif out
+    :return: animated gif and the name of the file
+    """
+    gif_frames = [convert_image(frame) for frame in frames]
+    try:
+        gif_frame_one = gif_frames[0]  # grab a frame to save full image with
+        ml_sec = int(1000 * len(gif_frames) * 1/frame_rate)  # frames * rate, 200 * 1/30 = 5 sec * 1,000 = ml sec
+        gif_frame_one.save(filename, format="GIF", append_images=gif_frames[1:],
+                           save_all=True, optimze=True, minimize_size=True, duration=ml_sec, loop=50)  # loop=0 infinity
+        gif = open(filename, 'rb')  # reload gif
+    except Exception as e:
+        print(e)
+        gif = frames[0]
+    return gif, filename
+
+
+# invoke main
+if __name__ == "__main__":
+    # print(overlap_area((1, 1, 10, 10), (1, 1, 2, 2)))
+    img1 = Image.open('/home/pi/birdclass/birds.gif')
+    # img = Image.open('/home/pi/birdclass/washout3.jpg')
+    print(img1.format)
+    print(avg_exposure(img1))
+    print(is_sun_reflection_jpg(img1))
+    img1.show()
+
+    img2 = Image.open('/home/pi/birdclass/washout3.jpg')
+    print(img2.format)
+    print(avg_exposure(img2))
+    print(is_sun_reflection_jpg(img2))
+    img2.show()
+
+    # img = resize(img_org, 100, 100, maintain_aspect=False)
+    # gif1 = convert_image(img1, target='gif', save_test_img=True)
+    # img2 = Image.open('/home/pi/birdclass/test2.jpg')
+    # img2_gif = convert_image(img=img2, target='gif')
+    # img3_gif = convert_image(img=img2, target='gif')
+    # img3_gif.save('/home/pi/birdclass/test stream.gif', 'gif')
+    # gif2 = convert_image(img2, target='gif', save_test_img=True)
+    # save_gif([img1, img2], frame_rate=10, filename='/home/pi/birdclass/test4.gif')
+
+    # img = enhance(img, brightness=1.3, sharpness=1.2, contrast=1.2, color=1.2)
+    # img.show()
+
+    # test image bad contrast and equalization
+    # grayimg = ImageOps.grayscale(img)
+    # print(is_low_contrast(grayimg))
+    # equalizedimg1 = equalize_gray(grayimg)
+    # equalizedimg1.show()
+    #
+    # # color equalize
+    # equalizedcolorimg = equalize_color(img)
+    # equalizedcolorimg.show()
+    # print(predominant_color(equalizedcolorimg))
+
+
+# old code
+# def contour(img):
+#     # find contours of the image
+#     img.filter(ImageFilter.CONTOUR)
+#     return img
 # def enhance_color(img, factor):
 #     # color enhance image
 #     # factor of 1 is no change. < 1 reduces color,  > 1 increases color
@@ -178,106 +315,6 @@ def enhance(img, brightness=1.0, sharpness=1.0, contrast=1.0, color=1.0):
 #     return round((endX - startX) / (endY - startY), 3)
 
 
-def area(rect):
-    # find area of an image, used by overlap area
-    (startX, startY, endX, endY) = rect
-    return abs(endX - startX) * abs(endY - startY)
-
-
-def overlap_area(rect1, rect2):
-    # find the % area in 2 rectangles that overlap
-    (XA1, YA1, XA2, YA2) = rect1
-    (XB1, YB1, XB2, YB2) = rect2
-    sa = area(rect1)
-    sb = area(rect2)
-    si = max(0, min(XA2, XB2) - max(XA1, XB1)) * max(0, min(YA2, YB2) - max(YA1, YB1))
-    su = sa + sb - si
-    return si/su
-
-
-def compare_images(img_c1, img_c2):
-    # compare two PIL images for differences
-    # returns an array of the differences
-    if np.array(img_c1).shape != np.array(img_c2).shape:
-        raise Exception(f'images are not the same shape img1:{np.array(img_c1).shape}, img2:{np.array(img_c2).shape}')
-    return ImageChops.difference(img_c2, img_c1)
-
-
-def convert_image(img, target='gif'):
-    stream = io.BytesIO()
-    img.save(stream, target)
-    stream.seek(0)
-    new_img = Image.open(stream)
-    return new_img
-
-
-def avg_exposure(img):
-    # exposure average
-    img_np = img if isinstance(img, np.ndarray) else np.array(img)
-    return np.mean(img_np)
-
-
-def normalize(img):
-    # normalize a jpg
-    return np.array(img, dtype=np.float32) / 255.0
-
-
-def save_gif(frames, frame_rate=30, filename=os.getcwd()+'/assets/birds.gif'):
-    """
-    takes a list of jpg images and converts them to an animated gif
-    :param frames: list of jpgs
-    :param frame_rate: used to calc time in ml seconds per frame displayed
-    :param filename: filename to write gif out
-    :return: animated gif and the name of the file
-    """
-    gif_frames = [convert_image(frame, target='gif') for frame in frames]
-    try:
-        gif_frame_one = gif_frames[0]  # grab a frame to save full image with
-        ml_sec = int(1000 * len(gif_frames) * 1/frame_rate)  # frames * rate, 200 * 1/30 = 5 sec * 1,000 = ml sec
-        gif_frame_one.save(filename, format="GIF", append_images=gif_frames[1:],
-                           save_all=True, optimze=True, minimize_size=True, duration=ml_sec, loop=50)  # loop=0 infinity
-        gif = open(filename, 'rb')  # reload gif
-    except Exception as e:
-        print(e)
-        gif = frames[0]
-    return gif, filename
-
-
-# invoke main
-if __name__ == "__main__":
-    # print(overlap_area((1, 1, 10, 10), (1, 1, 2, 2)))
-    img1 = Image.open('/home/pi/birdclass/birds.gif')
-    # img = Image.open('/home/pi/birdclass/washout3.jpg')
-    print(img1.format)
-    print(avg_exposure(img1))
-    print(is_sun_reflection_jpg(img1))
-    img1.show()
-
-    img2 = Image.open('/home/pi/birdclass/washout3.jpg')
-    print(img2.format)
-    print(avg_exposure(img2))
-    print(is_sun_reflection_jpg(img2))
-    img2.show()
-
-    # img = resize(img_org, 100, 100, maintain_aspect=False)
-    # gif1 = convert_image(img1, target='gif', save_test_img=True)
-    # img2 = Image.open('/home/pi/birdclass/test2.jpg')
-    # img2_gif = convert_image(img=img2, target='gif')
-    # img3_gif = convert_image(img=img2, target='gif')
-    # img3_gif.save('/home/pi/birdclass/test stream.gif', 'gif')
-    # gif2 = convert_image(img2, target='gif', save_test_img=True)
-    # save_gif([img1, img2], frame_rate=10, filename='/home/pi/birdclass/test4.gif')
-
-    # img = enhance(img, brightness=1.3, sharpness=1.2, contrast=1.2, color=1.2)
-    # img.show()
-
-    # test image bad contrast and equalization
-    # grayimg = ImageOps.grayscale(img)
-    # print(is_low_contrast(grayimg))
-    # equalizedimg1 = equalize_gray(grayimg)
-    # equalizedimg1.show()
-    #
-    # # color equalize
-    # equalizedcolorimg = equalize_color(img)
-    # equalizedcolorimg.show()
-    # print(predominant_color(equalizedcolorimg))
+# def flip(img):
+#     # Pillow img to flip
+#     return ImageOps.flip(img)
