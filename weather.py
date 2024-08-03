@@ -20,7 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-# Module checks local weather, used to adjust picture brightness for input to species model
+# Module checks local weather, used to adjust get sun rise and sun set to start or stop pictures
+# also used to adjust to twilight and automatically increase exposure
 # As OpenWeatherMap APIs need a valid API key to allow responses,
 # This stands for both free and paid (pro) subscription plans.
 # You can signup for a free API key on the OWM website
@@ -34,13 +35,20 @@ from datetime import timedelta
 import time
 
 
-# set city name or default to Madison, WI
-# boolean true if the sky is clear
-# sunrise and sunset as local time
-# all other variables returned as string type
 class CityWeather:
-    def __init__(self, city='Madison,WI,USA', units='Imperial', iscloudy=60):
-        # set defaults
+    """
+    Class variables: weather (general weather string), weatherdescription, temp,
+    pressure, humidity, visibility, windspeed , sunrise (datetime object),
+    sunset (datetime object), skycondition (% cloudy), self.isclear
+    """
+    def __init__(self, city: str = 'Madison,WI,USA', units: str = 'Imperial', iscloudy=60) -> None:
+        """
+        set up weather class.  isclear is true if less clouds than threshold.
+        sunrise and sunset as local date time fields
+        :param city: set city name or default to Madison, WI
+        :param units: Imperial or Metric
+        :param iscloudy: is cloudy is true if the % of clouds is higher than this threshold
+        """
         self.city = city
         self.base_url = 'http://api.openweathermap.org/data/2.5/weather?q='
         self.units = units
@@ -62,8 +70,11 @@ class CityWeather:
         # call for weather and fill variables
         self.local_weather()
 
-    # grab sunrise and sundown epoch data, parse epoch and convert to date time
-    def local_weather(self):
+    def local_weather(self) -> None:
+        """
+        grab weather data and parse into class variables
+        :return: None
+        """
         try:  # handle open weather API outages
             response = requests.get(self.full_url)
             self.weather = str(response.json()['weather'])  # find general weather string
@@ -85,31 +96,52 @@ class CityWeather:
             print(e)
         return
 
-    # is it daylight, now must be between sunrise and sunset
-    def is_daytime(self):
+    def is_daytime(self) -> bool:
+        """
+        # is it daylight, now must be between sunrise and sunset
+        :return: True or False for daylight
+        """
         return datetime.now() > self.sunrise or datetime.now() < self.sunset
 
-    def is_twilight(self):
+    def is_twilight(self) -> bool:
+        """
+        :return: True if it is twilight. used to boost exposure
+        """
         return self.is_dawn() or self.is_dusk()
 
-    def is_dawn(self):
+    def is_dawn(self) -> bool:
+        """
+        Used to determine if picture taking should start
+        :return: True if past sunrise
+        """
         from_sunrise_min = datetime.now() - self.sunrise
         from_sunrise_min = from_sunrise_min.total_seconds() / 60
         return from_sunrise_min < 60
 
-    def is_dusk(self):
+    def is_dusk(self) -> bool:
+        """
+        Determine if picture taking should stop
+        :return: True if past sunset
+        """
         from_sunset_min = self.sunset - datetime.now()
         from_sunset_min = from_sunset_min.total_seconds() / 60
         return from_sunset_min < 60
 
     # update weather conditions
-    def update_conditions(self):
-        self.local_weather()
+    def update_conditions(self) -> None:
+        """
+        Check the weather again....
+        :return:
+        """
+        self.local_weather()  # set class variables
         return
 
-    # wait here until after midnight and then wait for sunrise
-    # once midnight is reached + 1 second reset sunrise and sunset with correct date for new day
-    def wait_until_midnight(self):
+    def wait_until_midnight(self) -> None:
+        """
+        wait here until after midnight and then wait for sunrise
+        once midnight is reached + 1 second reset sunrise and sunset with correct date for new day
+        :return: None
+        """
         if datetime.now() > self.sunset:
             waittime = (datetime.combine(datetime.now().date() + timedelta(days=1),
                                          datetime.strptime("0000", "%H%M").time()) - datetime.now()).total_seconds()
@@ -119,8 +151,11 @@ class CityWeather:
             self.local_weather()  # reset dates and times for sunrise and sunset for a new day
         return
 
-    # wait here until the sun is up before initialize the camera
-    def wait_until_sunrise(self):
+    def wait_until_sunrise(self) -> None:
+        """
+        # wait here until the sun is up before initialize the camera
+        :return: None
+        """
         if datetime.now() < self.sunrise:
             waittime = (self.sunrise - datetime.now()).total_seconds()
             waittime = waittime + 1 if waittime >= 0 else 1  # add a second and check for negative numbers
