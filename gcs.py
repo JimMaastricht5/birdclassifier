@@ -25,6 +25,7 @@
 # send file and send df were hardened to protect the bird feeder app from crashing,
 # that is unnecessary for the get functions since that is used by the web app and the page can be refreshed to
 # reinvoke the app
+import pandas
 import pandas as pd
 from google.cloud import storage
 from PIL import Image  # Pillow
@@ -35,15 +36,27 @@ from auth import (
 
 
 class Storage:
-    def __init__(self, project="birdvision", bucket_name="tweeterssp-web-site-contents"):
+    """
+    Class makes reading and writing from a Google cloud storage (GCS) bucket easy....
+    """
+    def __init__(self, project: str = "birdvision", bucket_name: str = "tweeterssp-web-site-contents") -> None:
+        """
+        :param project: the Google project that the buckets lives in
+        :param bucket_name: the name of the bucket to read and write files
+        """
         # connect to temp bucket for public send
         self.project = project
         self.storage_client = storage.Client.from_service_account_json(json_credentials_path=google_json_key)
-        # self.storage_client = storage.Client()  # for cloud function, auth and json key not needed!
         self.bucket = self.storage_client.bucket(bucket_name)
         self.bucket_name = bucket_name
 
-    def send_file(self, name, file_loc_name):
+    def send_file(self, name: str, file_loc_name: str) -> None:
+        """
+        send a file to google cloud storage
+        :param name: name of the file to write into the cloud bucket
+        :param file_loc_name: fully qualified location on disk to grab from
+        :return:
+        """
         try:
             blob = self.bucket.blob(name)  # object name in bucket
             blob.upload_from_filename(file_loc_name)  # full qualified file location on disk
@@ -51,7 +64,13 @@ class Storage:
             print(f'Error in GCS send file {e}')
         return
 
-    def send_df(self, df, blob_name):
+    def send_df(self, df: pandas.DataFrame, blob_name: str) -> None:
+        """
+        write a dataframe to gcs
+        :param df: pandas data frame to write to cloud
+        :param blob_name: name of the object to write to in GCS
+        :return:
+        """
         try:
             blob = self.bucket.blob(blob_name)
             blob.upload_from_string(df.to_csv(), 'text/csv')
@@ -59,14 +78,24 @@ class Storage:
             print(f'failure sending dataframe to GCS: {e}')
         return
 
-    def get_img_file(self, blob_name):
+    def get_img_file(self, blob_name: str) -> Image.Image:
+        """
+        Get an img from cloud storage
+        :param blob_name: name of the blob to pull
+        :return: image requested
+        """
         blob = self.bucket.blob(blob_name)
         with blob.open("rb") as f:
             blob = f.read()
             gcs_image = Image.open(BytesIO(bytes(blob)))  # Convert bytes to pil image
         return gcs_image
 
-    def get_img_list(self, prefix=''):
+    def get_img_list(self, prefix: str = '') -> list:
+        """
+        generate a list of all images in a GCS bucket, ignore other file types
+        :param prefix: string specifying folder structure within the bucket to grab from
+        :return:
+        """
         # use prefix= to get folder 'abc/myfolder'
         blob_name_list = []
         for blob in self.storage_client.list_blobs(self.bucket_name, prefix=prefix):
@@ -74,21 +103,35 @@ class Storage:
                 blob_name_list.append(blob.name)
         return blob_name_list
 
-    def get_all_img_files(self, blob_name_list):
+    def get_all_img_files(self, blob_name_list: list) -> list:
+        """
+        get a list of images from a bucket
+        :param blob_name_list: list of blob names to retrieve
+        :return: list of images
+        """
         images = []
         for blob_name in blob_name_list:
             images.append(self.get_img_file(blob_name))
         return images
 
-    def get_csv_list(self, prefix=''):
-        # use prefix= to get folder 'abc/myfolder'
+    def get_csv_list(self, prefix: str = '') -> list:
+        """
+        grab a list of csv files in a bucket
+        :param prefix: specifies folder structure, use prefix= to get folder 'abc/myfolder'
+        :return: list of csv files in bucket
+        """
         blob_name_list = []
         for blob in self.storage_client.list_blobs(self.bucket_name, prefix=prefix):
             if blob.name.find('.csv') != -1:  # append csv to list
                 blob_name_list.append(blob.name)
         return blob_name_list
 
-    def get_df(self, blob_name):
+    def get_df(self, blob_name: str) -> pandas.DataFrame:
+        """
+        load a dataframe from a blob name
+        :param blob_name: string containing the name of the file to load
+        :return: populated dataframe
+        """
         blob = self.bucket.blob(blob_name)
         blob_bytes = blob.download_as_bytes()
         df = pd.read_csv(BytesIO(blob_bytes), header=0)
