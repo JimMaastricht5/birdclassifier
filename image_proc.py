@@ -49,7 +49,7 @@ def gaussianblur(img: Image.Image) -> Image.Image:
 
 
 # detect image problems where bottom half of the image is washed from suns reflection, must be jpg
-def is_sun_reflection_jpg(img: Image.Image, washout_red_threshold: float = .50) -> bool:
+def is_sun_reflection_jpg(img: Image.Image, washout_red_threshold: float = .33) -> bool:
     """
     function looks at an image and determines if it is overexposed.  On current hardware that results in
     the bottom half of the image having a pink or red hue.  Do the test is color diff from top to bottom
@@ -72,6 +72,8 @@ def is_sun_reflection_jpg(img: Image.Image, washout_red_threshold: float = .50) 
         top_red_avg = np.mean(top_half[:, :, 0])
         bottom_red_avg = np.mean(bottom_half[:, :, 0])
         reflection_b = True if bottom_red_avg > top_red_avg * (1 + washout_red_threshold) else False
+        print(f'top avg red is {top_red_avg}, bottom red avg is {bottom_red_avg} threshold is '
+              f'{washout_red_threshold} with a limit of {top_red_avg * (1+washout_red_threshold)}')
     else:
         print(f'image_proc.py is_sun_reflection got np array with something other than 3 dimensions. '
               f'{img.format} with {img_np_array.shape}')
@@ -223,7 +225,7 @@ if __name__ == "__main__":
     print(is_sun_reflection_jpg(img1))
     img1.show()
 
-    img2 = Image.open('/home/pi/birdclass/washout3.jpg')
+    img2 = Image.open('/home/pi/birdclass/washout5.gif')
     print(img2.format)
     print(avg_exposure(img2))
     print(is_sun_reflection_jpg(img2))
