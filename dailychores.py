@@ -22,24 +22,36 @@
 #
 # motion detector with builtin bird detection and bird classification
 # built by JimMaastricht5@gmail.com
-# class takes a tweeter.py class and population.py class as input on init
-# import weather
 from datetime import datetime
 from gpiozero import CPUTemperature
 import time
-# from subprocess import call
+import static_functions
 
 
 # find common / short name in species label
-def short_name(birdname):
-    start = birdname.find('(')
-    end = birdname.find(')')
-    return birdname[start + 1:end] if start >= 0 and end >= 0 else birdname
+# def short_name(birdname):
+#     start = birdname.find('(')
+#     end = birdname.find(')')
+#     return birdname[start + 1:end] if start >= 0 and end >= 0 else birdname
 
 
 class DailyChores:
-
-    def __init__(self, tweeter_obj, birdpop, city_weather, output_class=None, maxcpu_c_temp=86):
+    """
+    Class handles hourly and daily chores including checking the temp on the CPU,
+    morning weather report, evening report on bird species observed
+    takes a collection of objects as input tweeter.py, population.py, output_steam.py
+    coordinates calls across these objects to complete work on schedule
+    """
+    def __init__(self, tweeter_obj, birdpop, city_weather, output_class=None, maxcpu_c_temp: float = 86) -> None:
+        """
+        setup class to support chores
+        :param tweeter_obj: TweeterClass object form tweeter.py
+        :param birdpop: Census object from population.py
+        :param city_weather: CityWeather object from weather.py
+        :param output_class: Controller object from output_stream.py
+        :param maxcpu_c_temp: float containing max temp in C, if exceeded sleep until it cools off
+        return: none
+        """
         self.curr_day = datetime.now().day
         self.curr_hr = datetime.now().hour
         self.starttime = datetime.now()
@@ -48,17 +60,27 @@ class DailyChores:
         self.tweeter = tweeter_obj
         self.cityweather = city_weather
         self.birdpop = birdpop
-        self.output_class = output_class  # take an arguement of class Controller from output_stream.py
+        self.output_class = output_class  # take an argument of class Controller from output_stream.py
         self.output_func = output_class.message if output_class is not None else print
         self.maxcpu_c_temp = maxcpu_c_temp
+        return
 
     # end of process report
-    def end_report(self):
+    def end_report(self) -> None:
+        """
+        Send ending process final message to twitter
+        :return: none
+        """
         self.tweeter.post_status(f'Ending process at {datetime.now().strftime("%I:%M:%S %P")}.  Run time was ' +
                                  f'{divmod((datetime.now() - self.starttime).total_seconds(), 60)[0]} minutes')
+        return
 
     # check current cpu temp, print, shutdown if overheated
-    def check_cpu_temp(self):
+    def check_cpu_temp(self) -> None:
+        """
+        check tem and sleep if too hot
+        :return: none
+        """
         cpu = CPUTemperature()
         self.output_func(f'***hourly temp check. cpu temp is: {cpu.temperature:.1f}C'
                          f' {(cpu.temperature * 9 / 5) + 32:.1f}F')
@@ -67,14 +89,17 @@ class DailyChores:
                 self.tweeter.post_status(f'***sleeping for 30 minutes. temp: {cpu.temperature}C'
                                          f' {(cpu.temperature * 9 / 5) + 32:.1f}F')
                 time.sleep(1800)  # 1800 seconds is 30 min, allow CPU to cool
-                # call("sudo shutdown -poweroff")
         except Exception as e:
             self.output_func('Error in temp shutdown protection:', e)
             pass  # uncharted territory....
         return
 
     # post weather conditions
-    def weather_report(self):
+    def weather_report(self) -> None:
+        """
+        write a weather report to twitter, lets everyone know the detectors is active
+        :return: none
+        """
         self.tweeter.post_status(f'Current time and weather for {self.cityweather.city} '
                                  f'{datetime.now().strftime("%I:%M:%S %P")}, ' +
                                  f'{self.cityweather.weatherdescription} ' +
@@ -86,15 +111,17 @@ class DailyChores:
                                  f'Sunset is at {self.cityweather.sunset: %H:%m}.')
         return
 
-    # post a report of the top population for birds
-    # takes in a list of tuple objects
-    # position 0 in tuple is bird name, 1 is count, 2 is last seen
-    def top_pop_report(self):
+    def top_pop_report(self) -> None:
+        """
+        Post a report of the top population for birds.  Takes in a list of tuple objects
+        position 0 in tuple is bird name, 1 is count, 2 is last seen time
+        :return: none
+        """
         try:
             observed = self.birdpop.get_census_by_count()
             post_txt = f'Top birds for day {str(self.curr_day)} - '
             for index, birdkey in enumerate(observed):  # bird pop is list of tuples with 0th item species name
-                bird_txt = str(f'#{str(index + 1)}: {observed[birdkey][0]} {short_name(birdkey)}, ') \
+                bird_txt = str(f'#{str(index + 1)}: {observed[birdkey][0]} {static_functions.common_name(birdkey)}, ') \
                     if observed[birdkey][0] > 0 else ''  # post observed bird if count > 0 else keep prior txt
                 post_txt = post_txt + bird_txt if len(bird_txt) + len(post_txt) < 280 else post_txt
             self.tweeter.post_status(post_txt[0:279])  # grab full text up to 280 characters
@@ -103,9 +130,13 @@ class DailyChores:
             pass  # just keep going...
         return
 
-    # housekeeping for day and hour
-    # takes a pointer to the population tracking object
-    def hourly_and_daily(self, filename='', report_pop=False):
+    def hourly_and_daily(self, filename: str = '', report_pop: bool = False) -> None:
+        """
+        housekeeping for day and hour. handles weather report, population report, and cpu check
+        :param filename: file name to write out sample image to, used to check seed levels on web messages
+        :param report_pop: boolean telling the class to reports the daily population if true
+        :return: none
+        """
         # post the weather once during the daytime and while the sun is rising
         if self.weather_reported is False and self.cityweather.is_daytime() and \
                 self.cityweather.is_dawn():

@@ -27,10 +27,7 @@
 # added code for detailed object detection and for general classification
 # ==============================================================================
 # PY4: pip3 install https://dl.google.com/coral/python/tflite_runtime-2.1.0.post1-cp37-cp37m-linux_armv7l.whl
-# old python 2 code
-# from __future__ import absolute_import
-# from __future__ import division
-# from __future__ import print_function
+#
 
 import numpy as np
 import random

@@ -24,6 +24,7 @@
 #
 from datetime import datetime
 from collections import defaultdict
+import static_functions
 
 
 # default dictionary returns a tuple of zero count and the current date and time as last seen
@@ -41,19 +42,19 @@ class Census:
         self.census_dict = []  # clear it and re-establish
         self.census_dict = defaultdict(default_value)
 
-    def convert_to_list(self, input_str_list):
-        output_list = []
-        if isinstance(input_str_list, list):
-            output_list.append(input_str_list)
-        else:
-            output_list = input_str_list
-        return output_list
+    # def convert_to_list(self, input_str_list):
+    #     output_list = []
+    #     if isinstance(input_str_list, list):
+    #         output_list.append(input_str_list)
+    #     else:
+    #         output_list = input_str_list
+    #     return output_list
 
     # find visitor by census name, increment count, and update time
     # make sure visitor names is a list and not a string
     def visitors(self, visitor_names, time_of_visit=datetime.now()):
         self.first_time_seen = False
-        visitor_name_list = visitor_names if isinstance(visitor_names, list) else self.convert_to_list(visitor_names)
+        visitor_name_list = visitor_names if isinstance(visitor_names, list) else static_functions.convert_to_list(visitor_names)
         for i, visitor_name in enumerate(visitor_name_list):
             print(visitor_name)
             if isinstance(visitor_name, str) and visitor_name.rstrip() != '':  # do we have a name?
@@ -65,7 +66,7 @@ class Census:
 
     # return count of visitors by name along with last seen date time
     def report_census(self, visitor_names):
-        visitor_name_list = self.convert_to_list(visitor_names)
+        visitor_name_list = static_functions.convert_to_list(visitor_names)
         census_subset = {key: self.census_dict[key] for key in visitor_name_list}
         return census_subset
 
@@ -103,14 +104,14 @@ def main():
     print(popdogcats.get_occurrences())
 
     # mirror daily chorses reporting for testing
-    def short_name(birdname):
-        start = birdname.find('(')
-        end = birdname.find(')')
-        return birdname[start + 1:end] if start >= 0 and end >= 0 else birdname
+    # def short_name(birdname):
+    #     start = birdname.find('(')
+    #     end = birdname.find(')')
+    #     return birdname[start + 1:end] if start >= 0 and end >= 0 else birdname
 
     post_txt = ''
     for index, birdkey in enumerate(observed):  # bird pop is list of tuples with 0th item species name
-        birdstr = str(f'#{str(index + 1)}: {observed[birdkey][0]} {short_name(birdkey)}, ')  # top count & species name
+        birdstr = str(f'#{str(index + 1)}: {observed[birdkey][0]} {static_functions.common_name(birdkey)}, ')  # top count & species name
         post_txt = post_txt + birdstr  # aggregate text for post
     print(post_txt)
 
