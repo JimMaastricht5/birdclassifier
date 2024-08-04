@@ -20,41 +20,56 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-# population census
-#
+# population census, module keeps track of occurrences of an item along
+# with the date time it was last counted (last seen)
 from datetime import datetime
 from collections import defaultdict
 import static_functions
+from typing_extensions import Union
 
 
-# default dictionary returns a tuple of zero count and the current date and time as last seen
-def default_value():
+def default_value() -> tuple:
+    """
+    default dictionary returns a tuple of zero count and the current date and time as the last seen value
+    :return:
+    """
     return 0, datetime.now()
 
 
 class Census:
-    def __init__(self):
+    """
+    Census object tracks by key the count and last count of an item
+    Reports out values upon request
+    """
+    def __init__(self) -> None:
+        """
+        Set up object with dictionaries for count and last occurrence
+        :return: None
+        """
         self.census_dict = defaultdict(default_value)
         self.census_occurrence = []
         self.first_time_seen = False
+        return
 
-    def clear(self):
+    def clear(self) -> None:
+        """
+        clear dictionaries
+        :return: none
+        """
         self.census_dict = []  # clear it and re-establish
         self.census_dict = defaultdict(default_value)
 
-    # def convert_to_list(self, input_str_list):
-    #     output_list = []
-    #     if isinstance(input_str_list, list):
-    #         output_list.append(input_str_list)
-    #     else:
-    #         output_list = input_str_list
-    #     return output_list
-
-    # find visitor by census name, increment count, and update time
-    # make sure visitor names is a list and not a string
-    def visitors(self, visitor_names, time_of_visit=datetime.now()):
+    def visitors(self, visitor_names: Union[list, str], time_of_visit: datetime = datetime.now()) -> bool:
+        """
+        find visitor by census name, increment count, and update time
+        make sure visitor names is a list and not a string
+        :param visitor_names: list of names
+        :param time_of_visit: datetime of occurrence
+        :return: returns true if this is the first time the object was counted (first seen)
+        """
         self.first_time_seen = False
-        visitor_name_list = visitor_names if isinstance(visitor_names, list) else static_functions.convert_to_list(visitor_names)
+        visitor_name_list = visitor_names if isinstance(visitor_names, list) else\
+            static_functions.convert_to_list(visitor_names)
         for i, visitor_name in enumerate(visitor_name_list):
             print(visitor_name)
             if isinstance(visitor_name, str) and visitor_name.rstrip() != '':  # do we have a name?
@@ -64,21 +79,36 @@ class Census:
                 self.census_occurrence.append((visitor_name, time_of_visit.strftime("%Y-%m-%d %H:%M:%S")))
         return self.first_time_seen
 
-    # return count of visitors by name along with last seen date time
-    def report_census(self, visitor_names):
+    def report_census(self, visitor_names: Union[list, str]) -> dict:
+        """
+        return count of visitors by name along with last seen date time
+        :param visitor_names: key name to look up aka dog or [dog, cat]
+        :return:dictionary containing the subset of requested visitor counts
+        """
         visitor_name_list = static_functions.convert_to_list(visitor_names)
         census_subset = {key: self.census_dict[key] for key in visitor_name_list}
         return census_subset
 
-    # return count of visitors by name along with last seen date time
-    def report_single_census_count(self, visitor_name):
+    def report_single_census_count(self, visitor_name: str) -> int:
+        """
+        return count of visitors by name
+        :param visitor_name (key name) aka cat
+        :return: int count
+        """
         return self.census_dict[visitor_name][0]
 
-    # sort census by count
-    def get_census_by_count(self):
+    def get_census_by_count(self) -> dict:
+        """
+        sort census by count
+        :return: sorted dictionary
+        """
         return dict(sorted(self.census_dict.items(), key=lambda k_v: k_v[1][0], reverse=True))
 
-    def get_occurrences(self):
+    def get_occurrences(self) -> list:
+        """
+        returns a list of tuples containing the key and last seen or last counted time
+        :return: list of tuples.  tuples is a single set of key / datetime values
+        """
         return self.census_occurrence
 
 
