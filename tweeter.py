@@ -20,6 +20,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
+# Module handles sending text and images to twitter.  it maintains a tweet count by hour
+# so as not to exceed any hourly threshold set at X.
+# twitter changes the requirements and code without
+# much warning so this object is handy for object segmentation / separation
+# The last twitter change required a blend of some old a new techniques for auth and transmission
+# the code needs to fail gracefully so as not to crash the app
 # auth.py must be located in project; protect this file as it contains keys
 # code by JimMaastricht5@gmail.com
 import tweepy
@@ -29,11 +35,18 @@ from auth import (
     api_secret_key,
     access_token,
     access_token_secret
-)
+)  # auth.py file must contain these keys....
 
 
 class TweeterClass:
-    def __init__(self, tweetmax_per_hour=15):
+    """
+    Class authorizes to Twitter and maintains tweet count per hour not to exceed 15 as the default value
+    """
+    def __init__(self, tweetmax_per_hour: int = 15) -> None:
+        """
+        :param tweetmax_per_hour: int
+        :return: None
+        """
         self.client_v1 = self.get_twitter_conn_v1(api_key, api_secret_key, access_token, access_token_secret)
         self.client_v2 = self.get_twitter_conn_v2(api_key, api_secret_key, access_token, access_token_secret)
 
@@ -42,9 +55,17 @@ class TweeterClass:
         self.tweetcnt = 0
         self.tweetmax_per_hour = tweetmax_per_hour
         self.tweeted = False
+        return
 
     def get_twitter_conn_v1(self, api_key, api_secret_key, access_token, access_token_secret) -> tweepy.API:
-        """Get twitter conn 1.1"""
+        """
+        Get twitter conn 1.1
+        :param api_key: value from auth.py and twitter setup
+        :param api_secret_key: value from auth.py and twitter setup
+        :param access_token: value from auth.py and twitter setup
+        :param access_token_secret: value from auth.py and twitter setup
+        :return: tweetpy.API client connection
+        """
         auth = tweepy.OAuth1UserHandler(api_key, api_secret_key)
         auth.set_access_token(
             access_token,
@@ -53,7 +74,14 @@ class TweeterClass:
         return tweepy.API(auth)
 
     def get_twitter_conn_v2(self, api_key, api_secret_key, access_token, access_token_secret) -> tweepy.Client:
-        """Get twitter conn 2.0"""
+        """
+        Get twitter conn 2.0
+        :param api_key: value from auth.py and twitter setup
+        :param api_secret_key: value from auth.py and twitter setup
+        :param access_token: value from auth.py and twitter setup
+        :param access_token_secret: value from auth.py and twitter setup
+        :return: tweetpy v2 client connection
+        """
         client = tweepy.Client(
             consumer_key=api_key,
             consumer_secret=api_secret_key,
@@ -62,15 +90,22 @@ class TweeterClass:
         )
         return client
 
-    # reset hourly tweet count if new hour
-    def check_hour(self):
+    def check_hour(self) -> None:
+        """
+        reset hourly tweet count if new hour
+        :return: None
+        """
         if self.curr_hr != datetime.now().hour:
             self.curr_hr = datetime.now().hour
             self.tweetcnt = 0
         return
 
-    # set status message
-    def post_status(self, message):
+    def post_status(self, message: str) -> None:
+        """
+        set status message on Twitter
+        :param message: message to share
+        :return: None
+        """
         self.check_hour()
         if self.tweetcnt < self.tweetmax_per_hour:
             self.tweetcnt += 1
@@ -86,25 +121,13 @@ class TweeterClass:
             self.tweeted = False
         return
 
-    # def post_image_url(self, message, url):
-    #     self.check_hour()
-    #     if self.tweetcnt < self.tweetmax_per_hour:
-    #         try:
-    #             # media = self.twitter.media_upload(filename=file_name)
-    #             # self.twitter.update_status(status=message, media_ids=[media.media_id])
-    #             self.twitter.create_tweet(text=url + ' ' + message)
-    #             print(message)
-    #             self.tweetcnt += 1
-    #             self.tweeted = True
-    #         except Exception as e:
-    #             print(e)
-    #             self.tweeted = False
-    #     else:
-    #         self.tweeted = False
-    #     return self.tweeted
-
-    # set status and add an image
-    def post_image_from_file(self, message, file_name):
+    def post_image_from_file(self, message: str, file_name: str) -> bool:
+        """
+        set status and add an image to the tweet from a file name
+        :param message: message to share with the world
+        :param file_name: file name and location of media to post
+        :return: bool with success or failure
+        """
         self.check_hour()
         if self.tweetcnt < self.tweetmax_per_hour:
             try:
@@ -139,3 +162,26 @@ def main_test_twitter():
     # media = tweeter_obj.client_v1.media_upload(filename=media_path)
     # media_id = media.media_id
     # tweeter_obj.client_v2.create_tweet(text="Tweet text", media_ids=[media_id])
+
+# old code
+# def post_image_url(self, message, url):
+#     self.check_hour()
+#     if self.tweetcnt < self.tweetmax_per_hour:
+#         try:
+#             # media = self.twitter.media_upload(filename=file_name)
+#             # self.twitter.update_status(status=message, media_ids=[media.media_id])
+#             self.twitter.create_tweet(text=url + ' ' + message)
+#             print(message)
+#             self.tweetcnt += 1
+#             self.tweeted = True
+#         except Exception as e:
+#             print(e)
+#             self.tweeted = False
+#     else:
+#         self.tweeted = False
+#     return self.tweeted
+
+
+# testing code
+if __name__ == "__main__":
+    main_test_twitter()

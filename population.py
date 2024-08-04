@@ -141,7 +141,8 @@ def main():
 
     post_txt = ''
     for index, birdkey in enumerate(observed):  # bird pop is list of tuples with 0th item species name
-        birdstr = str(f'#{str(index + 1)}: {observed[birdkey][0]} {static_functions.common_name(birdkey)}, ')  # top count & species name
+        # top count & species name
+        birdstr = str(f'#{str(index + 1)}: {observed[birdkey][0]} {static_functions.common_name(birdkey)}, ')
         post_txt = post_txt + birdstr  # aggregate text for post
     print(post_txt)
 
