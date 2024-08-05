@@ -25,6 +25,8 @@
 # called the WebStream.  The WebStreams job is to write the files to the cloud and do
 # it in a distinct process so as not to block the detection of birds by the main app
 # this is probably overkill, but it was a good learning exercise
+#
+# Note: the name of the file to send to the cloud would need to change for each feeder to prevent overwriting contents!
 import multiprocessing
 import pandas as pd
 from datetime import datetime
@@ -43,7 +45,7 @@ class WebStream:
     # Date time: string
     # Prediction: string
     # Image_name: string, image name on disk
-    def __init__(self, queue, path: str = os.getcwd(), caller_id: str = "default") -> None:
+    def __init__(self, queue, path: str = os.getcwd(), caller_id: str = "default", debug=False) -> None:
         """
         set up web stream class, load from csv files to see if this restart was the result of a crash and
         load saved data
@@ -56,6 +58,7 @@ class WebStream:
         print(self.path)
         self.df_list = []
         self.id = caller_id
+        self.debug = debug
         self.storage = gcs.Storage()
         # recover from crash without losing data.  Load data if present.  Keep if current, delete if yesterday
         try:
@@ -106,16 +109,23 @@ class WebStream:
                                            columns=['Feeder Name', 'Event Num', 'Message Type', 'Date Time',
                                                     'Message', 'Image Name'])
                     self.df.to_csv(f'{self.path}/webstream.csv')
-                    self.storage.send_file(name=f'{datetime.now().strftime("%Y-%m-%d")}webstream.csv',
-                                           file_loc_name=f'{self.path}/webstream.csv')
+                    if self.debug is False:  # avoid overwriting web contents
+                        self.storage.send_file(name=f'{datetime.now().strftime("%Y-%m-%d")}webstream.csv',
+                                               file_loc_name=f'{self.path}/webstream.csv')
+                    else:
+                        print(f'skipped flush of contents to cloud for testing. contents were \n {self.df.to_string()}')
                 elif msg_type == 'occurrences':
                     if len(item[4]) > 0:  # in this case the message is a list and must be longer than 0
                         self.df_occurrences = pd.DataFrame(item[4], columns=['Species', 'Date Time'])  # in msg pos
                         self.df_occurrences.insert(0, "Feeder Name", "")
                         self.df_occurrences['Feeder Name'] = self.id
                         self.df_occurrences.to_csv(f'{self.path}/web_occurrences.csv')  # species, date time
-                        self.storage.send_file(name=f'{datetime.now().strftime("%Y-%m-%d")}web_occurrences.csv',
-                                               file_loc_name=f'{self.path}/web_occurrences.csv')
+                        if self.debug is False:  # don't write to cloud when debugging, will mess with website
+                            self.storage.send_file(name=f'{datetime.now().strftime("%Y-%m-%d")}web_occurrences.csv',
+                                                   file_loc_name=f'{self.path}/web_occurrences.csv')
+                        else:
+                            print(f'skipped writing occurrences for testing. '
+                                  f'contents were \n{self.df_occurrences.to_string()}')
                     else:
                         pass  # empty message
                 else:  # basic message or other event type: message, motion, spotted, inconclusive, weather, ....
@@ -129,20 +139,41 @@ class WebStream:
         return
 
 
+# start of function to prevent memory sharing between processes
+def web_stream_worker(queue, path: str, caller_id: str, debug: bool) -> None:
+    """
+    This function allows for the setup of the multiprocessing consumer outside the memory of the controller
+    The two processes cannot share memory or access one another directly and this func eliminates that
+    :param queue: multiprocessing queue to communicate back and forth
+    :param path: path for files such as images
+    :param caller_id: name of caller, or the name of the bird feeder
+    :param debug: true if debugging, do not write to cloud, overwrites web activity
+    :return: none
+    """
+    web_stream = WebStream(queue=queue, path=path, caller_id=caller_id, debug=debug)
+    web_stream.request_handler()
+    return
+
+
 class Controller:
     """
     Multiprocessing controller, send messages to WebStream to process when the CPU has a moment
     """
-    def __init__(self, caller_id: str = "default") -> None:
+    def __init__(self, caller_id: str = "default", debug: bool = False) -> None:
         """
         Set up class, uses a dataframe to store the content
-        :param caller_id: name of the sender, can be anything, non unique identifier
+        :param caller_id: name of the sender, can be anything, non-unique identifier
+        :param debug: boolean defaults to false, prevents unintentional send to cloud for contents when testing
         """
+        self.path = os.getcwd()
         self.queue = multiprocessing.Queue()
         self.web_stream = WebStream(queue=self.queue, caller_id=caller_id)
-        self.p_web_stream = multiprocessing.Process(target=self.web_stream.request_handler, args=(), daemon=True)
+        # self.p_web_stream = multiprocessing.Process(target=self.web_stream.request_handler, args=(), daemon=True)
+        self.p_web_stream = multiprocessing.Process(target=web_stream_worker, args=(self.queue, self.path, caller_id,
+                                                                                    debug), daemon=True)
         self.last_event_num = 0
         self.id = caller_id  # id name or number of sender
+        self.debug = debug
         # This dataframe is not used in this class, here for a reference since this is how the stream handler writes CSV
         self.df = pd.DataFrame({
                            'Feeder Name': pd.Series(dtype='str'),
@@ -196,7 +227,7 @@ class Controller:
 
     def flush(self) -> None:
         """
-        put the flush command on the queue to write the contents of actitivites to the cloud
+        put the flush command on the queue to write the contents of activities to the cloud
         :return: None
         """
         item = ['', 0, 'flush', datetime.now().strftime("%H:%M:%S"), '', '']
@@ -226,7 +257,7 @@ class Controller:
 
 # test code
 def main():
-    ctl = Controller()
+    ctl = Controller(caller_id='local testing', debug=True)
     ctl.start_stream()
     ctl.message('up and running')  # place message on queue for child process
     ctl.message(feeder_name='1SP', event_num=1, msg_type='prediction', message='big fat robin 97.0%',
