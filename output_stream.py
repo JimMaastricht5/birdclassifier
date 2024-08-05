@@ -20,8 +20,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-
-#!/usr/bin/env python3
+# This file consists of two classes that use multiprocessing to send data to the cloud
+# The controller class handle sending messages, images and files to a second class
+# called the WebStream.  The WebStreams job is to write the files to the cloud and do
+# it in a distinct process so as not to block the detection of birds by the main app
+# this is probably overkill, but it was a good learning exercise
 import multiprocessing
 import pandas as pd
 from datetime import datetime
@@ -30,7 +33,8 @@ import gcs
 
 
 class WebStream:
-    # item format is expected to be a tuple with
+    # Receives requests from the controller and writes out the contents periodically
+    # message format is expected to be a tuple with
     # event_num: unique int key for event
     # types: end_process, motion, prediction, prediction_final, flush, message
     #   end_process or None: stops the process and free the creator's block on join()
@@ -39,7 +43,14 @@ class WebStream:
     # Date time: string
     # Prediction: string
     # Image_name: string, image name on disk
-    def __init__(self, queue, path=os.getcwd(), caller_id="default"):
+    def __init__(self, queue, path: str = os.getcwd(), caller_id: str = "default") -> None:
+        """
+        set up web stream class, load from csv files to see if this restart was the result of a crash and
+        load saved data
+        :param queue: multiprocessing queue to pull messages from
+        :param path: str contain os path to working dir, writes out csv file to path to temporarily accumulate data
+        :param caller_id: caller identity, can be anything
+        """
         self.queue = queue
         self.path = path + '/assets'
         print(self.path)
@@ -70,8 +81,17 @@ class WebStream:
                 'Species': pd.Series(dtype='str'),
                 'Date Time': pd.Series(dtype='str')})
             pass
+        return
 
-    def request_handler(self):
+    def request_handler(self) -> None:
+        """
+        call back function for the controller to send requests / messages to
+        grab message, check type, and process appropriately.
+        message is in this format:
+        item = [feeder_name, event_num, msg_type, datetime.now().strftime("%m/%d/%Y, %H:%M:%S"), message,
+                image_name]
+        :return: None
+        """
         item = []
         try:
             while True:
@@ -79,12 +99,9 @@ class WebStream:
                 if item is None:  # poison pill, end the process
                     return  # end process
 
+                print(item)  # send item to console and log for debugging
                 msg_type = item[2]  # message type is the 3 rd item the list, count from 0
-                print(item)
-                # print('getting from q:', msg_type)
-                if msg_type == 'flush':  # event type is flush
-                    # print('flush mem to disk and web', item)
-                    # print('list is', self.df_list)
+                if msg_type == 'flush':  # event type is flush, write out the data to a file and to the cloud
                     self.df = pd.DataFrame(self.df_list,
                                            columns=['Feeder Name', 'Event Num', 'Message Type', 'Date Time',
                                                     'Message', 'Image Name'])
@@ -92,22 +109,17 @@ class WebStream:
                     self.storage.send_file(name=f'{datetime.now().strftime("%Y-%m-%d")}webstream.csv',
                                            file_loc_name=f'{self.path}/webstream.csv')
                 elif msg_type == 'occurrences':
-                    # print('in occurrences', item)
-                    if len(item[4]) > 0:  # list in a list in message position
-                        print(item)  # send full array to console
+                    if len(item[4]) > 0:  # in this case the message is a list and must be longer than 0
                         self.df_occurrences = pd.DataFrame(item[4], columns=['Species', 'Date Time'])  # in msg pos
                         self.df_occurrences.insert(0, "Feeder Name", "")
                         self.df_occurrences['Feeder Name'] = self.id
-                        # print('sending file to disk and web....')
                         self.df_occurrences.to_csv(f'{self.path}/web_occurrences.csv')  # species, date time
                         self.storage.send_file(name=f'{datetime.now().strftime("%Y-%m-%d")}web_occurrences.csv',
                                                file_loc_name=f'{self.path}/web_occurrences.csv')
-                        # print('return from file send to disk and web')
                     else:
                         pass  # empty message
                 else:  # basic message or other event type: message, motion, spotted, inconclusive, weather, ....
-                    # print('in msg else', item)  # values may be missing so don't subscript here
-                    if len(item) == 6:  # list should be six items long
+                    if len(item) == 6:  # list should be six items long to append to df if not write an error to log
                         self.df_list.append(item)
                     else:
                         print(f'error on item list size {len(item)}, with values {item}')
@@ -118,12 +130,20 @@ class WebStream:
 
 
 class Controller:
-    def __init__(self, caller_id="default"):
+    """
+    Multprocessing controller, send messages to WebStream to process when the CPU has a moment
+    """
+    def __init__(self, caller_id: str = "default") -> None:
+        """
+        Set up class, uses a dataframe to store the content
+        :param caller_id: name of the sender, can be anything, nonunique identifier
+        """
         self.queue = multiprocessing.Queue()
         self.web_stream = WebStream(queue=self.queue, caller_id=caller_id)
         self.p_web_stream = multiprocessing.Process(target=self.web_stream.request_handler, args=(), daemon=True)
         self.last_event_num = 0
         self.id = caller_id  # id name or number of sender
+        # This dataframe is not used in this class, here for a reference since this is how the stream handler writes CSV
         self.df = pd.DataFrame({
                            'Feeder Name': pd.Series(dtype='str'),
                            'Event Num': pd.Series(dtype='int'),
@@ -131,19 +151,32 @@ class Controller:
                            'Date Time': pd.Series(dtype='str'),
                            'Message': pd.Series(dtype='str'),
                            'Image Name': pd.Series(dtype='str')})
+        return
 
-    def start_stream(self):
-        # self.p_web_stream.start(id=self.id)
+    def start_stream(self) -> None:
+        """
+        start the stream, message queue is active
+        :return: none
+        """
         self.p_web_stream.start()
         return
 
-    def message(self, message, feeder_name='', event_num=0, msg_type='message', image_name='', flush=False):
-        # print('web controller sending: ', message)
+    def message(self, message: str, feeder_name: str = '', event_num: int = 0, msg_type: str = 'message',
+                image_name: str = '', flush: bool = False) -> None:
+        """
+        send a message from the controller to the message stream processor
+        :param message:
+        :param feeder_name:
+        :param event_num:
+        :param msg_type:
+        :param image_name:
+        :param flush:
+        :return:
+        """
         event_num = self.last_event_num if event_num == 0 else event_num
         feeder_name = self.id if feeder_name == '' else feeder_name
         item = [feeder_name, event_num, msg_type, datetime.now().strftime("%m/%d/%Y, %H:%M:%S"), message,
                 image_name]
-        # print('sending to queue', item)
         self.queue.put(item)
         if flush:
             self.flush()
@@ -151,17 +184,29 @@ class Controller:
         return
 
     def occurrences(self, occurrence_list):
-        # print(occurrence_list)
+        """
+
+        :param occurrence_list:
+        :return:
+        """
         item = [self.id, 0, 'occurrences', datetime.now().strftime("%m/%d/%Y, %H:%M:%S"), occurrence_list]
         self.queue.put(item)
         return
 
     def flush(self):
+        """
+
+        :return:
+        """
         item = ['', 0, 'flush', datetime.now().strftime("%H:%M:%S"), '', '']
         self.queue.put(item)
         return
 
     def end_stream(self):
+        """
+
+        :return:
+        """
         self.flush()  # write any pending contents to disk
         try:
             self.queue.put(None)  # transmit poison pill to stop child process
@@ -178,21 +223,20 @@ class Controller:
 
 
 def main():
-    web_stream = Controller()
-    web_stream.start_stream()
-    web_stream.message('up and running')  # place message on queue for child process
-    web_stream.message(feeder_name='1SP', event_num=1, msg_type='prediction', message='big fat robin 97.0%',
-                       image_name='/home/pi/birdclass/first_img.jpg')
-    web_stream.message(feeder_name='1SP', event_num=1, msg_type='prediction', message='big fat robin 37.0%',
-                       image_name='/home/pi/birdclass/first_img.jpg')
-    web_stream.message(feeder_name='1SP', event_num=1, msg_type='prediction', message='big fat robin 96.0%',
-                       image_name='/home/pi/birdclass/first_img.jpg')
-    web_stream.message(feeder_name='1SP', event_num=1, msg_type='final_prediction', message='big fat robin 74.0%',
-                       image_name='/home/pi/birdclass/birds.gif')
-    web_stream.occurrences([('Robin', '05/07/2022 14:52:00'), ('Robin', '05/07/2022 15:31:00')])
-    web_stream.end_stream()
+    ctl = Controller()
+    ctl.start_stream()
+    ctl.message('up and running')  # place message on queue for child process
+    ctl.message(feeder_name='1SP', event_num=1, msg_type='prediction', message='big fat robin 97.0%',
+                image_name='/home/pi/birdclass/first_img.jpg')
+    ctl.message(feeder_name='1SP', event_num=1, msg_type='prediction', message='big fat robin 37.0%',
+                image_name='/home/pi/birdclass/first_img.jpg')
+    ctl.message(feeder_name='1SP', event_num=1, msg_type='prediction', message='big fat robin 96.0%',
+                image_name='/home/pi/birdclass/first_img.jpg')
+    ctl.message(feeder_name='1SP', event_num=1, msg_type='final_prediction', message='big fat robin 74.0%',
+                image_name='/home/pi/birdclass/birds.gif')
+    ctl.occurrences([('Robin', '05/07/2022 14:52:00'), ('Robin', '05/07/2022 15:31:00')])
+    ctl.end_stream()
 
 
 if __name__ == '__main__':
     main()
-

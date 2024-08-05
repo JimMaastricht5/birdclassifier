@@ -25,7 +25,7 @@
 from datetime import datetime
 from collections import defaultdict
 import static_functions
-from typing_extensions import Union
+from typing import Union
 
 
 def default_value() -> tuple:
