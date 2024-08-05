@@ -131,12 +131,12 @@ class WebStream:
 
 class Controller:
     """
-    Multprocessing controller, send messages to WebStream to process when the CPU has a moment
+    Multiprocessing controller, send messages to WebStream to process when the CPU has a moment
     """
     def __init__(self, caller_id: str = "default") -> None:
         """
         Set up class, uses a dataframe to store the content
-        :param caller_id: name of the sender, can be anything, nonunique identifier
+        :param caller_id: name of the sender, can be anything, non unique identifier
         """
         self.queue = multiprocessing.Queue()
         self.web_stream = WebStream(queue=self.queue, caller_id=caller_id)
@@ -165,13 +165,14 @@ class Controller:
                 image_name: str = '', flush: bool = False) -> None:
         """
         send a message from the controller to the message stream processor
-        :param message:
-        :param feeder_name:
-        :param event_num:
-        :param msg_type:
-        :param image_name:
-        :param flush:
-        :return:
+        :param message: string containing the message (type message) or values to log as a list  in the format
+            ['Feeder Name', 'Event Num', 'Message Type', 'Date Time', 'Message', 'Image Name'] (type occurrence)
+        :param feeder_name: name of the bird feeder sending the info
+        :param event_num: incrementing count of events recorded
+        :param msg_type: string of types "flush", "occurrences", "message" with "message" as the default
+        :param image_name: fully qualified path to file and file name
+        :param flush: tells the handler to send the results to the cloud and disk
+        :return: none
         """
         event_num = self.last_event_num if event_num == 0 else event_num
         feeder_name = self.id if feeder_name == '' else feeder_name
@@ -183,29 +184,30 @@ class Controller:
         self.last_event_num = event_num
         return
 
-    def occurrences(self, occurrence_list):
+    def occurrences(self, occurrence_list: list) -> None:
         """
-
+        takes list of occurrences and puts it on the queue for processing
         :param occurrence_list:
-        :return:
+        :return: none
         """
         item = [self.id, 0, 'occurrences', datetime.now().strftime("%m/%d/%Y, %H:%M:%S"), occurrence_list]
         self.queue.put(item)
         return
 
-    def flush(self):
+    def flush(self) -> None:
         """
-
-        :return:
+        put the flush command on the queue to write the contents of actitivites to the cloud
+        :return: None
         """
         item = ['', 0, 'flush', datetime.now().strftime("%H:%M:%S"), '', '']
         self.queue.put(item)
         return
 
-    def end_stream(self):
+    def end_stream(self) -> None:
         """
-
-        :return:
+        Close down the stream for the day. Flushes the queue, sends the shutdown command (none), and
+        waits for the process to end
+        :return: None
         """
         self.flush()  # write any pending contents to disk
         try:
@@ -222,6 +224,7 @@ class Controller:
         return
 
 
+# test code
 def main():
     ctl = Controller()
     ctl.start_stream()
