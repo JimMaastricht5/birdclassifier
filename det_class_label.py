@@ -148,7 +148,13 @@ class DetectClassify:
         interpreter.allocate_tensors()
         return interpreter, possible_labels
 
-    def output_class(self, message: str, msg_type: str = ''):
+    def output_ctl(self, message: str, msg_type: str = ''):
+        """
+        functions sole purpose is to allow testing with the print function instead of the web send in the full app
+        :param message:
+        :param msg_type:
+        :return:
+        """
         if self.output_function is not None:
             self.output_function(message=message, msg_type=msg_type)
         else:
@@ -231,7 +237,7 @@ class DetectClassify:
             classify_label = classify_label if classify_conf >= classify_conf_equalized else classify_label_equalized
             classify_conf = classify_conf if classify_conf >= classify_conf_equalized else classify_conf_equalized
             if classify_conf != 0:
-                self.output_class(message=f'match returned: confidence {classify_conf:.3f}, {classify_label},',
+                self.output_ctl(message=f'match returned: confidence {classify_conf:.3f}, {classify_label},',
                                   msg_type='match')
 
             _overlap_perc = image_proc.overlap_area(prior_rect, rect)  # compare current rect and prior rect
