@@ -101,7 +101,7 @@ def bird_detector(args) -> None:
     birdpop = population.Census()  # initialize species population census object
     output = output_stream.Controller(caller_id=args.city)  # initialize class to handle terminal and web output
     output.start_stream()  # start streaming to terminal and web
-    gcs_storage = gcs.Storage()
+    gcs_storage = gcs.Storage(offline=args.offline)
     motioncnt, event_count, gcs_img_filename, seed_check_gcs_filename = 0, 0, '', ''
     curr_day, curr_hr, last_tweet = (datetime.now().day, datetime.now().hour,
                                      datetime(2021, 1, 1, 0, 0, 0))
@@ -271,6 +271,7 @@ if __name__ == "__main__":
     # load settings from config file to allow for simple override
     ap = argparse.ArgumentParser()
     ap.add_argument("-cf", "--config_file", type=str, help='Config file')
+    ap.add_argument("-ol", "--offline", type=bool, default=False, help='Operate offline, do not transmit to cloud')
 
     # camera settings
     ap.add_argument("-fc", "--flipcamera", type=bool, default=False, help="flip camera image")

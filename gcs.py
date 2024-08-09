@@ -39,16 +39,19 @@ class Storage:
     """
     Class makes reading and writing from a Google cloud storage (GCS) bucket easy....
     """
-    def __init__(self, project: str = "birdvision", bucket_name: str = "tweeterssp-web-site-contents") -> None:
+    def __init__(self, project: str = "birdvision", bucket_name: str = "tweeterssp-web-site-contents",
+                 offline: bool = False) -> None:
         """
         :param project: the Google project that the buckets lives in
         :param bucket_name: the name of the bucket to read and write files
+        :param offline: tells the class not to send objects to the web, used for testing or running with no wifi
         """
         # connect to temp bucket for public send
         self.project = project
         self.storage_client = storage.Client.from_service_account_json(json_credentials_path=google_json_key)
         self.bucket = self.storage_client.bucket(bucket_name)
         self.bucket_name = bucket_name
+        self.offline = offline
 
     def send_file(self, name: str, file_loc_name: str) -> None:
         """
@@ -57,6 +60,9 @@ class Storage:
         :param file_loc_name: fully qualified location on disk to grab from
         :return:
         """
+        if self.offline:
+            return
+
         try:
             blob = self.bucket.blob(name)  # object name in bucket
             blob.upload_from_filename(file_loc_name)  # full qualified file location on disk
@@ -71,6 +77,9 @@ class Storage:
         :param blob_name: name of the object to write to in GCS
         :return:
         """
+        if self.offline:
+            return
+
         try:
             blob = self.bucket.blob(blob_name)
             blob.upload_from_string(df.to_csv(), 'text/csv')

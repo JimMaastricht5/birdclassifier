@@ -42,21 +42,26 @@ class TweeterClass:
     """
     Class authorizes to Twitter and maintains tweet count per hour not to exceed 15 as the default value
     """
-    def __init__(self, tweetmax_per_hour: int = 15) -> None:
+    def __init__(self, tweetmax_per_hour: int = 15, offline: bool = False) -> None:
         """
         :param tweetmax_per_hour: number of tweets not to exceed in one hour
+        :param offline: tells the app not to post, used for testing or without a network connection
         :return: None
         """
-        self.client_v1 = self.get_twitter_conn_v1()
-        # self.client_v1 = self.get_twitter_conn_v1(api_key, api_secret_key, access_token, access_token_secret)
-        self.client_v2 = self.get_twitter_conn_v2()
-        # self.client_v2 = self.get_twitter_conn_v2(api_key, api_secret_key, access_token, access_token_secret)
-
         self.curr_day = datetime.now().day
         self.curr_hr = datetime.now().hour
         self.tweetcnt = 0
         self.tweetmax_per_hour = tweetmax_per_hour
         self.tweeted = False
+        self.offline = offline
+        if self.offline is False:
+            self.client_v1 = self.get_twitter_conn_v1()
+            # self.client_v1 = self.get_twitter_conn_v1(api_key, api_secret_key, access_token, access_token_secret)
+            self.client_v2 = self.get_twitter_conn_v2()
+            # self.client_v2 = self.get_twitter_conn_v2(api_key, api_secret_key, access_token, access_token_secret)
+        else:
+            self.client_v1 = None
+            self.client_v2 = None
         return
 
     #   def get_twitter_conn_v1(api_key, api_secret_key, access_token, access_token_secret) -> tweepy.API:
@@ -104,6 +109,9 @@ class TweeterClass:
         :param message: message to share
         :return: None
         """
+        if self.offline:
+            return
+
         self.check_hour()
         if self.tweetcnt < self.tweetmax_per_hour:
             self.tweetcnt += 1
@@ -126,6 +134,9 @@ class TweeterClass:
         :param file_name: file name and location of media to post
         :return: bool with success or failure
         """
+        if self.offline:
+            return False
+
         self.check_hour()
         if self.tweetcnt < self.tweetmax_per_hour:
             try:

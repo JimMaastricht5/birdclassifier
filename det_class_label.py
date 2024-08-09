@@ -217,6 +217,7 @@ class DetectClassify:
             (startX, startY, endX, endY) = self.scale_rect(class_img, self.detected_rects[i])  # set x,y bounding box
             rect = (startX, startY, endX, endY)
             rect_percent_scr = ((endX - startX) * (endY - startY)) / self.screen_sq_pixels * 100  # % of screen of img
+            # ?? note this section needs review for improvement crop, pad, equalize, normalize....
             crop_img = class_img.crop((startX, startY, endX, endY))  # extract image for better classification
             equalizedimg = image_proc.enhance(class_img, brightness=self.brightness_chg, contrast=self.contrast_chg,
                                               color=self.color_chg, sharpness=self.sharpness_chg)
