@@ -32,7 +32,7 @@
 import image_proc
 import static_functions
 from typing import Union
-import label_image  # code to init tensor flow model and classify bird type, bird object
+import det_class_label  # code to init tensor flow model and classify bird type, bird object
 import motion_detector  # motion detector helper functions
 import tweeter  # twitter helper functions
 import population  # population census object, tracks species total seen and last time
@@ -123,17 +123,17 @@ def bird_detector(args) -> None:
     bird_tweeter = tweeter.TweeterClass()  # init tweeter2 class twitter handler
     chores = dailychores.DailyChores(bird_tweeter, birdpop, cityweather, output_class=output)
     # init detection and classifier object
-    birds = label_image.DetectClassify(homedir=args.homedir, classifier_labels=args.labels,
-                                       classifier_model=args.classifier,
-                                       classifier_thresholds=args.thresholds,
-                                       detect_object_min_confidence=args.bird_confidence,
-                                       classify_object_min_confidence=args.species_confidence,
-                                       screenheight=args.screenheight, screenwidth=args.screenwidth,
-                                       color_chg=args.color_chg,
-                                       contrast_chg=args.contrast_chg, sharpness_chg=args.sharpness_chg,
-                                       brightness_chg=args.brightness_chg, min_img_percent=args.minimgperc,
-                                       target_object='bird',
-                                       output_class=output)
+    birds = det_class_label.DetectClassify(homedir=args.homedir, classifier_labels=args.labels,
+                                           classifier_model=args.classifier,
+                                           classifier_thresholds=args.thresholds,
+                                           detect_object_min_confidence=args.bird_confidence,
+                                           classify_object_min_confidence=args.species_confidence,
+                                           screenheight=args.screenheight, screenwidth=args.screenwidth,
+                                           color_chg=args.color_chg,
+                                           contrast_chg=args.contrast_chg, sharpness_chg=args.sharpness_chg,
+                                           brightness_chg=args.brightness_chg, min_img_percent=args.minimgperc,
+                                           target_object='bird',
+                                           output_class=output)
     output.message(f'Using label file: {birds.labels}')
     output.message(f'Using threshold file: {birds.thresholds}')
     output.message(f'Using classifier file: {birds.classifier_file}')
