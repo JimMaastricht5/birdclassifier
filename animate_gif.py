@@ -129,12 +129,12 @@ class BirdGif:
         self.build_dict()  # use census, confidence,weighted, bird labels and bird confidence
 
         frames = self.motion_detect.capture_stream()  # capture a list of images
-        first_img_jpg = self.birds.add_boxes_and_labels(img=first_img_jpg)
+        first_img_jpg = self.birds.add_boxes_and_labels(label_img=first_img_jpg)
         labeled_frames.insert(0, image_proc.convert_image(img=first_img_jpg))  # isrt 1st img
         for i, frame in enumerate(frames):
             frame = image_proc.enhance(img=frame, brightness=self.brightness_chg)
-            if self.birds.detect(img=frame):  # find bird object in frame and set rectangles containing object
-                if self.birds.classify(img=frame, use_confidence_threshold=False) > 0:   # classify at rect & chk conf
+            if self.birds.detect(detect_img=frame):  # find bird object in frame and set rectangles containing object
+                if self.birds.classify(class_img=frame, use_confidence_threshold=False) > 0:   # class at rect chk conf
                     self.frames_with_birds += 1
                     last_good_frame = i + 1  # found a bird, add one to frame to account for insert of 1st image
                 self.build_dict()  # use census, confidence,weighted, bird labels and bird confidence
