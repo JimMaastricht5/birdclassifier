@@ -44,11 +44,13 @@ class TweeterClass:
     """
     def __init__(self, tweetmax_per_hour: int = 15) -> None:
         """
-        :param tweetmax_per_hour: int
+        :param tweetmax_per_hour: number of tweets not to exceed in one hour
         :return: None
         """
-        self.client_v1 = self.get_twitter_conn_v1(api_key, api_secret_key, access_token, access_token_secret)
-        self.client_v2 = self.get_twitter_conn_v2(api_key, api_secret_key, access_token, access_token_secret)
+        self.client_v1 = self.get_twitter_conn_v1()
+        # self.client_v1 = self.get_twitter_conn_v1(api_key, api_secret_key, access_token, access_token_secret)
+        self.client_v2 = self.get_twitter_conn_v2()
+        # self.client_v2 = self.get_twitter_conn_v2(api_key, api_secret_key, access_token, access_token_secret)
 
         self.curr_day = datetime.now().day
         self.curr_hr = datetime.now().hour
@@ -57,14 +59,12 @@ class TweeterClass:
         self.tweeted = False
         return
 
-    def get_twitter_conn_v1(self, api_key, api_secret_key, access_token, access_token_secret) -> tweepy.API:
+    #   def get_twitter_conn_v1(api_key, api_secret_key, access_token, access_token_secret) -> tweepy.API:
+    @staticmethod
+    def get_twitter_conn_v1() -> tweepy.API:
         """
         Get twitter conn 1.1
-        :param api_key: value from auth.py and twitter setup
-        :param api_secret_key: value from auth.py and twitter setup
-        :param access_token: value from auth.py and twitter setup
-        :param access_token_secret: value from auth.py and twitter setup
-        :return: tweetpy.API client connection
+        :return: tweetpy API client connection
         """
         auth = tweepy.OAuth1UserHandler(api_key, api_secret_key)
         auth.set_access_token(
@@ -73,13 +73,11 @@ class TweeterClass:
         )
         return tweepy.API(auth)
 
-    def get_twitter_conn_v2(self, api_key, api_secret_key, access_token, access_token_secret) -> tweepy.Client:
+    # def get_twitter_conn_v2(api_key, api_secret_key, access_token, access_token_secret) -> tweepy.Client:
+    @staticmethod
+    def get_twitter_conn_v2() -> tweepy.Client:
         """
         Get twitter conn 2.0
-        :param api_key: value from auth.py and twitter setup
-        :param api_secret_key: value from auth.py and twitter setup
-        :param access_token: value from auth.py and twitter setup
-        :param access_token_secret: value from auth.py and twitter setup
         :return: tweetpy v2 client connection
         """
         client = tweepy.Client(

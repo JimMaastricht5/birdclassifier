@@ -133,7 +133,7 @@ def bird_detector(args) -> None:
                                        contrast_chg=args.contrast_chg, sharpness_chg=args.sharpness_chg,
                                        brightness_chg=args.brightness_chg, min_img_percent=args.minimgperc,
                                        target_object='bird',
-                                       output_class=output, verbose=args.verbose)
+                                       output_class=output)
     output.message(f'Using label file: {birds.labels}')
     output.message(f'Using threshold file: {birds.thresholds}')
     output.message(f'Using classifier file: {birds.classifier_file}')
@@ -150,7 +150,7 @@ def bird_detector(args) -> None:
         if motion_detect.motion:
             motioncnt += 1
 
-        if motion_detect.motion and birds.detect(img=motion_detect.img) and \
+        if motion_detect.motion and birds.detect(detect_img=motion_detect.img) and \
                 cityweather.is_dawn() is False and cityweather.is_dusk() is False\
                 and image_proc.is_sun_reflection_jpg(img=motion_detect.img) is False:  # daytime with motion & bird
             motioncnt = 0  # reset motion count between detected birds
@@ -162,7 +162,7 @@ def bird_detector(args) -> None:
 
             # classify, grab labels, output census, send to web and terminal,
             # enhance the shot, and add boxes, grab next set of gifs, build animation, tweet
-            if birds.classify(img=first_img_jpg) >= args.species_confidence:  # found a bird we can classify
+            if birds.classify(class_img=first_img_jpg) >= args.species_confidence:  # found a bird we can classify
                 first_rects, first_label, first_conf = birds.get_obj_data()  # grab data from this bird
                 max_index = birds.classified_confidences.index(max(birds.classified_confidences))
                 file_name = static_functions.common_name(birds.classified_labels[max_index]).replace(" ", "")
@@ -189,7 +189,7 @@ def bird_detector(args) -> None:
                 bird_first_time_seen = birdpop.visitors(best_first_label, datetime.now())  # increment species count
                 birds.set_ojb_data(classified_rects=first_rects, classified_labels=best_first_label,
                                    classified_confidences=best_first_conf)  # set to first bird
-                first_img_jpg = birds.add_boxes_and_labels(img=first_img_jpg_no_label, use_last_known=False)
+                first_img_jpg = birds.add_boxes_and_labels(label_img=first_img_jpg_no_label, use_last_known=False)
                 first_img_jpg.save(local_img_filename)
                 gcs_storage.send_file(name=gcs_img_filename, file_loc_name=local_img_filename)
                 seed_check_gcs_filename = gcs_img_filename  # reference to use for hourly seed check

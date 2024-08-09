@@ -129,7 +129,7 @@ class WebStream:
                                   f'contents were \n{self.df_occurrences.to_string()}')
                     else:
                         pass  # empty message
-                else:  # basic message or other event type: message, motion, spotted, inconclusive, weather, ....
+                else:  # basic message or other event type: message, match,motion, spotted, inconclusive, weather, ....
                     if len(item) == 6:  # list should be six items long to append to df if not write an error to log
                         self.df_list.append(item)
                     else:
@@ -201,7 +201,7 @@ class Controller:
             ['Feeder Name', 'Event Num', 'Message Type', 'Date Time', 'Message', 'Image Name'] (type occurrence)
         :param feeder_name: name of the bird feeder sending the info
         :param event_num: incrementing count of events recorded
-        :param msg_type: string of types "flush", "occurrences", "message" with "message" as the default
+        :param msg_type: string of types "flush", "occurrences", "match", "message" with "message" as the default
         :param image_name: fully qualified path to file and file name
         :param flush: tells the handler to send the results to the cloud and disk
         :return: none
