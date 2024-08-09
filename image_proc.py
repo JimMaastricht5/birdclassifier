@@ -193,6 +193,32 @@ def normalize(img: Image.Image) -> np.array:
     return np.array(img, dtype=np.float32) / 255.0
 
 
+def crop(img: Image.Image, rect: tuple[int, int, int, int]) -> Image.Image:
+    """
+    crop an image from a rect passed as a tuple
+    :param img: pillow image to crop
+    :param rect: crop area as a tuple containing startx, starty, endx, endy
+    :return: cropped image
+    """
+    return img.crop(rect)
+
+
+def pad(img: Image.Image, new_width: int, new_height: int) -> Image.Image:
+    """
+    add black pixels to an image.  this is useful to get a cropped object back to the corerct size for a model
+    :param img:
+    :param new_width: new width of img
+    :param new_height: new height of img
+    :return:
+    """
+    if img.size[0] > new_width or img.size[1] > new_height:
+        print(f'WARNING: Imageproc.py pad function is being asked to pad an image of size {img.size},'
+              f'but new width and height are smaller ({new_width},{new_height}). Performing pad operation....')
+    padded_img = Image.new('RGB', (new_width, new_height))  # create larger all black image
+    padded_img.paste(img)  # paste org image over black pad at 0, 0 which is the upper left
+    return padded_img
+
+
 def save_gif(frames: list, frame_rate: int = 30,
              filename: str = os.getcwd()+'/assets/birds.gif') -> tuple[Image.Image, str]:
     """
@@ -221,15 +247,17 @@ if __name__ == "__main__":
     img1 = Image.open('/home/pi/birdclass/birds.gif')
     # img = Image.open('/home/pi/birdclass/washout3.jpg')
     print(img1.format)
-    print(avg_exposure(img1))
-    print(is_sun_reflection_jpg(img1))
-    # img1.show()
+    # print(avg_exposure(img1))
+    # print(is_sun_reflection_jpg(img1))
+    # img1 = crop(img1, (100, 100, 200, 300))
+    img1 = pad(img1, 100, 100)
+    img1.show()
 
-    img2 = Image.open('/home/pi/birdclass/washout6.gif')
-    print(img2.format)
-    print(avg_exposure(img2))
-    print(is_sun_reflection_jpg(img2))
-    img2.show()
+    # img2 = Image.open('/home/pi/birdclass/washout6.gif')
+    # print(img2.format)
+    # print(avg_exposure(img2))
+    # print(is_sun_reflection_jpg(img2))
+    # img2.show()
 
     # img = resize(img_org, 100, 100, maintain_aspect=False)
     # gif1 = convert_image(img1, target='gif', save_test_img=True)
