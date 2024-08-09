@@ -138,7 +138,7 @@ class BirdGif:
                     self.frames_with_birds += 1
                     last_good_frame = i + 1  # found a bird, add one to frame to account for insert of 1st image
                 self.build_dict()  # use census, confidence,weighted, bird labels and bird confidence
-            labeled_frames.append(self.birds.add_boxes_and_labels(img=frame, use_last_known=True))
+            labeled_frames.append(self.birds.add_boxes_and_labels(label_img=frame, use_last_known=True))
 
         # build confidence, label, and weighted label
         self.best_confidence = self.confidence_dict[max(self.confidence_dict, key=self.confidence_dict.get)] / \
