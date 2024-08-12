@@ -238,7 +238,7 @@ class DetectClassify:
             classify_conf = classify_conf if classify_conf >= classify_conf_equalized else classify_conf_equalized
             if classify_conf != 0:
                 self.output_ctl(message=f'match returned: confidence {classify_conf:.3f}, {classify_label},',
-                                  msg_type='match')
+                                msg_type='match')
 
             _overlap_perc = image_proc.overlap_area(prior_rect, rect)  # compare current rect and prior rect
             prior_rect = rect  # set prior rect to current rect
@@ -392,35 +392,42 @@ class DetectClassify:
         """
         return (self.color_index + from_index) % (len(self.colors) - 1)
 
-    def check_threshold(self, cresult, lindex, use_confidence_threshold, screen_percent):
+    def check_threshold(self, cresult: float, lindex: int, use_confidence_threshold: bool,
+                        screen_percent: float) -> bool:
         """
-    # func checks threshold by each label passed as a nparray with text in col 0 and threshold in col 1
-    # object cannot be -1 (not present in geo location), confidence cannot be 0,must be equal or exceed minimum score
-    # img must take up the specified min % of the image, or it is tossed out
-    # cresult is a decimal % 0 - 1; lindex is % * 10 (no decimals) must div by 1000 to get same scale
-        :param cresult:
-        :param lindex:
+        checks the predictions confidence against the confidence thresholds to see if the species
+        is allowed in this geography or has a custom setting to allow for more or less positives.
+        classifier_thresholds are a percentage * 10 (no decimals) so values range from 0 to 1000.
+        we must multiply other values by 1000 to get same scale.
+        rules
+        1. threshold cannot be -1 (not present in geo location), returns false
+        2. img must take up the specified min % of the image, or it is tossed out, returns false
+        3. use_confidence_threshold false results in the function always returning true.  useful for debugging
+        4. prediction must be equal or exceed minimum score
+        :param cresult: predicted confidence, float  between 0 and 1;
+        :param lindex: integer containing the index of the species predicted for look up in threshold list
         :param use_confidence_threshold: requires classification prob to exceed threshold for validity
-        :param screen_percent:
-        :return:
+        :param screen_percent: min screen percentage bird must take up or the prediction is todded out
+        :return: true if prediction confidence is over threshold for species
         """
-        # grab default if species has 0 confidence, else use species specific score
-        label_threshold = self.classify_object_min_confidence * 1000 \
-            if self.classifier_thresholds[int(lindex)][1] == 0 \
-            else self.classifier_thresholds[int(lindex)][1]
-        # push to zero if the use_threshold boolean is false, this automatically puts any confidence over the threshold
-        label_threshold = label_threshold if (use_confidence_threshold or label_threshold == -1) else 0
-        try:  # handle typos in threshold file or unexpected results from model
-            label_threshold = float(label_threshold)
-            cresult = float(cresult)
+        label_threshold = 0
+        # apply rules 1 and 2
+        if self.classifier_thresholds[int(lindex)] == -1 or screen_percent < self.min_img_percent:
+            return False
+        # apply rule 3
+        elif use_confidence_threshold is False:
+            return True
+        # use default threshold if threshold is 0 else use species specific score
+        try:  # handle typos in threshold file
+            label_threshold = float(self.classify_object_min_confidence * 1000
+                                    if self.classifier_thresholds[int(lindex)][1] == 0
+                                    else self.classifier_thresholds[int(lindex)][1])
         except Exception as e:
             print(e)
-            print(label_threshold)
-            print(cresult)
-            label_threshold = 0
-            cresult = 0
-        return (float(label_threshold) != -1 and screen_percent >= self.min_img_percent and
-                cresult > 0 and cresult >= float(label_threshold) / 1000)
+            print(self.classifier_thresholds[int(lindex)])  # where was the error in the file?
+            print(cresult)  # what was the prediction?
+            cresult = 0  # cause a false to be returned for this species on an error
+        return cresult > 0 and cresult >= float(label_threshold) / 1000
 
     def get_obj_data(self) -> tuple:
         """
