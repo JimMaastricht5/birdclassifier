@@ -148,12 +148,12 @@ class DetectClassify:
         interpreter.allocate_tensors()
         return interpreter, possible_labels
 
-    def output_ctl(self, message: str, msg_type: str = ''):
+    def output_ctl(self, message: str, msg_type: str = '') -> None:
         """
         functions sole purpose is to allow testing with the print function instead of the web send in the full app
-        :param message:
-        :param msg_type:
-        :return:
+        :param message: message to print, log and/or send to web
+        :param msg_type: message type for web processing and log
+        :return: None
         """
         if self.output_function is not None:
             self.output_function(message=message, msg_type=msg_type)
@@ -175,7 +175,7 @@ class DetectClassify:
         """
         function performs object detection for the target object. Converts the image to a TF format for inference
         :param detect_img: Pillow Img from camera
-        :return: true if target object was found in the image
+        :return: true if target object was found in the image, useful for processing in a loop for detected objects
         """
         self.img = detect_img.copy()
         self.detected_confidences = []
@@ -202,15 +202,17 @@ class DetectClassify:
                     self.detected_confidences.append(self.obj_confidence)
                     self.detected_labels.append(det_label)
                     self.detected_rects.append(det_rects[0][index])
+        else:
+            self.output_function('det_class_label.py detect received a floating model and is only programmed for int')
         return self.target_object_found
 
     def classify(self, class_img: Image.Image, use_confidence_threshold: bool = True) -> float:
         """
-    # make classifications using img and detect results
-    # compare class_img and equalized images
-    # use self.detected_confidences,detected_labels, detected_rects lists
-    # stash prior classification for later processing if current frame does not find a bird
-        :param class_img:
+        loop over detected objects and classify each one.  Note there may be more than one bird in the image
+        make an equalized img and compare results from both
+        uses self.detected_confidences,detected_labels, detected_rects lists
+        stash prior classification for later processing if current frame does not find a bird
+        :param class_img: img to perform classification on
         :param use_confidence_threshold: True requires any classification confidence to exceed threshold
         :return: The highest confidence / probability for a class across all proposed classes
         """
@@ -218,12 +220,13 @@ class DetectClassify:
         self.classified_rects_area = []
         self.classified_confidences = []
         self.classified_labels = []
-        prior_rect = (0, 0, 0, 0)
+        max_confidence = 0  # set to zero in case we do n0t get a classification match
         for i, det_confidence in enumerate(self.detected_confidences):  # loop over detected target objects
             (startX, startY, endX, endY) = self.scale_rect(class_img, self.detected_rects[i])  # set x,y bounding box
             rect = (startX, startY, endX, endY)
             rect_percent_scr = ((endX - startX) * (endY - startY)) / self.screen_sq_pixels * 100  # % of screen of img
-            # ?? note this section needs review for improvement crop, pad, equalize, normalize....
+
+            # ??? note this section needs review for improvement crop, pad, equalize, normalize....
             crop_img = class_img.crop((startX, startY, endX, endY))  # extract image for better classification
             equalizedimg = image_proc.enhance(class_img, brightness=self.brightness_chg, contrast=self.contrast_chg,
                                               color=self.color_chg, sharpness=self.sharpness_chg)
@@ -236,22 +239,18 @@ class DetectClassify:
             # take the best result between cropped img and enhanced cropped img
             classify_label = classify_label if classify_conf >= classify_conf_equalized else classify_label_equalized
             classify_conf = classify_conf if classify_conf >= classify_conf_equalized else classify_conf_equalized
-            if classify_conf != 0:
+            # if there was a detection print a message and append the label to findings
+            if len(classify_label.strip()) > 0 and classify_conf != 0:
                 self.output_ctl(message=f'match returned: confidence {classify_conf:.3f}, {classify_label},',
                                 msg_type='match')
-
-            _overlap_perc = image_proc.overlap_area(prior_rect, rect)  # compare current rect and prior rect
-            prior_rect = rect  # set prior rect to current rect
-            # print('overlap percent', overlap_perc)
-            # record bird classification and location if there is a label
-            if len(classify_label.strip()) > 0:
                 self.classified_labels.append(classify_label)
                 self.classified_confidences.append(classify_conf)
                 self.classified_rects.append(rect)
                 self.classified_rects_area.append(rect_percent_scr)
-        if max(self.classified_confidences, default=0) == 0:  # if empty list or zero
-            max_confidence = 0
-        else:  # set last known to current species if confident
+
+        # done processing detect objects, check for a classification match (non-zero finding)
+        # set last known to current species if confidence is above threshold
+        if max(self.classified_confidences, default=0) != 0:  # not empty list or zero
             max_confidence = max(self.classified_confidences)
             self.last_known_classified_rects = self.classified_rects
             self.last_known_classified_rects_area = self.classified_rects_area
@@ -261,19 +260,20 @@ class DetectClassify:
 
     def classify_obj(self, class_img, use_confidence_threshold=True, screen_percent=100.00):
         """
-    # input image and return best result and label
-    # the function will sort the results and compare the confidence to the confidence for that label (species)
-    # if the ML models confidence is higher than the threshold for that label (species) it will stop searching and
-    # return that best result
+        take input image and return best result and label
+        the function will sort the results and compare the confidence to the confidence for that label (species)
+        i the ML models confidence is higher than the threshold for that label (species) it will stop searching and
+        return that best result
         :param class_img:
         :param use_confidence_threshold: requires probability for species returned to exceed threshold for valid result
         :param screen_percent:
         :return:
         """
+        # grab the input details setup at init.  use that clean version for further processing
         input_details = self.classifier.get_input_details()
         floating_model, input_data = self.convert_img_to_tf(class_img, input_details)
         self.classifier.set_tensor(input_details[0]['index'], input_data)
-        self.classifier.invoke()  # invoke classification
+        self.classifier.invoke()  # inference
         output_details = self.classifier.get_output_details()[0]
         output = np.squeeze(self.classifier.get_tensor(output_details['index']))
         # If the model is quantized (tflite uint8 data), then dequantize the results
@@ -297,6 +297,8 @@ class DetectClassify:
     def convert_img_to_tf(self, pil_img, input_details):
         """
         takes a PIL image type and converts it to np array for tensor and resizes for classification model
+        TF models can be full or lite versions.  The full version uses floating point numbers.  Lite version
+        is integer only so the data must be converted accordingly
         :param pil_img: image to convert for tensor flow model
         :param input_details: tf. get_input_details object used for dtype and shape
         :return:
@@ -307,14 +309,16 @@ class DetectClassify:
         width = input_details[0]['shape'][2]
         reshape_image = pil_img.resize((width, height))  # shape to match model input requirements
         image_np = np.array(reshape_image)  # convert to np array
-        # TF models expect input as a batch even if a single image.  Pad for N
-        image_np_expanded = np.expand_dims(image_np, axis=0)
+        # TF models expect input as a batch even if a single image.
+        image_np_expanded = np.expand_dims(image_np, axis=0)  # adds an extra dimension creating a batch size of 1
 
-        if floating_model:
-            input_data = image_np_expanded.astype('float32')
-            input_data = (np.float32(input_data) - self.input_mean) / self.input_std
-        else:
+        # model could be full or lite version.  lite version in int only.  full version is float32
+        # integer normalization is not attempted since much of the data would be lost after the decimal
+        if floating_model is False:
             input_data = image_np_expanded.astype('uint8')
+        else:
+            input_data = image_np_expanded.astype('float32')
+            input_data = (np.float32(input_data) - self.input_mean) / self.input_std  # attempt normalization ??? why here ???
         return floating_model, input_data
 
     @staticmethod
@@ -332,16 +336,16 @@ class DetectClassify:
         x_max = int(min(img_width, (box[3] * img_width)))
         return x_min, y_min, x_max, y_max
 
-    def add_boxes_and_labels(self, label_img, use_last_known=False):
+    def add_boxes_and_labels(self, label_img: Image.Image, use_last_known: bool = False) -> Image.Image:
         """
-    # add bounding box and label to an image
-    # we may have a rect with no species and a zero confidence, in that case use the last known label and confidence
-        :param label_img:
-        :param use_last_known:
-        :return:
+        add bounding box and label to an image.  May have a rect with no species and a zero confidence,
+        in that case uses the last known label and confidence
+        :param label_img: image to draw box and write label on
+        :param use_last_known: uses the last known species, used in animated gif maker is a label is unknown for a frame
+        :return: labeled image + bound box and text
         """
+        # set local variables for processing
         if use_last_known and round(max(self.classified_confidences, default=0), 2) == 0:
-            # print('using last known', self.last_known_classified_confidences, self.last_known_classified_labels)
             classified_rects = self.last_known_classified_rects
             classified_rects_area = self.last_known_classified_rects_area
             classified_labels = self.last_known_classified_labels
@@ -352,15 +356,20 @@ class DetectClassify:
             classified_labels = self.classified_labels
             classified_confidences = self.classified_confidences
 
+        # draw on the image
         draw = PILImageDraw.Draw(label_img)
         font = draw.getfont()
-        c_labs_len = len(classified_labels)
+        c_labels_list_len = len(classified_labels)
         for i, rect in enumerate(classified_rects):
             (start_x, start_y, end_x, end_y) = rect
-            try:  # add text to top and bottom of image, make box slightly large and put text on top and bottom
-                # sometimes the label and conf are the same for more than one rect, handle that here....
-                classified_label = classified_labels[i] if c_labs_len > i - 1 else classified_labels[-1]
-                classified_confidence = classified_confidences[i] if c_labs_len > i - 1 else classified_confidences[-1]
+            # the classifier may return more rectangles than labels.  in that case apply the last label
+            # and the last confidence.  Wrap this in a try except to trap any unhandled errors
+            try:
+                classified_label = classified_labels[i] if c_labels_list_len > i - 1 else classified_labels[-1]
+                classified_confidence = classified_confidences[i] if c_labels_list_len > i - 1 \
+                    else classified_confidences[-1]
+
+                # add text to top and bottom of image, make box slightly large and put text on top and bottom
                 draw_text_label = f'{static_functions.common_name(classified_label)} {classified_confidence * 100:.2f}%'
                 draw.text((start_x, start_y-50), draw_text_label, font=font, fill='white')
                 draw.text((start_x, end_y+50), draw_text_label, font=font, fill='white')
