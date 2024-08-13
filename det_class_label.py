@@ -230,19 +230,19 @@ class DetectClassify:
             rect_percent_scr = ((endX - startX) * (endY - startY)) / self.screen_sq_pixels * 100  # % of screen of img
 
             # ??? note this section needs review for improvement crop, pad, equalize, normalize....
-            # normalization code for float32 model: input_data = (np.float32(input_data) - self.input_mean) / self.input_std
+            # normalization code float32 model: input_data = (np.float32(input_data) - self.input_mean) / self.input_std
             crop_img = class_img.crop((startX, startY, endX, endY))  # extract image for better classification
-            equalizedimg = image_proc.enhance(class_img, brightness=self.brightness_chg, contrast=self.contrast_chg,
-                                              color=self.color_chg, sharpness=self.sharpness_chg)
-            crop_equalizedimg = equalizedimg.crop((startX, startY, endX, endY))
-            classify_conf, classify_label = self.classify_obj(crop_img, use_confidence_threshold,
-                                                              rect_percent_scr)
-            classify_conf_equalized, classify_label_equalized = self.classify_obj(crop_equalizedimg,
-                                                                                  use_confidence_threshold,
-                                                                                  rect_percent_scr)
-            # take the best result between cropped img and enhanced cropped img
-            classify_label = classify_label if classify_conf >= classify_conf_equalized else classify_label_equalized
-            classify_conf = classify_conf if classify_conf >= classify_conf_equalized else classify_conf_equalized
+            classify_conf, classify_label = self.classify_obj(crop_img, use_confidence_threshold, rect_percent_scr)
+
+            adjustedimg = image_proc.enhance(class_img, brightness=self.brightness_chg, contrast=self.contrast_chg,
+                                             color=self.color_chg, sharpness=self.sharpness_chg)
+            crop_adjustedimg = adjustedimg.crop((startX, startY, endX, endY))
+            classify_conf_adjusted, classify_label_adjusted = (
+                self.classify_obj(crop_adjustedimg, use_confidence_threshold, rect_percent_scr))
+
+            # take the best result between cropped img and adjusted cropped img
+            classify_label = classify_label if classify_conf >= classify_conf_adjusted else classify_label_adjusted
+            classify_conf = classify_conf if classify_conf >= classify_conf_adjusted else classify_conf_adjusted
             # if there was a detection print a message and append the label to findings
             if len(classify_label.strip()) > 0 and classify_conf != 0:
                 self.output_ctl(message=f'match returned: confidence {classify_conf:.3f}, {classify_label},',
@@ -283,14 +283,13 @@ class DetectClassify:
         self.classifier.invoke()  # inference
         output_details = self.classifier.get_output_details()[0]
         output = np.squeeze(self.classifier.get_tensor(output_details['index']))
-        # If the model is quantized (tflite uint8 data), then dequantize the results  ???
-        # this should be the same as self.classifier_is_floating_model is false
+
+        # If the model is quantized aka tflite uint8 data (not a floating pt model) then de-quantize the results
         if self.classifier_is_floating_model is False:
             # if output_details['dtype'] == np.uint8:
             scale, zero_point = output_details['quantization']
             output = scale * (output - zero_point) * 10  # scale factor to adjust results
-        # partial sort of array with largest values at start, grab the top 10
-        cindex = sorted(output, reverse=True)[10:]
+        cindex = sorted(output, reverse=True)[10:]  # partial sort of array with largest values at start, grab top 10
         # cindex = np.argpartition(output, -10)[-10:]
         # loop over top N results to find best match; highest score align with matching species threshold
 
