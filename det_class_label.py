@@ -274,6 +274,8 @@ class DetectClassify:
         :param rect_percent_scr: percentage of screen bounding box is of the total image
         :return: tuple containing best confidence result and best label for requested classification
         """
+        maxcresult = float(0)
+        maxlresult = ''
         # grab the input details setup at init.  use that clean version for further processing
         input_details = self.classifier.get_input_details()
         input_data = self.convert_img_to_tf(class_img, input_details, self.classifier_is_floating_model)
@@ -282,13 +284,16 @@ class DetectClassify:
         output_details = self.classifier.get_output_details()[0]
         output = np.squeeze(self.classifier.get_tensor(output_details['index']))
         # If the model is quantized (tflite uint8 data), then dequantize the results  ???
-        if output_details['dtype'] == np.uint8:
+        # this should be the same as self.classifier_is_floating_model is false
+        if self.classifier_is_floating_model is False:
+            # if output_details['dtype'] == np.uint8:
             scale, zero_point = output_details['quantization']
             output = scale * (output - zero_point) * 10  # scale factor to adjust results
-        cindex = np.argpartition(output, -10)[-10:]
+        # partial sort of array with largest values at start, grab the top 10
+        cindex = sorted(output, reverse=True)[10:]
+        # cindex = np.argpartition(output, -10)[-10:]
         # loop over top N results to find best match; highest score align with matching species threshold
-        maxcresult = float(0)
-        maxlresult = ''
+
         for lindex in cindex:
             lresult = str(self.classifier_possible_labels[lindex]).strip()  # grab label,push to string instead of tuple
             cresult = float(output[lindex]) if float(output[lindex]) > 0 else 0
