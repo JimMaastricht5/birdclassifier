@@ -93,9 +93,10 @@ class DetectClassify:
         self.classifier_labels_file = homedir + classifier_labels
         self.classifier_thresholds_file = homedir + classifier_thresholds
         self.classifier_thresholds = np.genfromtxt(self.classifier_thresholds_file, delimiter=',')
-        self.detector, self.obj_detector_possible_labels = self.init_tf2(self.detector_file, self.detector_labels_file)
-        self.classifier, self.classifier_possible_labels = self.init_tf2(self.classifier_file,
-                                                                         self.classifier_labels_file)
+        self.detector, self.obj_detector_possible_labels, self.detector_is_floating_model = (
+            self.init_tf2(self.detector_file, self.detector_labels_file))
+        self.classifier, self.classifier_possible_labels, self.classifier_is_floating_model = (
+            self.init_tf2(self.classifier_file, self.classifier_labels_file))
         self.input_mean = 127.5  # recommended default
         self.input_std = 127.5  # recommended default
         self.detect_obj_min_confidence = detect_object_min_confidence
@@ -138,7 +139,8 @@ class DetectClassify:
         if not present look for the full version
         :param model_file: name of the model to load for this instance of tensorflow
         :param label_file_name: name of the corresponding labels for the model
-        :return: tuple of the tensorflow interpreter and a list of the labels
+        :return: tuple of the tensorflow interpreter, list of the labels, and a boolean if
+            the model is float32 (True) or int (False)
         """
         possible_labels = np.asarray(self.load_labels(label_file_name))  # load label file and convert to list
         try:  # load tensorflow lite on rasp pi
@@ -146,7 +148,8 @@ class DetectClassify:
         except NameError:  # load full tensor for desktop dev
             interpreter = tf.lite.Interpreter(model_file, None)
         interpreter.allocate_tensors()
-        return interpreter, possible_labels
+        is_floating_model = interpreter.input_details[0]['dtype'] == np.float32  # is float32
+        return interpreter, possible_labels, is_floating_model
 
     def output_ctl(self, message: str, msg_type: str = '') -> None:
         """
@@ -185,7 +188,7 @@ class DetectClassify:
 
         input_details = self.detector.get_input_details()
         output_details = self.detector.get_output_details()
-        floating_model, input_data = self.convert_img_to_tf(self.img, input_details)
+        floating_model, input_data = self.convert_img_to_tf(self.img, input_details, self.detector_is_floating_model)
         self.detector.set_tensor(input_details[0]['index'], input_data)
         self.detector.invoke()
 
@@ -227,6 +230,7 @@ class DetectClassify:
             rect_percent_scr = ((endX - startX) * (endY - startY)) / self.screen_sq_pixels * 100  # % of screen of img
 
             # ??? note this section needs review for improvement crop, pad, equalize, normalize....
+            # normalization code for float32 model: input_data = (np.float32(input_data) - self.input_mean) / self.input_std
             crop_img = class_img.crop((startX, startY, endX, endY))  # extract image for better classification
             equalizedimg = image_proc.enhance(class_img, brightness=self.brightness_chg, contrast=self.contrast_chg,
                                               color=self.color_chg, sharpness=self.sharpness_chg)
@@ -271,7 +275,7 @@ class DetectClassify:
         """
         # grab the input details setup at init.  use that clean version for further processing
         input_details = self.classifier.get_input_details()
-        floating_model, input_data = self.convert_img_to_tf(class_img, input_details)
+        input_data = self.convert_img_to_tf(class_img, input_details, self.classifier_is_floating_model)
         self.classifier.set_tensor(input_details[0]['index'], input_data)
         self.classifier.invoke()  # inference
         output_details = self.classifier.get_output_details()[0]
@@ -294,17 +298,17 @@ class DetectClassify:
                     maxlresult = lresult
         return maxcresult, maxlresult  # highest confidence with best match
 
-    def convert_img_to_tf(self, pil_img, input_details):
+    @staticmethod
+    def convert_img_to_tf(pil_img: Image.Image, input_details, is_floating_model: bool):
         """
         takes a PIL image type and converts it to np array for tensor and resizes for classification model
         TF models can be full or lite versions.  The full version uses floating point numbers.  Lite version
         is integer only so the data must be converted accordingly
         :param pil_img: image to convert for tensor flow model
         :param input_details: tf. get_input_details object used for dtype and shape
-        :return:
+        :param is_floating_model: true if the model is float32 false if the model is int
+        :return: input details for model
         """
-        # check the type of the input tensor
-        floating_model = input_details[0]['dtype'] == np.float32  # is float32
         height = input_details[0]['shape'][1]  # NxHxWxC, H:1, W:2
         width = input_details[0]['shape'][2]
         reshape_image = pil_img.resize((width, height))  # shape to match model input requirements
@@ -314,12 +318,9 @@ class DetectClassify:
 
         # model could be full or lite version.  lite version in int only.  full version is float32
         # integer normalization is not attempted since much of the data would be lost after the decimal
-        if floating_model is False:
-            input_data = image_np_expanded.astype('uint8')
-        else:
-            input_data = image_np_expanded.astype('float32')
-            input_data = (np.float32(input_data) - self.input_mean) / self.input_std  # attempt normalization ??? why here ???
-        return floating_model, input_data
+        input_data = image_np_expanded.astype('uint8') if is_floating_model is False \
+            else image_np_expanded.astype('float32')
+        return input_data
 
     @staticmethod
     def scale_rect(scale_rect_img: Image.Image, box: tuple) -> tuple:
