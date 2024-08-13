@@ -128,7 +128,7 @@ class DetectClassify:
         # self.img = Image.fromarray(np.zeros((screenheight, screenwidth, 3), dtype=np.uint8))  # null image
         self.img = Image.new('RGB', (screenwidth, screenheight), color='black')  # null image at startup
         self.output_class = output_class
-        self.output_function = output_class.message
+        self.output_function = output_class.message if output_class is not None else print
         return
 
     def init_tf2(self, model_file: str, label_file_name: str) -> tuple:
@@ -146,7 +146,7 @@ class DetectClassify:
         except NameError:  # load full tensor for desktop dev
             interpreter = tf.lite.Interpreter(model_file, None)
         interpreter.allocate_tensors()
-        is_floating_model = interpreter.input_details[0]['dtype'] == np.float32  # is float32
+        is_floating_model = interpreter.get_input_details()[0]['dtype'] == np.float32  # is float32
         return interpreter, possible_labels, is_floating_model
 
     def output_ctl(self, message: str, msg_type: str = '') -> None:
@@ -186,11 +186,11 @@ class DetectClassify:
 
         input_details = self.detector.get_input_details()
         output_details = self.detector.get_output_details()
-        floating_model, input_data = self.convert_img_to_tf(self.img, input_details, self.detector_is_floating_model)
+        input_data = self.convert_img_to_tf(self.img, input_details, self.detector_is_floating_model)
         self.detector.set_tensor(input_details[0]['index'], input_data)
         self.detector.invoke()
 
-        if floating_model is False:  # tensor lite obj detection prebuilt model
+        if self.detector_is_floating_model is False:  # tensor lite obj detection prebuilt model
             det_rects = self.detector.get_tensor(output_details[0]['index'])
             det_labels_index = self.detector.get_tensor(output_details[1]['index'])  # label array for each result
             det_confidences = self.detector.get_tensor(output_details[2]['index'])
@@ -465,6 +465,7 @@ class DetectClassify:
 
 
 if __name__ == '__main__':
+    label = ''
     img_test = Image.open('/home/pi/birdclass/0.jpg')
     birds = DetectClassify('c:/Users/jimma/PycharmProjects/birdclassifier/', detect_object_min_confidence=.9)
     birds.detect(img_test)  # run object detection
@@ -475,9 +476,10 @@ if __name__ == '__main__':
 
     birds.classify(birds.img)  # classify species
     print(birds.classified_labels)
-    label = birds.classified_labels[0]
     if len(label) == 0:
         label = "no classification text"
+    else:
+        label = birds.classified_labels[0]
     print(label)
     img = birds.add_boxes_and_labels(img_test)
     img.save('imgtest.jpg')
