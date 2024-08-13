@@ -186,7 +186,7 @@ def avg_exposure(img: Image.Image) -> float:
 
 def normalize(img: Image.Image) -> np.array:
     """
-    normalize a jpg with values from 0 to 1 by dividing by max value of 255
+    normalize a jpg with values from 0 to 1 by dividing by max value of 255, old code used 127.5 as divisor
     :param img: jpg img
     :return: np array with scaled image data 0 to 1
     """

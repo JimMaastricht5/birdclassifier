@@ -97,8 +97,6 @@ class DetectClassify:
             self.init_tf2(self.detector_file, self.detector_labels_file))
         self.classifier, self.classifier_possible_labels, self.classifier_is_floating_model = (
             self.init_tf2(self.classifier_file, self.classifier_labels_file))
-        self.input_mean = 127.5  # recommended default
-        self.input_std = 127.5  # recommended default
         self.detect_obj_min_confidence = detect_object_min_confidence
         self.classify_object_min_confidence = classify_object_min_confidence
         self.obj_confidence = 0
@@ -228,9 +226,9 @@ class DetectClassify:
             (startX, startY, endX, endY) = self.scale_rect(class_img, self.detected_rects[i])  # set x,y bounding box
             rect = (startX, startY, endX, endY)
             rect_percent_scr = ((endX - startX) * (endY - startY)) / self.screen_sq_pixels * 100  # % of screen of img
+            if self.classifier_is_floating_model is True:  # normalize here current model is int so this will not exec
+                class_img = image_proc.normalize(class_img)  # normalize img
 
-            # ??? note this section needs review for improvement crop, pad, equalize, normalize....
-            # normalization code float32 model: input_data = (np.float32(input_data) - self.input_mean) / self.input_std
             crop_img = class_img.crop((startX, startY, endX, endY))  # extract image for better classification
             classify_conf, classify_label = self.classify_obj(crop_img, use_confidence_threshold, rect_percent_scr)
 
