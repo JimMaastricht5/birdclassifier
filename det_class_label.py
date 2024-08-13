@@ -262,16 +262,17 @@ class DetectClassify:
             self.last_known_classified_confidences = self.classified_confidences
         return max_confidence
 
-    def classify_obj(self, class_img, use_confidence_threshold=True, screen_percent=100.00):
+    def classify_obj(self, class_img: Image.Image, use_confidence_threshold: bool = True,
+                     rect_percent_scr: float = 100.00) -> tuple:
         """
         take input image and return best result and label
         the function will sort the results and compare the confidence to the confidence for that label (species)
         i the ML models confidence is higher than the threshold for that label (species) it will stop searching and
         return that best result
-        :param class_img:
+        :param class_img: image containing object to classify
         :param use_confidence_threshold: requires probability for species returned to exceed threshold for valid result
-        :param screen_percent:
-        :return:
+        :param rect_percent_scr: percentage of screen bounding box is of the total image
+        :return: tuple containing best confidence result and best label for requested classification
         """
         # grab the input details setup at init.  use that clean version for further processing
         input_details = self.classifier.get_input_details()
@@ -280,7 +281,7 @@ class DetectClassify:
         self.classifier.invoke()  # inference
         output_details = self.classifier.get_output_details()[0]
         output = np.squeeze(self.classifier.get_tensor(output_details['index']))
-        # If the model is quantized (tflite uint8 data), then dequantize the results
+        # If the model is quantized (tflite uint8 data), then dequantize the results  ???
         if output_details['dtype'] == np.uint8:
             scale, zero_point = output_details['quantization']
             output = scale * (output - zero_point) * 10  # scale factor to adjust results
@@ -292,7 +293,7 @@ class DetectClassify:
             lresult = str(self.classifier_possible_labels[lindex]).strip()  # grab label,push to string instead of tuple
             cresult = float(output[lindex]) if float(output[lindex]) > 0 else 0
             cresult = cresult - math.floor(cresult) if cresult > 1 else cresult  # ignore whole numbers, keep decimals
-            if self.check_threshold(cresult, lindex, use_confidence_threshold, screen_percent):
+            if self.check_threshold(cresult, lindex, use_confidence_threshold, rect_percent_scr):
                 if cresult > maxcresult:  # if this above threshold and is a better confidence result store it
                     maxcresult = cresult
                     maxlresult = lresult
@@ -403,7 +404,7 @@ class DetectClassify:
         return (self.color_index + from_index) % (len(self.colors) - 1)
 
     def check_threshold(self, cresult: float, lindex: int, use_confidence_threshold: bool,
-                        screen_percent: float) -> bool:
+                        rect_percent_scr: float) -> bool:
         """
         checks the predictions confidence against the confidence thresholds to see if the species
         is allowed in this geography or has a custom setting to allow for more or less positives.
@@ -417,12 +418,12 @@ class DetectClassify:
         :param cresult: predicted confidence, float  between 0 and 1;
         :param lindex: integer containing the index of the species predicted for look up in threshold list
         :param use_confidence_threshold: requires classification prob to exceed threshold for validity
-        :param screen_percent: min screen percentage bird must take up or the prediction is todded out
+        :param rect_percent_scr: min screen percentage object takes up in image.
         :return: true if prediction confidence is over threshold for species
         """
         label_threshold = 0
         # apply rules 1 and 2
-        if self.classifier_thresholds[int(lindex)] == -1 or screen_percent < self.min_img_percent:
+        if self.classifier_thresholds[int(lindex)] == -1 or rect_percent_scr < self.min_img_percent:
             return False
         # apply rule 3
         elif use_confidence_threshold is False:
