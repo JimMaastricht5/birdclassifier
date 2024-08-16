@@ -296,7 +296,7 @@ class DetectClassify:
         cindex = np.argpartition(output, -10)[-10:]  # output is an array with many zeros find index for nonzero values
         # loop over top N results to find best match; highest score align with matching species threshold
         for lindex in cindex:
-            # print(f'classify obj {output[lindex]} {self.classifier_possible_labels[lindex]}')
+            print(f'classify obj {output[lindex]} {self.classifier_possible_labels[lindex]}')
             lresult = str(self.classifier_possible_labels[lindex]).strip()  # grab label,push to string instead of tuple
             cresult = float(output[lindex]) if float(output[lindex]) > 0 else 0
             cresult = cresult - math.floor(cresult) if cresult > 1 else cresult  # ignore whole numbers, keep decimals
