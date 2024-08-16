@@ -28,6 +28,7 @@
 # Note on pi if problems with TF Lite install use something similar to below, most recent setup it was
 # not required (OS Bookworm)
 # pip3 install https://dl.google.com/coral/python/tflite_runtime-2.1.0.post1-cp37-cp37m-linux_armv7l.whl
+from typing import Union
 import numpy as np
 import random
 from PIL import ImageDraw as PILImageDraw
@@ -61,7 +62,7 @@ class DetectClassify:
                  detect_object_min_confidence: float = .6, screenheight: int = 480, screenwidth: int = 640,
                  contrast_chg: float = 1.0, color_chg: float = 1.0,
                  brightness_chg: float = 1.0, sharpness_chg: float = 1.0,
-                 min_img_percent: float = 10.0, target_object: list = 'bird',
+                 min_img_percent: float = 10.0, target_object: Union[list, str] = 'bird',
                  classify_object_min_confidence: float = .9, output_class=None) -> None:
         """
         set up class instance with object detection and classifier models using tensorflow toolset
@@ -92,7 +93,8 @@ class DetectClassify:
         self.thresholds = classifier_thresholds
         self.classifier_labels_file = homedir + classifier_labels
         self.classifier_thresholds_file = homedir + classifier_thresholds
-        self.classifier_thresholds = np.genfromtxt(self.classifier_thresholds_file, delimiter=',', usecols=-1)
+        # load the last col in the file only as a set of int values.  900 = .900
+        self.classifier_thresholds = np.genfromtxt(self.classifier_thresholds_file, delimiter=',', usecols=[-1])
         self.detector, self.obj_detector_possible_labels, self.detector_is_floating_model = (
             self.init_tf2(self.detector_file, self.detector_labels_file))
         self.classifier, self.classifier_possible_labels, self.classifier_is_floating_model = (
@@ -210,7 +212,6 @@ class DetectClassify:
                     self.detected_rects.append(det_rects[0][index])
         else:
             self.output_function('det_class_label.py detect received a floating model and is only programmed for int')
-        # print(self.target_object_found, self.detected_labels)
         return self.target_object_found
 
     def classify(self, class_img: Image.Image, use_confidence_threshold: bool = True) -> float:
@@ -278,21 +279,20 @@ class DetectClassify:
         :param rect_percent_scr: percentage of screen bounding box is of the total image
         :return: tuple containing best confidence result and best label for requested classification
         """
-        maxcresult = float(0)
-        maxlresult = ''
+        maxcresult = float(0)  # max confidence aka prediction result from model
+        maxlresult = ''  # best label from max confidence
         # grab the input details setup at init.  use that clean version for further processing
         input_details = self.classifier.get_input_details()
         input_data = self.convert_img_to_tf(class_img, input_details, self.classifier_is_floating_model)
-        self.classifier.set_tensor(input_details[0]['index'], input_data)
+        self.classifier.set_tensor(input_details[0]['index'], input_data)  # setup batch of 1 image
         self.classifier.invoke()  # inference
-        output_details = self.classifier.get_output_details()[0]
-        output = np.squeeze(self.classifier.get_tensor(output_details['index']))
+        output_details = self.classifier.get_output_details()[0]  # get results values as floats .9 = 90%
+        output = np.squeeze(self.classifier.get_tensor(output_details['index']))  # remove all 1 dim to get this to list
 
         # If the model is quantized aka tflite uint8 data (not a floating pt model) then de-quantize the results
         if self.classifier_is_floating_model is False:
             scale, zero_point = output_details['quantization']
-            # print(scale, zero_point)
-            output = scale * (output - zero_point) # scale factor to adjust results, this had a *10 is that need on pi?
+            output = scale * (output - zero_point)  # scale factor to adjust results, this had a *10 is that need on pi?
         cindex = np.argpartition(output, -10)[-10:]  # output is an array with many zeros find index for nonzero values
         # loop over top N results to find best match; highest score align with matching species threshold
         for lindex in cindex:

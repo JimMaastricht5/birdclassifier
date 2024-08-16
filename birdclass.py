@@ -132,7 +132,7 @@ def bird_detector(args) -> None:
                                            color_chg=args.color_chg,
                                            contrast_chg=args.contrast_chg, sharpness_chg=args.sharpness_chg,
                                            brightness_chg=args.brightness_chg, min_img_percent=args.minimgperc,
-                                           target_object='bird',
+                                           target_object=['bird'],
                                            output_class=output)
     output.message(f'Using label file: {birds.labels}')
     output.message(f'Using threshold file: {birds.thresholds}')
@@ -248,22 +248,6 @@ def tweet_text(label: Union[list, str], confidence: Union[list, float]) -> str:
         tweet_label = ''
         print(e)
     return tweet_label
-
-
-# def common_name(name):
-#     """
-#     :param name:
-#     :return:
-#     """
-#     cname, sname = '', ''
-#     try:
-#         sname = str(name)
-#         sname = sname[sname.find(' ') + 1:] if sname.find(' ') >= 0 else sname  # remove index number
-#         sname = sname[0: sname.find('[') - 1] if sname.find('[') >= 0 else sname  # remove sex
-#         cname = sname[sname.find('(') + 1: sname.find(')')] if sname.find('(') >= 0 else sname  # retrieve common name
-#     except Exception as e:
-#         print(e)
-#     return cname
 
 
 if __name__ == "__main__":
