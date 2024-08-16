@@ -58,11 +58,11 @@ class DetectClassify:
                  classifier_model: str = 'coral.ai.mobilenet_v2_1.0_224_inat_bird_quant.tflite',
                  classifier_labels: str = 'coral.ai.inat_bird_labels.txt',
                  classifier_thresholds: str = 'coral.ai.inat_bird_threshold.csv',
-                 detect_object_min_confidence: float = .9, screenheight: int = 480, screenwidth: int = 640,
+                 detect_object_min_confidence: float = .6, screenheight: int = 480, screenwidth: int = 640,
                  contrast_chg: float = 1.0, color_chg: float = 1.0,
                  brightness_chg: float = 1.0, sharpness_chg: float = 1.0,
-                 min_img_percent: float = 10.0, target_object: str = 'bird',
-                 classify_object_min_confidence: float = .8, output_class=None) -> None:
+                 min_img_percent: float = 10.0, target_object: list = 'bird',
+                 classify_object_min_confidence: float = .9, output_class=None) -> None:
         """
         set up class instance with object detection and classifier models using tensorflow toolset
         :param homedir: directory models, and labels
@@ -85,14 +85,14 @@ class DetectClassify:
         """
         self.detector_file = homedir + object_model  # object model
         self.detector_labels_file = homedir + object_model_labels  # obj model label
-        self.target_objects = target_object
+        self.target_objects = static_functions.convert_to_list(target_object)
         self.target_object_found = False
         self.classifier_file = homedir + classifier_model  # classifier model
         self.labels = classifier_labels
         self.thresholds = classifier_thresholds
         self.classifier_labels_file = homedir + classifier_labels
         self.classifier_thresholds_file = homedir + classifier_thresholds
-        self.classifier_thresholds = np.genfromtxt(self.classifier_thresholds_file, delimiter=',')
+        self.classifier_thresholds = np.genfromtxt(self.classifier_thresholds_file, delimiter=',', usecols=-1)
         self.detector, self.obj_detector_possible_labels, self.detector_is_floating_model = (
             self.init_tf2(self.detector_file, self.detector_labels_file))
         self.classifier, self.classifier_possible_labels, self.classifier_is_floating_model = (
@@ -128,7 +128,7 @@ class DetectClassify:
         # self.img = Image.fromarray(np.zeros((screenheight, screenwidth, 3), dtype=np.uint8))  # null image
         self.img = Image.new('RGB', (screenwidth, screenheight), color='black')  # null image at startup
         self.output_class = output_class
-        self.output_function = output_class.message if output_class is not None else print
+        self.output_function = output_class.message if output_class is not None else None
         return
 
     def init_tf2(self, model_file: str, label_file_name: str) -> tuple:
@@ -147,6 +147,7 @@ class DetectClassify:
             interpreter = tf.lite.Interpreter(model_file, None)
         interpreter.allocate_tensors()
         is_floating_model = interpreter.get_input_details()[0]['dtype'] == np.float32  # is float32
+        print(f'Requested model is {model_file} and this model is a float model: {is_floating_model}')
         return interpreter, possible_labels, is_floating_model
 
     def output_ctl(self, message: str, msg_type: str = '') -> None:
@@ -194,9 +195,13 @@ class DetectClassify:
             det_rects = self.detector.get_tensor(output_details[0]['index'])
             det_labels_index = self.detector.get_tensor(output_details[1]['index'])  # label array for each result
             det_confidences = self.detector.get_tensor(output_details[2]['index'])
+            # print(f'det_class_label.py detect results {det_labels_index}, {det_confidences}')
             for index, self.obj_confidence in enumerate(det_confidences[0]):
                 labelidx = int(det_labels_index[0][index])  # get result label index for labels;
                 det_label = self.obj_detector_possible_labels[labelidx]  # grab text from possible labels
+                # print(f'for index {index} label is {det_label} with confidence {self.obj_confidence} and '
+                #       f'threshold is {self.detect_obj_min_confidence}. '
+                #       f'Target object in {det_label in self.target_objects}')
                 if self.obj_confidence >= self.detect_obj_min_confidence and \
                         det_label in self.target_objects:
                     self.target_object_found = True
@@ -205,6 +210,7 @@ class DetectClassify:
                     self.detected_rects.append(det_rects[0][index])
         else:
             self.output_function('det_class_label.py detect received a floating model and is only programmed for int')
+        # print(self.target_object_found, self.detected_labels)
         return self.target_object_found
 
     def classify(self, class_img: Image.Image, use_confidence_threshold: bool = True) -> float:
@@ -284,14 +290,13 @@ class DetectClassify:
 
         # If the model is quantized aka tflite uint8 data (not a floating pt model) then de-quantize the results
         if self.classifier_is_floating_model is False:
-            # if output_details['dtype'] == np.uint8:
             scale, zero_point = output_details['quantization']
-            output = scale * (output - zero_point) * 10  # scale factor to adjust results
-        cindex = sorted(output, reverse=True)[10:]  # partial sort of array with largest values at start, grab top 10
-        # cindex = np.argpartition(output, -10)[-10:]
+            # print(scale, zero_point)
+            output = scale * (output - zero_point) # scale factor to adjust results, this had a *10 is that need on pi?
+        cindex = np.argpartition(output, -10)[-10:]  # output is an array with many zeros find index for nonzero values
         # loop over top N results to find best match; highest score align with matching species threshold
-
         for lindex in cindex:
+            # print(f'classify obj {output[lindex]} {self.classifier_possible_labels[lindex]}')
             lresult = str(self.classifier_possible_labels[lindex]).strip()  # grab label,push to string instead of tuple
             cresult = float(output[lindex]) if float(output[lindex]) > 0 else 0
             cresult = cresult - math.floor(cresult) if cresult > 1 else cresult  # ignore whole numbers, keep decimals
@@ -425,22 +430,24 @@ class DetectClassify:
         """
         label_threshold = 0
         # apply rules 1 and 2
+        # print(self.classifier_thresholds[lindex] == -1, rect_percent_scr < self.min_img_percent)
         if self.classifier_thresholds[int(lindex)] == -1 or rect_percent_scr < self.min_img_percent:
             return False
         # apply rule 3
-        elif use_confidence_threshold is False:
+        elif use_confidence_threshold is False:  # the requester doesnt care ot check the threshold
             return True
         # use default threshold if threshold is 0 else use species specific score
         try:  # handle typos in threshold file
             label_threshold = float(self.classify_object_min_confidence * 1000
-                                    if self.classifier_thresholds[int(lindex)][1] == 0
-                                    else self.classifier_thresholds[int(lindex)][1])
+                                    if self.classifier_thresholds[int(lindex)] == 0
+                                    else self.classifier_thresholds[int(lindex)])
         except Exception as e:
             print(e)
-            print(self.classifier_thresholds[int(lindex)])  # where was the error in the file?
-            print(cresult)  # what was the prediction?
+            print(f'det_class_label.py check_threshold error, possible type in input file for:'
+                  f'{self.classifier_thresholds[int(lindex)]}')  # where was the error in the file?
+            print(cresult)  # what was the prediction
             cresult = 0  # cause a false to be returned for this species on an error
-        return cresult > 0 and cresult >= float(label_threshold) / 1000
+        return cresult > 0 and cresult >= (float(label_threshold) / 1000)
 
     def get_obj_data(self) -> tuple:
         """
@@ -467,43 +474,20 @@ class DetectClassify:
 if __name__ == '__main__':
     label = ''
     img_test = Image.open('/home/pi/birdclass/0.jpg')
-    birds = DetectClassify('c:/Users/jimma/PycharmProjects/birdclassifier/', detect_object_min_confidence=.9)
+    birds = DetectClassify('c:/Users/jimma/PycharmProjects/birdclassifier/')
     birds.detect(img_test)  # run object detection
 
-    print('objects detected', birds.detected_confidences)
-    print('labels detected', birds.detected_labels)
-    print('rectangles', birds.detected_rects)
+    print('main testing code: objects detected', birds.detected_confidences)
+    print('main testing code: labels detected', birds.detected_labels)
+    print('main testing code: rectangles', birds.detected_rects)
 
     birds.classify(birds.img)  # classify species
-    print(birds.classified_labels)
-    if len(label) == 0:
-        label = "no classification text"
+    print(f'main testing code: {birds.classified_labels}')
+    if len(birds.classified_labels) == 0:
+        label = "main testing code: no classification text"
     else:
         label = birds.classified_labels[0]
-    print(label)
+    print(f'main testing code: final label is {label}')
     img = birds.add_boxes_and_labels(img_test)
     img.save('imgtest.jpg')
     img.show()
-
-# old code
-# def pick_a_color(self) -> int:
-#     """
-#     picks a random color for bounding boxes
-#     :return: integer for the color
-#     """
-#     return random.randint(0, (len(self.colors)) - 1)
-    # set label for box in image use short species name instead of scientific name
-    # def label_text(self, label, confidence):
-    #     """
-    #
-    #     :param label:
-    #     :param confidence:
-    #     :param screen_percent:
-    #     :return:
-    #     """
-    #     sname = str(label)  # make sure label is considered a string
-    #     start = sname.find('(') + 1  # find start of common name, move one character to drop (
-    #     end = sname.find(')')
-    #     cname = sname[start:end] if start >= 0 and end >= 0 else sname
-    #     common_name = f'{cname} {confidence * 100:.2f}%'
-    #     return common_name
