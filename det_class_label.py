@@ -305,9 +305,6 @@ class DetectClassify:
         cindex = np.argpartition(output, -10)[-10:]  # output is an array with many zeros find index for nonzero values
         # loop over top N results to find best match; highest score align with matching species threshold
         for lindex in cindex:
-            if self.debug:
-                print(f'det_class_label.py classify obj: interim result pre threshold check '
-                      f'{output[lindex]} {self.classifier_possible_labels[lindex]}')
             lresult = str(self.classifier_possible_labels[lindex]).strip()  # grab label,push to string instead of tuple
             cresult = float(output[lindex]) if float(output[lindex]) > 0 else 0
             cresult = cresult - math.floor(cresult) if cresult > 1 else cresult  # ignore whole numbers, keep decimals
@@ -445,7 +442,8 @@ class DetectClassify:
         # apply rules 1 and 2
         if self.debug:
             print(f'det_class_label.py check_threshold: confidence {cresult} for label index {lindex}, '
-                  f'threshold is {self.classifier_thresholds[int(lindex)]}')
+                  f'species threshold is {self.classifier_thresholds[int(lindex)]} with percent of img at'
+                  f'{rect_percent_scr} and a threshold percent of {self.min_img_percent}')
         if self.classifier_thresholds[int(lindex)] == -1 or rect_percent_scr < self.min_img_percent:
             return False
         # apply rule 3
@@ -456,6 +454,8 @@ class DetectClassify:
             label_threshold = float(self.classify_object_min_confidence * 1000
                                     if self.classifier_thresholds[int(lindex)] == 0
                                     else self.classifier_thresholds[int(lindex)])
+            if self.debug:
+                print(f'det_class_label.py check_threshold: calculated label threshold is {label_threshold}')
         except Exception as e:
             print(e)
             print(f'det_class_label.py check_threshold error, possible type in input file for:'
