@@ -144,7 +144,7 @@ class WebStream:
 
 
 # start of function to prevent memory sharing between processes
-def web_stream_worker(queue, path: str, caller_id: str, run_local: bool) -> None:
+def web_stream_worker(queue, path: str, caller_id: str, run_local: bool, debug: bool) -> None:
     """
     This function allows for the setup of the multiprocessing consumer outside the memory of the controller
     The two processes cannot share memory or access one another directly and this func eliminates that
@@ -152,9 +152,10 @@ def web_stream_worker(queue, path: str, caller_id: str, run_local: bool) -> None
     :param path: path for files such as images
     :param caller_id: name of caller, or the name of the bird feeder
     :param run_local: true if debugging do not write to cloud, overwrites web activity
+    :param debug: extra print if true
     :return: none
     """
-    web_stream = WebStream(queue=queue, path=path, caller_id=caller_id, run_local=run_local)
+    web_stream = WebStream(queue=queue, path=path, caller_id=caller_id, run_local=run_local, debug=debug)
     web_stream.request_handler()
     return
 
