@@ -443,7 +443,9 @@ class DetectClassify:
         """
         label_threshold = 0
         # apply rules 1 and 2
-        # print(self.classifier_thresholds[lindex] == -1, rect_percent_scr < self.min_img_percent)
+        if self.debug:
+            print(f'det_class_label.py check_threshold: confidence {cresult} for label index {lindex}, '
+                  f'threshold is {self.classifier_thresholds[int(lindex)]}')
         if self.classifier_thresholds[int(lindex)] == -1 or rect_percent_scr < self.min_img_percent:
             return False
         # apply rule 3
