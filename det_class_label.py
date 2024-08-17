@@ -59,7 +59,7 @@ class DetectClassify:
                  object_model_labels: str = 'lite-model_ssd_mobilenet_v1_1_metadata_2_labelmap.txt',
                  classifier_model: str = 'coral.ai.mobilenet_v2_1.0_224_inat_bird_quant.tflite',
                  classifier_labels: str = 'coral.ai.inat_bird_labels.txt',
-                 classifier_thresholds: str = 'coral.ai.inat_bird_threshold.csv',
+                 classifier_thresholds: str = 'USA_WI_coral.ai.inat_bird_threshold.csv',
                  detect_object_min_confidence: float = .6, screenheight: int = 480, screenwidth: int = 640,
                  contrast_chg: float = 1.0, color_chg: float = 1.0,
                  brightness_chg: float = 1.0, sharpness_chg: float = 1.0,
@@ -450,7 +450,7 @@ class DetectClassify:
         # apply rules 1 and 2
         if self.debug:
             print(f'det_class_label.py check_threshold: confidence {cresult} for label index {lindex}, '
-                  f'species threshold is {self.classifier_thresholds[int(lindex)]} with percent of img at'
+                  f'species threshold is {(self.classifier_thresholds[int(lindex)])} / 1000 with percent of img at'
                   f'{rect_percent_scr} and a threshold percent of {self.min_img_percent}')
         if self.classifier_thresholds[int(lindex)] == -1 or rect_percent_scr < self.min_img_percent:
             return False
@@ -495,7 +495,7 @@ class DetectClassify:
 if __name__ == '__main__':
     label = ''
     debugb = True
-    img_test = Image.open('/home/pi/birdclass/0.jpg')
+    img_test = Image.open('/home/pi/birdclass/1.jpg')
     birds = DetectClassify(homedir='c:/Users/jimma/PycharmProjects/birdclassifier/', debug=debugb)
     birds.detect(img_test)  # run object detection
 
