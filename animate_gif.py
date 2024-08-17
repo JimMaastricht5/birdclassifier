@@ -132,7 +132,7 @@ class BirdGif:
             self.gcs_gif_filename = f'{datetime.now().strftime("%Y-%m-%d-%H-%M-%S")}{str(event_count)}' \
                 f'({static_functions.common_name(best_weighted_label).replace(" ", "")}).gif'  # rmv spaces
             gif_file_name = (os.getcwd()+'/assets/birds.gif' if self.stash is False
-                             else os,getcwd() + '/assets/' + self.gcs_gif_filename)
+                             else os.getcwd() + '/assets/' + self.gcs_gif_filename)
             gif, self.local_gif_filename = image_proc.save_gif(frames=labeled_frames[0:last_good_frame],
                                                                filename=gif_file_name)
             # self.gcs_gif_filename = f'{datetime.now().strftime("%Y-%m-%d-%H-%M-%S")}{str(event_count)}' \
