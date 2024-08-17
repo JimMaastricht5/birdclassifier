@@ -98,6 +98,9 @@ class DetectClassify:
         self.classifier_thresholds_file = homedir + classifier_thresholds
         # load the last col in the file only as a set of int values.  900 = .900
         self.classifier_thresholds = np.genfromtxt(self.classifier_thresholds_file, delimiter=',', usecols=[-1])
+        print(self.classifier_thresholds[725])
+        print(self.classifier_thresholds[726])
+        print(self.classifier_thresholds[727])
         self.detector, self.obj_detector_possible_labels, self.detector_is_floating_model = (
             self.init_tf2(self.detector_file, self.detector_labels_file))
         self.classifier, self.classifier_possible_labels, self.classifier_is_floating_model = (
@@ -447,7 +450,7 @@ class DetectClassify:
         if self.classifier_thresholds[int(lindex)] == -1 or rect_percent_scr < self.min_img_percent:
             return False
         # apply rule 3
-        elif use_confidence_threshold is False:  # the requester doesnt care ot check the threshold
+        elif use_confidence_threshold is False:  # the requester doesnt care to check the threshold
             return True
         # use default threshold if threshold is 0 else use species specific score
         try:  # handle typos in threshold file
