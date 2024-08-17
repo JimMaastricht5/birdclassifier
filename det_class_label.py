@@ -101,10 +101,11 @@ class DetectClassify:
         # genfromtxt behaves differently on the pi than windows
         # self.classifier_thresholds = np.genfromtxt(self.classifier_thresholds_file, delimiter=',', usecols=[-1])
         self.classifier_thresholds = []
-        with open(self.classifier_thresholds_file, 'r') as csvfile:
+        with open(self.classifier_thresholds_file, 'r', encoding='utf-8') as csvfile:
             csvreader = csv.reader(csvfile)
             for row in csvreader:
-                self.classifier_thresholds.append(row[1])
+                if len(row) > 1:
+                    self.classifier_thresholds.append(row[1])
         print(self.classifier_thresholds[725])
         print(self.classifier_thresholds[726])
         print(self.classifier_thresholds[727])
