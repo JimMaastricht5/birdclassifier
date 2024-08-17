@@ -36,6 +36,7 @@ from PIL import Image
 import image_proc
 import math
 import static_functions
+import csv
 
 
 # attempt to load tensor flow lite,will fail if not raspberry pi, switch to full tensorflow for windows
@@ -97,7 +98,13 @@ class DetectClassify:
         self.classifier_labels_file = homedir + classifier_labels
         self.classifier_thresholds_file = homedir + classifier_thresholds
         # load the last col in the file only as a set of int values.  900 = .900
-        self.classifier_thresholds = np.genfromtxt(self.classifier_thresholds_file, delimiter=',', usecols=[-1])
+        # genfromtxt behaves differently on the pi than windows
+        # self.classifier_thresholds = np.genfromtxt(self.classifier_thresholds_file, delimiter=',', usecols=[-1])
+        self.classifier_thresholds = []
+        with open(self.classifier_thresholds_file, 'r') as csvfile:
+            csvreader = csv.reader(csvfile)
+            for row in csvreader:
+                self.classifier_thresholds.append(row[1])
         print(self.classifier_thresholds[725])
         print(self.classifier_thresholds[726])
         print(self.classifier_thresholds[727])
