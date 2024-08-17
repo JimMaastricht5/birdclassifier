@@ -196,8 +196,6 @@ class DetectClassify:
         input_data = self.convert_img_to_tf(self.img, input_details, self.detector_is_floating_model)
         self.detector.set_tensor(input_details[0]['index'], input_data)
         self.detector.invoke()
-        if self.debug:
-            print('Invoked detection, eval results')
         if self.detector_is_floating_model is False:  # tensor lite obj detection prebuilt model
             det_rects = self.detector.get_tensor(output_details[0]['index'])
             det_labels_index = self.detector.get_tensor(output_details[1]['index'])  # label array for each result
@@ -295,20 +293,21 @@ class DetectClassify:
         self.classifier.invoke()  # inference
         output_details = self.classifier.get_output_details()[0]  # get results values as floats .9 = 90%
         output = np.squeeze(self.classifier.get_tensor(output_details['index']))  # remove all 1 dim to get this to list
-        if self.debug:
-            print(f'det_class_label.py classify obj: output was {output}')
+        # if self.debug:
+        #     print(f'det_class_label.py classify obj: output was {output}')
         # If the model is quantized aka tflite uint8 data (not a floating pt model) then de-quantize the results
         if self.classifier_is_floating_model is False:
             scale, zero_point = output_details['quantization']
             output = scale * (output - zero_point)  # scale factor to adjust results, this had a *10 is that need on pi?
-            if self.debug:
-                print(f'det_class_label.py classify obj: adjusted output was {output} using scale {scale} '
-                      f'and zero point {zero_point}')
+            # if self.debug:
+            #     print(f'det_class_label.py classify obj: adjusted output was {output} using scale {scale} '
+            #           f'and zero point {zero_point}')
         cindex = np.argpartition(output, -10)[-10:]  # output is an array with many zeros find index for nonzero values
         # loop over top N results to find best match; highest score align with matching species threshold
         for lindex in cindex:
             if self.debug:
-                print(f'det_class_label.py classify obj: {output[lindex]} {self.classifier_possible_labels[lindex]}')
+                print(f'det_class_label.py classify obj: interim result pre threshold check '
+                      f'{output[lindex]} {self.classifier_possible_labels[lindex]}')
             lresult = str(self.classifier_possible_labels[lindex]).strip()  # grab label,push to string instead of tuple
             cresult = float(output[lindex]) if float(output[lindex]) > 0 else 0
             cresult = cresult - math.floor(cresult) if cresult > 1 else cresult  # ignore whole numbers, keep decimals
@@ -316,6 +315,8 @@ class DetectClassify:
                 if cresult > maxcresult:  # if this above threshold and is a better confidence result store it
                     maxcresult = cresult
                     maxlresult = lresult
+        if self.debug:
+            print(f'det_class_label.py classify obj: final answer was {maxcresult} and {maxlresult}')
         return maxcresult, maxlresult  # highest confidence with best match
 
     @staticmethod
