@@ -105,6 +105,7 @@ class DetectClassify:
             csvreader = csv.reader(csvfile)
             for row in csvreader:
                 if len(row) > 1:
+                    print(row)
                     self.classifier_thresholds.append(row[1])
         print(self.classifier_thresholds[725])
         print(self.classifier_thresholds[726])
