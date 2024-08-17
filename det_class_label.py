@@ -98,18 +98,13 @@ class DetectClassify:
         self.classifier_labels_file = homedir + classifier_labels
         self.classifier_thresholds_file = homedir + classifier_thresholds
         # load the last col in the file only as a set of int values.  900 = .900
-        # genfromtxt behaves differently on the pi than windows
+        # genfromtxt may behave differently on the pi than windows
         # self.classifier_thresholds = np.genfromtxt(self.classifier_thresholds_file, delimiter=',', usecols=[-1])
         self.classifier_thresholds = []
         with open(self.classifier_thresholds_file, 'r', encoding='utf-8') as csvfile:
             csvreader = csv.reader(csvfile)
             for row in csvreader:
-                if len(row) > 1:
-                    print(row)
                     self.classifier_thresholds.append(row[1])
-        print(self.classifier_thresholds[725])
-        print(self.classifier_thresholds[726])
-        print(self.classifier_thresholds[727])
         self.detector, self.obj_detector_possible_labels, self.detector_is_floating_model = (
             self.init_tf2(self.detector_file, self.detector_labels_file))
         self.classifier, self.classifier_possible_labels, self.classifier_is_floating_model = (
