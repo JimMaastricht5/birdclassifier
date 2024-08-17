@@ -143,7 +143,8 @@ def bird_detector(args) -> None:
 
     bird_gif = animate_gif.BirdGif(motion_detector_cls=motion_detect, birds_cls=birds,
                                    gcs_storage_cls=gcs_storage, brightness_chg=args.brightness_chg,
-                                   min_animated_frames=args.minanimatedframes)
+                                   min_animated_frames=args.minanimatedframes,
+                                   stash=args.offline)
 
     # loop while the sun is up, look for motion, detect birds, determine species
     while cityweather.sunrise.time() < datetime.now().time() < cityweather.sunset.time():
