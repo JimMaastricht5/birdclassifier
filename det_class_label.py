@@ -63,7 +63,9 @@ class DetectClassify:
                  contrast_chg: float = 1.0, color_chg: float = 1.0,
                  brightness_chg: float = 1.0, sharpness_chg: float = 1.0,
                  min_img_percent: float = 10.0, target_object: Union[list, str] = 'bird',
-                 classify_object_min_confidence: float = .9, output_class=None) -> None:
+                 classify_object_min_confidence: float = .9,
+                 debug: bool = False,
+                 output_class=None) -> None:
         """
         set up class instance with object detection and classifier models using tensorflow toolset
         :param homedir: directory models, and labels
@@ -82,6 +84,7 @@ class DetectClassify:
         :param min_img_percent: min percent of the picture that the obj should take up for classification
         :param target_object: what object are we looking for: bird, plane, superman?
         :param classify_object_min_confidence: min confidence to consider for any classification
+        :param debug: flag for debugging, provides extra print
         :param output_class: object class used to handle output for logging, printing, etc.
         """
         self.detector_file = homedir + object_model  # object model
@@ -129,6 +132,7 @@ class DetectClassify:
         self.screen_sq_pixels = screenwidth * screenheight
         # self.img = Image.fromarray(np.zeros((screenheight, screenwidth, 3), dtype=np.uint8))  # null image
         self.img = Image.new('RGB', (screenwidth, screenheight), color='black')  # null image at startup
+        self.debug=debug
         self.output_class = output_class
         self.output_function = output_class.message if output_class is not None else None
         return
@@ -197,13 +201,15 @@ class DetectClassify:
             det_rects = self.detector.get_tensor(output_details[0]['index'])
             det_labels_index = self.detector.get_tensor(output_details[1]['index'])  # label array for each result
             det_confidences = self.detector.get_tensor(output_details[2]['index'])
-            # print(f'det_class_label.py detect results {det_labels_index}, {det_confidences}')
+            if self.debug:
+                print(f'det_class_label.py model results {det_labels_index}, {det_confidences}')
             for index, self.obj_confidence in enumerate(det_confidences[0]):
                 labelidx = int(det_labels_index[0][index])  # get result label index for labels;
                 det_label = self.obj_detector_possible_labels[labelidx]  # grab text from possible labels
-                # print(f'for index {index} label is {det_label} with confidence {self.obj_confidence} and '
-                #       f'threshold is {self.detect_obj_min_confidence}. '
-                #       f'Target object in {det_label in self.target_objects}')
+                if self.debug:
+                    print(f'det_class_label.py detect object: for index {index} label is {det_label} '
+                          f'with confidence {self.obj_confidence} and threshold is {self.detect_obj_min_confidence}. '
+                          f'Target object in {det_label in self.target_objects}')
                 if self.obj_confidence >= self.detect_obj_min_confidence and \
                         det_label in self.target_objects:
                     self.target_object_found = True
@@ -288,15 +294,20 @@ class DetectClassify:
         self.classifier.invoke()  # inference
         output_details = self.classifier.get_output_details()[0]  # get results values as floats .9 = 90%
         output = np.squeeze(self.classifier.get_tensor(output_details['index']))  # remove all 1 dim to get this to list
-
+        if self.debug:
+            print(f'det_class_label.py classify obj: output was {output}')
         # If the model is quantized aka tflite uint8 data (not a floating pt model) then de-quantize the results
         if self.classifier_is_floating_model is False:
             scale, zero_point = output_details['quantization']
             output = scale * (output - zero_point)  # scale factor to adjust results, this had a *10 is that need on pi?
+            if self.debug:
+                print(f'det_class_label.py classify obj: adjusted output was {output} using scale {scale} '
+                      f'and zero point {zero_point}')
         cindex = np.argpartition(output, -10)[-10:]  # output is an array with many zeros find index for nonzero values
         # loop over top N results to find best match; highest score align with matching species threshold
         for lindex in cindex:
-            print(f'classify obj {output[lindex]} {self.classifier_possible_labels[lindex]}')
+            if self.debug:
+                print(f'det_class_label.py classify obj: {output[lindex]} {self.classifier_possible_labels[lindex]}')
             lresult = str(self.classifier_possible_labels[lindex]).strip()  # grab label,push to string instead of tuple
             cresult = float(output[lindex]) if float(output[lindex]) > 0 else 0
             cresult = cresult - math.floor(cresult) if cresult > 1 else cresult  # ignore whole numbers, keep decimals
@@ -473,8 +484,9 @@ class DetectClassify:
 
 if __name__ == '__main__':
     label = ''
+    debug = True
     img_test = Image.open('/home/pi/birdclass/0.jpg')
-    birds = DetectClassify('c:/Users/jimma/PycharmProjects/birdclassifier/')
+    birds = DetectClassify(homedir='c:/Users/jimma/PycharmProjects/birdclassifier/', debug=debug)
     birds.detect(img_test)  # run object detection
 
     print('main testing code: objects detected', birds.detected_confidences)

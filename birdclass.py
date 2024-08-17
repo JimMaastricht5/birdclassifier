@@ -59,6 +59,9 @@ def bird_detector(args) -> None:
     main function for the bird feeder detector, takes a list of arguments from the command line or a file
     :param args: parsed arguments from arg parser list below
         "-cf", "--config_file", type=str, help='Config file'
+        "-ol", "--offline", type=bool, default=False, help='Operate offline, do not transmit to cloud'
+        "-db", "--debug", type=bool, default=False, help="debug flag"
+
         # camera settings
         "-fc", "--flipcamera", type=bool, default=False, help="flip camera image"
         "-sw", "--screenwidth", type=int, default=640, help="max screen width"
@@ -132,8 +135,7 @@ def bird_detector(args) -> None:
                                            color_chg=args.color_chg,
                                            contrast_chg=args.contrast_chg, sharpness_chg=args.sharpness_chg,
                                            brightness_chg=args.brightness_chg, min_img_percent=args.minimgperc,
-                                           target_object=['bird'],
-                                           output_class=output)
+                                           target_object=['bird'], debug=args.debug, output_class=output)
     output.message(f'Using label file: {birds.labels}')
     output.message(f'Using threshold file: {birds.thresholds}')
     output.message(f'Using classifier file: {birds.classifier_file}')
@@ -255,7 +257,9 @@ if __name__ == "__main__":
     # load settings from config file to allow for simple override
     ap = argparse.ArgumentParser()
     ap.add_argument("-cf", "--config_file", type=str, help='Config file')
-    ap.add_argument("-ol", "--offline", type=bool, default=False, help='Operate offline, do not transmit to cloud')
+    ap.add_argument("-ol", "--offline", type=bool, default=False,
+                    help='Operate offline, do not transmit to cloud')
+    ap.add_argument("-db", "--debug", type=bool, default=False, help="debug flag")
 
     # camera settings
     ap.add_argument("-fc", "--flipcamera", type=bool, default=False, help="flip camera image")
@@ -263,7 +267,8 @@ if __name__ == "__main__":
     ap.add_argument("-sh", "--screenheight", type=int, default=480, help="max screen height")
 
     # general app settings
-    ap.add_argument("-gf", "--minanimatedframes", type=int, default=10, help="minimum number of frames with a bird")
+    ap.add_argument("-gf", "--minanimatedframes", type=int, default=10,
+                    help="minimum number of frames with a bird")
     ap.add_argument("-bb", "--broadcast", type=bool, default=False, help="stream images and text")
     ap.add_argument("-v", "--verbose", type=bool, default=True, help="To tweet extra stuff or not")
     ap.add_argument("-td", "--tweetdelay", type=int, default=1800,
@@ -273,16 +278,18 @@ if __name__ == "__main__":
     # adjustment to the output images.  # 1 no chg,< 1 -, > 1 +
     # ap.add_argument("-is", "--iso", type=int, default=800, help="iso camera sensitivity. higher requires less light")
     ap.add_argument("-b", "--brightness_chg", type=int, default=1.2, help="brightness boost twilight")
-    ap.add_argument("-c", "--contrast_chg", type=float, default=1.0, help="contrast boost")  # 1 no chg,< 1 -, > 1 +
-    ap.add_argument("-cl", "--color_chg", type=float, default=1.0, help="color boost")  # 1 no chg,< 1 -, > 1 +
-    ap.add_argument("-sp", "--sharpness_chg", type=float, default=1.0, help="sharpness")  # 1 no chg,< 1 -, > 1 +
+    ap.add_argument("-c", "--contrast_chg", type=float, default=1.0, help="contrast boost")
+    ap.add_argument("-cl", "--color_chg", type=float, default=1.0, help="color boost")
+    ap.add_argument("-sp", "--sharpness_chg", type=float, default=1.0, help="sharpness")
 
     # prediction defaults
-    ap.add_argument("-sc", "--species_confidence", type=float, default=.90, help="species confidence threshold")
+    ap.add_argument("-sc", "--species_confidence", type=float, default=.90,
+                    help="species confidence threshold")
     ap.add_argument("-bc", "--bird_confidence", type=float, default=.6, help="bird confidence threshold")
     ap.add_argument("-ma", "--minentropy", type=float, default=5.0,
                     help="min change from first img to current to trigger motion")
-    ap.add_argument("-ms", "--minimgperc", type=float, default=10.0, help="ignore objects that are less then % of img")
+    ap.add_argument("-ms", "--minimgperc", type=float, default=10.0,
+                    help="ignore objects that are less then % of img")
     ap.add_argument("-hd", "--homedir", type=str, default='/home/pi/birdclassifier/',
                     help="home directory for files")
     ap.add_argument("-la", "--labels", type=str, default='coral.ai.inat_bird_labels.txt',
@@ -297,10 +304,9 @@ if __name__ == "__main__":
                     help="name of city weather station uses OWM web service.  See their site for city options")
     ap.add_argument('-fi', "--feeder_id", type=str, default=hex(uuid.getnode()),
                     help='feeder id default MAC address')
-    ap.add_argument('-t', "--feeder_max_temp_c", type=int, default=86, help="Max operating temp for the feeder in C")
-
+    ap.add_argument('-t', "--feeder_max_temp_c", type=int, default=86,
+                    help="Max operating temp for the feeder in C")
     arguments = ap.parse_args()
-
     if arguments.config_file:
         config = configparser.ConfigParser()
         config.read(arguments.config_file)
