@@ -102,7 +102,7 @@ def bird_detector(args) -> None:
     favorite_birds = ['Rose-breasted Grosbeak', 'Red-bellied Woodpecker',
                       'Northern Cardinal']  # rare birds or just birds you want to see
     birdpop = population.Census()  # initialize species population census object
-    output = output_stream.Controller(caller_id=args.city)  # initialize class to handle terminal and web output
+    output = output_stream.Controller(caller_id=args.city, debug=args.debug)  # initialize class to handle terminal and web output
     output.start_stream()  # start streaming to terminal and web
     gcs_storage = gcs.Storage(offline=args.offline)
     motioncnt, event_count, gcs_img_filename, seed_check_gcs_filename = 0, 0, '', ''
@@ -152,9 +152,10 @@ def bird_detector(args) -> None:
         if motion_detect.motion:
             motioncnt += 1
 
+        # check if day time, motion, bird, and not overexposed
         if motion_detect.motion and birds.detect(detect_img=motion_detect.img) and \
                 cityweather.is_dawn() is False and cityweather.is_dusk() is False\
-                and image_proc.is_sun_reflection_jpg(img=motion_detect.img) is False:  # daytime with motion & bird
+                and image_proc.is_sun_reflection_jpg(img=motion_detect.img, debug=args.debug) is False:
             motioncnt = 0  # reset motion count between detected birds
             birds.set_colors()  # set new colors for this series of bounding boxes
             event_count += 1  # increment event code for log and messages

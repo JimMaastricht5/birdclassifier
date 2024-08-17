@@ -196,7 +196,8 @@ class DetectClassify:
         input_data = self.convert_img_to_tf(self.img, input_details, self.detector_is_floating_model)
         self.detector.set_tensor(input_details[0]['index'], input_data)
         self.detector.invoke()
-
+        if self.debug:
+            print('Invoked detection, eval results')
         if self.detector_is_floating_model is False:  # tensor lite obj detection prebuilt model
             det_rects = self.detector.get_tensor(output_details[0]['index'])
             det_labels_index = self.detector.get_tensor(output_details[1]['index'])  # label array for each result

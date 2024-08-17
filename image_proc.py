@@ -49,12 +49,13 @@ def gaussianblur(img: Image.Image) -> Image.Image:
 
 
 # detect image problems where bottom half of the image is washed from suns reflection, must be jpg
-def is_sun_reflection_jpg(img: Image.Image, washout_red_threshold: float = .25) -> bool:
+def is_sun_reflection_jpg(img: Image.Image, washout_red_threshold: float = .25, debug: bool = False) -> bool:
     """
     function looks at an image and determines if it is overexposed.  On current hardware that results in
     the bottom half of the image having a pink or red hue.  Do the test is color diff from top to bottom
     :param img: jpg or gif to test for over exposure aka washout
     :param washout_red_threshold: threshold that is the % change from the bottom of the image in red spectrum
+    :param debug: true provides extra print
     :return: bool true if the image is over exposed
     """
     if img.format == 'GIF':
@@ -72,11 +73,13 @@ def is_sun_reflection_jpg(img: Image.Image, washout_red_threshold: float = .25) 
         top_red_avg = np.mean(top_half[:, :, 0])
         bottom_red_avg = np.mean(bottom_half[:, :, 0])
         reflection_b = True if bottom_red_avg > top_red_avg * (1 + washout_red_threshold) else False
-        print(f'top avg red is {top_red_avg}, bottom red avg is {bottom_red_avg} threshold is '
-              f'{washout_red_threshold} with a limit of {top_red_avg * (1+washout_red_threshold)}')
+        if debug:
+            print(f'top avg red is {top_red_avg}, bottom red avg is {bottom_red_avg} threshold is '
+                  f'{washout_red_threshold} with a limit of {top_red_avg * (1+washout_red_threshold)}')
     else:
-        print(f'image_proc.py is_sun_reflection got np array with something other than 3 dimensions. '
-              f'{img.format} with {img_np_array.shape}')
+        if debug:
+            print(f'image_proc.py is_sun_reflection got np array with something other than 3 dimensions. '
+                  f'{img.format} with {img_np_array.shape}')
         reflection_b = False  # drop thru and return false if conversion or np dimensions does not return 3 channels
     return reflection_b
 

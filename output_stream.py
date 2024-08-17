@@ -45,7 +45,8 @@ class WebStream:
     # Date time: string
     # Prediction: string
     # Image_name: string, image name on disk
-    def __init__(self, queue, path: str = os.getcwd(), caller_id: str = "default", run_local=False) -> None:
+    def __init__(self, queue, path: str = os.getcwd(), caller_id: str = "default", run_local: bool = False,
+                 debug: bool = False) -> None:
         """
         set up web stream class, load from csv files to see if this restart was the result of a crash and
         load saved data
@@ -53,6 +54,7 @@ class WebStream:
         :param path: str contain os path to working dir, writes out csv file to path to temporarily accumulate data
         :param caller_id: caller identity, can be anything
         :param run_local: stops writing to web, prevents overwriting for testing or running w/o network access
+        :param debug: true prints extra messages to console
         """
         self.queue = queue
         self.path = path + '/assets'
@@ -60,6 +62,7 @@ class WebStream:
         self.df_list = []
         self.id = caller_id
         self.run_local = run_local
+        self.debug = debug
         self.storage = gcs.Storage()
         # recover from crash without losing data.  Load data if present.  Keep if current, delete if yesterday
         try:
@@ -160,21 +163,23 @@ class Controller:
     """
     Multiprocessing controller, send messages to WebStream to process when the CPU has a moment
     """
-    def __init__(self, caller_id: str = "default", run_local: bool = False) -> None:
+    def __init__(self, caller_id: str = "default", run_local: bool = False, debug: bool = False) -> None:
         """
         Set up class, uses a dataframe to store the content
         :param caller_id: name of the sender, can be anything, non-unique identifier
         :param run_local: boolean defaults to false, prevents unintentional send to cloud for contents when testing
+        :param debug: prints extra messages to console if true
         """
         self.path = os.getcwd()
         self.queue = multiprocessing.Queue()
         self.web_stream = WebStream(queue=self.queue, caller_id=caller_id)
         # self.p_web_stream = multiprocessing.Process(target=self.web_stream.request_handler, args=(), daemon=True)
         self.p_web_stream = multiprocessing.Process(target=web_stream_worker, args=(self.queue, self.path, caller_id,
-                                                                                    run_local), daemon=True)
+                                                                                    run_local, debug), daemon=True)
         self.last_event_num = 0
         self.id = caller_id  # id name or number of sender
         self.run_local = run_local
+        self.debug = debug
         # This dataframe is not used in this class, here for a reference since this is how the stream handler writes CSV
         self.df = pd.DataFrame({
                            'Feeder Name': pd.Series(dtype='str'),
@@ -214,6 +219,8 @@ class Controller:
         if flush:
             self.flush()
         self.last_event_num = event_num
+        if self.debug:
+            print(f'output_stream.py message: write item to file {item}')
         return
 
     def occurrences(self, occurrence_list: list) -> None:
