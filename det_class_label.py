@@ -104,7 +104,8 @@ class DetectClassify:
         with open(self.classifier_thresholds_file, 'r', encoding='utf-8') as csvfile:
             csvreader = csv.reader(csvfile)
             for row in csvreader:
-                    self.classifier_thresholds.append(row[1])
+                self.classifier_thresholds.append(row[1])
+
         self.detector, self.obj_detector_possible_labels, self.detector_is_floating_model = (
             self.init_tf2(self.detector_file, self.detector_labels_file))
         self.classifier, self.classifier_possible_labels, self.classifier_is_floating_model = (
@@ -139,7 +140,7 @@ class DetectClassify:
         self.screen_sq_pixels = screenwidth * screenheight
         # self.img = Image.fromarray(np.zeros((screenheight, screenwidth, 3), dtype=np.uint8))  # null image
         self.img = Image.new('RGB', (screenwidth, screenheight), color='black')  # null image at startup
-        self.debug=debug
+        self.debug = debug
         self.output_class = output_class
         self.output_function = output_class.message if output_class is not None else None
         return
@@ -207,8 +208,8 @@ class DetectClassify:
             det_rects = self.detector.get_tensor(output_details[0]['index'])
             det_labels_index = self.detector.get_tensor(output_details[1]['index'])  # label array for each result
             det_confidences = self.detector.get_tensor(output_details[2]['index'])
-            if self.debug:
-                print(f'det_class_label.py model results {det_labels_index}, {det_confidences}')
+            # if self.debug:
+            #     print(f'det_class_label.py model results {det_labels_index}, {det_confidences}')
             for index, self.obj_confidence in enumerate(det_confidences[0]):
                 labelidx = int(det_labels_index[0][index])  # get result label index for labels;
                 det_label = self.obj_detector_possible_labels[labelidx]  # grab text from possible labels
@@ -461,8 +462,6 @@ class DetectClassify:
             label_threshold = float(self.classify_object_min_confidence * 1000
                                     if self.classifier_thresholds[int(lindex)] == 0
                                     else self.classifier_thresholds[int(lindex)])
-            if self.debug:
-                print(f'det_class_label.py check_threshold: calculated label threshold is {label_threshold}')
         except Exception as e:
             print(e)
             print(f'det_class_label.py check_threshold error, possible type in input file for:'
@@ -495,9 +494,9 @@ class DetectClassify:
 
 if __name__ == '__main__':
     label = ''
-    debug = True
+    debugb = True
     img_test = Image.open('/home/pi/birdclass/0.jpg')
-    birds = DetectClassify(homedir='c:/Users/jimma/PycharmProjects/birdclassifier/', debug=debug)
+    birds = DetectClassify(homedir='c:/Users/jimma/PycharmProjects/birdclassifier/', debug=debugb)
     birds.detect(img_test)  # run object detection
 
     print('main testing code: objects detected', birds.detected_confidences)
