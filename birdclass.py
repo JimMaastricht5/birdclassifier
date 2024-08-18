@@ -123,7 +123,7 @@ def bird_detector(args) -> None:
                                                    first_img_name='first_img.jpg')
     # old code.... first_img_name = os.getcwd() + '/assets/' + 'first_img.jpg')  # init
     output.message('Done with camera init... setting up classes.')
-    bird_tweeter = tweeter.TweeterClass()  # init tweeter2 class twitter handler
+    bird_tweeter = tweeter.TweeterClass(offline=args.offline)  # init tweeter2 class twitter handler
     chores = dailychores.DailyChores(bird_tweeter, birdpop, cityweather, output_class=output)
     # init detection and classifier object
     birds = det_class_label.DetectClassify(homedir=args.homedir, classifier_labels=args.labels,

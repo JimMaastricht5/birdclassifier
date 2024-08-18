@@ -42,10 +42,11 @@ class TweeterClass:
     """
     Class authorizes to Twitter and maintains tweet count per hour not to exceed 15 as the default value
     """
-    def __init__(self, tweetmax_per_hour: int = 15, offline: bool = False) -> None:
+    def __init__(self, tweetmax_per_hour: int = 15, offline: bool = False, debug: bool = False) -> None:
         """
         :param tweetmax_per_hour: number of tweets not to exceed in one hour
         :param offline: tells the app not to post, used for testing or without a network connection
+        :param debug: extra print if true for debugging
         :return: None
         """
         self.curr_day = datetime.now().day
@@ -54,6 +55,7 @@ class TweeterClass:
         self.tweetmax_per_hour = tweetmax_per_hour
         self.tweeted = False
         self.offline = offline
+        self.debug = debug
         if self.offline is False:
             self.client_v1 = self.get_twitter_conn_v1()
             # self.client_v1 = self.get_twitter_conn_v1(api_key, api_secret_key, access_token, access_token_secret)
