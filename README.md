@@ -61,8 +61,8 @@ That model supports 965 species. I've added some thresholds by species to skip s
    weather_key = ''  
    \# google  
    google_json_key = ''  
-14. Note: what about google GCS contained in the json_key_file?  
-15. [Note: add crontab setup] I have some bash scripts to start the process every day on a schedule.  
+14. Note: what about google GCS contained in the json_key_file???  Need to test empty auth and json file 
+15. [Note: add crontab setup] I have some bash scripts to start the process every day on a schedule.  ??? need to add options for start up sudo crontab -e
 
 
 ## Repos
