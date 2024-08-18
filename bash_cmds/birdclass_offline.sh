@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PIDFILE="/var/run/birdclass.pid"
+PIDFILE="/home/pi/birdclassifier/run/birdclass.pid"
 
 function cleanup() {
   rm -f "$PIDFILE"
