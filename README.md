@@ -31,19 +31,22 @@ That model supports 965 species. I've added some thresholds by species to skip s
 8. Install other software  
    (remote control software from windows with RDP): sudo apt install xrdp  
 9. Set up the software and the virtual environment for python, note picamera2 is hard to install and is installed globally, so we'll use that instead.  We will also run a camera test that writes out a file to the assets directory
-    mkdir birdclassifier 
-    git clone https://github.com/JimMaastricht5/birdclassifier.git
-    cd birdclassifier
-    ls
+    mkdir birdclassifier  
+    git clone https://github.com/JimMaastricht5/birdclassifier.git  
+    cd birdclassifier  
+    ls  
     mkdir assets
+    mkdir run  
     python -m venv venv --system-site-packages
-    pip install --upgrade pip
-    pip install -r requirements.txt
-    bash /home/pi/birdclassifier/bash_cmds/cameratest2.sh
-    chmod +x bash_cmds/birdclass.sh
-10. [Note: add link here] Set up a developer Twitter account for the bot to broadcast to...  twitter has good directions  
-11. Set up a free account on OpenWeatherMap (http://api.openweathermap.org)cat   
-12. create your auth.py file with the Twitter keys and the open weather key.  
+    source venv/bin/activate  
+    pip install --upgrade pip  
+    pip install -r requirements.txt  
+    bash /home/pi/birdclassifier/bash_cmds/cameratest2.sh  
+    chmod +x bash_cmds/birdclass.sh  
+    chmod +x bash_cmds/birdclass_offline.sh  
+11. [Note: add link here] Set up a developer Twitter account for the bot to broadcast to...  twitter has good directions  
+12. Set up a free account on OpenWeatherMap (http://api.openweathermap.org)cat   
+13. create your auth.py file with the Twitter keys and the open weather key.  
     set a file in the birdclassifier directory and call it auth.py. I would suggest using "nano auth.py"  
     enter the keys from your Twitter account into the file. 
    \# Twitter keys  
@@ -58,8 +61,8 @@ That model supports 965 species. I've added some thresholds by species to skip s
    weather_key = ''  
    \# google  
    google_json_key = ''  
-13. Note: what about google GCS contained in the json_key_file?  
-14. [Note: add crontab setup] I have some bash scripts to start the process every day on a schedule.  
+14. Note: what about google GCS contained in the json_key_file?  
+15. [Note: add crontab setup] I have some bash scripts to start the process every day on a schedule.  
 
 
 ## Repos
