@@ -265,8 +265,8 @@ if __name__ == "__main__":
 
     # camera settings
     ap.add_argument("-fc", "--flipcamera", type=bool, default=False, help="flip camera image")
-    ap.add_argument("-sw", "--screenwidth", type=int, default=640, help="max screen width")
-    ap.add_argument("-sh", "--screenheight", type=int, default=480, help="max screen height")
+    ap.add_argument("-sw", "--screenwidth", type=int, default=480, help="max screen width")
+    ap.add_argument("-sh", "--screenheight", type=int, default=640, help="max screen height")
 
     # general app settings
     ap.add_argument("-gf", "--minanimatedframes", type=int, default=10,

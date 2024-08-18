@@ -60,7 +60,7 @@ class DetectClassify:
                  classifier_model: str = 'coral.ai.mobilenet_v2_1.0_224_inat_bird_quant.tflite',
                  classifier_labels: str = 'coral.ai.inat_bird_labels.txt',
                  classifier_thresholds: str = 'USA_WI_coral.ai.inat_bird_threshold.csv',
-                 detect_object_min_confidence: float = .6, screenheight: int = 480, screenwidth: int = 640,
+                 detect_object_min_confidence: float = .6, screenwidth: int = 480, screenheight: int = 640,
                  contrast_chg: float = 1.0, color_chg: float = 1.0,
                  brightness_chg: float = 1.0, sharpness_chg: float = 1.0,
                  min_img_percent: float = 10.0, target_object: Union[list, str] = 'bird',

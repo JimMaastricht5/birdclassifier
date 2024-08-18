@@ -34,7 +34,7 @@ from libcamera import Transform
 
 
 class MotionDetector:
-    def __init__(self, min_entropy: int = 4, screenwidth: int = 640, screenheight: int = 480,
+    def __init__(self, min_entropy: int = 4, screenwidth: int = 480, screenheight: int = 640,
                  flip_camera: bool = False, first_img_name: str = 'capture.jpg', file_dest: str = 'assets',
                  debug: bool = False) -> None:
         """
@@ -52,7 +52,7 @@ class MotionDetector:
         self.min_entropy = min_entropy
         self.screenwidth = screenwidth
         self.screenheight = screenheight
-        self.config = self.camera2.create_preview_configuration(main={"size": (screenheight, screenwidth)},
+        self.config = self.camera2.create_preview_configuration(main={"size": (screenwidth, screenheight)},
                                                                 transform=Transform(vflip=flip_camera))
         self.camera2.configure(self.config)
         self.camera2.start()
