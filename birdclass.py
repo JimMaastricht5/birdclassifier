@@ -102,7 +102,7 @@ def bird_detector(args) -> None:
     favorite_birds = ['Rose-breasted Grosbeak', 'Red-bellied Woodpecker',
                       'Northern Cardinal']  # rare birds or just birds you want to see
     birdpop = population.Census()  # initialize species population census object
-    output = output_stream.Controller(caller_id=args.city, debug=args.debug)  # initialize class to handle terminal and web output
+    output = output_stream.Controller(caller_id=args.city, debug=args.debug)  # handle terminal and web output
     output.start_stream()  # start streaming to terminal and web
     gcs_storage = gcs.Storage(offline=args.offline)
     motioncnt, event_count, gcs_img_filename, seed_check_gcs_filename = 0, 0, '', ''
@@ -296,9 +296,10 @@ if __name__ == "__main__":
                     help="home directory for files")
     ap.add_argument("-la", "--labels", type=str, default='coral.ai.inat_bird_labels.txt',
                     help="name of file to use for species labels and thresholds")
-    ap.add_argument("-tr", "--thresholds", type=str, default='coral.ai.inat_bird_threshold.csv',
+    ap.add_argument("-tr", "--thresholds", type=str, default='USA_WI_coral.ai.inat_bird_threshold.csv',
                     help="name of file to use for species labels and thresholds")
-    ap.add_argument("-cm", "--classifier", type=str, default='coral.ai.mobilenet_v2_1.0_224_inat_bird_quant.tflite',
+    ap.add_argument("-cm", "--classifier", type=str,
+                    default='coral.ai.mobilenet_v2_1.0_224_inat_bird_quant.tflite',
                     help="model name for species classifier")
 
     # feeder defaults

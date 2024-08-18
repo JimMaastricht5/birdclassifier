@@ -244,7 +244,7 @@ def save_gif(frames: list, frame_rate: int = 30,
     return gif, filename
 
 
-# invoke main
+# invoke main testing code
 if __name__ == "__main__":
     # print(overlap_area((1, 1, 10, 10), (1, 1, 2, 2)))
     img1 = Image.open('/home/pi/birdclass/birds.gif')
@@ -284,70 +284,3 @@ if __name__ == "__main__":
     # equalizedcolorimg = equalize_color(img)
     # equalizedcolorimg.show()
     # print(predominant_color(equalizedcolorimg))
-
-
-# old code
-# def contour(img):
-#     # find contours of the image
-#     img.filter(ImageFilter.CONTOUR)
-#     return img
-# def enhance_color(img, factor):
-#     # color enhance image
-#     # factor of 1 is no change. < 1 reduces color,  > 1 increases color
-#     # recommended values for color pop of 1.2
-#     # recommended values for reductions 0.8
-#     return ImageEnhance.Color(img).enhance(factor)
-#
-#
-# def enhance_brightness(img, factor):
-#     # brighten or darken an image
-#     # factor of 1 is no change. < 1 reduces color,  > 1 increases color
-#     # recommended values of 1.2 or 0.8
-#     return ImageEnhance.Brightness(img).enhance(factor)
-#
-#
-# def enhance_contrast(img, factor):
-#     # increases or decreases contrast
-#     # factor of 1 is no change. < 1 reduces color,  > 1 increases color
-#     # recommended values 1.5, 3, 0.8
-#     return ImageEnhance.Contrast(img).enhance(factor)
-#
-#
-# def enhance_sharpness(img, factor):
-#     # increases or decreases sharpness
-#     # factor of 1 is no change. < 1 reduces color,  > 1 increases color
-#     # recommended values 1.5, 3
-#     # use 0.2 for blur
-#     return ImageEnhance.Sharpness(img).enhance(factor)
-
-
-# def is_color_low_contrast(colorimg, threshold=.35):
-#     # check in image to see if is low contrast, return True or False
-#     # input image and threshold as a decimal with .35 or 35% being the default
-#     stats = ImageStat.Stat(colorimg)
-#     if stats.stdev < threshold:
-#         return False
-#     else:
-#         return True
-
-
-# def equalize_gray(grayimg):
-#     # adjust contrast of gray image to improve process
-#     # apply histogram equalization to boost contrast
-#     return ImageOps.equalize(grayimg)
-
-
-# def equalize_color(img):
-#     # color histogram equalization
-#     return ImageOps.equalize(img)
-
-
-# def ratio(rect):
-#     # find the ratio of width/height
-#     (startX, startY, endX, endY) = rect
-#     return round((endX - startX) / (endY - startY), 3)
-
-
-# def flip(img):
-#     # Pillow img to flip
-#     return ImageOps.flip(img)
