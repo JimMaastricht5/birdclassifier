@@ -49,12 +49,13 @@ def gaussianblur(img: Image.Image) -> Image.Image:
 
 
 # detect image problems where bottom half of the image is washed from suns reflection, must be jpg
-def is_sun_reflection_jpg(img: Image.Image, washout_red_threshold: float = .25) -> bool:
+def is_sun_reflection_jpg(img: Image.Image, washout_red_threshold: float = .25, debug: bool = False) -> bool:
     """
     function looks at an image and determines if it is overexposed.  On current hardware that results in
     the bottom half of the image having a pink or red hue.  Do the test is color diff from top to bottom
     :param img: jpg or gif to test for over exposure aka washout
     :param washout_red_threshold: threshold that is the % change from the bottom of the image in red spectrum
+    :param debug: true provides extra print
     :return: bool true if the image is over exposed
     """
     if img.format == 'GIF':
@@ -72,11 +73,13 @@ def is_sun_reflection_jpg(img: Image.Image, washout_red_threshold: float = .25) 
         top_red_avg = np.mean(top_half[:, :, 0])
         bottom_red_avg = np.mean(bottom_half[:, :, 0])
         reflection_b = True if bottom_red_avg > top_red_avg * (1 + washout_red_threshold) else False
-        print(f'top avg red is {top_red_avg}, bottom red avg is {bottom_red_avg} threshold is '
-              f'{washout_red_threshold} with a limit of {top_red_avg * (1+washout_red_threshold)}')
+        if debug:
+            print(f'top avg red is {top_red_avg}, bottom red avg is {bottom_red_avg} threshold is '
+                  f'{washout_red_threshold} with a limit of {top_red_avg * (1+washout_red_threshold)}')
     else:
-        print(f'image_proc.py is_sun_reflection got np array with something other than 3 dimensions. '
-              f'{img.format} with {img_np_array.shape}')
+        if debug:
+            print(f'image_proc.py is_sun_reflection got np array with something other than 3 dimensions. '
+                  f'{img.format} with {img_np_array.shape}')
         reflection_b = False  # drop thru and return false if conversion or np dimensions does not return 3 channels
     return reflection_b
 
@@ -186,7 +189,7 @@ def avg_exposure(img: Image.Image) -> float:
 
 def normalize(img: Image.Image) -> np.array:
     """
-    normalize a jpg with values from 0 to 1 by dividing by max value of 255
+    normalize a jpg with values from 0 to 1 by dividing by max value of 255, old code used 127.5 as divisor
     :param img: jpg img
     :return: np array with scaled image data 0 to 1
     """
@@ -241,7 +244,7 @@ def save_gif(frames: list, frame_rate: int = 30,
     return gif, filename
 
 
-# invoke main
+# invoke main testing code
 if __name__ == "__main__":
     # print(overlap_area((1, 1, 10, 10), (1, 1, 2, 2)))
     img1 = Image.open('/home/pi/birdclass/birds.gif')
@@ -281,70 +284,3 @@ if __name__ == "__main__":
     # equalizedcolorimg = equalize_color(img)
     # equalizedcolorimg.show()
     # print(predominant_color(equalizedcolorimg))
-
-
-# old code
-# def contour(img):
-#     # find contours of the image
-#     img.filter(ImageFilter.CONTOUR)
-#     return img
-# def enhance_color(img, factor):
-#     # color enhance image
-#     # factor of 1 is no change. < 1 reduces color,  > 1 increases color
-#     # recommended values for color pop of 1.2
-#     # recommended values for reductions 0.8
-#     return ImageEnhance.Color(img).enhance(factor)
-#
-#
-# def enhance_brightness(img, factor):
-#     # brighten or darken an image
-#     # factor of 1 is no change. < 1 reduces color,  > 1 increases color
-#     # recommended values of 1.2 or 0.8
-#     return ImageEnhance.Brightness(img).enhance(factor)
-#
-#
-# def enhance_contrast(img, factor):
-#     # increases or decreases contrast
-#     # factor of 1 is no change. < 1 reduces color,  > 1 increases color
-#     # recommended values 1.5, 3, 0.8
-#     return ImageEnhance.Contrast(img).enhance(factor)
-#
-#
-# def enhance_sharpness(img, factor):
-#     # increases or decreases sharpness
-#     # factor of 1 is no change. < 1 reduces color,  > 1 increases color
-#     # recommended values 1.5, 3
-#     # use 0.2 for blur
-#     return ImageEnhance.Sharpness(img).enhance(factor)
-
-
-# def is_color_low_contrast(colorimg, threshold=.35):
-#     # check in image to see if is low contrast, return True or False
-#     # input image and threshold as a decimal with .35 or 35% being the default
-#     stats = ImageStat.Stat(colorimg)
-#     if stats.stdev < threshold:
-#         return False
-#     else:
-#         return True
-
-
-# def equalize_gray(grayimg):
-#     # adjust contrast of gray image to improve process
-#     # apply histogram equalization to boost contrast
-#     return ImageOps.equalize(grayimg)
-
-
-# def equalize_color(img):
-#     # color histogram equalization
-#     return ImageOps.equalize(img)
-
-
-# def ratio(rect):
-#     # find the ratio of width/height
-#     (startX, startY, endX, endY) = rect
-#     return round((endX - startX) / (endY - startY), 3)
-
-
-# def flip(img):
-#     # Pillow img to flip
-#     return ImageOps.flip(img)

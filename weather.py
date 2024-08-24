@@ -30,6 +30,7 @@ from auth import (
     weather_key
 )
 import requests
+import datetime as dt
 from datetime import datetime
 from datetime import timedelta
 import time
@@ -41,23 +42,26 @@ class CityWeather:
     pressure, humidity, visibility, windspeed , sunrise (datetime object),
     sunset (datetime object), skycondition (% cloudy), self.isclear
     """
-    def __init__(self, city: str = 'Madison,WI,USA', units: str = 'Imperial', iscloudy=60) -> None:
+    def __init__(self, city: str = 'Madison,WI,USA', units: str = 'Imperial', iscloudy: int = 60,
+                 offline: bool = False) -> None:
         """
         set up weather class.  isclear is true if less clouds than threshold.
         sunrise and sunset as local date time fields
         :param city: set city name or default to Madison, WI
         :param units: Imperial or Metric
-        :param iscloudy: is cloudy is true if the % of clouds is higher than this threshold
+        :param iscloudy: int percentage threshold for the % of clouds to be considered cloudy
+        :param offline: bool letting the class know that there is no network connection
         """
         self.city = city
         self.base_url = 'http://api.openweathermap.org/data/2.5/weather?q='
         self.units = units
         self.full_url = self.base_url + self.city + '&units=' + self.units + '&appid=' + weather_key
         self.cloudythreshold = iscloudy
+        self.offline = offline
 
-        # init variables
-        self.sunrise = datetime.now()
-        self.sunset = datetime.now()
+        # init variables, set default for sunrise and sunset incase the network is offline
+        self.sunrise = dt.datetime.combine(dt.date.today(), dt.time(6, 0))  # 6am
+        self.sunset = dt.datetime.combine(dt.date.today(), dt.time(21, 0))  # 9pm
         self.isclear = True
         self.weather = ''
         self.temp = ''
@@ -75,6 +79,8 @@ class CityWeather:
         grab weather data and parse into class variables
         :return: None
         """
+        if self.offline:
+            return
         try:  # handle open weather API outages
             response = requests.get(self.full_url)
             self.weather = str(response.json()['weather'])  # find general weather string
@@ -165,11 +171,11 @@ class CityWeather:
 
 
 def main():
-    spweather = CityWeather()
+    spweather = CityWeather(offline=True)
     spweather.update_conditions()
     print(spweather.isclear)
-    print(datetime.now())
-    print(spweather.sunrise)
+    # print(datetime.now())
+    # print(spweather.sunrise)
     print(spweather.sunrise.strftime('%H:%M:%S'))
     print(spweather.sunset.strftime('%H:%M:%S'))
     print(spweather.temp)
@@ -179,10 +185,10 @@ def main():
     print(spweather.humidity)
     print(spweather.visibility)
     print(spweather.is_daytime())
-    waittime = (spweather.sunrise - datetime.now()).total_seconds()
-    print('waittime:', waittime)
-    spweather.wait_until_midnight()
-    spweather.wait_until_sunrise()
+    # waittime = (spweather.sunrise - datetime.now()).total_seconds()
+    # print('waittime:', waittime)
+    # spweather.wait_until_midnight()
+    # spweather.wait_until_sunrise()
     print(spweather.is_twilight())
 
 

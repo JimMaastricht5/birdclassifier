@@ -685,7 +685,7 @@
 684 Prunella modularis (Dunnock),-1
 685 Falco tinnunculus (Rock Kestrel),-1
 686 Ixoreus naevius (Varied Thrush),-1
-687 Archilochus colubris (Ruby-throated Hummingbird),-1
+687 Archilochus colubris (Ruby-throated Hummingbird),500
 688 Lampornis clemenciae (Blue-throated Hummingbird),-1
 689 Myiarchus tuberculifer (Dusky-capped Flycatcher),-1
 690 Setophaga ruticilla (American Redstart),-1
@@ -724,7 +724,7 @@
 723 Melanerpes erythrocephalus (Red-headed Woodpecker),-1
 724 Emberiza calandra (Corn Bunting),-1
 725 Acanthis flammea (Common Redpoll),-1
-726 Spinus pinus (Pine Siskin),0
+726 Spinus pinus (Pine Siskin),-1
 727 Thraupis abbas (Yellow-winged Tanager),-1
 728 Spinus psaltria (Lesser Goldfinch),-1
 729 Spinus lawrencei (Lawrence's Goldfinch),-1

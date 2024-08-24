@@ -30,6 +30,7 @@ import static_functions
 from datetime import datetime
 from collections import defaultdict
 from PIL import Image
+import os
 
 
 def default_value():
@@ -39,19 +40,22 @@ def default_value():
 
 class BirdGif:
     def __init__(self, motion_detector_cls, birds_cls, gcs_storage_cls,
-                 brightness_chg: float = 1.0, min_animated_frames: float = 10) -> None:
+                 brightness_chg: float = 1.0, min_animated_frames: float = 10,
+                 stash: bool = False) -> None:
         """
         :param motion_detector_cls: motion detector class instance, allows for call back to object
         :param birds_cls: bird classifier instance, allows for call back to object
         :param gcs_storage_cls: google cloud storage instance, allows for call back to ojbect
         :param brightness_chg: adjusts image brightness, typical values are .8 to 1.2.  1.0 is neutral / no change
         :param min_animated_frames: min number of animated frames to accept for animated gif, lower is smaller file size
+        :param stash: save a copy of an animated gif for analysis later instead of overwriting it every time
         """
         self.motion_detect = motion_detector_cls
         self.birds = birds_cls
         self.gcs_storage = gcs_storage_cls
         self.brightness_chg = brightness_chg
         self.min_animated_frames = min_animated_frames
+        self.stash = stash
 
         # init dictionaries
         self.census_dict = defaultdict(default_value)  # track all results and pick best confidence
@@ -67,29 +71,6 @@ class BirdGif:
         self.frames_with_birds = 0
         return
 
-    # def convert_to_list(self, input_str_list: Union[str, list]) -> list:
-    #     """
-    #     static function that checks if the input is a list or a string and converts the string to a list
-    #     :param input_str_list: str or list
-    #     :return: list
-    #     """
-    #     return input_str_list if isinstance(input_str_list, list) else [input_str_list]
-
-    # def common_name(self, name: str) -> str:
-    #     """
-    #     pull the common name from the full name which contains species, common name, and sometimes sex
-    #     :param name: full label or name for the species
-    #     :return: string containing the common name such as Northern Cardinal
-    #     """
-    #     cname, sname = '', ''
-    #     try:
-    #         sname = str(name)
-    #         sname = sname[sname.find(' ') + 1:] if sname.find(' ') >= 0 else sname  # remove index number
-    #         sname = sname[0: sname.find('[') - 1] if sname.find('[') >= 0 else sname  # remove sex
-    #         cname = sname[sname.find('(') + 1: sname.find(')')] if sname.find('(') >= 0 else sname  # common name
-    #     except Exception as e:
-    #         print(e)
-    #     return cname
 
     def build_dict(self) -> None:
         """
@@ -148,9 +129,14 @@ class BirdGif:
 
         # if bird is in min number of frames build gif
         if self.frames_with_birds >= (self.min_animated_frames - 1):
-            gif, self.local_gif_filename = image_proc.save_gif(frames=labeled_frames[0:last_good_frame])
             self.gcs_gif_filename = f'{datetime.now().strftime("%Y-%m-%d-%H-%M-%S")}{str(event_count)}' \
                 f'({static_functions.common_name(best_weighted_label).replace(" ", "")}).gif'  # rmv spaces
+            gif_file_name = (os.getcwd()+'/assets/birds.gif' if self.stash is False
+                             else os.getcwd() + '/assets/' + self.gcs_gif_filename)
+            gif, self.local_gif_filename = image_proc.save_gif(frames=labeled_frames[0:last_good_frame],
+                                                               filename=gif_file_name)
+            # self.gcs_gif_filename = f'{datetime.now().strftime("%Y-%m-%d-%H-%M-%S")}{str(event_count)}' \
+            #     f'({static_functions.common_name(best_weighted_label).replace(" ", "")}).gif'  # rmv spaces
             self.gcs_storage.send_file(name=self.gcs_gif_filename, file_loc_name=self.local_gif_filename)
             self.animated = True
         return gif

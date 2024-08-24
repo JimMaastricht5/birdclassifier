@@ -59,6 +59,9 @@ def bird_detector(args) -> None:
     main function for the bird feeder detector, takes a list of arguments from the command line or a file
     :param args: parsed arguments from arg parser list below
         "-cf", "--config_file", type=str, help='Config file'
+        "-ol", "--offline", type=bool, default=False, help='Operate offline, do not transmit to cloud'
+        "-db", "--debug", type=bool, default=False, help="debug flag"
+
         # camera settings
         "-fc", "--flipcamera", type=bool, default=False, help="flip camera image"
         "-sw", "--screenwidth", type=int, default=640, help="max screen width"
@@ -99,7 +102,7 @@ def bird_detector(args) -> None:
     favorite_birds = ['Rose-breasted Grosbeak', 'Red-bellied Woodpecker',
                       'Northern Cardinal']  # rare birds or just birds you want to see
     birdpop = population.Census()  # initialize species population census object
-    output = output_stream.Controller(caller_id=args.city)  # initialize class to handle terminal and web output
+    output = output_stream.Controller(caller_id=args.city, debug=args.debug)  # handle terminal and web output
     output.start_stream()  # start streaming to terminal and web
     gcs_storage = gcs.Storage(offline=args.offline)
     motioncnt, event_count, gcs_img_filename, seed_check_gcs_filename = 0, 0, '', ''
@@ -108,7 +111,7 @@ def bird_detector(args) -> None:
 
     # while loop below processes from sunrise to sunset.  The python program needs to be restarted daily
     # wait to enter that main while loop until sunrise
-    cityweather = weather.CityWeather(city=args.city, units='Imperial', iscloudy=60)  # init class and set vars
+    cityweather = weather.CityWeather(city=args.city, units='Imperial', iscloudy=60, offline=False)  # get weather
     output.message(message=f'Now: {datetime.now()}.  \nSunrise: {cityweather.sunrise} Sunset: {cityweather.sunset}.',
                    msg_type='weather')
     cityweather.wait_until_midnight()  # if after sunset, wait here until after midnight
@@ -120,7 +123,7 @@ def bird_detector(args) -> None:
                                                    first_img_name='first_img.jpg')
     # old code.... first_img_name = os.getcwd() + '/assets/' + 'first_img.jpg')  # init
     output.message('Done with camera init... setting up classes.')
-    bird_tweeter = tweeter.TweeterClass()  # init tweeter2 class twitter handler
+    bird_tweeter = tweeter.TweeterClass(offline=args.offline)  # init tweeter2 class twitter handler
     chores = dailychores.DailyChores(bird_tweeter, birdpop, cityweather, output_class=output)
     # init detection and classifier object
     birds = det_class_label.DetectClassify(homedir=args.homedir, classifier_labels=args.labels,
@@ -132,8 +135,7 @@ def bird_detector(args) -> None:
                                            color_chg=args.color_chg,
                                            contrast_chg=args.contrast_chg, sharpness_chg=args.sharpness_chg,
                                            brightness_chg=args.brightness_chg, min_img_percent=args.minimgperc,
-                                           target_object='bird',
-                                           output_class=output)
+                                           target_object=['bird'], debug=args.debug, output_class=output)
     output.message(f'Using label file: {birds.labels}')
     output.message(f'Using threshold file: {birds.thresholds}')
     output.message(f'Using classifier file: {birds.classifier_file}')
@@ -141,7 +143,8 @@ def bird_detector(args) -> None:
 
     bird_gif = animate_gif.BirdGif(motion_detector_cls=motion_detect, birds_cls=birds,
                                    gcs_storage_cls=gcs_storage, brightness_chg=args.brightness_chg,
-                                   min_animated_frames=args.minanimatedframes)
+                                   min_animated_frames=args.minanimatedframes,
+                                   stash=args.offline)
 
     # loop while the sun is up, look for motion, detect birds, determine species
     while cityweather.sunrise.time() < datetime.now().time() < cityweather.sunset.time():
@@ -150,9 +153,10 @@ def bird_detector(args) -> None:
         if motion_detect.motion:
             motioncnt += 1
 
+        # check if day time, motion, bird, and not overexposed
         if motion_detect.motion and birds.detect(detect_img=motion_detect.img) and \
                 cityweather.is_dawn() is False and cityweather.is_dusk() is False\
-                and image_proc.is_sun_reflection_jpg(img=motion_detect.img) is False:  # daytime with motion & bird
+                and image_proc.is_sun_reflection_jpg(img=motion_detect.img, debug=args.debug) is False:
             motioncnt = 0  # reset motion count between detected birds
             birds.set_colors()  # set new colors for this series of bounding boxes
             event_count += 1  # increment event code for log and messages
@@ -250,36 +254,23 @@ def tweet_text(label: Union[list, str], confidence: Union[list, float]) -> str:
     return tweet_label
 
 
-# def common_name(name):
-#     """
-#     :param name:
-#     :return:
-#     """
-#     cname, sname = '', ''
-#     try:
-#         sname = str(name)
-#         sname = sname[sname.find(' ') + 1:] if sname.find(' ') >= 0 else sname  # remove index number
-#         sname = sname[0: sname.find('[') - 1] if sname.find('[') >= 0 else sname  # remove sex
-#         cname = sname[sname.find('(') + 1: sname.find(')')] if sname.find('(') >= 0 else sname  # retrieve common name
-#     except Exception as e:
-#         print(e)
-#     return cname
-
-
 if __name__ == "__main__":
     # construct the argument parser and parse the arguments
     # load settings from config file to allow for simple override
     ap = argparse.ArgumentParser()
     ap.add_argument("-cf", "--config_file", type=str, help='Config file')
-    ap.add_argument("-ol", "--offline", type=bool, default=False, help='Operate offline, do not transmit to cloud')
+    ap.add_argument("-ol", "--offline", type=bool, default=False,
+                    help='Operate offline, do not transmit to cloud')
+    ap.add_argument("-db", "--debug", type=bool, default=False, help="debug flag")
 
     # camera settings
     ap.add_argument("-fc", "--flipcamera", type=bool, default=False, help="flip camera image")
-    ap.add_argument("-sw", "--screenwidth", type=int, default=640, help="max screen width")
-    ap.add_argument("-sh", "--screenheight", type=int, default=480, help="max screen height")
+    ap.add_argument("-sw", "--screenwidth", type=int, default=480, help="max screen width")
+    ap.add_argument("-sh", "--screenheight", type=int, default=640, help="max screen height")
 
     # general app settings
-    ap.add_argument("-gf", "--minanimatedframes", type=int, default=10, help="minimum number of frames with a bird")
+    ap.add_argument("-gf", "--minanimatedframes", type=int, default=10,
+                    help="minimum number of frames with a bird")
     ap.add_argument("-bb", "--broadcast", type=bool, default=False, help="stream images and text")
     ap.add_argument("-v", "--verbose", type=bool, default=True, help="To tweet extra stuff or not")
     ap.add_argument("-td", "--tweetdelay", type=int, default=1800,
@@ -289,23 +280,26 @@ if __name__ == "__main__":
     # adjustment to the output images.  # 1 no chg,< 1 -, > 1 +
     # ap.add_argument("-is", "--iso", type=int, default=800, help="iso camera sensitivity. higher requires less light")
     ap.add_argument("-b", "--brightness_chg", type=int, default=1.2, help="brightness boost twilight")
-    ap.add_argument("-c", "--contrast_chg", type=float, default=1.0, help="contrast boost")  # 1 no chg,< 1 -, > 1 +
-    ap.add_argument("-cl", "--color_chg", type=float, default=1.0, help="color boost")  # 1 no chg,< 1 -, > 1 +
-    ap.add_argument("-sp", "--sharpness_chg", type=float, default=1.0, help="sharpness")  # 1 no chg,< 1 -, > 1 +
+    ap.add_argument("-c", "--contrast_chg", type=float, default=1.0, help="contrast boost")
+    ap.add_argument("-cl", "--color_chg", type=float, default=1.0, help="color boost")
+    ap.add_argument("-sp", "--sharpness_chg", type=float, default=1.0, help="sharpness")
 
     # prediction defaults
-    ap.add_argument("-sc", "--species_confidence", type=float, default=.90, help="species confidence threshold")
+    ap.add_argument("-sc", "--species_confidence", type=float, default=.90,
+                    help="species confidence threshold")
     ap.add_argument("-bc", "--bird_confidence", type=float, default=.6, help="bird confidence threshold")
     ap.add_argument("-ma", "--minentropy", type=float, default=5.0,
                     help="min change from first img to current to trigger motion")
-    ap.add_argument("-ms", "--minimgperc", type=float, default=10.0, help="ignore objects that are less then % of img")
+    ap.add_argument("-ms", "--minimgperc", type=float, default=10.0,
+                    help="ignore objects that are less then % of img")
     ap.add_argument("-hd", "--homedir", type=str, default='/home/pi/birdclassifier/',
                     help="home directory for files")
     ap.add_argument("-la", "--labels", type=str, default='coral.ai.inat_bird_labels.txt',
                     help="name of file to use for species labels and thresholds")
-    ap.add_argument("-tr", "--thresholds", type=str, default='coral.ai.inat_bird_threshold.csv',
+    ap.add_argument("-tr", "--thresholds", type=str, default='USA_WI_coral.ai.inat_bird_threshold.csv',
                     help="name of file to use for species labels and thresholds")
-    ap.add_argument("-cm", "--classifier", type=str, default='coral.ai.mobilenet_v2_1.0_224_inat_bird_quant.tflite',
+    ap.add_argument("-cm", "--classifier", type=str,
+                    default='coral.ai.mobilenet_v2_1.0_224_inat_bird_quant.tflite',
                     help="model name for species classifier")
 
     # feeder defaults
@@ -313,10 +307,9 @@ if __name__ == "__main__":
                     help="name of city weather station uses OWM web service.  See their site for city options")
     ap.add_argument('-fi', "--feeder_id", type=str, default=hex(uuid.getnode()),
                     help='feeder id default MAC address')
-    ap.add_argument('-t', "--feeder_max_temp_c", type=int, default=86, help="Max operating temp for the feeder in C")
-
+    ap.add_argument('-t', "--feeder_max_temp_c", type=int, default=86,
+                    help="Max operating temp for the feeder in C")
     arguments = ap.parse_args()
-
     if arguments.config_file:
         config = configparser.ConfigParser()
         config.read(arguments.config_file)
