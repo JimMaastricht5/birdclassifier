@@ -111,7 +111,7 @@ def bird_detector(args) -> None:
 
     # while loop below processes from sunrise to sunset.  The python program needs to be restarted daily
     # wait to enter that main while loop until sunrise
-    cityweather = weather.CityWeather(city=args.city, units='Imperial', iscloudy=60)  # init class and set vars
+    cityweather = weather.CityWeather(city=args.city, units='Imperial', iscloudy=60, offline=False)  # get weather
     output.message(message=f'Now: {datetime.now()}.  \nSunrise: {cityweather.sunrise} Sunset: {cityweather.sunset}.',
                    msg_type='weather')
     cityweather.wait_until_midnight()  # if after sunset, wait here until after midnight
