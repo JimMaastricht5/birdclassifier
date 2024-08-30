@@ -99,8 +99,7 @@ def bird_detector(args) -> None:
         '-t', "--feeder_max_temp_c", type=int, default=86, help="Max operating temp for the feeder in C"
     :return: None
     """
-    favorite_birds = ['Rose-breasted Grosbeak', 'Red-bellied Woodpecker',
-                      'Northern Cardinal']  # rare birds or just birds you want to see
+    favorite_birds = ['Rose-breasted Grosbeak', 'Red-bellied Woodpecker']  # rare birds or just birds you want to see
     birdpop = population.Census()  # initialize species population census object
     output = output_stream.Controller(caller_id=args.city, debug=args.debug)  # handle terminal and web output
     output.start_stream()  # start streaming to terminal and web
