@@ -99,7 +99,7 @@ def bird_detector(args) -> None:
         '-t', "--feeder_max_temp_c", type=int, default=86, help="Max operating temp for the feeder in C"
     :return: None
     """
-    favorite_birds = ['Rose-breasted Grosbeak', 'Red-bellied Woodpecker']  # rare birds or just birds you want to see
+    favorite_birds = ['Rose-breasted Grosbeak', 'Red-bellied Woodpecker', 'White-breasted Nuthatch']  # birds to see
     birdpop = population.Census()  # initialize species population census object
     output = output_stream.Controller(caller_id=args.city, debug=args.debug)  # handle terminal and web output
     output.start_stream()  # start streaming to terminal and web
@@ -160,10 +160,9 @@ def bird_detector(args) -> None:
             birds.set_colors()  # set new colors for this series of bounding boxes
             event_count += 1  # increment event code for log and messages
             local_img_filename = os.getcwd() + '/assets/' + str(event_count % 10) + '.jpg'
-            # gcs_img_filename = f'{datetime.now().strftime("%Y-%m-%d-%H-%M-%S")}{str(event_count)}.jpg'  # redundant
             first_img_jpg = birds.img  # keep first shot for animation and web
 
-            # classify, grab labels, output census, send to web and terminal,
+            # classify species, grab labels, output census, send to web and terminal,
             # enhance the shot, and add boxes, grab next set of gifs, build animation, tweet
             if birds.classify(class_img=first_img_jpg) >= args.species_confidence:  # found a bird we can classify
                 first_rects, first_label, first_conf = birds.get_obj_data()  # grab data from this bird
@@ -189,7 +188,7 @@ def bird_detector(args) -> None:
                 best_first_conf = (
                     static_functions.convert_to_list(bird_gif.best_confidence if bird_gif.best_confidence > 0 else
                                                      first_conf))
-                bird_first_time_seen = birdpop.visitors(best_first_label, datetime.now())  # increment species count
+                bird_first_time_seen = birdpop.record_visitor(best_first_label, datetime.now())  # inc species count
                 birds.set_ojb_data(classified_rects=first_rects, classified_labels=best_first_label,
                                    classified_confidences=best_first_conf)  # set to first bird
                 first_img_jpg = birds.add_boxes_and_labels(label_img=first_img_jpg_no_label, use_last_known=False)
@@ -198,7 +197,7 @@ def bird_detector(args) -> None:
                 seed_check_gcs_filename = gcs_img_filename  # reference to use for hourly seed check
 
                 # process tweets, jpg if not min number of frame, gif otherwise.  wait X min * N bird before tweeting
-                waittime = birdpop.report_single_census_count(bird_gif.best_label) * args.tweetdelay / 10
+                waittime = birdpop.get_single_census_count(bird_gif.best_label) * args.tweetdelay / 10
                 waittime = args.tweetdelay if waittime >= args.tweetdelay else waittime
                 if (datetime.now() - last_tweet).total_seconds() >= waittime or bird_first_time_seen or \
                         static_functions.common_name(bird_gif.best_label) in favorite_birds:
