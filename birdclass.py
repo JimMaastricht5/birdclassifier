@@ -42,6 +42,7 @@ import output_stream
 import argparse  # argument parser
 import configparser  # read args from ini file
 from datetime import datetime
+import time
 import os
 import uuid
 import gcs  # save objects to website for viewing
@@ -112,16 +113,22 @@ def bird_detector(args) -> None:
     # wait to enter that main while loop until sunrise
     cityweather = weather.CityWeather(city=args.city, units='Imperial', iscloudy=60, offline=False)  # get weather
     output.message(message=f'Now: {datetime.now()}.  \nSunrise: {cityweather.sunrise} Sunset: {cityweather.sunset}.',
-                   msg_type='weather')
+                   msg_type='weather', flush=True)
     cityweather.wait_until_midnight()  # if after sunset, wait here until after midnight
     cityweather.wait_until_sunrise()  # if before sun rise, wait here
 
     # initial video capture, screen size, and grab first image (no motion)
-    motion_detect = motion_detector.MotionDetector(min_entropy=args.minentropy, screenwidth=args.screenwidth,
-                                                   screenheight=args.screenheight, flip_camera=args.flipcamera,
-                                                   first_img_name='first_img.jpg')
-    # old code.... first_img_name = os.getcwd() + '/assets/' + 'first_img.jpg')  # init
-    output.message('Done with camera init... setting up classes.')
+    try:
+        motion_detect = motion_detector.MotionDetector(min_entropy=args.minentropy, screenwidth=args.screenwidth,
+                                                       screenheight=args.screenheight, flip_camera=args.flipcamera,
+                                                       first_img_name='first_img.jpg')
+        output.message('Done with camera init... setting up classes.')
+    except Exception as e:
+        print(e)
+        output.message(message='Camera initialization failed, check the ribbon', msg_type='message', flush=True)
+        time.sleep(60)  # wait for thread to write contents to website
+        raise ValueError('List out of range due to camera init failure')
+
     bird_tweeter = tweeter.TweeterClass(offline=args.offline)  # init tweeter2 class twitter handler
     chores = dailychores.DailyChores(bird_tweeter, birdpop, cityweather, output_class=output)
     # init detection and classifier object
