@@ -42,6 +42,7 @@ import output_stream
 import argparse  # argument parser
 import configparser  # read args from ini file
 from datetime import datetime
+import time
 import os
 import uuid
 import gcs  # save objects to website for viewing
@@ -99,7 +100,7 @@ def bird_detector(args) -> None:
         '-t', "--feeder_max_temp_c", type=int, default=86, help="Max operating temp for the feeder in C"
     :return: None
     """
-    favorite_birds = ['Rose-breasted Grosbeak', 'Red-bellied Woodpecker']  # rare birds or just birds you want to see
+    favorite_birds = ['Rose-breasted Grosbeak', 'Red-bellied Woodpecker', 'White-breasted Nuthatch']  # birds to see
     birdpop = population.Census()  # initialize species population census object
     output = output_stream.Controller(caller_id=args.city, debug=args.debug)  # handle terminal and web output
     output.start_stream()  # start streaming to terminal and web
@@ -112,16 +113,22 @@ def bird_detector(args) -> None:
     # wait to enter that main while loop until sunrise
     cityweather = weather.CityWeather(city=args.city, units='Imperial', iscloudy=60, offline=False)  # get weather
     output.message(message=f'Now: {datetime.now()}.  \nSunrise: {cityweather.sunrise} Sunset: {cityweather.sunset}.',
-                   msg_type='weather')
+                   msg_type='weather', flush=True)
     cityweather.wait_until_midnight()  # if after sunset, wait here until after midnight
     cityweather.wait_until_sunrise()  # if before sun rise, wait here
 
     # initial video capture, screen size, and grab first image (no motion)
-    motion_detect = motion_detector.MotionDetector(min_entropy=args.minentropy, screenwidth=args.screenwidth,
-                                                   screenheight=args.screenheight, flip_camera=args.flipcamera,
-                                                   first_img_name='first_img.jpg')
-    # old code.... first_img_name = os.getcwd() + '/assets/' + 'first_img.jpg')  # init
-    output.message('Done with camera init... setting up classes.')
+    try:
+        motion_detect = motion_detector.MotionDetector(min_entropy=args.minentropy, screenwidth=args.screenwidth,
+                                                       screenheight=args.screenheight, flip_camera=args.flipcamera,
+                                                       first_img_name='first_img.jpg')
+        output.message('Done with camera init... setting up classes.')
+    except Exception as e:
+        print(e)
+        output.message(message='Camera initialization failed, check the ribbon', msg_type='message', flush=True)
+        time.sleep(60)  # wait for thread to write contents to website
+        raise ValueError('List out of range due to camera init failure')
+
     bird_tweeter = tweeter.TweeterClass(offline=args.offline)  # init tweeter2 class twitter handler
     chores = dailychores.DailyChores(bird_tweeter, birdpop, cityweather, output_class=output)
     # init detection and classifier object
@@ -160,10 +167,9 @@ def bird_detector(args) -> None:
             birds.set_colors()  # set new colors for this series of bounding boxes
             event_count += 1  # increment event code for log and messages
             local_img_filename = os.getcwd() + '/assets/' + str(event_count % 10) + '.jpg'
-            # gcs_img_filename = f'{datetime.now().strftime("%Y-%m-%d-%H-%M-%S")}{str(event_count)}.jpg'  # redundant
             first_img_jpg = birds.img  # keep first shot for animation and web
 
-            # classify, grab labels, output census, send to web and terminal,
+            # classify species, grab labels, output census, send to web and terminal,
             # enhance the shot, and add boxes, grab next set of gifs, build animation, tweet
             if birds.classify(class_img=first_img_jpg) >= args.species_confidence:  # found a bird we can classify
                 first_rects, first_label, first_conf = birds.get_obj_data()  # grab data from this bird
@@ -189,7 +195,7 @@ def bird_detector(args) -> None:
                 best_first_conf = (
                     static_functions.convert_to_list(bird_gif.best_confidence if bird_gif.best_confidence > 0 else
                                                      first_conf))
-                bird_first_time_seen = birdpop.visitors(best_first_label, datetime.now())  # increment species count
+                bird_first_time_seen = birdpop.record_visitor(best_first_label, datetime.now())  # inc species count
                 birds.set_ojb_data(classified_rects=first_rects, classified_labels=best_first_label,
                                    classified_confidences=best_first_conf)  # set to first bird
                 first_img_jpg = birds.add_boxes_and_labels(label_img=first_img_jpg_no_label, use_last_known=False)
@@ -198,7 +204,7 @@ def bird_detector(args) -> None:
                 seed_check_gcs_filename = gcs_img_filename  # reference to use for hourly seed check
 
                 # process tweets, jpg if not min number of frame, gif otherwise.  wait X min * N bird before tweeting
-                waittime = birdpop.report_single_census_count(bird_gif.best_label) * args.tweetdelay / 10
+                waittime = birdpop.get_single_census_count(bird_gif.best_label) * args.tweetdelay / 10
                 waittime = args.tweetdelay if waittime >= args.tweetdelay else waittime
                 if (datetime.now() - last_tweet).total_seconds() >= waittime or bird_first_time_seen or \
                         static_functions.common_name(bird_gif.best_label) in favorite_birds:

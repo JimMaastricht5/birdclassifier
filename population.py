@@ -59,7 +59,7 @@ class Census:
         self.census_dict = []  # clear it and re-establish
         self.census_dict = defaultdict(default_value)
 
-    def visitors(self, visitor_names: Union[list, str], time_of_visit: datetime = datetime.now()) -> bool:
+    def record_visitor(self, visitor_names: Union[list, str], time_of_visit: datetime = datetime.now()) -> bool:
         """
         find visitor by census name, increment count, and update time
         make sure visitor names is a list and not a string
@@ -89,7 +89,7 @@ class Census:
         census_subset = {key: self.census_dict[key] for key in visitor_name_list}
         return census_subset
 
-    def report_single_census_count(self, visitor_name: str) -> int:
+    def get_single_census_count(self, visitor_name: str) -> int:
         """
         return count of visitors by name
         :param visitor_name (key name) aka cat
@@ -116,16 +116,16 @@ def main():
     observed_time = datetime.now()
     popdogcats = Census()
 
-    popdogcats.visitors('dog', observed_time)
+    popdogcats.record_visitor('dog', observed_time)
     print('should be one dog', popdogcats.report_census('dog'))
     print('should be zero cats', popdogcats.report_census('cat'))
 
-    popdogcats.visitors('cat', observed_time)
-    popdogcats.visitors('cat', observed_time)
+    popdogcats.record_visitor('cat', observed_time)
+    popdogcats.record_visitor('cat', observed_time)
     print('should be one dog', popdogcats.report_census('dog'))
     print('should be two cats', popdogcats.report_census('cat'))
-    print(popdogcats.report_single_census_count('cat'))
-    popdogcats.visitors(['dog', 'cat', 'bird'], datetime.now())
+    print(popdogcats.get_single_census_count('cat'))
+    popdogcats.record_visitor(['dog', 'cat', 'bird'], datetime.now())
 
     print('should be two dogs, three cats, and a bird')
     observed = popdogcats.get_census_by_count()  # print count from prior day
