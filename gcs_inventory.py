@@ -51,10 +51,14 @@ def get_archived_jpg_images(save_file_name: str='archive-jpg-list.csv'):
 
 
 if __name__ == "__main__":
-    df = get_archived_jpg_images()
-    print(df.columns)
-
+    df_file_name = 'archive-jpg-list.csv'
+    # df = get_archived_jpg_images('archive-jpg-list.csv')
+    df = pd.read_csv(df_file_name)
     name_counts = df['Name'].value_counts()
-    print(f'Name Counts: {name_counts}')
+    print(df.columns)
+    # print(f'Name Counts: {name_counts}')
+    print(f'Possible False Positives: {name_counts[name_counts <= 150]}')
+    print(f'Remaining Species: {name_counts[name_counts > 150]}')
+    print(len(name_counts))
+    # print(df.head(5).to_string())
 
-    print(df.head(5).to_string())
