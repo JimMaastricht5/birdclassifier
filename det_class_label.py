@@ -320,8 +320,8 @@ class DetectClassify:
                 if cresult > maxcresult:  # if this above threshold and is a better confidence result store it
                     maxcresult = cresult
                     maxlresult = lresult
-        if self.debug:
-            print(f'det_class_label.py classify obj: final answer was {maxcresult} and {maxlresult}')
+        # if self.debug:
+        print(f'det_class_label.py classify obj: final answer was {maxcresult} and {maxlresult}')
         return maxcresult, maxlresult  # highest confidence with best match
 
     @staticmethod
@@ -455,7 +455,7 @@ class DetectClassify:
         if self.classifier_thresholds[int(lindex)] == -1 or rect_percent_scr < self.min_img_percent:
             return False
         # apply rule 3
-        elif use_confidence_threshold is False:  # the requester doesnt care to check the threshold
+        elif use_confidence_threshold is False:  # the requester does not care to check the threshold
             return True
         # use default threshold if threshold is 0 else use species specific score
         try:  # handle typos in threshold file

@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-# reads the set of files in gcs stroage for archived jpgs and creates a csv for further analysis
+# reads the set of files in gcs storage for archived jpgs and creates a csv for further analysis
 import gcs
 import static_functions
 import datetime as dt
