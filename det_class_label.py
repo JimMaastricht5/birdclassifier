@@ -454,9 +454,11 @@ class DetectClassify:
                   f'{rect_percent_scr} and a threshold min image percent of {self.min_img_percent}'
                   f'and use threshold is {use_confidence_threshold}')
         if self.classifier_thresholds[int(lindex)] == -1 or rect_percent_scr < self.min_img_percent:
+            print('returning false, -1 seen')
             return False
         # apply rule 3
         elif use_confidence_threshold is False:  # the requester does not care to check the threshold
+            print('returning true, check threshold is false')
             return True
         # use default threshold if threshold is 0 else use species specific score
         try:  # handle typos in threshold file
