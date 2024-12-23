@@ -453,7 +453,7 @@ class DetectClassify:
                   f'species threshold is {(self.classifier_thresholds[int(lindex)])} / 1000 with percent of img at'
                   f'{rect_percent_scr} and a threshold min image percent of {self.min_img_percent}'
                   f'and use threshold is {use_confidence_threshold}')
-        if self.classifier_thresholds[int(lindex)] == -1 or rect_percent_scr < self.min_img_percent:
+        if self.classifier_thresholds[int(lindex)] == -1: # or rect_percent_scr < self.min_img_percent:
             print('returning false, -1 seen')
             return False
         # apply rule 3
