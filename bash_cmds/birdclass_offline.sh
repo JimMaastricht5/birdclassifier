@@ -21,9 +21,9 @@
 
 # Your script logic here
 cd ~/birdclassifier
-# git pull origin dev
+git pull origin dev
 source venv/bin/activate
-python3 /home/pi/birdclassifier/birdclass.py --homedir '/home/pi/birdclassifier/' --thresholds 'USA_WI_coral.ai.inat_bird_threshold.csv' --offline True  --debug False
+python3 /home/pi/birdclassifier/birdclass.py --homedir '/home/pi/birdclassifier/' --thresholds 'USA_WI_coral.ai.inat_bird_threshold.csv' --offline True  --debug True
 
 # clean up
 #cleanup
