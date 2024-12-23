@@ -471,6 +471,7 @@ class DetectClassify:
                   f'{self.classifier_thresholds[int(lindex)]}')  # where was the error in the file?
             print(cresult)  # what was the prediction
             cresult = 0  # cause a false to be returned for this species on an error
+        print('eval cresult')
         return cresult > 0 and cresult >= (float(label_threshold) / 1000) and label_threshold != -1
 
     def get_obj_data(self) -> tuple:
