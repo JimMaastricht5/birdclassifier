@@ -316,7 +316,7 @@ class DetectClassify:
             lresult = str(self.classifier_possible_labels[lindex]).strip()  # grab label,push to string instead of tuple
             cresult = float(output[lindex]) if float(output[lindex]) > 0 else 0
             cresult = cresult - math.floor(cresult) if cresult > 1 else cresult  # ignore whole numbers, keep decimals
-            if self.check_threshold(cresult, lindex, use_confidence_threshold, rect_percent_scr):
+            if self.check_threshold(cresult, lindex, rect_percent_scr, use_confidence_threshold):
                 if cresult > maxcresult:  # if this above threshold and is a better confidence result store it
                     maxcresult = cresult
                     maxlresult = lresult
@@ -428,8 +428,8 @@ class DetectClassify:
         """
         return (self.color_index + from_index) % (len(self.colors) - 1)
 
-    def check_threshold(self, cresult: float, lindex: int, use_confidence_threshold: bool,
-                        rect_percent_scr: float) -> bool:
+    def check_threshold(self, cresult: float, lindex: int, rect_percent_scr: float ,
+                        use_confidence_threshold: bool=False) -> bool:
         """
         checks the predictions confidence against the confidence thresholds to see if the species
         is allowed in this geography or has a custom setting to allow for more or less positives.
@@ -451,7 +451,8 @@ class DetectClassify:
         if self.debug:
             print(f'det_class_label.py check_threshold: confidence {cresult} for label index {lindex}, '
                   f'species threshold is {(self.classifier_thresholds[int(lindex)])} / 1000 with percent of img at'
-                  f'{rect_percent_scr} and a threshold percent of {self.min_img_percent}')
+                  f'{rect_percent_scr} and a threshold percent of {self.min_img_percent}'
+                  f'and use threshold is {use_confidence_threshold}')
         if self.classifier_thresholds[int(lindex)] == -1 or rect_percent_scr < self.min_img_percent:
             return False
         # apply rule 3
@@ -468,7 +469,7 @@ class DetectClassify:
                   f'{self.classifier_thresholds[int(lindex)]}')  # where was the error in the file?
             print(cresult)  # what was the prediction
             cresult = 0  # cause a false to be returned for this species on an error
-        return cresult > 0 and cresult >= (float(label_threshold) / 1000)
+        return cresult > 0 and cresult >= (float(label_threshold) / 1000) and label_threshold != -1
 
     def get_obj_data(self) -> tuple:
         """
