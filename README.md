@@ -29,7 +29,7 @@ That model supports 965 species. I've added some thresholds by species to skip s
    pip3 show picamera2  
    sudo apt install python3-picamera2  
 8. Install other software  
-   (remote control software from windows with RDP): sudo apt install xrdp  
+   (remote control software from windows with RDP): sudo apt install xrdp  Note: remote software will not work with root id, e.g., pi.  create a less privledge id for the remote desktop, e.g., rmdt
 9. Set up the software and the virtual environment for python, note picamera2 is hard to install and is installed globally, so we'll use that instead.  We will also run a camera test that writes out a file to the assets directory
     mkdir birdclassifier  
     git clone https://github.com/JimMaastricht5/birdclassifier.git  
