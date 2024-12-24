@@ -27,7 +27,9 @@
 # this is probably overkill, but it was a good learning exercise
 #
 # Note: the name of the file to send to the cloud would need to change for each feeder to prevent overwriting contents!
-import multiprocessing
+# import multiprocessing
+import queue
+import threading
 import pandas as pd
 from datetime import datetime
 import os
@@ -45,18 +47,18 @@ class WebStream:
     # Date time: string
     # Prediction: string
     # Image_name: string, image name on disk
-    def __init__(self, queue, path: str = os.getcwd(), caller_id: str = "default", run_local: bool = False,
+    def __init__(self, t_queue, path: str = os.getcwd(), caller_id: str = "default", run_local: bool = False,
                  debug: bool = False) -> None:
         """
         set up web stream class, load from csv files to see if this restart was the result of a crash and
         load saved data
-        :param queue: multiprocessing queue to pull messages from
+        :param t_queue: multiprocessing queue to pull messages from
         :param path: str contain os path to working dir, writes out csv file to path to temporarily accumulate data
         :param caller_id: caller identity, can be anything
         :param run_local: stops writing to web, prevents overwriting for testing or running w/o network access
         :param debug: true prints extra messages to console
         """
-        self.queue = queue
+        self.queue = t_queue
         self.path = path + '/assets'
         print(self.path)
         self.df_list = []
@@ -144,20 +146,20 @@ class WebStream:
 
 
 # start of function to prevent memory sharing between processes
-def web_stream_worker(queue, path: str, caller_id: str, run_local: bool, debug: bool) -> None:
-    """
-    This function allows for the setup of the multiprocessing consumer outside the memory of the controller
-    The two processes cannot share memory or access one another directly and this func eliminates that
-    :param queue: multiprocessing queue to communicate back and forth
-    :param path: path for files such as images
-    :param caller_id: name of caller, or the name of the bird feeder
-    :param run_local: true if debugging do not write to cloud, overwrites web activity
-    :param debug: extra print if true
-    :return: none
-    """
-    web_stream = WebStream(queue=queue, path=path, caller_id=caller_id, run_local=run_local, debug=debug)
-    web_stream.request_handler()
-    return
+# def web_stream_worker(queue, path: str, caller_id: str, run_local: bool, debug: bool) -> None:
+#     """
+#     This function allows for the setup of the multiprocessing consumer outside the memory of the controller
+#     The two processes cannot share memory or access one another directly and this func eliminates that
+#     :param queue: multiprocessing queue to communicate back and forth
+#     :param path: path for files such as images
+#     :param caller_id: name of caller, or the name of the bird feeder
+#     :param run_local: true if debugging do not write to cloud, overwrites web activity
+#     :param debug: extra print if true
+#     :return: none
+#     """
+#     web_stream = WebStream(queue=queue, path=path, caller_id=caller_id, run_local=run_local, debug=debug)
+#     web_stream.request_handler()
+#     return
 
 
 class Controller:
@@ -172,11 +174,12 @@ class Controller:
         :param debug: prints extra messages to console if true
         """
         self.path = os.getcwd()
-        self.queue = multiprocessing.Queue()
-        self.web_stream = WebStream(queue=self.queue, caller_id=caller_id)
-        # self.p_web_stream = multiprocessing.Process(target=self.web_stream.request_handler, args=(), daemon=True)
-        self.p_web_stream = multiprocessing.Process(target=web_stream_worker, args=(self.queue, self.path, caller_id,
-                                                                                    run_local, debug), daemon=True)
+        # self.queue = multiprocessing.Queue()
+        self.queue = queue.Queue()
+        self.web_stream = WebStream(t_queue=self.queue, caller_id=caller_id, run_local=run_local, debug=debug)
+        # self.p_web_stream = multiprocessing.Process(target=web_stream_worker, args=(self.queue, self.path, caller_id,
+        #                                                                             run_local, debug), daemon=True)
+        self.t_web_stream = threading.Thread(target=self.web_stream.request_handler, args=(), daemon=True)
         self.last_event_num = 0
         self.id = caller_id  # id name or number of sender
         self.run_local = run_local
@@ -196,7 +199,9 @@ class Controller:
         start the stream, message queue is active
         :return: none
         """
-        self.p_web_stream.start()
+        # self.p_web_stream.start()
+        print('in start_stream')
+        self.t_web_stream.start()
         return
 
     def message(self, message: str, feeder_name: str = '', event_num: int = 0, msg_type: str = 'message',
@@ -253,22 +258,26 @@ class Controller:
         try:
             self.queue.put(None)  # transmit poison pill to stop child process
             # does not seem to be ending correctly ******
-            if self.p_web_stream.is_alive():  # wait for the child process to finish if it is still alive
+            # if self.p_web_stream.is_alive():  # wait for the child process to finish if it is still alive
+            if self.t_web_stream.is_alive():  # wait for the child process to finish if it is still alive
                 print('waiting for web stream to finish processing queue....')
-                self.p_web_stream.join(timeout=30)
+                # self.p_web_stream.join(timeout=30)
+                self.t_web_stream.join(timeout=30)
         except Exception as e:
             print('attempted to end stream and failed')
             print(e)
         finally:
-            print('')
+            print('Stream ended')
         return
 
 
 # test code
 def main():
-    ctl = Controller(caller_id='local testing', run_local=True)
+    ctl = Controller(caller_id='local testing', run_local=True, debug=True)
     ctl.start_stream()
+    print('starting stream')
     ctl.message('up and running')  # place message on queue for child process
+    print('sent up and running msg')
     ctl.message(feeder_name='1SP', event_num=1, msg_type='prediction', message='big fat robin 97.0%',
                 image_name='/home/pi/birdclass/first_img.jpg')
     ctl.message(feeder_name='1SP', event_num=1, msg_type='prediction', message='big fat robin 37.0%',
@@ -278,6 +287,7 @@ def main():
     ctl.message(feeder_name='1SP', event_num=1, msg_type='final_prediction', message='big fat robin 74.0%',
                 image_name='/home/pi/birdclass/birds.gif')
     ctl.occurrences([('Robin', '05/07/2022 14:52:00'), ('Robin', '05/07/2022 15:31:00')])
+    print('finished test code waiting for end stream')
     ctl.end_stream()
 
 
