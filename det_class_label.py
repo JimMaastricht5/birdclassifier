@@ -320,8 +320,8 @@ class DetectClassify:
                 if cresult > maxcresult:  # if this above threshold and is a better confidence result store it
                     maxcresult = cresult
                     maxlresult = lresult
-        # if self.debug:
-        print(f'det_class_label.py classify obj: final answer was {maxcresult} and {maxlresult}')
+        if self.debug:
+            print(f'det_class_label.py classify obj: final answer was {maxcresult} and {maxlresult}')
         return maxcresult, maxlresult  # highest confidence with best match
 
     @staticmethod
