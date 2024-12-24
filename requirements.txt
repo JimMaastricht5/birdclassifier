@@ -4,6 +4,7 @@ Pillow
 pandas
 gpiozero
 # picamera2  # globally installed, hard to install, use global site packages
+# rpicamera
 matplotlib
 scipy
 tflite-runtime
