@@ -243,18 +243,18 @@ class DetectClassify:
         self.classified_labels = []
         max_confidence = 0  # set to zero in case we do n0t get a classification match
         for i, det_confidence in enumerate(self.detected_confidences):  # loop over detected target objects
-            (startX, startY, endX, endY) = self.scale_rect(class_img, self.detected_rects[i])  # set x,y bounding box
-            rect = (startX, startY, endX, endY)
-            rect_percent_scr = ((endX - startX) * (endY - startY)) / self.screen_sq_pixels * 100  # % of screen of img
+            (start_x, start_y, end_x, end_y) = self.scale_rect(class_img, self.detected_rects[i])  # set x,y bound box
+            rect = (start_x, start_y, end_x, end_y)
+            rect_percent_scr = ((end_x - start_x) * (end_y - start_y)) / self.screen_sq_pixels * 100  # % of screen img
             if self.classifier_is_floating_model is True:  # normalize here current model is int so this will not exec
                 class_img = image_proc.normalize(class_img)  # normalize img
 
-            crop_img = class_img.crop((startX, startY, endX, endY))  # extract image for better classification
+            crop_img = class_img.crop((start_x, start_y, end_x, end_y))  # extract image for better classification
             classify_conf, classify_label = self.classify_obj(crop_img, use_confidence_threshold, rect_percent_scr)
 
             adjustedimg = image_proc.enhance(class_img, brightness=self.brightness_chg, contrast=self.contrast_chg,
                                              color=self.color_chg, sharpness=self.sharpness_chg)
-            crop_adjustedimg = adjustedimg.crop((startX, startY, endX, endY))
+            crop_adjustedimg = adjustedimg.crop((start_x, start_y, end_x, end_y))
             classify_conf_adjusted, classify_label_adjusted = (
                 self.classify_obj(crop_adjustedimg, use_confidence_threshold, rect_percent_scr))
 
@@ -290,7 +290,7 @@ class DetectClassify:
         :param class_img: image containing object to classify
         :param use_confidence_threshold: requires probability for species returned to exceed threshold for valid result
         :param rect_percent_scr: percentage of screen bounding box is of the total image
-        :return: tuple containing best confidence result and best label for requested classification
+        :return: a tuple that contains the best confidence result and best label for requested classification
         """
         maxcresult = float(0)  # max confidence aka prediction result from model
         maxlresult = ''  # best label from max confidence
@@ -320,8 +320,8 @@ class DetectClassify:
                 if cresult > maxcresult:  # if this above threshold and is a better confidence result store it
                     maxcresult = cresult
                     maxlresult = lresult
-        # if self.debug:
-        print(f'det_class_label.py classify obj: final answer was {maxcresult} and {maxlresult}')
+        if self.debug:
+            print(f'det_class_label.py classify obj: final answer was {maxcresult} and {maxlresult}')
         return maxcresult, maxlresult  # highest confidence with best match
 
     @staticmethod
@@ -436,7 +436,7 @@ class DetectClassify:
         classifier_thresholds are a percentage * 10 (no decimals) so values range from 0 to 1000.
         we must multiply other values by 1000 to get same scale.
         rules
-        1. threshold cannot be -1 (not present in geo location), returns false
+        1. threshold cannot be -1 (not present in geolocation), returns false
         2. img must take up the specified min % of the image, or it is tossed out, returns false
         3. use_confidence_threshold false results in the function always returning true.  useful for debugging
         4. prediction must be equal or exceed minimum score
@@ -469,7 +469,7 @@ class DetectClassify:
                   f'{self.classifier_thresholds[int(lindex)]}')  # where was the error in the file?
             print(cresult)  # what was the prediction
             cresult = 0  # cause a false to be returned for this species on an error
-        return cresult > 0 and cresult >= (float(label_threshold) / 1000) and label_threshold != -1
+        return cresult > 0 and cresult >= (float(label_threshold) / 1000) and int(label_threshold) != -1
 
     def get_obj_data(self) -> tuple:
         """

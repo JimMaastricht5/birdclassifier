@@ -79,9 +79,9 @@ def bird_detector(args) -> None:
         # note adjustments are used as both a detector second prediction and a final
         # adjustment to the output images.  # 1 no chg,< 1 -, > 1 +
         "-b", "--brightness_chg", type=int, default=1.2, help="brightness boost twilight"
-        "-c", "--contrast_chg", type=float, default=1.0, help="contrast boost")  # 1 no chg,< 1 -, > 1 +
-        "-cl", "--color_chg", type=float, default=1.0, help="color boost")  # 1 no chg,< 1 -, > 1 +
-        "-sp", "--sharpness_chg", type=float, default=1.0, help="sharpness")  # 1 no chg,< 1 -, > 1 +
+        "-c", "--contrast_chg", type=float, default=1.0, help="contrast boost"  # 1 no chg,< 1 -, > 1 +
+        "-cl", "--color_chg", type=float, default=1.0, help="color boost"  # 1 no chg,< 1 -, > 1 +
+        "-sp", "--sharpness_chg", type=float, default=1.0, help="sharpness"  # 1 no chg,< 1 -, > 1 +
 
         # prediction defaults
         "-sc", "--species_confidence", type=float, default=.90, help="species confidence threshold"
