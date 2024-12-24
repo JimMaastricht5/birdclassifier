@@ -11,7 +11,7 @@ That model supports 965 species. I've added some thresholds by species to skip s
 3. Waterproof case if you're going to run it outside.  I'd recommend this.  I drilled a hole in the bottom for the power cable and added a fan for the summer months.  The code does a temp check on the core, and it should shut down if it gets too hot.  If you aren't running it outside you can tape the camera to a window.  https://www.amazon.com/gp/product/B0009NZ4KE/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&th=1&psc=1  
 
 ## Software Set up:
-1. Use the Rasp Pi Imager to create the OS on a mini-sd card  
+1. Use the Rasp Pi Imager to create the OS on a mini-sd card, select the version of rasp pi you are running, e.g., 4 or 5.  select the 64-bit os, and the erase/format option.   
 2. Boot the system and update the software  
      sudo apt upgrade  
      sudo apt update  
@@ -62,7 +62,13 @@ That model supports 965 species. I've added some thresholds by species to skip s
    \# google  
    google_json_key = ''  
 14. Note: what about google GCS contained in the json_key_file???  Need to test empty auth and json file 
-15. [Note: add crontab setup] I have some bash scripts to start the process every day on a schedule.  ??? need to add options for start up sudo crontab -e
+15. I have some bash scripts to start the process every day on a schedule.
+   run crontab -e in a terminal, pick option #1 for the editor unless you have a preference
+   add the two lines below to the bottom of the file
+   0 4 * * *   sudo /sbin/shutdown -r +1 "scheduled reboot 4am" >> /home/pi/birdcl>
+   0 5 * * *  /home/pi/birdclassifier/bash_cmds/birdclass.sh >> /home/pi/birdclass>
+   save the file and exit:  ctrl-o, enter, ctrl-x
+
 
 
 ## Repos
