@@ -49,7 +49,7 @@ class Storage:
         # connect to temp bucket for public send
         self.project = project
         self.offline = offline
-        if self.offline is False:
+        if self.offline:
             self.storage_client = storage.Client.from_service_account_json(json_credentials_path=google_json_key)
             self.bucket = self.storage_client.bucket(bucket_name)
             self.bucket_name = bucket_name
