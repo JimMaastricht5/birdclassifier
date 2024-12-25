@@ -104,6 +104,7 @@ def bird_detector(args) -> None:
     birdpop = population.Census()  # initialize species population census object
     output = output_stream.Controller(caller_id=args.city, debug=args.debug)  # handle terminal and web output
     output.start_stream()  # start streaming to terminal and web
+    print('about to start gcs')
     print(args.offline)
     print(args)
     gcs_storage = gcs.Storage(offline=args.offline)
