@@ -51,14 +51,14 @@ class Storage:
         self.offline = offline
         print(self.offline)
         if self.offline:
-            print('in gcs connect')
-            self.storage_client = storage.Client.from_service_account_json(json_credentials_path=google_json_key)
-            self.bucket = self.storage_client.bucket(bucket_name)
-            self.bucket_name = bucket_name
-        else:
             self.storage_client = None
             self.bucket = None
             self.bucket_name = None
+        else:
+            self.storage_client = storage.Client.from_service_account_json(json_credentials_path=google_json_key)
+            self.bucket = self.storage_client.bucket(bucket_name)
+            self.bucket_name = bucket_name
+
 
     def send_file(self, name: str, file_loc_name: str) -> None:
         """
