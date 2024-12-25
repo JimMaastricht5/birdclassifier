@@ -13,7 +13,7 @@ That model supports 965 species. I've added some thresholds by species to skip s
 ## Software Set up:
 1. Use the Rasp Pi Imager to create the OS on a mini-sd card, select the version of rasp pi you are running, e.g., 4 or 5.  select the 64-bit os, and the erase/format option.   
 2. Boot the system and update the software  
-     sudo apt upgrade  
+     sudo apt-get update  
      sudo apt update  
 3.  Check that the locale, and time are correct in the Pi/Perferences/Raspberry Pi Configuration menu  
 4.  The bookworm version of the OS enables the camera by default.  
@@ -29,8 +29,12 @@ That model supports 965 species. I've added some thresholds by species to skip s
    pip3 show picamera2  
    sudo apt install python3-picamera2  
 8. Install other software  
-   (remote control software from windows with RDP): sudo apt install xrdp  Note: remote software will not work with root id, e.g., pi.  create a less privledge id for the remote desktop, e.g., rmdt
-9. Set up the software and the virtual environment for python, note picamera2 is hard to install and is installed globally, so we'll use that instead.  We will also run a camera test that writes out a file to the assets directory
+   (remote control software from windows with RDP)
+   sudo apt install xrdp
+   Note: remote software will not work with root id at first attemp. create another admin password and the first one will work.
+   sudo adduser [USERNAME]
+   sudo usermod -aG sudo [USERNAME]
+10. Set up the software and the virtual environment for python, note picamera2 is hard to install and is installed globally, so we'll use that instead.  We will also run a camera test that writes out a file to the assets directory
     mkdir birdclassifier  
     git clone https://github.com/JimMaastricht5/birdclassifier.git  
     cd birdclassifier  
@@ -61,7 +65,7 @@ That model supports 965 species. I've added some thresholds by species to skip s
    weather_key = ''  
    \# google  
    google_json_key = ''  
-14. Note: what about google GCS contained in the json_key_file???  Need to test empty auth and json file 
+14. The app will send to a gcs storage bucket.  You can setup your own account with google and save the images there.  Otherwise the code should handle a null key.   
 15. I have some bash scripts to start the process every day on a schedule.
    run crontab -e in a terminal, pick option #1 for the editor unless you have a preference
    add the two lines below to the bottom of the file
