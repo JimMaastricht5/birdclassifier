@@ -38,7 +38,7 @@ def camera_test(args):
                                                  transform=Transform(vflip=args.flipcamera))
     picam2.configure(config)
     picam2.start_preview()
-    picam2.start(Preview.QT)
+    picam2.start(Preview.DRM)
     sleep(args.sleep_time)  # let the camera settle
     metadata = picam2.capture_file(args.directory + '/testcap2.jpg')
     print(metadata)
