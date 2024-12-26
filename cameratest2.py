@@ -32,17 +32,13 @@ def camera_test(args):
     :param args: command line arguments, include screenheight, screenwidth, and flipcamera (vertical)
     :return: Nothing
     """
-    # Ensure DISPLAY environment variable is set
-    if not os.environ.get('DISPLAY'):
-        os.environ['DISPLAY'] = ':0'
-
     picam2 = Picamera2()
 
     config = picam2.create_preview_configuration(main={"size": (args.screenheight, args.screenwidth)},
                                                  transform=Transform(vflip=args.flipcamera))
     picam2.configure(config)
     picam2.start_preview()
-    picam2.start()
+    picam2.start(Preview.QT)
     sleep(args.sleep_time)  # let the camera settle
     metadata = picam2.capture_file(args.directory + '/testcap2.jpg')
     print(metadata)
