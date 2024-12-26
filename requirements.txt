@@ -6,10 +6,11 @@ gpiozero
 # picamera2  # globally installed, hard to install, use global site packages
 # rpicamera
 matplotlib
-scipy
+# scipy
 tflite-runtime
 tweepy
 plotly
 ifcfg
 uuid
 google-cloud-storage
+google-cloud

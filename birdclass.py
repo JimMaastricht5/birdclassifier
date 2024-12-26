@@ -102,12 +102,10 @@ def bird_detector(args) -> None:
     """
     favorite_birds = ['Rose-breasted Grosbeak', 'Red-bellied Woodpecker', 'White-breasted Nuthatch']  # birds to see
     birdpop = population.Census()  # initialize species population census object
-    output = output_stream.Controller(caller_id=args.city, debug=args.debug)  # handle terminal and web output
-    output.start_stream()  # start streaming to terminal and web
-    print('about to start gcs')
-    print(args.offline)
-    print(args)
     gcs_storage = gcs.Storage(offline=args.offline)
+    output = output_stream.Controller(caller_id=args.city, gcs_obj=gcs_storage,
+                                      debug=args.debug)  # handle terminal and web output
+    output.start_stream()  # start streaming to terminal and web
     motioncnt, event_count, last_seed_check_hour, gcs_img_filename, seed_check_gcs_filename = 0, 0, 0, '', ''
     curr_day, curr_hr, last_tweet = (datetime.now().day, datetime.now().hour,
                                      datetime(2021, 1, 1, 0, 0, 0))
