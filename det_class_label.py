@@ -301,8 +301,8 @@ class DetectClassify:
         self.classifier.invoke()  # inference
         output_details = self.classifier.get_output_details()[0]  # get results values as floats .9 = 90%
         output = np.squeeze(self.classifier.get_tensor(output_details['index']))  # remove all 1 dim to get this to list
-        if self.debug:
-            print(f'det_class_label.py classify obj: output was {output}')
+        # if self.debug:
+        #     print(f'det_class_label.py classify obj: output was {output}')
         # If the model is quantized aka tflite uint8 data (not a floating pt model) then de-quantize the results
         if self.classifier_is_floating_model is False:
             scale, zero_point = output_details['quantization']
