@@ -213,7 +213,7 @@ class DetectClassify:
             for index, self.obj_confidence in enumerate(det_confidences[0]):
                 labelidx = int(det_labels_index[0][index])  # get result label index for labels;
                 det_label = self.obj_detector_possible_labels[labelidx]  # grab text from possible labels
-                if self.debug:
+                if self.debug and 'bird' is in det_label:
                     print(f'det_class_label.py detect: for index {index} label is {det_label} '
                           f'with confidence {self.obj_confidence} and threshold is {self.detect_obj_min_confidence}. '
                           f'Target object in {det_label in self.target_objects}')
@@ -301,8 +301,8 @@ class DetectClassify:
         self.classifier.invoke()  # inference
         output_details = self.classifier.get_output_details()[0]  # get results values as floats .9 = 90%
         output = np.squeeze(self.classifier.get_tensor(output_details['index']))  # remove all 1 dim to get this to list
-        # if self.debug:
-        #     print(f'det_class_label.py classify obj: output was {output}')
+        if self.debug:
+            print(f'det_class_label.py classify obj: output was {output}')
         # If the model is quantized aka tflite uint8 data (not a floating pt model) then de-quantize the results
         if self.classifier_is_floating_model is False:
             scale, zero_point = output_details['quantization']
