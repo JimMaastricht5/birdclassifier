@@ -37,7 +37,7 @@ def camera_test(args):
     config = picam2.create_preview_configuration(main={"size": (args.screenheight, args.screenwidth)},
                                                  transform=Transform(vflip=args.flipcamera))
     picam2.configure(config)
-    picam2.start_preview(Preview.DRM)
+    picam2.start_preview(Preview.QT)
     picam2.start()
     sleep(args.sleep_time)  # let the camera settle
     metadata = picam2.capture_file(args.directory + '/testcap2.jpg')
