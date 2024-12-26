@@ -271,6 +271,7 @@ def seed_check(motion_detect, gcs_storage, last_check_hour: int, gcs_filename: s
     """
     if last_check_hour != datetime.now().hour:
         last_check_hour = datetime.now().hour
+        print(f'performing seed check at hour {last_check_hour}')
         seed_check_filename = 'seed_check.jpg'
         _ = motion_detect.capture_image_with_file(seed_check_filename)
         gcs_storage.send_file(name=gcs_filename, file_loc_name=seed_check_filename)
