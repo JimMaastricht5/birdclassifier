@@ -57,7 +57,7 @@ if __name__ == "__main__":
     ap.add_argument("-sh", "--screenheight", type=int, default=480, help="max screen height")
 
     # general app settings
-    ap.add_argument("-st", "--sleep_time", type=int, default=2, help="time to hold preview")
+    ap.add_argument("-st", "--sleep_time", type=int, default=5, help="time to hold preview")
     ap.add_argument("-dr", "--directory", type=str, default="/home/pi/birdclassifier/assets",
                     help="directory to write test file")
 
