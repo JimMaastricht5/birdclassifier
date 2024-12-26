@@ -33,7 +33,7 @@ import threading
 import pandas as pd
 from datetime import datetime
 import os
-import gcs
+# import gcs
 
 
 class WebStream:
@@ -47,13 +47,14 @@ class WebStream:
     # Date time: string
     # Prediction: string
     # Image_name: string, image name on disk
-    def __init__(self, t_queue, path: str = os.getcwd(), caller_id: str = "default", run_local: bool = False,
-                 debug: bool = False) -> None:
+    def __init__(self, t_queue, path: str = os.getcwd(), gcs_obj = None, caller_id: str = "default",
+                 run_local: bool = False, debug: bool = False) -> None:
         """
         set up web stream class, load from csv files to see if this restart was the result of a crash and
         load saved data
         :param t_queue: multiprocessing queue to pull messages from
         :param path: str contain os path to working dir, writes out csv file to path to temporarily accumulate data
+        :param gcs_obj: class to control reading and writing to gcs
         :param caller_id: caller identity, can be anything
         :param run_local: stops writing to web, prevents overwriting for testing or running w/o network access
         :param debug: true prints extra messages to console
@@ -65,7 +66,8 @@ class WebStream:
         self.id = caller_id
         self.run_local = run_local
         self.debug = debug
-        self.storage = gcs.Storage()
+        # self.storage = gcs.Storage()
+        self.storage = gcs_obj
         # recover from crash without losing data.  Load data if present.  Keep if current, delete if yesterday
         try:
             self.df = pd.read_csv(f'{self.path}/webstream.csv')
@@ -166,17 +168,21 @@ class Controller:
     """
     Multiprocessing controller, send messages to WebStream to process when the CPU has a moment
     """
-    def __init__(self, caller_id: str = "default", run_local: bool = False, debug: bool = False) -> None:
+    def __init__(self, caller_id: str = "default", gcs_obj=None, run_local: bool = False,
+                 debug: bool = False) -> None:
         """
         Set up class, uses a dataframe to store the content
         :param caller_id: name of the sender, can be anything, non-unique identifier
+        :param gcs_obj: obj that handles reading and writing to and from gcs
         :param run_local: boolean defaults to false, prevents unintentional send to cloud for contents when testing
         :param debug: prints extra messages to console if true
         """
         self.path = os.getcwd()
         # self.queue = multiprocessing.Queue()
         self.queue = queue.Queue()
-        self.web_stream = WebStream(t_queue=self.queue, caller_id=caller_id, run_local=run_local, debug=debug)
+        self.gcs_obj = gcs_obj
+        self.web_stream = WebStream(t_queue=self.queue, caller_id=caller_id, gcs_obj=gcs_obj,
+                                    run_local=run_local, debug=debug)
         # self.p_web_stream = multiprocessing.Process(target=web_stream_worker, args=(self.queue, self.path, caller_id,
         #                                                                             run_local, debug), daemon=True)
         self.t_web_stream = threading.Thread(target=self.web_stream.request_handler, args=(), daemon=True)

@@ -102,10 +102,11 @@ def bird_detector(args) -> None:
     """
     favorite_birds = ['Rose-breasted Grosbeak', 'Red-bellied Woodpecker', 'White-breasted Nuthatch']  # birds to see
     birdpop = population.Census()  # initialize species population census object
-    output = output_stream.Controller(caller_id=args.city, debug=args.debug)  # handle terminal and web output
-    output.start_stream()  # start streaming to terminal and web
     gcs_storage = gcs.Storage(offline=args.offline)
-    motioncnt, event_count, gcs_img_filename, seed_check_gcs_filename = 0, 0, '', ''
+    output = output_stream.Controller(caller_id=args.city, gcs_obj=gcs_storage,
+                                      debug=args.debug)  # handle terminal and web output
+    output.start_stream()  # start streaming to terminal and web
+    motioncnt, event_count, last_seed_check_hour, gcs_img_filename, seed_check_gcs_filename = 0, 0, 0, '', ''
     curr_day, curr_hr, last_tweet = (datetime.now().day, datetime.now().hour,
                                      datetime(2021, 1, 1, 0, 0, 0))
 
@@ -154,7 +155,9 @@ def bird_detector(args) -> None:
 
     # loop while the sun is up, look for motion, detect birds, determine species
     while cityweather.sunrise.time() < datetime.now().time() < cityweather.sunset.time():
-        chores.hourly_and_daily(filename=seed_check_gcs_filename)  # weather reporting, cpu checks, last img seed check
+        last_seed_check_hour = seed_check(motion_detect=motion_detect, gcs_storage=gcs_storage,
+                                          last_check_hour=last_seed_check_hour, gcs_filename='seed_check.jpg')
+        chores.hourly_and_daily(filename='seed_check.jpg')  # weather reporting, cpu checks, seed check img
         motion_detect.detect()
         if motion_detect.motion:
             motioncnt += 1
@@ -201,7 +204,7 @@ def bird_detector(args) -> None:
                 first_img_jpg = birds.add_boxes_and_labels(label_img=first_img_jpg_no_label, use_last_known=False)
                 first_img_jpg.save(local_img_filename)
                 gcs_storage.send_file(name=gcs_img_filename, file_loc_name=local_img_filename)
-                seed_check_gcs_filename = gcs_img_filename  # reference to use for hourly seed check
+                # seed_check_gcs_filename = gcs_img_filename  # reference to use for hourly seed check
 
                 # process tweets, jpg if not min number of frame, gif otherwise.  wait X min * N bird before tweeting
                 waittime = birdpop.get_single_census_count(bird_gif.best_label) * args.tweetdelay / 10
@@ -257,6 +260,22 @@ def tweet_text(label: Union[list, str], confidence: Union[list, float]) -> str:
         tweet_label = ''
         print(e)
     return tweet_label
+
+def seed_check(motion_detect, gcs_storage, last_check_hour: int, gcs_filename: str) -> int:
+    """
+    :param motion_detect: motion detector object
+    :param gcs_storage: gcs storage object
+    :param last_check_hour: integer representing last hour seed check was performed
+    :param gcs_filename: string containing file name to write to in gcs
+    :return:
+    """
+    if last_check_hour != datetime.now().hour:
+        last_check_hour = datetime.now().hour
+        print(f'performing seed check at hour {last_check_hour}')
+        seed_check_filename = 'seed_check.jpg'
+        _ = motion_detect.capture_image_with_file(seed_check_filename)
+        gcs_storage.send_file(name=gcs_filename, file_loc_name=seed_check_filename)
+    return last_check_hour
 
 
 if __name__ == "__main__":

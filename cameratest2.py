@@ -20,6 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
+import os
 import argparse  # argument parser
 from time import sleep
 from picamera2 import Picamera2, Preview
@@ -36,7 +37,7 @@ def camera_test(args):
     config = picam2.create_preview_configuration(main={"size": (args.screenheight, args.screenwidth)},
                                                  transform=Transform(vflip=args.flipcamera))
     picam2.configure(config)
-    picam2.start_preview(Preview.QT)  # QTGL does not work properly.
+    picam2.start_preview(Preview.QT)
     picam2.start()
     sleep(args.sleep_time)  # let the camera settle
     metadata = picam2.capture_file(args.directory + '/testcap2.jpg')
@@ -56,7 +57,7 @@ if __name__ == "__main__":
     ap.add_argument("-sh", "--screenheight", type=int, default=480, help="max screen height")
 
     # general app settings
-    ap.add_argument("-st", "--sleep_time", type=int, default=2, help="time to hold preview")
+    ap.add_argument("-st", "--sleep_time", type=int, default=5, help="time to hold preview")
     ap.add_argument("-dr", "--directory", type=str, default="/home/pi/birdclassifier/assets",
                     help="directory to write test file")
 

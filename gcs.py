@@ -48,10 +48,17 @@ class Storage:
         """
         # connect to temp bucket for public send
         self.project = project
-        self.storage_client = storage.Client.from_service_account_json(json_credentials_path=google_json_key)
-        self.bucket = self.storage_client.bucket(bucket_name)
-        self.bucket_name = bucket_name
         self.offline = offline
+        print(self.offline)
+        if self.offline:
+            self.storage_client = None
+            self.bucket = None
+            self.bucket_name = None
+        else:
+            self.storage_client = storage.Client.from_service_account_json(json_credentials_path=google_json_key)
+            self.bucket = self.storage_client.bucket(bucket_name)
+            self.bucket_name = bucket_name
+
 
     def send_file(self, name: str, file_loc_name: str) -> None:
         """

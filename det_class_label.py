@@ -213,8 +213,8 @@ class DetectClassify:
             for index, self.obj_confidence in enumerate(det_confidences[0]):
                 labelidx = int(det_labels_index[0][index])  # get result label index for labels;
                 det_label = self.obj_detector_possible_labels[labelidx]  # grab text from possible labels
-                if self.debug:
-                    print(f'det_class_label.py detect object: for index {index} label is {det_label} '
+                if self.debug and 'bird' in det_label:
+                    print(f'det_class_label.py detect: for index {index} label is {det_label} '
                           f'with confidence {self.obj_confidence} and threshold is {self.detect_obj_min_confidence}. '
                           f'Target object in {det_label in self.target_objects}')
                 if self.obj_confidence >= self.detect_obj_min_confidence and \
