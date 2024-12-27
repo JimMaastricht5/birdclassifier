@@ -66,7 +66,6 @@ class WebStream:
         self.id = caller_id
         self.run_local = run_local
         self.debug = debug
-        # self.storage = gcs.Storage()
         self.storage = gcs_obj
         # recover from crash without losing data.  Load data if present.  Keep if current, delete if yesterday
         try:
@@ -117,7 +116,7 @@ class WebStream:
                                            columns=['Feeder Name', 'Event Num', 'Message Type', 'Date Time',
                                                     'Message', 'Image Name'])
                     self.df.to_csv(f'{self.path}/webstream.csv')
-                    if self.run_local is False:  # avoid overwriting web contents
+                    if self.run_local is False and self.storage is not None:  # avoid overwriting web contents when testing
                         self.storage.send_file(name=f'{datetime.now().strftime("%Y-%m-%d")}webstream.csv',
                                                file_loc_name=f'{self.path}/webstream.csv')
                     else:
@@ -128,7 +127,7 @@ class WebStream:
                         self.df_occurrences.insert(0, "Feeder Name", "")
                         self.df_occurrences['Feeder Name'] = self.id
                         self.df_occurrences.to_csv(f'{self.path}/web_occurrences.csv')  # species, date time
-                        if self.run_local is False:  # don't write to cloud when debugging, will mess with website
+                        if self.run_local is False and self.storage is not None:  # don't write to cloud when debugging
                             self.storage.send_file(name=f'{datetime.now().strftime("%Y-%m-%d")}web_occurrences.csv',
                                                    file_loc_name=f'{self.path}/web_occurrences.csv')
                         else:
