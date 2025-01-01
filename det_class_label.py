@@ -455,8 +455,9 @@ class DetectClassify:
         if self.debug:
             print(f'det_class_label.py check_threshold: confidence {cresult} for label index {lindex}, '
                   f'use species boolean is {int((self.classifier_thresholds[int(lindex)])) == -1}.  Threshold is '
-                  f'{(self.classifier_thresholds[int(lindex)])} / 1000 with percent of img at'
-                  f' {rect_percent_scr} and a threshold min image percent of {self.min_img_percent}'
+                  f'{(self.classifier_thresholds[int(lindex)]) / 1000}.'
+                  f' Object percent of img is'
+                  f' {rect_percent_scr} with threshold min of {self.min_img_percent}'
                   f' and use species threshold is {use_confidence_threshold}')
         if int(self.classifier_thresholds[int(lindex)]) == -1 or rect_percent_scr < self.min_img_percent:
             return False
