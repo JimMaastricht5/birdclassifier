@@ -262,7 +262,8 @@ class DetectClassify:
             classify_label = classify_label if classify_conf >= classify_conf_adjusted else classify_label_adjusted
             classify_conf = classify_conf if classify_conf >= classify_conf_adjusted else classify_conf_adjusted
             if self.debug:
-                print(f'cropped image was classified as a {classify_conf} with {classify_label}')
+                print(f'det_class_label.py classify, best image was classified as a'
+                      f' {classify_conf} with {classify_label}')
 
             # if there was a detection print a message and append the label to findings
             if len(classify_label.strip()) > 0 and classify_conf != 0:
