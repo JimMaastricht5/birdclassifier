@@ -216,7 +216,7 @@ class DetectClassify:
                 if self.debug and 'bird' in det_label:
                     print(f'det_class_label.py detect: for index {index} label is {det_label} '
                           f'with confidence {self.obj_confidence} and threshold is {self.detect_obj_min_confidence}. '
-                          f'Target object in {det_label in self.target_objects}')
+                          f'Target object is {det_label in self.target_objects}')
                 if self.obj_confidence >= self.detect_obj_min_confidence and \
                         det_label in self.target_objects:
                     self.target_object_found = True
@@ -261,6 +261,9 @@ class DetectClassify:
             # take the best result between cropped img and adjusted cropped img
             classify_label = classify_label if classify_conf >= classify_conf_adjusted else classify_label_adjusted
             classify_conf = classify_conf if classify_conf >= classify_conf_adjusted else classify_conf_adjusted
+            if self.debug:
+                print(f'cropped image was classified as a {classify_conf} with {classify_label}')
+
             # if there was a detection print a message and append the label to findings
             if len(classify_label.strip()) > 0 and classify_conf != 0:
                 self.output_ctl(message=f'match returned: confidence {classify_conf:.3f}, {classify_label},',
