@@ -353,6 +353,16 @@ class BirdFeederDetector:
         first_img_jpg = self.birds.add_boxes_and_labels(label_img=first_img_jpg_no_label, use_last_known=False)
         first_img_jpg.save(self.local_img_filename)
         self.gcs_storage.send_file(name=gcs_img_filename, file_loc_name=self.local_img_filename)
+
+        # save unlabeled jpg, wrap in try except since this is untested as yet.
+        try:
+            first_img_jpg_no_label.save('raw_' + self.local_img_filename)
+            self.gcs_storage.send_file(name='raw_' + gcs_img_filename + str(first_rects),
+                                       file_loc_name='raw_' + self.local_img_filename)
+        except Exception as e:
+            print(e)
+            print('Error in saving unlabeled jpg')
+            pass
         return
 
     def detect_birds(self) -> None:
