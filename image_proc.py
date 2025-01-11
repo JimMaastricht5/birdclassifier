@@ -74,8 +74,9 @@ def is_sun_reflection_jpg(img: Image.Image, washout_red_threshold: float = .25, 
         bottom_red_avg = np.mean(bottom_half[:, :, 0])
         reflection_b = True if bottom_red_avg > top_red_avg * (1 + washout_red_threshold) else False
         if debug:
-            print(f'top avg red is {top_red_avg}, bottom red avg is {bottom_red_avg} threshold is '
-                  f'{washout_red_threshold} with a limit of {top_red_avg * (1+washout_red_threshold)}')
+            print(f'top of pic avg red is {top_red_avg}, bottom of pic red avg is {bottom_red_avg} threshold is '
+                  f'{washout_red_threshold} with a limit of {top_red_avg * (1+washout_red_threshold)} '
+                  f' washout result is {reflection_b}')
     else:
         if debug:
             print(f'image_proc.py is_sun_reflection got np array with something other than 3 dimensions. '

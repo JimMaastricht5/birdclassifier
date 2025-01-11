@@ -69,6 +69,7 @@ class MotionDetector:
         self.first_gray_img = self.graymotion.copy()
         self.motion = False  # init motion detection boolean
         self.FPS = 0  # calculated frames per second
+        self.motion_count = 0
         print('camera setup completed')
         return
 
@@ -109,22 +110,36 @@ class MotionDetector:
         try:  # trap any camera or image errors gracefully
             self.img = self.capture_image_with_file(filename='capture.jpg')
             self.motion = (self.image_entropy() >= self.min_entropy)  # higher entropy indicates a bird arrival
+            if self.motion:
+                self.motion_count += 1
         except Exception as e:
             self.motion = False
             print(e)
         return self.motion
 
-    def stop(self):
+    def reset_motion_count(self) -> None:
+        """
+        reset motion count
+        :return: none
+        """
+        self.motion_count = 0
+        return
+
+    def stop(self) -> None:
+        """
+        stop camera
+        :return: None
+        """
         self.camera2.close()
         return
 
-    def image_entropy(self):
+    def image_entropy(self) -> int:
         """
         determine change between static image and new frame, creates a gray scale img, applies a blur to get
         contours and compares the result to the first img
         calculates the entropy of the probability distribution.
         Entropy is a measure of randomness or uncertainty. The formula used here is the Shannon entropy formula.
-        :return: bool with true if image has a large enough change
+        :return: int with image change
         """
         grayimg = image_proc.grayscale(self.img)  # convert image to gray scale
         grayblur = image_proc.gaussianblur(grayimg)  # smooth out image for motion detection
