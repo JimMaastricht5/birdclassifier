@@ -356,9 +356,11 @@ class BirdFeederDetector:
 
         # save unlabeled jpg, wrap in try except since this is untested as yet.
         try:
-            first_img_jpg_no_label.save('raw_' + self.local_img_filename)
-            self.gcs_storage.send_file(name='raw_' + gcs_img_filename + str(first_rects),
-                                       file_loc_name='raw_' + self.local_img_filename)
+            raw_file_name = os.getcwd() + '/assets/raw_' + str(self.event_count % 10) + '.jpg'
+            raw_gcs_img_filename = f'{datetime.now().strftime("%Y-%m-%d-%H-%M-%S")}{str(self.event_count)}' \
+                           f'({file_name} {str(first_rects)}).jpg'
+            first_img_jpg_no_label.save(raw_file_name)
+            self.gcs_storage.send_file(name=raw_gcs_img_filename, file_loc_name=raw_file_name)
         except Exception as e:
             print(e)
             print('Error in saving unlabeled jpg')
