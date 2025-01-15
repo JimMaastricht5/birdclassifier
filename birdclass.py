@@ -287,7 +287,7 @@ class BirdFeederDetector:
             self.last_seed_check_hour = datetime.now().hour
             _ = self.motion_detect.capture_image_with_file(self.seed_check_filename)
             self.gcs_storage.send_file(name=self.seed_check_filename,
-                                       file_loc_name=os.getcwd() + '/assets/' + self.seed_check_filename)
+                                       file_loc_name=os.getcwd() + '/assets/' + self.seed_check_filename)  # add path
         return
 
     def process_tweets(self) -> None:
