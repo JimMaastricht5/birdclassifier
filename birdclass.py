@@ -346,20 +346,6 @@ class BirdFeederDetector:
         # create animation: unlabeled first image is passed to gif function, bare copy is annotated later
         _gif = self.bird_gif.build_gif(self.event_count, self.first_img_jpg)
 
-        # annotate bare image copy, use either best gif label or org data
-        best_first_label = (
-            static_functions.convert_to_list(
-                self.bird_gif.best_label if self.bird_gif.best_label != '' else first_label))
-        best_first_conf = (
-            static_functions.convert_to_list(self.bird_gif.best_confidence if self.bird_gif.best_confidence > 0 else
-                                             first_conf))
-        self.bird_first_time_seen = self.birdpop.record_visitor(best_first_label, datetime.now())  # inc species count
-        self.birds.set_ojb_data(classified_rects=first_rects, classified_labels=best_first_label,
-                                classified_confidences=best_first_conf)  # set to first bird
-        first_img_jpg = self.birds.add_boxes_and_labels(label_img=first_img_jpg_no_label, use_last_known=False)
-        first_img_jpg.save(self.local_img_filename)
-        self.gcs_storage.send_file(name=gcs_img_filename, file_loc_name=self.local_img_filename)
-
         # save unlabeled jpg, wrap in try except since this is untested as yet.
         try:
             raw_file_name = os.getcwd() + '/assets/raw_' + str(self.event_count % 10) + '.jpg'
@@ -371,6 +357,17 @@ class BirdFeederDetector:
             print(e)
             print('Error in saving unlabeled jpg')
             pass
+
+        # annotate bare image copy, use either best gif label or org data
+        best_first_label = (static_functions.convert_to_list(self.bird_gif.best_label if self.bird_gif.best_label != '' else first_label))
+        best_first_conf = (static_functions.convert_to_list(self.bird_gif.best_confidence if self.bird_gif.best_confidence > 0 else first_conf))
+        self.bird_first_time_seen = self.birdpop.record_visitor(best_first_label, datetime.now())  # inc species count
+        self.birds.set_ojb_data(classified_rects=first_rects, classified_labels=best_first_label,
+                                classified_confidences=best_first_conf)  # set to first bird
+        first_img_jpg = self.birds.add_boxes_and_labels(label_img=first_img_jpg_no_label, use_last_known=False)
+        first_img_jpg.save(self.local_img_filename)
+        self.gcs_storage.send_file(name=gcs_img_filename, file_loc_name=self.local_img_filename)
+
         return
 
     def detect_birds(self) -> None:
