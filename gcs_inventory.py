@@ -52,7 +52,10 @@ def get_archived_jpg_images(save_file_name: str='archive-jpg-list.csv') -> panda
     for ii, image_name in enumerate(image_list):
         try:
             common_name = insert_spaces_before_capitals(static_functions.common_name(image_name))
-            image_date_time_str = image_name[0:18]  # date time string is in first 19 characters of the files name
+            if image_name.startswith('raw_'):
+                image_date_time_str = image_name[4:23]  # raw jpgs have the date at pos 5 (#4 offset) 
+            else:
+                image_date_time_str = image_name[0:18]  # date time string is in first 19 characters of the files name
             img_date_time = dt.datetime.strptime(image_date_time_str, '%Y-%m-%d-%H-%M-%S')
             image_dict.append({'Number': ii, 'Name': common_name, 'Year': img_date_time.year, 'Month': img_date_time.month,
                               'Day': img_date_time.day, 'Hour': img_date_time.hour, 'DateTime': img_date_time,
@@ -76,8 +79,8 @@ if __name__ == "__main__":
     name_counts = df['Name'].value_counts()
     print(df.columns)
     print('')
-    print(f'Starting date: {df['DateTime'].min()}')
-    print(f'Ending date: {df['DateTime'].max()}')
+    print(f'Starting date: {df["DateTime"].min()}')
+    print(f'Ending date: {df["DateTime"].max()}')
     print(f'Number of Images: \t{df.shape[0]}\n')
     print(f'Possible False Positives: \n{name_counts[name_counts <= 150]}')
     print('')

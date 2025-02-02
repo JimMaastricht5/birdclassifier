@@ -30,10 +30,14 @@ import pandas as pd
 from google.cloud import storage
 from PIL import Image  # Pillow
 from io import BytesIO  # built-in package
-from auth import (
-    google_json_key
-)
-
+try: 
+    from auth import (
+        google_json_key
+    )
+except ModuleNotFoundError:
+    google_json_key = None
+    print('no module auth.py found with key google_json_key for gcs, assuming this is running from within GCP project')
+    pass
 
 class Storage:
     """
@@ -49,13 +53,16 @@ class Storage:
         # connect to temp bucket for public send
         self.project = project
         self.offline = offline
-        print(self.offline)
+        # print(self.offline)
         if self.offline:
             self.storage_client = None
             self.bucket = None
             self.bucket_name = None
         else:
-            self.storage_client = storage.Client.from_service_account_json(json_credentials_path=google_json_key)
+            if google_json_key is None:
+                self.storage_client = storage.Client()  # from within GCP project
+            else:
+                self.storage_client = storage.Client.from_service_account_json(json_credentials_path=google_json_key)  # from feeder
             self.bucket = self.storage_client.bucket(bucket_name)
             self.bucket_name = bucket_name
 
