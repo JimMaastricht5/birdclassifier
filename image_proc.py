@@ -23,6 +23,7 @@
 # collection of image enhancement and processing techniques along with testing code
 # many of the functions that are here are simple wrappers for Pillow functions.  Easier to remember this way
 # from PIL import ImageStat
+import cv2  # in requirements.txt as opencv-contrib-python
 from PIL import ImageEnhance, Image, ImageOps, ImageFilter, ImageChops
 import numpy as np
 import io
@@ -132,8 +133,8 @@ def area(rect: tuple) -> float:
     :return: float with area of rectangle
     """
     # find area of an image, used by overlap area
-    (startX, startY, endX, endY) = rect
-    return abs(endX - startX) * abs(endY - startY)
+    (startx, starty, endx, endy) = rect
+    return abs(endx - startx) * abs(endy - starty)
 
 
 def overlap_area(rect1: tuple, rect2: tuple) -> float:
@@ -145,11 +146,11 @@ def overlap_area(rect1: tuple, rect2: tuple) -> float:
     :return: float containing ratio of overlap 0 to 1.0
     """
     # find the % area in 2 rectangles that overlap
-    (XA1, YA1, XA2, YA2) = rect1
-    (XB1, YB1, XB2, YB2) = rect2
+    (xa1, ya1, xa2, ya2) = rect1
+    (xb1, yb1, xb2, yb2) = rect2
     sa = area(rect1)
     sb = area(rect2)
-    si = max(0, min(XA2, XB2) - max(XA1, XB1)) * max(0, min(YA2, YB2) - max(YA1, YB1))
+    si = max(0, min(xa2, xb2) - max(xa1, xb1)) * max(0, min(ya2, yb2) - max(ya1, yb1))
     su = sa + sb - si
     return si/su
 
@@ -181,14 +182,32 @@ def convert_image(img: Image.Image) -> Image.Image:
 
 def avg_exposure(img: Image.Image) -> float:
     """
-    determine the avg exposure for an image
+    determine the avg exposure for an image or brightness of an image, < 100 is too dark > 150 is washed out
     :param img: jpg
     :return: float with average for entire image
     """
     return float(np.mean(np.array(img)))
 
 
-def normalize(img: Image.Image) -> np.array:
+def focal_quality(img: np.array) -> float:
+    """
+    Measure the blur or focus quality of an image, given a gray scale image as input, anything under 100 is low quality
+    :param img:
+    :return: float with number representing the quality of the image, is in focus?
+    """
+    laplacain_operator = cv2.Laplacian(img, cv2.CV_64F)
+    return laplacain_operator.var()
+
+def contrast_quality(img: np.array) -> float:
+    """
+    measure image contrast, good is between 50 and 100, < 50 lacks detail, >100 losses detail in light and dark areas
+    :param img:
+    :return:
+    """
+    return img.std()
+
+
+def normalize(img: np.array) -> np.array:
     """
     normalize a jpg with values from 0 to 1 by dividing by max value of 255, old code used 127.5 as divisor
     :param img: jpg img
