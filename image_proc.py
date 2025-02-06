@@ -180,7 +180,7 @@ def convert_image(img: Image.Image) -> Image.Image:
     return new_img
 
 
-def avg_exposure(img: Image.Image) -> float:
+def avg_exposure(img: np.array) -> float:
     """
     determine the avg exposure for an image or brightness of an image, < 100 is too dark > 150 is washed out
     :param img: jpg
