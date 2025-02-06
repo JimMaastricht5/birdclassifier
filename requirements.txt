@@ -14,3 +14,4 @@ ifcfg
 uuid
 google-cloud-storage
 google-cloud
+opencv-contrib-python
