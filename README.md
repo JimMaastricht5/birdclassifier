@@ -41,7 +41,7 @@ That model supports 965 species. I've added some thresholds by species to skip s
     ls  
     mkdir assets
     mkdir run  
-    python -m venv venv --system-site-packages
+    python -m venv venv --system-site-packages  
     source venv/bin/activate  
     pip install --upgrade pip  
     pip install -r requirements.txt  
