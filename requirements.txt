@@ -14,4 +14,4 @@ ifcfg
 uuid
 google-cloud-storage
 google-cloud
-opencv-contrib-python
+# opencv-contrib-python  # difficult to install on rasp pi, only required for cloud nb analysis
