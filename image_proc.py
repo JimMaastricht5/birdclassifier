@@ -183,7 +183,7 @@ def convert_image(img: Image.Image) -> Image.Image:
     return new_img
 
 
-def avg_exposure(img: np.array) -> float:
+def avg_exposure(img: Image.Image) -> float:
     """
     determine the avg exposure for an image or brightness of an image, < 100 is too dark > 150 is washed out
     :param img: jpg
@@ -201,13 +201,13 @@ def avg_exposure(img: np.array) -> float:
 #     laplacain_operator = cv2.Laplacian(img, cv2.CV_64F)
 #     return laplacain_operator.var()
 
-def contrast_quality(img: np.array) -> float:
+def contrast_quality(img: Image.Image) -> float:
     """
     measure image contrast, good is between 50 and 100, < 50 lacks detail, >100 losses detail in light and dark areas
     :param img:
     :return:
     """
-    return img.std()
+    return np.array(img).std()
 
 
 def normalize(img: np.array) -> np.array:
