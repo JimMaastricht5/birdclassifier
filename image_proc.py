@@ -22,11 +22,6 @@
 #
 # collection of image enhancement and processing techniques along with testing code
 # many of the functions that are here are simple wrappers for Pillow functions.  Easier to remember this way
-# from PIL import ImageStat
-# try:
-#     import cv2  # in requirements.txt as opencv-contrib-python
-# except:
-#     pass # do not require install on rasp pi, difficult to install; only required for analysis
 from PIL import ImageEnhance, Image, ImageOps, ImageFilter, ImageChops
 import numpy as np
 import io
@@ -192,16 +187,8 @@ def avg_exposure(img: Image.Image) -> float:
     return float(np.mean(np.array(img)))
 
 
-# def focal_quality(img: np.array) -> float:
-#     """
-#     Measure the blur or focus quality of an image, given a gray scale image as input, anything under 100 is low quality
-#     :param img:
-#     :return: float with number representing the quality of the image, is in focus?
-#     """
-#     laplacain_operator = cv2.Laplacian(img, cv2.CV_64F)
-#     return laplacain_operator.var()
 
-def contrast_quality(img: Image.Image) -> float:
+def contrast_quality(img: np.array) -> float:
     """
     measure image contrast, good is between 50 and 100, < 50 lacks detail, >100 losses detail in light and dark areas
     :param img:
