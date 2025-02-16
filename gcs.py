@@ -49,7 +49,7 @@ class Storage:
         # connect to temp bucket for public send
         self.project = project
         self.offline = offline
-        print(self.offline)
+        # print(self.offline)
         if self.offline:
             self.storage_client = None
             self.bucket = None
@@ -115,6 +115,7 @@ class Storage:
         # use prefix= to get folder 'abc/myfolder'
         blob_name_list = []
         for blob in self.storage_client.list_blobs(self.bucket_name, prefix=prefix):
+            # print(blob.name)
             if blob.name.find('.jpg') != -1 or blob.name.find('gif') != -1:  # append images to list
                 blob_name_list.append(blob.name)
         return blob_name_list
@@ -158,6 +159,12 @@ class Storage:
 if __name__ == "__main__":
     web_storage = Storage()
 
+    # test crawling sub directories with get image list
+    nabirds_storage = Storage(bucket_name='nabirds_filtered')
+    nabirds_list = nabirds_storage.get_img_list(prefix='images/')
+    print(nabirds_list)
+
+
     # test dataframe func
     # csv_list = web_storage.get_csv_list()
     # # print(csv_list)
@@ -172,19 +179,19 @@ if __name__ == "__main__":
     # web_storage.send_file(blob_name='test0.jpg', blob_filename='/home/pi/birdclass/0.jpg')
 
     # get list test
-    last_gif_name = ''
-    file_name_list = web_storage.get_img_list()
-    file_name_list.reverse()
-    for file_name in file_name_list:
-        if file_name.find('.gif') != -1:
-            last_gif_name = file_name
-            break
-    print(file_name_list)
-    print(last_gif_name)
-
-    # test retrieval in mem
-    p_image = web_storage.get_img_file(file_name_list[1])
-    p_image.show()
+    # last_gif_name = ''
+    # file_name_list = web_storage.get_img_list()
+    # file_name_list.reverse()
+    # for file_name in file_name_list:
+    #     if file_name.find('.gif') != -1:
+    #         last_gif_name = file_name
+    #         break
+    # print(file_name_list)
+    # print(last_gif_name)
+    #
+    # # test retrieval in mem
+    # p_image = web_storage.get_img_file(file_name_list[1])
+    # p_image.show()
 
     # test retrieval of all images
     # this takes a long time and will likely cost too much
