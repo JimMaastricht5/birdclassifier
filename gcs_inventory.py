@@ -38,6 +38,9 @@ def insert_spaces_before_capitals(text: str) -> str:
     """
     return ("" if not text else re.sub(r"(?<!^)([A-Z])", r" \1", text)).replace('- ', '')
 
+def remove_brackets_and_contents(text):
+    """Removes square brackets and their contents from a string."""
+    return re.sub(r"\[[^\]]*\]", "", text).replace(' ', '')
 
 def get_archived_jpg_images(save_file_name: str='archive-jpg-list.csv') -> pandas.DataFrame:
     """
@@ -51,10 +54,17 @@ def get_archived_jpg_images(save_file_name: str='archive-jpg-list.csv') -> panda
     image_date_time_str = ''
     for ii, image_name in enumerate(image_list):
         try:
-            species_name = insert_spaces_before_capitals(static_functions.common_name(image_name))
-            image_date_time_str = image_name[0:18]  # date time string is in first 19 characters of the files name
+#             species_name = insert_spaces_before_capitals(static_functions.common_name(image_name))
+            if image_name.startswith('raw_'):
+                image_name_raw = image_name[4:]  # drop raw_
+                image_date_time_str = image_name_raw[0:18]  # date time string is in first 19 characters of the files name
+                image_name_raw = remove_brackets_and_contents(image_name_raw)  # remove the bounding box info
+                common_name = insert_spaces_before_capitals(static_functions.common_name(image_name_raw))
+            else:
+                image_date_time_str = image_name[0:18]  # date time string is in first 19 characters of the files name
+                common_name = insert_spaces_before_capitals(static_functions.common_name(image_name))
             img_date_time = dt.datetime.strptime(image_date_time_str, '%Y-%m-%d-%H-%M-%S')
-            image_dict.append({'Number': ii, 'Name': species_name, 'Year': img_date_time.year, 'Month': img_date_time.month,
+            image_dict.append({'Number': ii, 'Name': common_name, 'Year': img_date_time.year, 'Month': img_date_time.month,
                               'Day': img_date_time.day, 'Hour': img_date_time.hour, 'DateTime': img_date_time,
                                'Image Name': image_name})
         except ValueError as e:

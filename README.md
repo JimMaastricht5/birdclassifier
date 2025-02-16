@@ -11,9 +11,9 @@ That model supports 965 species. I've added some thresholds by species to skip s
 3. Waterproof case if you're going to run it outside.  I'd recommend this.  I drilled a hole in the bottom for the power cable and added a fan for the summer months.  The code does a temp check on the core, and it should shut down if it gets too hot.  If you aren't running it outside you can tape the camera to a window.  https://www.amazon.com/gp/product/B0009NZ4KE/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&th=1&psc=1  
 
 ## Software Set up:
-1. Use the Rasp Pi Imager to create the OS on a mini-sd card  
+1. Use the Rasp Pi Imager to create the OS on a mini-sd card, select the version of rasp pi you are running, e.g., 4 or 5.  select the 64-bit os, and the erase/format option.   
 2. Boot the system and update the software  
-     sudo apt upgrade  
+     sudo apt-get update  
      sudo apt update  
 3.  Check that the locale, and time are correct in the Pi/Perferences/Raspberry Pi Configuration menu  
 4.  The bookworm version of the OS enables the camera by default.  
@@ -29,21 +29,28 @@ That model supports 965 species. I've added some thresholds by species to skip s
    pip3 show picamera2  
    sudo apt install python3-picamera2  
 8. Install other software  
-   (remote control software from windows with RDP): sudo apt install xrdp  
-9. Set up the software and the virtual environment for python, note picamera2 is hard to install and is installed globally, so we'll use that instead.  We will also run a camera test that writes out a file to the assets directory
-    mkdir birdclassifier 
-    git clone https://github.com/JimMaastricht5/birdclassifier.git
-    cd birdclassifier
-    ls
+   (remote control software from windows with RDP)
+   sudo apt install xrdp
+   Note: remote software will not work with root id at first attemp. create another admin password and the first one will work.
+   sudo adduser [USERNAME]
+   sudo usermod -aG sudo [USERNAME]
+10. Set up the software and the virtual environment for python, note picamera2 is hard to install and is installed globally, so we'll use that instead.  We will also run a camera test that writes out a file to the assets directory
+    mkdir birdclassifier  
+    git clone https://github.com/JimMaastricht5/birdclassifier.git  
+    cd birdclassifier  
+    ls  
     mkdir assets
-    python -m venv venv --system-site-packages
-    pip install --upgrade pip
-    pip install -r requirements.txt
-    bash /home/pi/birdclassifier/bash_cmds/cameratest2.sh
-    chmod +x bash_cmds/birdclass.sh
-10. [Note: add link here] Set up a developer Twitter account for the bot to broadcast to...  twitter has good directions  
-11. Set up a free account on OpenWeatherMap (http://api.openweathermap.org)cat   
-12. create your auth.py file with the Twitter keys and the open weather key.  
+    mkdir run  
+    python -m venv venv --system-site-packages  
+    source venv/bin/activate  
+    pip install --upgrade pip  
+    pip install -r requirements.txt  
+    bash /home/pi/birdclassifier/bash_cmds/cameratest2.sh  
+    chmod +x bash_cmds/birdclass.sh  
+    chmod +x bash_cmds/birdclass_offline.sh  
+11. [Note: add link here] Set up a developer Twitter account for the bot to broadcast to...  twitter has good directions  
+12. Set up a free account on OpenWeatherMap (http://api.openweathermap.org)cat   
+13. create your auth.py file with the Twitter keys and the open weather key.  
     set a file in the birdclassifier directory and call it auth.py. I would suggest using "nano auth.py"  
     enter the keys from your Twitter account into the file. 
    \# Twitter keys  
@@ -58,8 +65,14 @@ That model supports 965 species. I've added some thresholds by species to skip s
    weather_key = ''  
    \# google  
    google_json_key = ''  
-13. Note: what about google GCS contained in the json_key_file?  
-14. [Note: add crontab setup] I have some bash scripts to start the process every day on a schedule.  
+14. The app will send to a gcs storage bucket.  You can setup your own account with google and save the images there.  Otherwise the code should handle a null key.   
+15. I have some bash scripts to start the process every day on a schedule.
+   run crontab -e in a terminal, pick option #1 for the editor unless you have a preference
+   add the two lines below to the bottom of the file
+   0 4 * * *   sudo /sbin/shutdown -r +1 "scheduled reboot 4am" >> /home/pi/birdcl>
+   0 5 * * *  /home/pi/birdclassifier/bash_cmds/birdclass.sh >> /home/pi/birdclass>
+   save the file and exit:  ctrl-o, enter, ctrl-x
+
 
 
 ## Repos
@@ -69,40 +82,44 @@ The complete project spans several
 3. Data Aggregation: website uses a pre-aggregation by day calculation.  That is done in this cloud function scheduled nightly: https://github.com/JimMaastricht5/cloud_data_aggregation
 
 ## Command Line Arguments
-    "-cf", "--config_file", type=str, help='Config file'
-    ### camera settings
-    "-fc", "--flipcamera", type=bool, default=False, help="flip camera image"
-    "-sw", "--screenwidth", type=int, default=640, help="max screen width"
-    "-sh", "--screenheight", type=int, default=480, help="max screen height"
+     "-cf", "--config_file", type=str, help='Config file'  
+        "-ol", "--offline", type=bool, default=False, help='Operate offline, do not transmit to cloud'  
+        "-db", "--debug", type=bool, default=False, help="debug flag"  
 
-    ### general app settings
-    "-gf", "--minanimatedframes", type=int, default=10, help="minimum number of frames with a bird"
-    "-bb", "--broadcast", type=bool, default=False, help="stream images and text"
-    "-v", "--verbose", type=bool, default=True, help="To tweet extra stuff or not"
-    "-td", "--tweetdelay", type=int, default=1800, help="Wait time between tweets is N species seen * delay/10 with not to exceed max of tweet delay"
+        # camera settings  
+        "-fc", "--flipcamera", type=bool, default=False, help="flip camera image"  
+        "-sw", "--screenwidth", type=int, default=640, help="max screen width"  
+        "-sh", "--screenheight", type=int, default=480, help="max screen height"  
 
-    ### motion and image processing settings,
-    note adjustments are used as both a detector second prediction and a final
-    adjustment to the output images.  # 1 no chg,< 1 -, > 1 +
-    "-b", "--brightness_chg", type=int, default=1.2, help="brightness boost twilight"
-    "-c", "--contrast_chg", type=float, default=1.0, help="contrast boost")  # 1 no chg,< 1 -, > 1 +
-    "-cl", "--color_chg", type=float, default=1.0, help="color boost")  # 1 no chg,< 1 -, > 1 +
-    "-sp", "--sharpness_chg", type=float, default=1.0, help="sharpness")  # 1 no chg,< 1 -, > 1 +
+        # general app settings  
+        "-gf", "--minanimatedframes", type=int, default=10, help="minimum number of frames with a bird"  
+        "-bb", "--broadcast", type=bool, default=False, help="stream images and text"  
+        "-v", "--verbose", type=bool, default=True, help="To tweet extra stuff or not"  
+        "-td", "--tweetdelay", type=int, default=1800  
+            help="Wait time between tweets is N species seen * delay/10 with not to exceed max of tweet delay"  
 
-    ### prediction defaults
-    "-sc", "--species_confidence", type=float, default=.90, help="species confidence threshold"
-    "-bc", "--bird_confidence", type=float, default=.6, help="bird confidence threshold"
-    "-ma", "--minentropy", type=float, default=5.0, help="min change from first img to current to trigger motion"
-    "-ms", "--minimgperc", type=float, default=10.0, help="ignore objects that are less than % of img"
-    "-hd", "--homedir", type=str, default='/home/pi/birdclassifier/', help="home directory for files"
-    "-la", "--labels", type=str, default='coral.ai.inat_bird_labels.txt', help="file for species labels "
-    "-tr", "--thresholds", type=str, default='coral.ai.inat_bird_threshold.csv', help="file for species thresholds"
-    "-cm", "--classifier", type=str, default='coral.ai.mobilenet_v2_1.0_224_inat_bird_quant.tflite', help="model name for species classifier"
+        # motion and image processing settings,  
+        # note adjustments are used as both a detector second prediction and a final  
+        # adjustment to the output images.  # 1 no chg,< 1 -, > 1 +  
+        "-b", "--brightness_chg", type=int, default=1.2, help="brightness boost twilight"  
+        "-c", "--contrast_chg", type=float, default=1.0, help="contrast boost")  # 1 no chg,< 1 -, > 1 +  
+        "-cl", "--color_chg", type=float, default=1.0, help="color boost")  # 1 no chg,< 1 -, > 1 +  
+        "-sp", "--sharpness_chg", type=float, default=1.0, help="sharpness")  # 1 no chg,< 1 -, > 1 +  
 
-    ### feeder defaults
-    "-ct", "--city", type=str, default='Madison,WI,USA', help="city name weather station uses OWM web service."
-    '-fi', "--feeder_id", type=str, default=hex(uuid.getnode()), help='feeder id default MAC address'
-    '-t', "--feeder_max_temp_c", type=int, default=86, help="Max operating temp for the feeder in C" 
+        # prediction defaults  
+        "-sc", "--species_confidence", type=float, default=.90, help="species confidence threshold"  
+        "-bc", "--bird_confidence", type=float, default=.6, help="bird confidence threshold"  
+        "-ma", "--minentropy", type=float, default=5.0, help="min change from first img to current to trigger motion"  
+        "-ms", "--minimgperc", type=float, default=10.0, help="ignore objects that are less than % of img"  
+        "-hd", "--homedir", type=str, default='/home/pi/birdclassifier/', help="home directory for files"  
+        "-la", "--labels", type=str, default='coral.ai.inat_bird_labels.txt', help="file for species labels "  
+        "-tr", "--thresholds", type=str, default='coral.ai.inat_bird_threshold.csv', help="file for species thresholds"  
+        "-cm", "--classifier", type=str, default='coral.ai.mobilenet_v2_1.0_224_inat_bird_quant.tflite',  
+            help="model name for species classifier"  
 
+        # feeder defaults  
+        "-ct", "--city", type=str, default='Madison,WI,USA', help="city name weather station uses OWM web service."  
+        '-fi', "--feeder_id", type=str, default=hex(uuid.getnode()), help='feeder id default MAC address'  
+        '-t', "--feeder_max_temp_c", type=int, default=86, help="Max operating temp for the feeder in C"  
 ## Arguments as a configuration file 
 
