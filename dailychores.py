@@ -78,7 +78,7 @@ class DailyChores:
     # check current cpu temp, print, shutdown if overheated
     def check_cpu_temp(self) -> None:
         """
-        check tem and sleep if too hot
+        check temp and sleep if too hot
         :return: none
         """
         cpu = CPUTemperature()
