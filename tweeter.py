@@ -143,8 +143,10 @@ class TweeterClass:
         if self.tweetcnt < self.tweetmax_per_hour:
             try:
                 media = self.client_v1.media_upload(filename=file_name)
+                print('Media uploaded to twitter....')
                 media_id = media.media_id
                 self.client_v2.create_tweet(text=message, media_ids=[media_id])
+                print('Tweet sent.... ')
                 self.tweetcnt += 1
                 self.tweeted = True
             except Exception as e:

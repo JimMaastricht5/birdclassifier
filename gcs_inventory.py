@@ -54,7 +54,7 @@ def get_archived_jpg_images(save_file_name: str='archive-jpg-list.csv') -> panda
     image_date_time_str = ''
     for ii, image_name in enumerate(image_list):
         try:
-            
+#             species_name = insert_spaces_before_capitals(static_functions.common_name(image_name))
             if image_name.startswith('raw_'):
                 image_name_raw = image_name[4:]  # drop raw_
                 image_date_time_str = image_name_raw[0:18]  # date time string is in first 19 characters of the files name
@@ -76,24 +76,55 @@ def get_archived_jpg_images(save_file_name: str='archive-jpg-list.csv') -> panda
     return df_img
 
 
+def get_nabirds_jpg_images(save_file_name: str='nabirds-jpg-list.csv') -> pandas.DataFrame:
+    """
+    get list of web nabirds jpgs from gcs, put into df, and write csv to output
+    :param save_file_name: string containing the file name
+    :return: pandas.Dataframe
+    """
+    nabirds_storage = gcs.Storage(bucket_name='nabirds_filtered')
+    nabirds_filter_df = nabirds_storage.get_df('filter.txt')
+    nabirds_filter_df['class'] = nabirds_filter_df['class'].astype(int)
+    nabirds_image_list = nabirds_storage.get_img_list(prefix='images/')
+    nabirds_image_dict = []
+    for ii, image_name in enumerate(nabirds_image_list):
+        try:
+            class_id = int(image_name.split('/')[1])  # split into three parts with the middle being the class #
+            species_name = nabirds_filter_df.loc[nabirds_filter_df['class'] == class_id, 'Species'].iloc[0]
+            sex_match = re.search(r'Male|Female', species_name)
+            sex = sex_match.group(0) if sex_match else ''
+            juvi_match = re.search(r'Juvenile', species_name)
+            juvi = juvi_match.group(0) if juvi_match else ''
+            simple_name = re.sub(r"\b(Male|Female Juvenile|Female)\b\s*$", "", species_name, re.IGNORECASE).strip()
+            nabirds_image_dict.append({'Number': ii, 'Class Name': species_name, 'Name': simple_name,
+                                       'Sex': sex, 'Juvenile': juvi,
+                                       'Class': str(class_id), 'Image Name': image_name})
+        except Exception as e:
+            print(f'Value Error {e}')
+            print(f'Image file name: {image_name}')
+    df_nabirds_img = pd.DataFrame(nabirds_image_dict)
+    df_nabirds_img.to_csv(save_file_name, index=False)
+    return df_nabirds_img
+
 if __name__ == "__main__":
-    df_file_name = 'archive-jpg-list.csv'
-    # _ = get_archived_jpg_images(df_file_name)  # .01 per 1000 operations so about $0.80 per run
-    df_raw = pd.read_csv(df_file_name)
-    df_raw['DateTime'] = pd.to_datetime(df_raw['DateTime'], errors='raise')
-    print('Limiting list to 2024 only....')
-    df = df_raw[df_raw['DateTime'].dt.year == 2024].copy() # .copy() avoids warnings about setting values on slice
-    name_counts = df['Name'].value_counts()
-    print(df.columns)
-    print('')
-    print(f'Starting date: {df["DateTime"].min()}')
-    print(f'Ending date: {df["DateTime"].max()}')
-    print(f'Number of Images: \t{df.shape[0]}\n')
-    print(f'Possible False Positives: \n{name_counts[name_counts <= 150]}')
-    print('')
-    print(f'Remaining Species: \n{name_counts[name_counts > 150]}')
+    # df_file_name = 'archive-jpg-list.csv'
+    # # _ = get_archived_jpg_images(df_file_name)  # .01 per 1000 operations so about $0.80 per run
+    # df_raw = pd.read_csv(df_file_name)
+    # df_raw['DateTime'] = pd.to_datetime(df_raw['DateTime'], errors='raise')
+    # print('Limiting list to 2024 only....')
+    # df = df_raw[df_raw['DateTime'].dt.year == 2024].copy() # .copy() avoids warnings about setting values on slice
+    # name_counts = df['Name'].value_counts()
+    # print(df.columns)
+    # print('')
+    # print(f'Starting date: {df["DateTime"].min()}')
+    # print(f'Ending date: {df["DateTime"].max()}')
+    # print(f'Number of Images: \t{df.shape[0]}\n')
+    # print(f'Possible False Positives: \n{name_counts[name_counts <= 150]}')
+    # print('')
+    # print(f'Remaining Species: \n{name_counts[name_counts > 150]}')
 
     # limit to 2024 for full year of analysis
-
+    df = get_nabirds_jpg_images()
+    print(df.to_string())
 
 
