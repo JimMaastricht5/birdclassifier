@@ -150,15 +150,20 @@ class Storage:
                 blob_name_list.append(blob.name)
         return blob_name_list
 
-    def get_df(self, blob_name: str) -> pandas.DataFrame:
+    def get_df(self, blob_name: str, header: int=0, column_names: list=None, delimiter: str = ',') -> pandas.DataFrame:
         """
         load a dataframe from a blob name
         :param blob_name: string containing the name of the file to load
+        :param header: int default is 0 meaning the df has a heading, send none to indicate no heading
+        :param column_names: list containing columns names
         :return: populated dataframe
         """
         blob = self.bucket.blob(blob_name)
         blob_bytes = blob.download_as_bytes()
-        df = pd.read_csv(BytesIO(blob_bytes), header=0)
+        if header == 0:
+            df = pd.read_csv(BytesIO(blob_bytes), header=header, delimiter=delimiter)
+        else:
+            df=pd.read_csv(BytesIO(blob_bytes), header=header, names=column_names, delimiter=delimiter)
         return df
 
 
