@@ -98,13 +98,11 @@ class DetectClassify:
         self.classifier_labels_file = homedir + classifier_labels
         self.classifier_thresholds_file = homedir + classifier_thresholds
         # load the last col in the file only as a set of int values.  900 = .900
-        # genfromtxt may behave differently on the pi than windows
-        # self.classifier_thresholds = np.genfromtxt(self.classifier_thresholds_file, delimiter=',', usecols=[-1])
         self.classifier_thresholds = []
         with open(self.classifier_thresholds_file, 'r', encoding='utf-8') as csvfile:
             csvreader = csv.reader(csvfile)
             for row in csvreader:
-                self.classifier_thresholds.append(row[1])
+                self.classifier_thresholds.append(row[1])  # grabs the second (last) col
 
         self.detector, self.obj_detector_possible_labels, self.detector_is_floating_model = (
             self.init_tf2(self.detector_file, self.detector_labels_file))
@@ -138,16 +136,15 @@ class DetectClassify:
         self.screenwidth = screenwidth
         self.screenheight = screenheight
         self.screen_sq_pixels = screenwidth * screenheight
-        # self.img = Image.fromarray(np.zeros((screenheight, screenwidth, 3), dtype=np.uint8))  # null image
         self.img = Image.new('RGB', (screenwidth, screenheight), color='black')  # null image at startup
         self.debug = debug
-        self.output_class = output_class
+        self.output_class = output_class  # class handles printing and writing to log; default is None
         self.output_function = output_class.message if output_class is not None else None
         return
 
     def init_tf2(self, model_file: str, label_file_name: str) -> tuple:
         """
-        initialize a tensorflow object for inference, attempt lite version first for Rasp PI
+        initialize a tensorflow object for classification, attempt lite version first for Rasp PI
         if not present look for the full version
         :param model_file: name of the model to load for this instance of tensorflow
         :param label_file_name: name of the corresponding labels for the model
@@ -166,7 +163,7 @@ class DetectClassify:
 
     def output_ctl(self, message: str, msg_type: str = '') -> None:
         """
-        functions sole purpose is to allow testing with the print function instead of the web send in the full app
+        functions sole purpose is to allow testing with the print function instead of the web output class in full app
         :param message: message to print, log and/or send to web
         :param msg_type: message type for web processing and log
         :return: None
@@ -189,7 +186,7 @@ class DetectClassify:
 
     def detect(self, detect_img: Image.Image) -> bool:
         """
-        function performs object detection for the target object. Converts the image to a TF format for inference
+        function performs object detection for the target object. Converts the image to a correct format for inference
         :param detect_img: Pillow Img from camera
         :return: true if target object was found in the image, useful for processing in a loop for detected objects
         """
