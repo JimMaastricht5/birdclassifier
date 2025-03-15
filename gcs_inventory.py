@@ -107,24 +107,33 @@ def get_nabirds_jpg_images(save_file_name: str='nabirds-jpg-list.csv') -> pandas
     return df_nabirds_img
 
 if __name__ == "__main__":
-    # df_file_name = 'archive-jpg-list.csv'
-    # # _ = get_archived_jpg_images(df_file_name)  # .01 per 1000 operations so about $0.80 per run
-    # df_raw = pd.read_csv(df_file_name)
-    # df_raw['DateTime'] = pd.to_datetime(df_raw['DateTime'], errors='raise')
-    # print('Limiting list to 2024 only....')
-    # df = df_raw[df_raw['DateTime'].dt.year == 2024].copy() # .copy() avoids warnings about setting values on slice
-    # name_counts = df['Name'].value_counts()
-    # print(df.columns)
-    # print('')
-    # print(f'Starting date: {df["DateTime"].min()}')
-    # print(f'Ending date: {df["DateTime"].max()}')
-    # print(f'Number of Images: \t{df.shape[0]}\n')
+    df_file_name = 'archive-jpg-list-2025.csv'
+    # _ = get_archived_jpg_images(df_file_name)  # .01 per 1000 operations so about $0.80 per run
+    df_raw = pd.read_csv(df_file_name)
+    df_raw['DateTime'] = pd.to_datetime(df_raw['DateTime'], errors='raise')
+    print('Limiting list to 2025 only....')
+    df = df_raw[df_raw['DateTime'].dt.year == 2025].copy() # .copy() avoids warnings about setting values on slice
+    df = df[df['Image Name'].str.startswith('raw_')]  # filter to images with bounding box in name
+
+    print(df.columns)
+    print('')
+    print(f'Starting date: {df["DateTime"].min()}')
+    print(f'Ending date: {df["DateTime"].max()}')
+    print(f'Number of Images: \t{df.shape[0]}\n')
+    print(df.head(10).to_string())
+
+    # sample each name down to 20 or less
+    df = (df.groupby('Name').apply(lambda group: group if len(group) <= 20 else group.sample(n=20)).reset_index(drop=True))
+    name_counts = df['Name'].value_counts()
+    print(name_counts)
+    df.to_csv('archive-jpg-list-2025-sample.csv')
+
     # print(f'Possible False Positives: \n{name_counts[name_counts <= 150]}')
     # print('')
     # print(f'Remaining Species: \n{name_counts[name_counts > 150]}')
 
     # limit to 2024 for full year of analysis
-    df = get_nabirds_jpg_images()
-    print(df.to_string())
+    # df = get_nabirds_jpg_images()
+    # print(df.to_string())
 
 
