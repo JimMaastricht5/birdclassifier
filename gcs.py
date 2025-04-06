@@ -169,12 +169,23 @@ class Storage:
 
 # testing code for this module
 if __name__ == "__main__":
+    # get a list of files from archive for rasp pi perf test
     web_storage = Storage()
+    df = pd.read_csv('archive-jpg-list-2025-sample.csv')
+    blob_name_list = df['Image Name'].tolist()
+    for blob_name in blob_name_list:
+        print(f'Saving image name {blob_name}')
+        p_image = web_storage.get_img_file('archive_jpg_from_birdclassifier/' + blob_name)
+        p_image.save(f'/home/pi/batch_test/{p_image}')
+        break
+
+    # old testing code
+    # web_storage = Storage()
 
     # test crawling sub directories with get image list
-    nabirds_storage = Storage(bucket_name='nabirds_filtered')
-    nabirds_list = nabirds_storage.get_img_list(prefix='images/')
-    print(nabirds_list)
+    # nabirds_storage = Storage(bucket_name='nabirds_filtered')
+    # nabirds_list = nabirds_storage.get_img_list(prefix='images/')
+    # print(nabirds_list)
 
 
     # test dataframe func
@@ -210,6 +221,7 @@ if __name__ == "__main__":
     # for p_image in web_storage.get_all_files(blob_name_list):
     #     pass # just show the last one
     # p_image.show()
-
-    # save file if needed
     # p_image.save("c:/home/pi/getblob.jpg")
+
+
+
