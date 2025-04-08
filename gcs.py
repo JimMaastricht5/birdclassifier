@@ -170,13 +170,14 @@ class Storage:
 # testing code for this module
 if __name__ == "__main__":
     # get a list of files from archive for rasp pi perf test
-    web_storage = Storage()
+    web_storage = Storage(bucket_name='archive_jpg_from_birdclassifier')
     df = pd.read_csv('archive-jpg-list-2025-sample.csv')
     blob_name_list = df['Image Name'].tolist()
     for blob_name in blob_name_list:
+        print(f'Getting image name {blob_name}')
+        p_image = web_storage.get_img_file(blob_name)
         print(f'Saving image name {blob_name}')
-        p_image = web_storage.get_img_file('archive_jpg_from_birdclassifier/' + blob_name)
-        p_image.save(f'/home/pi/batch_test/{p_image}')
+        p_image.save(f'/home/pi/batch_test/{blob_name}')
         break
 
     # old testing code
