@@ -178,7 +178,6 @@ if __name__ == "__main__":
         p_image = web_storage.get_img_file(blob_name)
         print(f'Saving image name {blob_name}')
         p_image.save(f'/home/pi/batch_test/{blob_name}')
-        break
 
     # old testing code
     # web_storage = Storage()
