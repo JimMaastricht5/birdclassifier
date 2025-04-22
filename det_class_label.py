@@ -37,6 +37,8 @@ import image_proc
 import math
 import static_functions
 import csv
+import os
+from datetime import datetime, timedelta
 
 
 # attempt to load tensor flow lite,will fail if not raspberry pi, switch to full tensorflow for windows
@@ -496,24 +498,65 @@ class DetectClassify:
         return
 
 
+def batch_test(batch_home_dir, batch_classifier_model, batch_classifier_labels, batch_classifier_thresholds):
+    """
+    :param batch_home_dir:
+    :param batch_classifier_mode:
+    :param batch_classifier_labels:
+    :param batch_classifier_thresholds:
+    :return:
+    """
+    batch_image_list = []
+    birds = DetectClassify(homedir=batch_home_dir, classifier_model=batch_classifier_model,
+                           classifier_labels=batch_classifier_labels, classifier_thresholds=batch_classifier_thresholds,
+                           classify_object_min_confidence=0.1)
+    for filename in os.listdir(batch_home_dir):
+        if filename.lower().endswith(".jpg") or filename.lower().endswith(".jpeg"):
+            file_path = os.path.join(batch_home_dir, filename)
+            batch_img = Image.open(file_path)
+            batch_image_list.append(batch_img)
+
+    num_of_images = len(batch_image_list)
+    start_time = datetime.now()
+    print(f'Start time: {start_time.strftime("%Y-%m-%d %H:%M:%S")}')
+    for ii, batch_img_name in enumerate(batch_image_list):
+        print(f'Image {ii} of {num_of_images}....')
+        birds.detect(batch_img_name)  # run object detection
+        birds.classify(birds.img, use_confidence_threshold=False)  # classify species
+
+    end_time = datetime.now()
+    print(f'End time: {end_time.strftime("%Y-%m-%d %H:%M:%S")}')
+    time_difference = end_time - start_time
+    total_seconds = time_difference.total_seconds()
+    total_minutes = total_seconds // 60
+    remaining_seconds = total_seconds % 60
+    print(f'Total run time: {int(total_seconds)} seconds ({int(total_minutes)} '
+          f'minutes and {remaining_seconds:.2f} seconds)')
+    return total_seconds, total_minutes
+
+
 if __name__ == '__main__':
-    label = ''
-    debugb = True
-    img_test = Image.open('/home/pi/birdclass/1.jpg')
-    birds = DetectClassify(homedir='c:/Users/jimma/PycharmProjects/birdclassifier/', debug=debugb)
-    birds.detect(img_test)  # run object detection
-
-    print('main testing code: objects detected', birds.detected_confidences)
-    print('main testing code: labels detected', birds.detected_labels)
-    print('main testing code: rectangles', birds.detected_rects)
-
-    birds.classify(birds.img)  # classify species
-    print(f'main testing code: {birds.classified_labels}')
-    if len(birds.classified_labels) == 0:
-        label = "main testing code: no classification text"
-    else:
-        label = birds.classified_labels[0]
-    print(f'main testing code: final label is {label}')
-    img = birds.add_boxes_and_labels(img_test)
-    img.save('imgtest.jpg')
-    img.show()
+    _, _ = batch_test(batch_home_dir='/home/pi/batch_test/',
+                      batch_classifier_model='coral.ai.mobilenet_v2_1.0_224_inat_bird_quant.tflite',
+                      batch_classifier_labels='coral.ai.inat_bird_labels.txt',
+                      batch_classifier_thresholds='coral.ai.inat_bird_threshold.csv')
+    # old testing code
+    # label = ''
+    # img_test = Image.open('/home/pi/birdclass/1.jpg')
+    # birds = DetectClassify(homedir='c:/Users/jimma/PycharmProjects/birdclassifier/', classify_object_min_confidence=0.5)
+    # birds.detect(img_test)  # run object detection
+    #
+    # print('main testing code: objects detected', birds.detected_confidences)
+    # print('main testing code: labels detected', birds.detected_labels)
+    # print('main testing code: rectangles', birds.detected_rects)
+    #
+    # birds.classify(birds.img, use_confidence_threshold=False)  # classify species
+    # print(f'main testing code: {birds.classified_labels}')
+    # if len(birds.classified_labels) == 0:
+    #     label = "main testing code: no classification text"
+    # else:
+    #     label = birds.classified_labels[0]
+    # print(f'main testing code: final label is {label}')
+    # img = birds.add_boxes_and_labels(img_test)
+    # img.save('imgtest.jpg')
+    # img.show()
