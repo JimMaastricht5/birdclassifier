@@ -507,21 +507,25 @@ def batch_test(batch_home_dir, batch_classifier_model, batch_classifier_labels, 
     :return:
     """
     batch_image_list = []
+    batch_image_file_name = []
     birds = DetectClassify(homedir=batch_home_dir, classifier_model=batch_classifier_model,
                            classifier_labels=batch_classifier_labels, classifier_thresholds=batch_classifier_thresholds,
-                           classify_object_min_confidence=0.1)
+                           detect_object_min_confidence= 0.0,
+                           classify_object_min_confidence=0.0)
     for filename in os.listdir(batch_home_dir):
         if filename.lower().endswith(".jpg") or filename.lower().endswith(".jpeg"):
             file_path = os.path.join(batch_home_dir, filename)
             batch_img = Image.open(file_path)
             batch_image_list.append(batch_img)
+            batch_image_file_name.append(filename)
 
     num_of_images = len(batch_image_list)
     start_time = datetime.now()
     print(f'Start time: {start_time.strftime("%Y-%m-%d %H:%M:%S")}')
     for ii, batch_img_name in enumerate(batch_image_list):
-        print(f'Image {ii} of {num_of_images}....')
-        birds.detect(batch_img_name)  # run object detection
+        print(f'Image {ii + 1} of {num_of_images}  {batch_image_file_name[ii]}....')
+        bird_detected = birds.detect(batch_img_name)
+        print(f'Bird detected: {bird_detected}')  # run object detection
         birds.classify(birds.img, use_confidence_threshold=False)  # classify species
 
     end_time = datetime.now()
@@ -536,10 +540,10 @@ def batch_test(batch_home_dir, batch_classifier_model, batch_classifier_labels, 
 
 
 if __name__ == '__main__':
-    _, _ = batch_test(batch_home_dir='/home/pi/batch_test/',
-                      batch_classifier_model='coral.ai.mobilenet_v2_1.0_224_inat_bird_quant.tflite',
-                      batch_classifier_labels='coral.ai.inat_bird_labels.txt',
-                      batch_classifier_thresholds='coral.ai.inat_bird_threshold.csv')
+    _, _ = batch_test(batch_home_dir='/home/pi/twitter_test/',
+                      batch_classifier_model='batch_test.coral.ai.mobilenet_v2_1.0_224_inat_bird_quant.tflite',
+                      batch_classifier_labels='batch_test.coral.ai.inat_bird_labels.txt',
+                      batch_classifier_thresholds='twitter_test.coral.ai.inat_bird_threshold.csv')
     # old testing code
     # label = ''
     # img_test = Image.open('/home/pi/birdclass/1.jpg')

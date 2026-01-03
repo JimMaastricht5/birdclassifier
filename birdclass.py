@@ -197,6 +197,7 @@ class BirdFeederDetector:
         self.local_img_filename = ''
         self.first_img_jpg = None
         self.bird_first_time_seen = False
+        self.runtime_reduction_minutes = 30
         return
 
     def wait_for_sunup(self) -> None:
@@ -210,7 +211,7 @@ class BirdFeederDetector:
             message=f'Now: {datetime.now()}.  \nSunrise: {self.cityweather.sunrise} Sunset: {self.cityweather.sunset}.',
             msg_type='weather', flush=True)
         self.cityweather.wait_until_midnight()  # if after sunset, wait here until after midnight
-        self.cityweather.wait_until_sunrise()  # if before sun rise, wait here
+        self.cityweather.wait_until_sunrise(delta_minutes=self.runtime_reduction_minutes)  # if before sun rise, wait
         return
 
     def setup_camera(self) -> None:
@@ -384,9 +385,10 @@ class BirdFeederDetector:
             self.motion_detect.detect()
 
             # check if day time, is motion, is a bird, and image not overexposed
-            if self.motion_detect.motion and self.birds.detect(detect_img=self.motion_detect.img) and \
-                    self.cityweather.is_dawn() is False and self.cityweather.is_dusk() is False \
-                    and image_proc.is_sun_reflection_jpg(img=self.motion_detect.img, debug=self.args.debug) is False:
+            if (self.motion_detect.motion and self.birds.detect(detect_img=self.motion_detect.img) and
+                    self.cityweather.is_dawn() is False
+                    and self.cityweather.is_dusk(delta_time=-1 * self.runtime_reduction_minutes) is False
+                    and image_proc.is_sun_reflection_jpg(img=self.motion_detect.img, debug=self.args.debug) is False):
                 self.motion_detect.reset_motion_count()  # used for debugging in motion_detect object
                 self.birds.set_colors()  # set new colors for this series of bounding boxes
                 self.event_count += 1  # increment event code for log and messages

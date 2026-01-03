@@ -124,12 +124,12 @@ class CityWeather:
         from_sunrise_min = from_sunrise_min.total_seconds() / 60
         return from_sunrise_min < 60
 
-    def is_dusk(self) -> bool:
+    def is_dusk(self, delta_time: int=0) -> bool:
         """
-        Determine if picture taking should stop
+        Determine if picture taking should stop or be skipped
         :return: True if past sunset
         """
-        from_sunset_min = self.sunset - datetime.now()
+        from_sunset_min = self.sunset - datetime.now() - timedelta(minutes=delta_time)
         from_sunset_min = from_sunset_min.total_seconds() / 60
         return from_sunset_min < 60
 
@@ -157,12 +157,12 @@ class CityWeather:
             self.local_weather()  # reset dates and times for sunrise and sunset for a new day
         return
 
-    def wait_until_sunrise(self) -> None:
+    def wait_until_sunrise(self, delta_minutes: int=0) -> None:
         """
         # wait here until the sun is up before initialize the camera
         :return: None
         """
-        if datetime.now() < self.sunrise:
+        if datetime.now() < self.sunrise + timedelta(minutes=delta_minutes):
             waittime = (self.sunrise - datetime.now()).total_seconds()
             waittime = waittime + 1 if waittime >= 0 else 1  # add a second and check for negative numbers
             print(f'taking a {waittime} second nap to wait for sun rise')
